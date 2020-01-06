@@ -380,7 +380,7 @@ public class ECDSARoundTripTest extends TestCase {
 	}
 	
 	
-	public void testES256KwithGen()
+	public void testES256KWithGen()
 		throws Exception {
 		
 		// Generate EC key pair on the secp256k1 curve
