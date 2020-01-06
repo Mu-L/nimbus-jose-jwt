@@ -27,12 +27,15 @@ import java.security.spec.*;
 import java.util.Collections;
 import java.util.HashSet;
 
+import junit.framework.TestCase;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.KeyUse;
+import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import junit.framework.TestCase;
 
 
 /**
@@ -377,29 +380,36 @@ public class ECDSARoundTripTest extends TestCase {
 	}
 	
 	
-	public void testES256KWithGen()
+	public void testES256KwithGen()
 		throws Exception {
 		
-		KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
-		gen.initialize(Curve.SECP256K1.toECParameterSpec());
-		KeyPair kp = gen.generateKeyPair();
+		// Generate EC key pair on the secp256k1 curve
+		ECKey ecJWK = new ECKeyGenerator(Curve.SECP256K1)
+			.keyUse(KeyUse.SIGNATURE)
+			.keyID("123")
+			.generate();
 		
-		ECPublicKey publicKey = (ECPublicKey)kp.getPublic();
-		ECPrivateKey privateKey = (ECPrivateKey)kp.getPrivate();
+		ECKey ecPublicJWK = ecJWK.toPublicJWK();
 		
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
 			.subject("alice")
 			.build();
 		
-		SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.ES256K), claimsSet);
+		SignedJWT jwt = new SignedJWT(
+			new JWSHeader.Builder(JWSAlgorithm.ES256K)
+				.keyID(ecJWK.getKeyID())
+				.build(),
+			claimsSet);
 		
-		jwt.sign(new ECDSASigner(privateKey));
+		jwt.sign(new ECDSASigner(ecJWK));
 		
 		String out = jwt.serialize();
 		
+//		System.out.println(out);
+		
 		jwt = SignedJWT.parse(out);
 		
-		assertTrue(jwt.verify(new ECDSAVerifier(publicKey)));
+		assertTrue(jwt.verify(new ECDSAVerifier(ecPublicJWK)));
 		
 		assertEquals("alice", jwt.getJWTClaimsSet().getSubject());
 	}
