@@ -349,7 +349,7 @@ final class Base64Codec {
 		final int sLen = srcBytes.length;
 
 		// Calculate output length assuming zero bytes are padding or separators
-		final int maxOutputLen = sLen * 6 >> 3;
+		final int maxOutputLen = checkedCast((long)sLen * 6 >> 3);
 
 		// Allocate output array (may be too large)
 		final byte[] dstBytes = new byte[maxOutputLen];
@@ -389,5 +389,14 @@ final class Base64Codec {
 
 		// Copy dstBytes to new array of proper size
 		return Arrays.copyOf(dstBytes, d);
+	}
+
+	private static int checkedCast(long value) {
+		int result = (int) value;
+		if (result != value) {
+			throw new IllegalArgumentException(value +
+					" cannot be cast to int without changing its value.");
+		}
+		return result;
 	}
 }
