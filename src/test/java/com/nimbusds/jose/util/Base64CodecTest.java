@@ -22,7 +22,7 @@ import java.nio.charset.Charset;
 
 import com.nimbusds.jose.util.Base64Codec;
 import junit.framework.TestCase;
-
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Tests the base 64 codec.
@@ -158,6 +158,9 @@ public class Base64CodecTest extends TestCase {
 		assertEquals("foobar", new String(Base64Codec.decode("Zm9vYmFy"), Charset.forName("utf-8")));
 	}
 
+	public void testDecodeLargeString() {
+		Base64Codec.decode(StringUtils.repeat(" ", Integer.MAX_VALUE / 4));
+	}
 
 	public void testDecodeWithIllegalChars() {
 
