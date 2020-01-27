@@ -28,7 +28,7 @@ import java.security.cert.*;
  *  X.509 certificate utilities.
  *
  *  @author Vladimir Dzhuvinov
- *  @version 2018-07-24
+ *  @version 2020-01-27
  */
 public class X509CertUtils {
 
@@ -36,13 +36,13 @@ public class X509CertUtils {
 	/**
 	 * The PEM start marker.
 	 */
-	private static final String PEM_BEGIN_MARKER = "-----BEGIN CERTIFICATE-----";
+	public static final String PEM_BEGIN_MARKER = "-----BEGIN CERTIFICATE-----";
 
 
 	/**
 	 * The PEM end marker.
 	 */
-	private static final String PEM_END_MARKER = "-----END CERTIFICATE-----";
+	public static final String PEM_END_MARKER = "-----END CERTIFICATE-----";
 
 
 	/**

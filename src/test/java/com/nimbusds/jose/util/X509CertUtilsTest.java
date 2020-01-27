@@ -259,4 +259,11 @@ public class X509CertUtilsTest extends TestCase {
 		assertEquals(-1, pemString.indexOf("\n"));
 		assertEquals(cert.getSubjectDN(), X509CertUtils.parse(pemString).getSubjectDN());
 	}
+	
+	
+	public void testMarkerConstants() {
+		
+		assertEquals("-----BEGIN CERTIFICATE-----", X509CertUtils.PEM_BEGIN_MARKER);
+		assertEquals("-----END CERTIFICATE-----", X509CertUtils.PEM_END_MARKER);
+	}
 }
