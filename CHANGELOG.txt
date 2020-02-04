@@ -1077,3 +1077,7 @@ version 8.4.1 (2020-01-25)
 
 version 8.5 (2020-01-27)
     * Makes X509CertUtils.PEM_BEGIN_MARKER and PEM_END_MARKER constants public.
+
+version 8.5.1 (2020-02-04)
+    * Removes redundant PEM parsing in JWK.parseFromPEMEncodedObjects (iss
+      #344).
