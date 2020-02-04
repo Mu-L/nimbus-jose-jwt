@@ -1081,3 +1081,6 @@ version 8.5 (2020-01-27)
 version 8.5.1 (2020-02-04)
     * Removes redundant PEM parsing in JWK.parseFromPEMEncodedObjects (iss
       #344).
+    * Removes parsedX5c from JWK.equals and JWK.hashCode calculation because
+      it's redundant (iss #346).
+

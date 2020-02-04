@@ -74,7 +74,7 @@ import com.nimbusds.jose.util.*;
  * @author Vladimir Dzhuvinov
  * @author Justin Richer
  * @author Stefan Larsson
- * @version 2019-04-15
+ * @version 2020-02-04
  */
 public abstract class JWK implements JSONAware, Serializable {
 
@@ -834,13 +834,12 @@ public abstract class JWK implements JSONAware, Serializable {
 				Objects.equals(x5t, jwk.x5t) &&
 				Objects.equals(x5t256, jwk.x5t256) &&
 				Objects.equals(x5c, jwk.x5c) &&
-				Objects.equals(parsedX5c, jwk.parsedX5c) &&
 				Objects.equals(keyStore, jwk.keyStore);
 	}
 
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(kty, use, ops, alg, kid, x5u, x5t, x5t256, x5c, parsedX5c, keyStore);
+		return Objects.hash(kty, use, ops, alg, kid, x5u, x5t, x5t256, x5c, keyStore);
 	}
 }
