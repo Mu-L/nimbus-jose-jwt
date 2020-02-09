@@ -74,7 +74,7 @@ import com.nimbusds.jose.util.*;
  * @author Vladimir Dzhuvinov
  * @author Justin Richer
  * @author Stefan Larsson
- * @version 2020-02-04
+ * @version 2020-02-09
  */
 public abstract class JWK implements JSONAware, Serializable {
 
@@ -433,6 +433,46 @@ public abstract class JWK implements JSONAware, Serializable {
 	 * @return The JWK size, in bits.
 	 */
 	public abstract int size();
+	
+	
+	/**
+	 * Casts this JWK to an RSA JWK.
+	 *
+	 * @return The RSA JWK.
+	 */
+	public RSAKey toRSAKey() {
+		return (RSAKey)this;
+	}
+	
+	
+	/**
+	 * Casts this JWK to an EC JWK.
+	 *
+	 * @return The EC JWK.
+	 */
+	public ECKey toECKey() {
+		return (ECKey)this;
+	}
+	
+	
+	/**
+	 * Casts this JWK to an octet sequence JWK.
+	 *
+	 * @return The octet sequence JWK.
+	 */
+	public OctetSequenceKey toOctetSequenceKey() {
+		return (OctetSequenceKey)this;
+	}
+	
+	
+	/**
+	 * Casts this JWK to an octet key pair JWK.
+	 *
+	 * @return The octet key pair JWK.
+	 */
+	public OctetKeyPair toOctetKeyPair() {
+		return (OctetKeyPair)this;
+	}
 
 
 	/**

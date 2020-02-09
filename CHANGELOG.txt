@@ -1084,3 +1084,6 @@ version 8.5.1 (2020-02-04)
     * Removes parsedX5c from JWK.equals and JWK.hashCode calculation because
       it's redundant (iss #346).
 
+version 8.6 (2020-02-09)
+    * Adds JWK toRSAKey, toECKey, toOctetSequenceKey and toOctetKeyPair cast
+      methods.

@@ -37,6 +37,10 @@ import javax.crypto.SecretKey;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
+import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
+import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.util.IOUtils;
 import com.nimbusds.jose.util.X509CertUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -54,7 +58,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
  * Tests the base JWK class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-10-15
+ * @version 2020-02-10
  */
 public class JWKTest extends TestCase {
 	
@@ -432,5 +436,26 @@ public class JWKTest extends TestCase {
 		} catch (JOSEException e) {
 			assertEquals("Missing PEM-encoded public key to construct JWK", e.getMessage());
 		}
+	}
+	
+	
+	public void testCastMethods()
+		throws Exception {
+		
+		JWK jwk = new RSAKeyGenerator(2048).generate();
+		RSAKey rsaKey = jwk.toRSAKey();
+		assertEquals(jwk, rsaKey);
+		
+		jwk = new ECKeyGenerator(Curve.P_256).generate();
+		ECKey ecKey = jwk.toECKey();
+		assertEquals(jwk, ecKey);
+		
+		jwk = new OctetSequenceKeyGenerator(128).generate();
+		OctetSequenceKey oct = jwk.toOctetSequenceKey();
+		assertEquals(jwk, oct);
+		
+		jwk = new OctetKeyPairGenerator(Curve.Ed25519).generate();
+		OctetKeyPair okp = jwk.toOctetKeyPair();
+		assertEquals(jwk, okp);
 	}
 }
