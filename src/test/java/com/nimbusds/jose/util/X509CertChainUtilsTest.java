@@ -20,13 +20,20 @@ package com.nimbusds.jose.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
+import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
+
+import junit.framework.TestCase;
 
 import com.nimbusds.jose.jwk.SampleCertificates;
-import junit.framework.TestCase;
 
 
 public class X509CertChainUtilsTest extends TestCase {
@@ -80,5 +87,31 @@ public class X509CertChainUtilsTest extends TestCase {
 		assertEquals("CN=Amazon Root CA 1, O=Amazon, C=US", certChain.get(2).getSubjectDN().getName());
 		
 		assertEquals(3, certChain.size());
+	}
+	
+	
+	public void testStore() throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException {
+		
+		File file = new File("src/test/resources/sample-cert-chains/c2id-net-chain.pem");
+		List<X509Certificate> certChain = X509CertChainUtils.parse(file);
+		
+		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+		keyStore.load(null, "secretpassword".toCharArray());
+		
+		X509CertChainUtils.store(keyStore, certChain);
+		
+		List<String> subjects = new LinkedList<>();
+		
+		for (Enumeration<String> aliases = keyStore.aliases(); aliases.hasMoreElements(); ) {
+			String alias = aliases.nextElement();
+			UUID.fromString(alias);
+			subjects.add(((X509Certificate)keyStore.getCertificate(alias)).getSubjectDN().getName());
+		}
+		
+		assertEquals(3, subjects.size());
+		
+		assertTrue(subjects.contains("CN=c2id.net"));
+		assertTrue(subjects.contains("CN=Amazon, OU=Server CA 1B, O=Amazon, C=US"));
+		assertTrue(subjects.contains("CN=Amazon Root CA 1, O=Amazon, C=US"));
 	}
 }

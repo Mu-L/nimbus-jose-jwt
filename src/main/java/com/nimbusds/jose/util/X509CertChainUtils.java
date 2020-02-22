@@ -24,11 +24,14 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import net.minidev.json.JSONArray;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -121,7 +124,7 @@ public class X509CertChainUtils {
 	/**
 	 * Parses a X.509 certificate chain from the specified PEM-encoded
 	 * representation. PEM-encoded objects that are not X.509 certificates
-	 * are ignored.
+	 * are ignored. Requires BouncyCastle.
 	 *
 	 * @param pemFile The PEM-encoded X.509 certificate chain file. Must
 	 *                not be {@code null}.
@@ -143,7 +146,7 @@ public class X509CertChainUtils {
 	/**
 	 * Parses a X.509 certificate chain from the specified PEM-encoded
 	 * representation. PEM-encoded objects that are not X.509 certificates
-	 * are ignored.
+	 * are ignored. Requires BouncyCastle.
 	 *
 	 * @param pemString The PEM-encoded X.509 certificate chain. Must not
 	 *                  be {@code null}.
@@ -177,6 +180,27 @@ public class X509CertChainUtils {
 		} while (pemObject != null);
 		
 		return certChain;
+	}
+	
+	
+	/**
+	 * Stores a X.509 certificate chain into the specified Java trust (key)
+	 * store. The name (alias) for each certificate in the store is a
+	 * generated UUID.
+	 *
+	 * @param trustStore The trust (key) store. Must be initialised and not
+	 *                   {@code null}.
+	 * @param certChain  The X.509 certificate chain. Must not be
+	 *                   {@code null}.
+	 *
+	 * @throws KeyStoreException On a key store exception.
+	 */
+	public static void store(final KeyStore trustStore, final List<X509Certificate> certChain)
+		throws KeyStoreException {
+		
+		for (X509Certificate cert: certChain) {
+			trustStore.setCertificateEntry(UUID.randomUUID().toString(), cert);
+		}
 	}
 
 	
