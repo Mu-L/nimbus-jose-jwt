@@ -18,19 +18,28 @@
 package com.nimbusds.jose.util;
 
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.minidev.json.JSONArray;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.openssl.PEMParser;
 
 
 /**
  * X.509 certificate chain utilities.
  *
  * @author Vladimir Dzhuvinov
- * @version 2018-02-27
+ * @version 2020-02-22
  */
 public class X509CertChainUtils {
 
@@ -106,6 +115,68 @@ public class X509CertChainUtils {
 		}
 		
 		return out;
+	}
+	
+	
+	/**
+	 * Parses a X.509 certificate chain from the specified PEM-encoded
+	 * representation. PEM-encoded objects that are not X.509 certificates
+	 * are ignored.
+	 *
+	 * @param pemFile The PEM-encoded X.509 certificate chain file. Must
+	 *                not be {@code null}.
+	 *
+	 * @return The X.509 certificate chain, empty list if no certificates
+	 *         are found.
+	 *
+	 * @throws IOException          On I/O exception.
+	 * @throws CertificateException On a certificate exception.
+	 */
+	public static List<X509Certificate> parse(final File pemFile)
+		throws IOException, CertificateException {
+		
+		final String pemString = new String(Files.readAllBytes(pemFile.toPath()), StandardCharsets.UTF_8);
+		return parse(pemString);
+	}
+	
+	
+	/**
+	 * Parses a X.509 certificate chain from the specified PEM-encoded
+	 * representation. PEM-encoded objects that are not X.509 certificates
+	 * are ignored.
+	 *
+	 * @param pemString The PEM-encoded X.509 certificate chain. Must not
+	 *                  be {@code null}.
+	 *
+	 * @return The X.509 certificate chain, empty list if no certificates
+	 *         are found.
+	 *
+	 * @throws IOException          On I/O exception.
+	 * @throws CertificateException On a certificate exception.
+	 */
+	public static List<X509Certificate> parse(final String pemString)
+		throws IOException, CertificateException {
+		
+		final Reader pemReader = new StringReader(pemString);
+		final PEMParser parser = new PEMParser(pemReader);
+		
+		List<X509Certificate> certChain = new LinkedList<>();
+		
+		Object pemObject;
+		do {
+			pemObject = parser.readObject();
+			
+			if (pemObject instanceof X509CertificateHolder) {
+				
+				X509CertificateHolder certHolder = (X509CertificateHolder)pemObject;
+				byte[] derEncodedCert = certHolder.getEncoded();
+				certChain.add(X509CertUtils.parseWithException(derEncodedCert));
+				
+			}
+			
+		} while (pemObject != null);
+		
+		return certChain;
 	}
 
 	

@@ -18,6 +18,9 @@
 package com.nimbusds.jose.util;
 
 
+import java.io.File;
+import java.io.IOException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.List;
@@ -64,5 +67,18 @@ public class X509CertChainUtilsTest extends TestCase {
 		assertEquals(2352, ByteUtils.bitLength(chain.get(0).getPublicKey().getEncoded()));
 		assertEquals(2352, ByteUtils.bitLength(chain.get(1).getPublicKey().getEncoded()));
 		assertEquals(2352, ByteUtils.bitLength(chain.get(2).getPublicKey().getEncoded()));
+	}
+	
+	
+	public void testParseChainFromFile() throws IOException, CertificateException {
+		
+		File file = new File("src/test/resources/sample-cert-chains/c2id-net-chain.pem");
+		List<X509Certificate> certChain = X509CertChainUtils.parse(file);
+		
+		assertEquals("CN=c2id.net", certChain.get(0).getSubjectDN().getName());
+		assertEquals("CN=Amazon, OU=Server CA 1B, O=Amazon, C=US", certChain.get(1).getSubjectDN().getName());
+		assertEquals("CN=Amazon Root CA 1, O=Amazon, C=US", certChain.get(2).getSubjectDN().getName());
+		
+		assertEquals(3, certChain.size());
 	}
 }
