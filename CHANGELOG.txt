@@ -1090,3 +1090,4 @@ version 8.6 (2020-02-09)
 
 version 8.6 (2020-02-22)
     * Adds new X509CertChainUtils.parse(String) and parse(File) methods.
+    * Adds new X509CertChainUtils.store(KeyStore,List<X509Certificate>) method.
