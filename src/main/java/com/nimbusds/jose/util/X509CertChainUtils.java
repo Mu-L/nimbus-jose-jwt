@@ -193,14 +193,22 @@ public class X509CertChainUtils {
 	 * @param certChain  The X.509 certificate chain. Must not be
 	 *                   {@code null}.
 	 *
+	 * @return The UUIDs for the stored entry.
+	 *
 	 * @throws KeyStoreException On a key store exception.
 	 */
-	public static void store(final KeyStore trustStore, final List<X509Certificate> certChain)
+	public static List<UUID> store(final KeyStore trustStore, final List<X509Certificate> certChain)
 		throws KeyStoreException {
 		
+		List<UUID> aliases = new LinkedList<>();
+		
 		for (X509Certificate cert: certChain) {
-			trustStore.setCertificateEntry(UUID.randomUUID().toString(), cert);
+			UUID alias = UUID.randomUUID();
+			trustStore.setCertificateEntry(alias.toString(), cert);
+			aliases.add(alias);
 		}
+		
+		return aliases;
 	}
 
 	

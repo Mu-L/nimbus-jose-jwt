@@ -98,13 +98,13 @@ public class X509CertChainUtilsTest extends TestCase {
 		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 		keyStore.load(null, "secretpassword".toCharArray());
 		
-		X509CertChainUtils.store(keyStore, certChain);
+		List<UUID> aliases = X509CertChainUtils.store(keyStore, certChain);
 		
 		List<String> subjects = new LinkedList<>();
 		
-		for (Enumeration<String> aliases = keyStore.aliases(); aliases.hasMoreElements(); ) {
-			String alias = aliases.nextElement();
-			UUID.fromString(alias);
+		for (Enumeration<String> entryAliases = keyStore.aliases(); entryAliases.hasMoreElements(); ) {
+			String alias = entryAliases.nextElement();
+			assertTrue(aliases.contains(UUID.fromString(alias)));
 			subjects.add(((X509Certificate)keyStore.getCertificate(alias)).getSubjectDN().getName());
 		}
 		
