@@ -26,9 +26,26 @@ import java.nio.charset.Charset;
  * Input / output utilities.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-11-07
+ * @version 2020-02-23
  */
 public class IOUtils {
+	
+	
+	/**
+	 * Reads the specified input stream into a string using UTF-8 character
+	 * set encoding.
+	 *
+	 * @param stream The input stream. Must not be {@code null}.
+	 *
+	 * @return The string.
+	 *
+	 * @throws IOException If an input exception is encountered.
+	 */
+	public static String readInputStreamToString(final InputStream stream)
+		throws IOException {
+		
+		return readInputStreamToString(stream, StandardCharset.UTF_8);
+	}
 	
 	
 	/**
@@ -60,6 +77,23 @@ public class IOUtils {
 		} finally {
 			in.close();
 		}
+	}
+	
+	
+	/**
+	 * Reads the content of the specified file into a string using UTF-8
+	 * character set encoding.
+	 *
+	 * @param file The file. Must not be {@code null}.
+	 *
+	 * @return The string.
+	 *
+	 * @throws IOException If an input exception is encountered.
+	 */
+	public static String readFileToString(final File file)
+		throws IOException {
+		
+		return readInputStreamToString(new FileInputStream(file));
 	}
 	
 	

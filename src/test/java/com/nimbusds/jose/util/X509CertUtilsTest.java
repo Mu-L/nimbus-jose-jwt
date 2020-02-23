@@ -307,11 +307,11 @@ public class X509CertUtilsTest extends TestCase {
 	
 	public void testStore_withPassword() throws Exception {
 		
-		JWK jwk = JWK.parseFromPEMEncodedObjects(IOUtils.readFileToString(new File("src/test/resources/sample-pem-encoded-objects/ecprivkey.pem"), StandardCharset.UTF_8));
+		JWK jwk = JWK.parseFromPEMEncodedObjects(IOUtils.readFileToString(new File("src/test/resources/sample-pem-encoded-objects/ecprivkey.pem")));
 		assertTrue(jwk instanceof ECKey);
 		ECKey ecJWK = (ECKey)jwk;
 		
-		X509Certificate cert = X509CertUtils.parse(IOUtils.readFileToString(new File("src/test/resources/sample-pem-encoded-objects/eccert.pem"), StandardCharset.UTF_8));
+		X509Certificate cert = X509CertUtils.parse(IOUtils.readFileToString(new File("src/test/resources/sample-pem-encoded-objects/eccert.pem")));
 		
 		Assert.assertArrayEquals(ecJWK.toECPublicKey().getEncoded(), cert.getPublicKey().getEncoded());
 		

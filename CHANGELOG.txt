@@ -1095,3 +1095,5 @@ version 8.7 (2020-02-22)
 version 8.8 (2020-02-23)
     * Adds new X509CertUtils.store method for storing private key / X.509
       certificates pairs in a Java KeyStore.
+    * Adds new short-hand IOUtils.readInputStreamToString and readFileToString
+      methods using UTF-8 encoding.
