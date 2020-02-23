@@ -1091,3 +1091,7 @@ version 8.6 (2020-02-09)
 version 8.7 (2020-02-22)
     * Adds new X509CertChainUtils.parse(String) and parse(File) methods.
     * Adds new X509CertChainUtils.store(KeyStore,List<X509Certificate>) method.
+
+version 8.8 (2020-02-23)
+    * Adds new X509CertUtils.store method for storing private key / X.509
+      certificates pairs in a Java KeyStore.

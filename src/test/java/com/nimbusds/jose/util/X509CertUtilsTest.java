@@ -19,16 +19,26 @@ package com.nimbusds.jose.util;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
-import java.security.MessageDigest;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
+import java.util.UUID;
 
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWK;
+
 import junit.framework.TestCase;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.junit.Assert;
 
 
 /**
@@ -265,5 +275,60 @@ public class X509CertUtilsTest extends TestCase {
 		
 		assertEquals("-----BEGIN CERTIFICATE-----", X509CertUtils.PEM_BEGIN_MARKER);
 		assertEquals("-----END CERTIFICATE-----", X509CertUtils.PEM_END_MARKER);
+	}
+	
+	
+	public void testStore_noPassword() throws Exception {
+		
+		JWK jwk = JWK.parseFromPEMEncodedObjects(IOUtils.readFileToString(new File("src/test/resources/sample-pem-encoded-objects/ecprivkey.pem"), StandardCharset.UTF_8));
+		assertTrue(jwk instanceof ECKey);
+		ECKey ecJWK = (ECKey)jwk;
+		
+		X509Certificate cert = X509CertUtils.parse(IOUtils.readFileToString(new File("src/test/resources/sample-pem-encoded-objects/eccert.pem"), StandardCharset.UTF_8));
+		
+		Assert.assertArrayEquals(ecJWK.toECPublicKey().getEncoded(), cert.getPublicKey().getEncoded());
+		
+		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+		keyStore.load(null);
+		
+		UUID alias = X509CertUtils.store(keyStore, ecJWK.toECPrivateKey(), new char[]{0}, cert);
+		
+		assertNotNull(alias);
+	
+		KeyStore.Entry en = keyStore.getEntry(alias.toString(), new KeyStore.PasswordProtection(new char[]{0}));
+		assertTrue(en instanceof KeyStore.PrivateKeyEntry);
+		
+		KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)en;
+		
+		Assert.assertArrayEquals(ecJWK.toPrivateKey().getEncoded(), privateKeyEntry.getPrivateKey().getEncoded());
+		Assert.assertArrayEquals(cert.getEncoded(), privateKeyEntry.getCertificate().getEncoded());
+	}
+	
+	
+	public void testStore_withPassword() throws Exception {
+		
+		JWK jwk = JWK.parseFromPEMEncodedObjects(IOUtils.readFileToString(new File("src/test/resources/sample-pem-encoded-objects/ecprivkey.pem"), StandardCharset.UTF_8));
+		assertTrue(jwk instanceof ECKey);
+		ECKey ecJWK = (ECKey)jwk;
+		
+		X509Certificate cert = X509CertUtils.parse(IOUtils.readFileToString(new File("src/test/resources/sample-pem-encoded-objects/eccert.pem"), StandardCharset.UTF_8));
+		
+		Assert.assertArrayEquals(ecJWK.toECPublicKey().getEncoded(), cert.getPublicKey().getEncoded());
+		
+		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+		keyStore.load(null);
+		
+		String password = "secret";
+		UUID alias = X509CertUtils.store(keyStore, ecJWK.toECPrivateKey(), password.toCharArray(), cert);
+		
+		assertNotNull(alias);
+	
+		KeyStore.Entry en = keyStore.getEntry(alias.toString(), new KeyStore.PasswordProtection(password.toCharArray()));
+		assertTrue(en instanceof KeyStore.PrivateKeyEntry);
+		
+		KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)en;
+		
+		Assert.assertArrayEquals(ecJWK.toPrivateKey().getEncoded(), privateKeyEntry.getPrivateKey().getEncoded());
+		Assert.assertArrayEquals(cert.getEncoded(), privateKeyEntry.getCertificate().getEncoded());
 	}
 }

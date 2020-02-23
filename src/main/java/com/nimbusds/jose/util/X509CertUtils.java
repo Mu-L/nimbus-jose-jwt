@@ -19,16 +19,17 @@ package com.nimbusds.jose.util;
 
 
 import java.io.ByteArrayInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.*;
+import java.util.UUID;
 
 
 /**
  *  X.509 certificate utilities.
  *
  *  @author Vladimir Dzhuvinov
- *  @version 2020-01-27
+ *  @version 2020-02-22
  */
 public class X509CertUtils {
 
@@ -230,5 +231,33 @@ public class X509CertUtils {
 		} catch (NoSuchAlgorithmException | CertificateEncodingException e) {
 			return null;
 		}
+	}
+	
+	
+	/**
+	 * Stores a private key with its associated X.509 certificate in a
+	 * Java key store. The name (alias) for the stored entry is a given a
+	 * random UUID.
+	 *
+	 * @param keyStore    The key store. Must be initialised and not
+	 *                    {@code null}.
+	 * @param privateKey  The private key. Must not be {@code null}.
+	 * @param keyPassword The password to protect the private key, empty
+	 *                    array for none. Must not be {@code null}.
+	 * @param cert        The X.509 certificate, its public key and the
+	 *                    private key should form a pair. Must not be
+	 *                    {@code null}.
+	 *
+	 * @return The UUID for the stored entry.
+	 */
+	public static UUID store(final KeyStore keyStore,
+				 final PrivateKey privateKey,
+				 final char[] keyPassword,
+				 final X509Certificate cert)
+		throws KeyStoreException {
+		
+		UUID alias = UUID.randomUUID();
+		keyStore.setKeyEntry(alias.toString(), privateKey, keyPassword, new Certificate[]{cert});
+		return alias;
 	}
 }
