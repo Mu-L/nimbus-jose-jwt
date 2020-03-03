@@ -1099,3 +1099,7 @@ version 8.8 (2020-02-23)
       stored certificate entries.
     * Adds new short-hand IOUtils.readInputStreamToString and readFileToString
       methods using UTF-8 encoding.
+
+version 8.9 (2020-03-03)
+    * Updates DefaultJWEDecrypterFactory to support opaque keys, e.g. keys
+      stored in a HSM or remote keystore (iss #350).

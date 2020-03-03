@@ -19,13 +19,15 @@ package com.nimbusds.jose;
 
 
 import java.security.Key;
+import java.util.Arrays;
 
 
 /**
  * Key type exception.
  *
  * @author Vladimir Dzhuvinov
- * @version 2015-06-29
+ * @author stisve
+ * @version 2020-03-03
  */
 public class KeyTypeException extends KeyException {
 
@@ -39,5 +41,18 @@ public class KeyTypeException extends KeyException {
 	public KeyTypeException(final Class<? extends Key> expectedKeyClass) {
 
 		super("Invalid key: Must be an instance of " + expectedKeyClass);
+	}
+
+	/**
+	 * Creates a new key type exception.
+	 *
+	 * @param expectedKeyInterface The expected key interfaces. Should not
+	 *                             be {@code null}.
+	 * @param additionalInterfaces Additional interfaces the key is required to implement.
+	 */
+	public KeyTypeException(final Class<? extends Key> expectedKeyInterface, final Class<?> ... additionalInterfaces) {
+
+		super("Invalid key: Must be an instance of " + expectedKeyInterface
+				+ " and implement all of the following interfaces " + Arrays.toString(additionalInterfaces));
 	}
 }

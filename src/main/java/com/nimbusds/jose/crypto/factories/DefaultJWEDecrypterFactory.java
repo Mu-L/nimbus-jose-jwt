@@ -19,8 +19,9 @@ package com.nimbusds.jose.crypto.factories;
 
 
 import java.security.Key;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.RSAPrivateKey;
+import java.security.PrivateKey;
+import java.security.interfaces.ECKey;
+import java.security.interfaces.RSAKey;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -29,6 +30,7 @@ import javax.crypto.SecretKey;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.*;
 import com.nimbusds.jose.jca.JWEJCAContext;
+import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.proc.JWEDecrypterFactory;
 import net.jcip.annotations.ThreadSafe;
 
@@ -40,7 +42,8 @@ import net.jcip.annotations.ThreadSafe;
  * {@link com.nimbusds.jose.crypto} package.
  *
  * @author Vladimir Dzhuvinov
- * @version 2015-11-16
+ * @author stisve
+ * @version 2020-03-03
  */
 @ThreadSafe
 public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
@@ -113,23 +116,25 @@ public class DefaultJWEDecrypterFactory implements JWEDecrypterFactory {
 		if (RSADecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
 			RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
 
-			if (!(key instanceof RSAPrivateKey)) {
-				throw new KeyTypeException(RSAPrivateKey.class);
+			if (!(key instanceof PrivateKey && key instanceof RSAKey)) {
+				throw new KeyTypeException(PrivateKey.class, RSAKey.class);
 			}
 
-			RSAPrivateKey rsaPrivateKey = (RSAPrivateKey)key;
+			PrivateKey rsaPrivateKey = (PrivateKey)key;
 
 			decrypter = new RSADecrypter(rsaPrivateKey);
 
 		} else if (ECDHDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
 			ECDHDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
 
-			if (!(key instanceof ECPrivateKey)) {
-				throw new KeyTypeException(ECPrivateKey.class);
+			if (!(key instanceof PrivateKey && key instanceof ECKey)) {
+				throw new KeyTypeException(PrivateKey.class, ECKey.class);
 			}
 
-			ECPrivateKey ecPrivateKey = (ECPrivateKey)key;
-			decrypter = new ECDHDecrypter(ecPrivateKey);
+			PrivateKey ecPrivateKey = (PrivateKey)key;
+			Curve curve = Curve.forECParameterSpec(((ECKey)key).getParams());
+
+			decrypter = new ECDHDecrypter(ecPrivateKey, null, curve);
 
 		} else if (DirectDecrypter.SUPPORTED_ALGORITHMS.contains(header.getAlgorithm()) &&
 			DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(header.getEncryptionMethod())) {
