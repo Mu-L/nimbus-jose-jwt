@@ -28,26 +28,40 @@ import com.nimbusds.jose.jwk.JWKSet;
  * JSON Web Key (JWK) set cache implementation.
  *
  * @author Vladimir Dzhuvinov
- * @version 2018-12-01
+ * @author Sarvesh Sharma
+ * @version 2020-03-11
  */
 public class DefaultJWKSetCache implements JWKSetCache {
 	
 	
 	/**
-	 * The default lifespan for cached JWK sets (5 minutes).
+	 * The default lifespan for cached JWK sets (15 minutes).
 	 */
-	public static final long DEFAULT_LIFESPAN_MINUTES = 5;
-	
+	public static final long DEFAULT_LIFESPAN_MINUTES = 15;
+
+
+	/**
+	 * The default refresh time for cached JWK sets (5 minutes).
+	 */
+	public static final long DEFAULT_REFRESH_TIME_MINUTES = 5;
+
 	
 	/**
-	 * The lifespan the cached JWK set, in {@link #timeUnit}s, negative
-	 * means no expiration
+	 * The lifespan of the cached JWK set, in {@link #timeUnit}s, negative
+	 * means no expiration.
 	 */
 	private final long lifespan;
-	
+
+
+	/**
+	 * The refresh time of the cached JWK set, in {@link #timeUnit}s,
+	 * negative means no refresh time.
+	 */
+	private final long refreshTime;
+
 	
 	/**
-	 * The lifespan time unit, may be {@code null} if no expiration.
+	 * The time unit, may be {@code null} if no expiration / refresh time.
 	 */
 	private final TimeUnit timeUnit;
 	
@@ -60,28 +74,32 @@ public class DefaultJWKSetCache implements JWKSetCache {
 	
 	/**
 	 * Creates a new JWK set, the default lifespan of the cached JWK set is
-	 * set to 5 minutes.
+	 * set to 15 minutes, the refresh time to 5 minutes.
 	 */
 	public DefaultJWKSetCache() {
 		
-		this(DEFAULT_LIFESPAN_MINUTES, TimeUnit.MINUTES);
+		this(DEFAULT_LIFESPAN_MINUTES, DEFAULT_REFRESH_TIME_MINUTES, TimeUnit.MINUTES);
 	}
 	
 	
 	/**
 	 * Creates a new JWK set cache.
 	 *
-	 * @param lifespan The lifespan of the cached JWK set before it
-	 *                 expires, negative means no expiration.
-	 * @param timeUnit The lifespan time unit, may be {@code null} if no
-	 *                 expiration.
+	 * @param lifespan    The lifespan of the cached JWK set before it
+	 *                    expires, negative means no expiration.
+	 * @param refreshTime The time after which the cached JWK set is marked
+	 *                    for refresh, negative if not specified. Should be
+	 *                    shorter or equal to the lifespan.
+	 * @param timeUnit    The lifespan time unit, may be {@code null} if no
+	 *                    expiration or refresh time.
 	 */
-	public DefaultJWKSetCache(final long lifespan, final TimeUnit timeUnit) {
+	public DefaultJWKSetCache(final long lifespan, final long refreshTime, final TimeUnit timeUnit) {
 		
 		this.lifespan = lifespan;
-		
-		if (lifespan > -1 && timeUnit == null) {
-			throw new IllegalArgumentException("A time unit must be specified for non-negative lifespans");
+		this.refreshTime = refreshTime;
+
+		if ((lifespan > -1 || refreshTime > -1) && timeUnit == null) {
+			throw new IllegalArgumentException("A time unit must be specified for non-negative lifespans or refresh times");
 		}
 		
 		this.timeUnit = timeUnit;
@@ -117,7 +135,16 @@ public class DefaultJWKSetCache implements JWKSetCache {
 		
 		return jwkSet;
 	}
-	
+
+
+	@Override
+	public boolean requiresRefresh() {
+
+		return putTimestamp > -1 &&
+			refreshTime > -1 &&
+			new Date().getTime() > putTimestamp + TimeUnit.MILLISECONDS.convert(refreshTime, timeUnit);
+	}
+
 	
 	/**
 	 * Returns the cache put timestamp.
@@ -157,5 +184,22 @@ public class DefaultJWKSetCache implements JWKSetCache {
 		}
 		
 		return timeUnit.convert(lifespan, timeUnit);
+	}
+
+
+	/**
+	 * Returns the configured refresh time of the cached JWK.
+	 *
+	 * @param timeUnit The time unit to use.
+	 *
+	 * @return The configured refresh time, negative means no expiration.
+	 */
+	public long getRefreshTime(final TimeUnit timeUnit) {
+
+		if (refreshTime < 0) {
+			return refreshTime;
+		}
+
+		return timeUnit.convert(refreshTime, timeUnit);
 	}
 }

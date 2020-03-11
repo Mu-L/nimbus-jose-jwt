@@ -25,7 +25,8 @@ import com.nimbusds.jose.jwk.JWKSet;
  * JSON Web Key (JWK) set cache.
  *
  * @author Vladimir Dzhuvinov
- * @version 2018-10-28
+ * @author Sarvesh Sharma
+ * @version 2020-03-11
  */
 public interface JWKSetCache {
 	
@@ -44,4 +45,14 @@ public interface JWKSetCache {
 	 * @return The cached JWK set, {@code null} if none or expired.
 	 */
 	JWKSet get();
+
+
+	/**
+	 * Returns {@code true} if the cached JWK set requires a refresh. This
+	 * should typically occur some time before the cache has expired, to
+	 * allow for transient retrieval exceptions before expiration.
+	 *
+	 * @return {@code true} if the cached JWK set requires a refresh.
+	 */
+	boolean requiresRefresh();
 }

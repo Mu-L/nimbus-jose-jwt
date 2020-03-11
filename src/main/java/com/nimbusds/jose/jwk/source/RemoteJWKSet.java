@@ -254,8 +254,16 @@ public class RemoteJWKSet<C extends SecurityContext> implements JWKSource<C> {
 
 		// Get the JWK set, may necessitate a cache update
 		JWKSet jwkSet = jwkSetCache.get();
-		if (jwkSet == null) {
-			jwkSet = updateJWKSetFromURL();
+		if (jwkSetCache.requiresRefresh() || jwkSet == null) {
+			try {
+				// retrieve jwkSet by calling JWK set URL
+				jwkSet = updateJWKSetFromURL();
+			} catch (Exception ex) {
+				if (jwkSet == null) {
+					// throw the received exception if expired.
+					throw  ex;
+				}
+			}
 		}
 
 		// Run the selector on the JWK set
