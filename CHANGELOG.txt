@@ -1108,3 +1108,7 @@ version 8.10 (2020-03-11)
     * Extends JWKSetCache interface with requiresRefresh method to indicate
       the cached JWK set is about to expire and should be updated. Intended to
       allow for transient retrieval exceptions (iss #348).
+
+version 8.11 (2020-03-27)
+    * Adds new DateUtils.isWithin method for checking if a date is within the
+      specified reference, give or take an accepted clock skew.

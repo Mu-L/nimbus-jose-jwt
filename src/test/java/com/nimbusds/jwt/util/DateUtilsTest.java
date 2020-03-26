@@ -20,7 +20,6 @@ package com.nimbusds.jwt.util;
 
 import java.util.Date;
 
-import com.nimbusds.jose.util.DateUtils;
 import junit.framework.TestCase;
 
 
@@ -152,5 +151,45 @@ public class DateUtilsTest extends TestCase {
 
 		boolean valid = DateUtils.isBefore(iat, now, 60);
 		assertTrue(valid);
+	}
+	
+	
+	public void testWithin() {
+		
+		final Date now = new Date();
+		
+		final Date ref = now;
+		
+		assertTrue(DateUtils.isWithin(now, ref, 1));
+		assertTrue(DateUtils.isWithin(now, ref, 10));
+		assertTrue(DateUtils.isWithin(now, ref, 100));
+	}
+	
+	
+	public void testWithinEdges() {
+		
+		final Date now = new Date();
+		
+		final Date ref = now;
+		
+		final Date nineSecondsAgo = new Date(now.getTime() - 9_000);
+		final Date nineSecondsAhead = new Date(now.getTime() + 9_000);
+		
+		assertTrue(DateUtils.isWithin(nineSecondsAgo, ref, 10));;
+		assertTrue(DateUtils.isWithin(nineSecondsAhead, ref, 10));;
+	}
+	
+	
+	public void testWithinNegative() {
+		
+		final Date now = new Date();
+		
+		final Date ref = now;
+		
+		final Date tenSecondsAgo = new Date(now.getTime() - 10_000);
+		final Date tenSecondsAhead = new Date(now.getTime() + 10_000);
+		
+		assertFalse(DateUtils.isWithin(tenSecondsAgo, ref, 9));;
+		assertFalse(DateUtils.isWithin(tenSecondsAhead, ref, 9));;
 	}
 }
