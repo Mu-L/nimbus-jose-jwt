@@ -11,3 +11,4 @@ target
 *asc
 .settings
 release.properties
+.factorypath
