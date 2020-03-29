@@ -30,11 +30,7 @@ import com.nimbusds.jose.crypto.Ed25519Signer;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jca.JCAContext;
-import com.nimbusds.jose.jwk.ECKey;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.OctetKeyPair;
-import com.nimbusds.jose.jwk.OctetSequenceKey;
-import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.proc.JWSSignerFactory;
 
 /**
@@ -42,7 +38,7 @@ import com.nimbusds.jose.proc.JWSSignerFactory;
  * key type.
  *
  * @author Justin Richer
- * @since 2020-03-26
+ * @since 2020-03-29
  */
 public class DefaultJWSSignerFactory implements JWSSignerFactory {
 
@@ -77,10 +73,14 @@ public class DefaultJWSSignerFactory implements JWSSignerFactory {
 	}
 
 	@Override
-	public JWSSigner createJWSSigner(JWK key) throws JOSEException {
+	public JWSSigner createJWSSigner(final JWK key) throws JOSEException {
 
 		if (!key.isPrivate()) { // can't create a signer without the private key
 			throw JWKException.expectedPrivate();
+		}
+		
+		if (key.getKeyUse() != null && ! KeyUse.SIGNATURE.equals(key.getKeyUse())) {
+			throw new JWKException("The JWK use must be sig (signature) or unspecified");
 		}
 
 		JWSSigner signer;
@@ -106,10 +106,14 @@ public class DefaultJWSSignerFactory implements JWSSignerFactory {
 	}
 
 	@Override
-	public JWSSigner createJWSSigner(JWK key, JWSAlgorithm alg) throws JOSEException {
+	public JWSSigner createJWSSigner(final JWK key, final JWSAlgorithm alg) throws JOSEException {
 
 		if (!key.isPrivate()) { // can't create a signer without the private key
 			throw JWKException.expectedPrivate();
+		}
+		
+		if (key.getKeyUse() != null && ! KeyUse.SIGNATURE.equals(key.getKeyUse())) {
+			throw new JWKException("The JWK use must be sig (signature) or unspecified");
 		}
 
 		JWSSigner signer;
@@ -154,5 +158,4 @@ public class DefaultJWSSignerFactory implements JWSSignerFactory {
 
 		return signer;
 	}
-
 }
