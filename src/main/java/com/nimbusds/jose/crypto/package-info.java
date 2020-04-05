@@ -16,8 +16,8 @@
  */
 
 /**
- * Implementations of all standard Javascript Object Signing and Encryption
- * (JOSE) algorithms.
+ * Implementations of standard Javascript Object Signing and Encryption (JOSE)
+ * algorithms.
  *
  * <p>Provides {@link com.nimbusds.jose.JWSSigner signers} and 
  * {@link com.nimbusds.jose.JWSVerifier verifiers} for the following JSON Web
@@ -84,6 +84,8 @@
  *
  * <ul>
  *     <li><a href="http://tools.ietf.org/html/rfc7518">RFC 7518 (JWA)</a>
+ *     <li><a href="http://tools.ietf.org/html/rfc8037">RFC 8037 (CFRG ECDH and
+ *         Signatures JOSE)</a>
  * </ul>
  */
 package com.nimbusds.jose.crypto;

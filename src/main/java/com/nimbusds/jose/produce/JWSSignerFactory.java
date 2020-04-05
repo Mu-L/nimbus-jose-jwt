@@ -1,7 +1,7 @@
 /*
  * nimbus-jose-jwt
  *
- * Copyright 2012-2020, Connect2id Ltd.
+ * Copyright 2012-2016, Connect2id Ltd and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
  * this file except in compliance with the License. You may obtain a copy of the
@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.nimbusds.jose.proc;
+package com.nimbusds.jose.produce;
 
 
 import com.nimbusds.jose.JOSEException;
@@ -26,7 +26,8 @@ import com.nimbusds.jose.jwk.JWK;
 
 
 /**
- * JSON Web Signature (JWS) signer factory to create a signer out of a key.
+ * JSON Web Signature (JWS) signer factory to create a signer out of a JSON Web
+ * Key (JWK).
  *
  * @author Justin Richer
  * @version 2020-03-26
@@ -34,13 +35,13 @@ import com.nimbusds.jose.jwk.JWK;
 public interface JWSSignerFactory extends JWSProvider {
 
 	/**
-	 * Create a signer based on the key.
+	 * Create a JWS signer based on the key.
 	 */
 	JWSSigner createJWSSigner(final JWK key)
 		throws JOSEException;
 
 	/**
-	 * Create a signer based on the key and algorithm. Ensures
+	 * Create a JWS signer based on the key and algorithm. Ensures
 	 * that the key supports the given algorithm.
 	 */
 	JWSSigner createJWSSigner(final JWK key, final JWSAlgorithm alg)

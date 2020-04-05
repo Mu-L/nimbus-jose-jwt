@@ -16,6 +16,6 @@
  */
 
 /**
- * Utility interfaces and classes.
+ * JSON Web Token (JWT) utility interfaces and classes.
  */
 package com.nimbusds.jwt.util;

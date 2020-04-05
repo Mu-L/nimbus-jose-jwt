@@ -15,6 +15,6 @@
  * specific language governing permissions and limitations under the License.
  */
 /**
- * Key generation utilities.
+ * JSON Web Key (JWK) generation utilities.
  */
 package com.nimbusds.jose.jwk.gen;

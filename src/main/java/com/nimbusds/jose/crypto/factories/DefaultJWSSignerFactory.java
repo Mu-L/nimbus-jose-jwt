@@ -31,7 +31,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jca.JCAContext;
 import com.nimbusds.jose.jwk.*;
-import com.nimbusds.jose.proc.JWSSignerFactory;
+import com.nimbusds.jose.produce.JWSSignerFactory;
 
 /**
  * A factory to create JWS signers from a JWK instance based on the

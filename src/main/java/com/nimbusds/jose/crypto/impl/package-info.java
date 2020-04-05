@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations under the License.
  */
 /**
- * Cryptographic primitives and framework for the JWS signers / verifiers and
- * JWE encrypters / decrypters in the {@link com.nimbusds.jose.crypto} package.
+ * Cryptographic primitives for JWS signers, JWS verifiers, JWE encrypters and
+ * JWE decrypters in the {@link com.nimbusds.jose.crypto} package.
  */
 package com.nimbusds.jose.crypto.impl;

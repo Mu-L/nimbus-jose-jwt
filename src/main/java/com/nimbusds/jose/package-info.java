@@ -16,7 +16,7 @@
  */
 
 /**
- * Javascript Object Signing and Encryption (JOSE) classes.
+ * Base Javascript Object Signing and Encryption (JOSE) interfaces and classes.
  *
  * <p>This package provides representation, compact serialisation and parsing 
  * for the following JOSE objects:

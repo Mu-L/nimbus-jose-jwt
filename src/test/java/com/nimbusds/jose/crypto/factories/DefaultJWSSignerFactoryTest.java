@@ -16,7 +16,7 @@ import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.jca.JCAAware;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
-import com.nimbusds.jose.proc.JWSSignerFactory;
+import com.nimbusds.jose.produce.JWSSignerFactory;
 import com.nimbusds.jose.util.ByteUtils;
 
 import junit.framework.TestCase;

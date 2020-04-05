@@ -16,7 +16,7 @@
  */
 
 /**
- * JWS verifier and JWE decrypter factories for use by the JOSE / JWT processor
- * framework.
+ * JWS signer, JWS verifier, JWE encrypter and JWE decrypter factory
+ * implementations.
  */
 package com.nimbusds.jose.crypto.factories;

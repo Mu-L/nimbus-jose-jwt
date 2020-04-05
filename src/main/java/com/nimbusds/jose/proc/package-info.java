@@ -16,8 +16,8 @@
  */
 
 /**
- * Secure framework for application-specific verification and decryption of
- * JOSE objects (with arbitrary payloads). Provides a core
+ * Framework for application-specific verification and decryption of JOSE
+ * objects (with arbitrary payloads). Provides a core
  * {@link com.nimbusds.jose.proc.JOSEProcessor interface} for processing JWS,
  * JWE and unsecured (plain) objects, with a
  * {@link com.nimbusds.jose.proc.DefaultJOSEProcessor default implementation}
