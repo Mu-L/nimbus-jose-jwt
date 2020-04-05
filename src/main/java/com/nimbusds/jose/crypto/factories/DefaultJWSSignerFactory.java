@@ -22,7 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWKException;
+import com.nimbusds.jose.jwk.JWKException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.ECDSASigner;
