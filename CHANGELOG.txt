@@ -1112,3 +1112,8 @@ version 8.10 (2020-03-11)
 version 8.11 (2020-03-27)
     * Adds new DateUtils.isWithin method for checking if a date is within the
       specified reference, give or take an accepted clock skew.
+
+version 8.12 (2020-04-05)
+    * Adds new JWSSignerFactory factory for creating a JWS signer from a given
+      JWK, with a DefaultJWSSignerFactory implementation supporting HMAC, RSA,
+      EC and EdDSA signatures.
