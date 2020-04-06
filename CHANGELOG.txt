@@ -1117,3 +1117,8 @@ version 8.12 (2020-04-05)
     * Adds new JWSSignerFactory factory for creating a JWS signer from a given
       JWK, with a DefaultJWSSignerFactory implementation supporting HMAC, RSA,
       EC and EdDSA signatures.
+
+version 8.13 (2020-04-06)
+    * Adds new JWKSet.isPresent(JWK) method which returns true if the specified
+      JWK is present in the JWK set as public or private JWK, by comparing its
+      thumbprint with those of the keys in the set.

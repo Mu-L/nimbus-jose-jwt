@@ -45,8 +45,11 @@ import javax.crypto.SecretKey;
 
 import static net.jadler.Jadler.*;
 
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.X509CertUtils;
 import junit.framework.TestCase;
@@ -64,7 +67,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
  *
  * @author Vladimir Dzhuvinov
  * @author Vedran Pavic
- * @version 2019-02-24
+ * @version 2020-04-06
  */
 public class JWKSetTest extends TestCase {
 	
@@ -1008,5 +1011,27 @@ public class JWKSetTest extends TestCase {
 		} catch (ParseException e) {
 			assertEquals("Missing required \"keys\" member", e.getMessage());
 		}
+	}
+	
+	
+	public void testIsPresent() throws JOSEException {
+		
+		JWK rsaJWK = new RSAKeyGenerator(2048).keyID("1").generate();
+		JWK otherRsaJWK = new RSAKeyGenerator(2048).keyID("2").generate();
+		JWK ecJWK = new ECKeyGenerator(Curve.P_256).keyID("3").generate();
+		
+		assertTrue(new JWKSet(Arrays.asList(rsaJWK, otherRsaJWK, ecJWK)).isPresent(rsaJWK));
+		assertTrue(new JWKSet(Arrays.asList(rsaJWK, otherRsaJWK, ecJWK)).isPresent(otherRsaJWK));
+		assertTrue(new JWKSet(Arrays.asList(rsaJWK, otherRsaJWK, ecJWK)).isPresent(ecJWK));
+		
+		assertTrue(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).isPresent(rsaJWK));
+		assertTrue(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).isPresent(otherRsaJWK));
+		assertTrue(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).isPresent(ecJWK));
+		
+		assertFalse(new JWKSet(Arrays.asList(rsaJWK, ecJWK)).isPresent(otherRsaJWK));
+		assertFalse(new JWKSet(Arrays.asList(rsaJWK, otherRsaJWK)).isPresent(ecJWK));
+		
+		assertFalse(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).isPresent(otherRsaJWK));
+		assertFalse(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK())).isPresent(ecJWK));
 	}
 }

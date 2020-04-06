@@ -71,7 +71,7 @@ import net.minidev.json.JSONObject;
  *
  * @author Vladimir Dzhuvinov
  * @author Vedran Pavic
- * @version 2019-10-03
+ * @version 2020-04-06
  */
 @Immutable
 public class JWKSet implements Serializable {
@@ -188,6 +188,30 @@ public class JWKSet implements Serializable {
 		
 		// no key found
 		return null;
+	}
+	
+	
+	/**
+	 * Returns {@code true} if the specified JWK is present in this JWK set
+	 * as public or private JWK, by comparing its thumbprint with those of
+	 * the keys in the set.
+	 *
+	 * @param jwk The JWK to check. Must not be {@code null}.
+	 *
+	 * @return {@code true} if present, {@code false} if not.
+	 *
+	 * @throws JOSEException If thumbprint computation failed.
+	 */
+	public boolean isPresent(final JWK jwk) throws JOSEException {
+		
+		Base64URL thumbprint = jwk.computeThumbprint();
+		
+		for (JWK k: getKeys()) {
+			if (thumbprint.equals(k.computeThumbprint())) {
+				return true; // found
+			}
+		}
+		return false;
 	}
 
 
