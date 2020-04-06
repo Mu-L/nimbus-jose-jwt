@@ -1122,3 +1122,6 @@ version 8.13 (2020-04-06)
     * Adds new JWKSet.isPresent(JWK) method which returns true if the specified
       JWK is present in the JWK set as public or private JWK, by comparing its
       thumbprint with those of the keys in the set.
+
+version 8.14 (2020-04-06)
+    * Renames JWKSet.isPresent to JWKSet.containsJWK.

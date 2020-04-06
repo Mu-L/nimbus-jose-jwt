@@ -20,7 +20,6 @@ package com.nimbusds.jose.jwk;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigInteger;
@@ -1014,24 +1013,24 @@ public class JWKSetTest extends TestCase {
 	}
 	
 	
-	public void testIsPresent() throws JOSEException {
+	public void testContainsJWK() throws JOSEException {
 		
 		JWK rsaJWK = new RSAKeyGenerator(2048).keyID("1").generate();
 		JWK otherRsaJWK = new RSAKeyGenerator(2048).keyID("2").generate();
 		JWK ecJWK = new ECKeyGenerator(Curve.P_256).keyID("3").generate();
 		
-		assertTrue(new JWKSet(Arrays.asList(rsaJWK, otherRsaJWK, ecJWK)).isPresent(rsaJWK));
-		assertTrue(new JWKSet(Arrays.asList(rsaJWK, otherRsaJWK, ecJWK)).isPresent(otherRsaJWK));
-		assertTrue(new JWKSet(Arrays.asList(rsaJWK, otherRsaJWK, ecJWK)).isPresent(ecJWK));
+		assertTrue(new JWKSet(Arrays.asList(rsaJWK, otherRsaJWK, ecJWK)).containsJWK(rsaJWK));
+		assertTrue(new JWKSet(Arrays.asList(rsaJWK, otherRsaJWK, ecJWK)).containsJWK(otherRsaJWK));
+		assertTrue(new JWKSet(Arrays.asList(rsaJWK, otherRsaJWK, ecJWK)).containsJWK(ecJWK));
 		
-		assertTrue(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).isPresent(rsaJWK));
-		assertTrue(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).isPresent(otherRsaJWK));
-		assertTrue(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).isPresent(ecJWK));
+		assertTrue(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).containsJWK(rsaJWK));
+		assertTrue(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).containsJWK(otherRsaJWK));
+		assertTrue(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).containsJWK(ecJWK));
 		
-		assertFalse(new JWKSet(Arrays.asList(rsaJWK, ecJWK)).isPresent(otherRsaJWK));
-		assertFalse(new JWKSet(Arrays.asList(rsaJWK, otherRsaJWK)).isPresent(ecJWK));
+		assertFalse(new JWKSet(Arrays.asList(rsaJWK, ecJWK)).containsJWK(otherRsaJWK));
+		assertFalse(new JWKSet(Arrays.asList(rsaJWK, otherRsaJWK)).containsJWK(ecJWK));
 		
-		assertFalse(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).isPresent(otherRsaJWK));
-		assertFalse(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK())).isPresent(ecJWK));
+		assertFalse(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).containsJWK(otherRsaJWK));
+		assertFalse(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK())).containsJWK(ecJWK));
 	}
 }

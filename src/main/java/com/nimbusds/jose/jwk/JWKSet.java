@@ -192,17 +192,17 @@ public class JWKSet implements Serializable {
 	
 	
 	/**
-	 * Returns {@code true} if the specified JWK is present in this JWK set
-	 * as public or private JWK, by comparing its thumbprint with those of
-	 * the keys in the set.
+	 * Returns {@code true} if this JWK set contains the specified JWK as
+	 * public or private key, by comparing its thumbprint with those of the
+	 * keys in the set.
 	 *
 	 * @param jwk The JWK to check. Must not be {@code null}.
 	 *
-	 * @return {@code true} if present, {@code false} if not.
+	 * @return {@code true} if contained, {@code false} if not.
 	 *
 	 * @throws JOSEException If thumbprint computation failed.
 	 */
-	public boolean isPresent(final JWK jwk) throws JOSEException {
+	public boolean containsJWK(final JWK jwk) throws JOSEException {
 		
 		Base64URL thumbprint = jwk.computeThumbprint();
 		
