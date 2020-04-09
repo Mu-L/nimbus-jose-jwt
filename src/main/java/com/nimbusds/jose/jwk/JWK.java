@@ -502,14 +502,11 @@ public abstract class JWK implements JSONAware, Serializable {
 		}
 
 		if (ops != null) {
-
-			List<String> sl = new ArrayList<>(ops.size());
-
+			JSONArray stringValues = new JSONArray();
 			for (KeyOperation op: ops) {
-				sl.add(op.identifier());
+				stringValues.add(op.identifier());
 			}
-
-			o.put("key_ops", sl);
+			o.put("key_ops", stringValues);
 		}
 
 		if (alg != null) {

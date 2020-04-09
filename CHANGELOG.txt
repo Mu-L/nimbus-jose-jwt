@@ -1125,3 +1125,6 @@ version 8.13 (2020-04-06)
 
 version 8.14 (2020-04-06)
     * Renames JWKSet.isPresent to JWKSet.containsJWK.
+
+version 8.14.1 (2020-04-09)
+    * Fixes parsing of JWK key_ops from JWK.toJSONObject() output (iss #355).

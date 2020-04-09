@@ -30,6 +30,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -58,7 +59,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
  * Tests the base JWK class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-02-10
+ * @version 2020-04-09
  */
 public class JWKTest extends TestCase {
 	
@@ -457,5 +458,19 @@ public class JWKTest extends TestCase {
 		jwk = new OctetKeyPairGenerator(Curve.Ed25519).generate();
 		OctetKeyPair okp = jwk.toOctetKeyPair();
 		assertEquals(jwk, okp);
+	}
+	
+	
+	// https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/355/parsing-of-key_ops-from-jwk-output
+	public void testParseKeyOps()
+		throws Exception {
+		
+		RSAKey rsaKey = new RSAKeyGenerator(2048)
+			.keyOperations(Collections.singleton(KeyOperation.VERIFY))
+			.generate();
+		
+		RSAKey parsed = RSAKey.parse(rsaKey.toJSONObject());
+		
+		assertEquals(rsaKey.getKeyOperations(), parsed.getKeyOperations());
 	}
 }
