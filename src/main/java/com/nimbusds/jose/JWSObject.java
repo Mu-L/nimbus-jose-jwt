@@ -129,11 +129,11 @@ public class JWSObject extends JOSEObject {
 
 
 	/**
-	 * Creates a new signed JSON Web Signature (JWS) object with the 
-	 * specified serialised parts. The state will be 
+	 * Creates a new signed JSON Web Signature (JWS) object with the
+	 * specified serialised parts. The state will be
 	 * {@link State#SIGNED signed}.
 	 *
-	 * @param firstPart  The first part, corresponding to the JWS header. 
+	 * @param firstPart  The first part, corresponding to the JWS header.
 	 *                   Must not be {@code null}.
 	 * @param secondPart The second part, corresponding to the payload. Must
 	 *                   not be {@code null}.
@@ -142,7 +142,27 @@ public class JWSObject extends JOSEObject {
 	 *
 	 * @throws ParseException If parsing of the serialised parts failed.
 	 */
-	public JWSObject(final Base64URL firstPart, final Base64URL secondPart, final Base64URL thirdPart)	
+	public JWSObject(final Base64URL firstPart, final Base64URL secondPart, final Base64URL thirdPart)
+		throws ParseException {
+		this(firstPart, new Payload(secondPart), thirdPart);
+		setParsedParts(firstPart, secondPart, thirdPart);
+	}
+
+	/**
+	 * Creates a new signed JSON Web Signature (JWS) object with the
+	 * specified serialised parts. The state will be
+	 * {@link State#SIGNED signed}.
+	 *
+	 * @param firstPart  The first part, corresponding to the JWS header.
+	 *                   Must not be {@code null}.
+	 * @param secondPart The second part, corresponding to the payload. Must
+	 *                   not be {@code null}.
+	 * @param thirdPart  The third part, corresponding to the signature.
+	 *                   Must not be {@code null}.
+	 *
+	 * @throws ParseException If parsing of the serialised parts failed.
+	 */
+	public JWSObject(final Base64URL firstPart, final Payload secondPart, final Base64URL thirdPart)
 		throws ParseException {
 
 		if (firstPart == null) {
@@ -163,9 +183,13 @@ public class JWSObject extends JOSEObject {
 			throw new IllegalArgumentException("The second part must not be null");
 		}
 
-		setPayload(new Payload(secondPart));
+		setPayload(secondPart);
 
-		signingInputString = composeSigningInput(firstPart, secondPart);
+		if (header.getCustomParam("b64")  == null || (Boolean) header.getCustomParam("b64")) {
+			signingInputString = composeSigningInput(firstPart, secondPart.toBase64URL());
+		} else {
+			signingInputString = firstPart.toString() + '.' + secondPart.toString();
+		}
 
 		if (thirdPart == null) {
 			throw new IllegalArgumentException("The third part must not be null");
@@ -175,9 +199,9 @@ public class JWSObject extends JOSEObject {
 
 		state = State.SIGNED; // but signature not verified yet!
 
-		setParsedParts(firstPart, secondPart, thirdPart);
+		// this gets overridden if called from the other constructor in order to set the second part
+		setParsedParts(firstPart, null, thirdPart);
 	}
-
 
 	@Override
 	public JWSHeader getHeader() {
