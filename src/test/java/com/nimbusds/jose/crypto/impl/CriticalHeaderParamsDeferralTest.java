@@ -21,6 +21,7 @@ package com.nimbusds.jose.crypto.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 import com.nimbusds.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import junit.framework.TestCase;
@@ -33,7 +34,7 @@ import com.nimbusds.jose.JWSHeader;
  * Tests the critical parameters checker.
  *
  * @author Vladimir Dzhuvinov
- * @version 2015-04-21
+ * @version 2020-04-17
  */
 public class CriticalHeaderParamsDeferralTest extends TestCase {
 
@@ -42,20 +43,34 @@ public class CriticalHeaderParamsDeferralTest extends TestCase {
 
 		CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
 
-		assertTrue(checker.getProcessedCriticalHeaderParams().isEmpty());
+		assertEquals(Collections.singleton("b64"), checker.getProcessedCriticalHeaderParams());
 		assertTrue(checker.getDeferredCriticalHeaderParams().isEmpty());
 	}
 
 
 	public void testSetter() {
-
+		
+		Set<String> deferred = new HashSet<>(Arrays.asList("exp", "hs"));
+		
 		CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
 
-		checker.setDeferredCriticalHeaderParams(new HashSet<>(Arrays.asList("exp", "hs")));
-
-		assertTrue(checker.getDeferredCriticalHeaderParams().contains("exp"));
-		assertTrue(checker.getDeferredCriticalHeaderParams().contains("hs"));
-		assertEquals(2, checker.getDeferredCriticalHeaderParams().size());
+		checker.setDeferredCriticalHeaderParams(deferred);
+		
+		assertEquals(Collections.singleton("b64"), checker.getProcessedCriticalHeaderParams());
+		assertEquals(deferred, checker.getDeferredCriticalHeaderParams());
+	}
+	
+	
+	public void testPassB64Header() {
+		
+		CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
+		
+		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+			.base64URLEncodePayload(true)
+			.criticalParams(Collections.singleton("b64"))
+			.build();
+		
+		assertTrue(checker.headerPasses(header));
 	}
 
 

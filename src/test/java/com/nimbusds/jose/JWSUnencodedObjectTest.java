@@ -122,7 +122,7 @@ public class JWSUnencodedObjectTest extends TestCase {
 		assertFalse(parsedJWSObject.getHeader().isBase64URLEncodePayload());
 		assertEquals(Collections.singleton("b64"), parsedJWSObject.getHeader().getCriticalParams());
 		
-		assertTrue(parsedJWSObject.verify(new MACVerifier(HMAC_JWK, Collections.singleton("b64"))));
+		assertTrue(parsedJWSObject.verify(new MACVerifier(HMAC_JWK)));
 		
 		assertEquals("$.02", parsedJWSObject.getPayload().toString());
 	}
@@ -151,7 +151,7 @@ public class JWSUnencodedObjectTest extends TestCase {
 		
 		assertFalse(jwsObject.getHeader().isBase64URLEncodePayload());
 		
-		JWSVerifier verifier = new MACVerifier(HMAC_JWK, Collections.singleton("b64"));
+		JWSVerifier verifier = new MACVerifier(HMAC_JWK);
 		byte[] payloadBytes = detachedPayload.toBytes();
 		byte[] headerBytes = (header.toBase64URL().toString() + '.').getBytes(StandardCharsets.UTF_8);
 		byte[] signingInput = new byte[headerBytes.length + payloadBytes.length];

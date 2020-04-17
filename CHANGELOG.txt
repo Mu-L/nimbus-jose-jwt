@@ -1135,3 +1135,6 @@ version 8.15 (2020-04-17)
       JWSHeader.isBase64URLEncodePayload methods for the boolean "b64"
       parameter. Adds new static JWSObject.parse(String,Payload) method for
       parsing JWS objects with a detached and optionally unencoded payload.
+    * Makes the "b64" (base64url-encode payload) JWS header parameter a
+      processed header parameter in
+      CriticalHeaderParamsDeferral.getProcessedCriticalHeaderParams().

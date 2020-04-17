@@ -31,12 +31,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
-import junit.framework.TestCase;
 
 
 /**
@@ -44,7 +45,7 @@ import junit.framework.TestCase;
  * from the JWS spec.
  *
  * @author Vladimir Dzhuvinov
- * @version 2018-10-08
+ * @version 2020-04-17
  */
 public class RSASSATest extends TestCase {
 
@@ -711,7 +712,7 @@ public class RSASSATest extends TestCase {
 		RSASSAVerifier verifier = new RSASSAVerifier(PUBLIC_KEY, deferredCrit);
 
 		assertTrue(deferredCrit.containsAll(verifier.getDeferredCriticalHeaderParams()));
-		assertTrue(verifier.getProcessedCriticalHeaderParams().isEmpty());
+		assertEquals(Collections.singleton("b64"), verifier.getProcessedCriticalHeaderParams());
 
 		boolean verified = jwsObject.verify(verifier);
 

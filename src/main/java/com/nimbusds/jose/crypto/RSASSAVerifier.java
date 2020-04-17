@@ -142,7 +142,7 @@ public class RSASSAVerifier extends RSASSAProvider implements JWSVerifier, Criti
 	@Override
 	public Set<String> getDeferredCriticalHeaderParams() {
 
-		return critPolicy.getProcessedCriticalHeaderParams();
+		return critPolicy.getDeferredCriticalHeaderParams();
 	}
 
 

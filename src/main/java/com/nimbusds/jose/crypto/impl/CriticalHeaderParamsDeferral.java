@@ -33,7 +33,7 @@ import com.nimbusds.jose.JWEHeader;
  * @see CriticalHeaderParamsAware
  *
  * @author Vladimir Dzhuvinov
- * @version 2015-05-20
+ * @version 2020-04-17
  */
 public class CriticalHeaderParamsDeferral {
 
@@ -52,7 +52,7 @@ public class CriticalHeaderParamsDeferral {
 	 */
 	public Set<String> getProcessedCriticalHeaderParams() {
 
-		return Collections.emptySet();
+		return Collections.singleton("b64");
 	}
 
 
@@ -101,14 +101,20 @@ public class CriticalHeaderParamsDeferral {
 	 */
 	public boolean headerPasses(final Header header) {
 
-		Set<String> crit = header.getCriticalParams();
-
-		if (crit == null || crit.isEmpty()) {
-			return true; // OK
+		if (header.getCriticalParams() == null) {
+			return true; // ok
 		}
-
-		// Ensure all marked as deferred
-		return deferredParams != null && deferredParams.containsAll(crit);
+		
+		for (String critParam: header.getCriticalParams()) {
+			if (getProcessedCriticalHeaderParams().contains(critParam)) {
+				continue;
+			}
+			if (getDeferredCriticalHeaderParams().contains(critParam)) {
+				continue;
+			}
+			return false;
+		}
+		return true;
 	}
 
 
