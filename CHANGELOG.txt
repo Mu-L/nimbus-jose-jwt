@@ -1128,3 +1128,10 @@ version 8.14 (2020-04-06)
 
 version 8.14.1 (2020-04-09)
     * Fixes parsing of JWK key_ops from JWK.toJSONObject() output (iss #355).
+
+version 8.15 (2020-04-17)
+    * Implements JSON Web Signature (JWS) Unencoded Payload Option (RFC 7797).
+      Adds new JWSHeader.Builder.base64URLEncodePayload and
+      JWSHeader.isBase64URLEncodePayload methods for the boolean "b64"
+      parameter. Adds new static JWSObject.parse(String,Payload) method for
+      parsing JWS objects with a detached and optionally unencoded payload.

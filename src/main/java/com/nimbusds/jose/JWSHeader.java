@@ -35,7 +35,8 @@ import net.minidev.json.JSONObject;
  * JSON Web Signature (JWS) header. This class is immutable.
  *
  * <p>Supports all {@link #getRegisteredParameterNames registered header
- * parameters} of the JWS specification:
+ * parameters} of the JWS specification (RFC 7515) and the "b64" header from
+ * JWS Unencoded Payload Option (RFC 7797):
  *
  * <ul>
  *     <li>alg
@@ -49,6 +50,7 @@ import net.minidev.json.JSONObject;
  *     <li>typ
  *     <li>cty
  *     <li>crit
+ *     <li>b64
  * </ul>
  *
  * <p>The header may also include {@link #getCustomParams custom
@@ -64,7 +66,7 @@ import net.minidev.json.JSONObject;
  * </pre>
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-10-04
+ * @version 2020-04-17
  */
 @Immutable
 public final class JWSHeader extends CommonSEHeader {
@@ -79,9 +81,6 @@ public final class JWSHeader extends CommonSEHeader {
 	private static final Set<String> REGISTERED_PARAMETER_NAMES;
 
 
-	/**
-	 * Initialises the registered parameter name set.
-	 */
 	static {
 		Set<String> p = new HashSet<>();
 
@@ -96,6 +95,7 @@ public final class JWSHeader extends CommonSEHeader {
 		p.add("typ");
 		p.add("cty");
 		p.add("crit");
+		p.add("b64");
 
 		REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(p);
 	}
@@ -182,6 +182,13 @@ public final class JWSHeader extends CommonSEHeader {
 		 * Key ID.
 		 */
 		private String kid;
+		
+		
+		/**
+		 * Base64URL encoding of the payload, the default is
+		 * {@code true} for standard JWS serialisation.
+		 */
+		private boolean b64 = true;
 
 
 		/**
@@ -234,6 +241,7 @@ public final class JWSHeader extends CommonSEHeader {
 			x5t256 = jwsHeader.getX509CertSHA256Thumbprint();
 			x5c = jwsHeader.getX509CertChain();
 			kid = jwsHeader.getKeyID();
+			b64 = jwsHeader.isBase64URLEncodePayload();
 			customParams = jwsHeader.getCustomParams();
 		}
 
@@ -391,6 +399,22 @@ public final class JWSHeader extends CommonSEHeader {
 			this.kid = kid;
 			return this;
 		}
+		
+		
+		/**
+		 * Sets the Base64URL encode payload ({@code b64}) parameter.
+		 *
+		 * @param b64 {@code true} to Base64URL encode the payload
+		 *            for standard JWS serialisation, {@code false} for
+		 *            unencoded payload (RFC 7797).
+		 *
+		 * @return This builder.
+		 */
+		public Builder base64URLEncodePayload(final boolean b64) {
+			
+			this.b64 = b64;
+			return this;
+		}
 
 
 		/**
@@ -465,10 +489,17 @@ public final class JWSHeader extends CommonSEHeader {
 
 			return new JWSHeader(
 				alg, typ, cty, crit,
-				jku, jwk, x5u, x5t, x5t256, x5c, kid,
+				jku, jwk, x5u, x5t, x5t256, x5c, kid, b64,
 				customParams, parsedBase64URL);
 		}
 	}
+	
+	
+	/**
+	 * Base64URL encoding of the payload, {@code true} for standard JWS
+	 * serialisation, {@code false} for unencoded payload (RFC 7797).
+	 */
+	private final boolean b64;
 
 
 	/**
@@ -482,7 +513,7 @@ public final class JWSHeader extends CommonSEHeader {
 	 */
 	public JWSHeader(final JWSAlgorithm alg) {
 
-		this(alg, null, null, null, null, null, null, null, null, null, null, null, null);
+		this(alg, null, null, null, null, null, null, null, null, null, null, true,null, null);
 	}
 
 
@@ -522,6 +553,7 @@ public final class JWSHeader extends CommonSEHeader {
 	 * @param parsedBase64URL The parsed Base64URL, {@code null} if the
 	 *                        header is created from scratch.
 	 */
+	@Deprecated
 	public JWSHeader(final JWSAlgorithm alg,
 			 final JOSEObjectType typ,
 			 final String cty,
@@ -536,11 +568,71 @@ public final class JWSHeader extends CommonSEHeader {
 			 final Map<String,Object> customParams,
 			 final Base64URL parsedBase64URL) {
 
+		this(alg, typ, cty, crit, jku, jwk, x5u, x5t, x5t256, x5c, kid, true, customParams, parsedBase64URL);
+	}
+
+
+	/**
+	 * Creates a new JSON Web Signature (JWS) header.
+	 *
+	 * <p>Note: Use {@link PlainHeader} to create a header with algorithm
+	 * {@link Algorithm#NONE none}.
+	 *
+	 * @param alg             The JWS algorithm ({@code alg}) parameter.
+	 *                        Must not be "none" or {@code null}.
+	 * @param typ             The type ({@code typ}) parameter,
+	 *                        {@code null} if not specified.
+	 * @param cty             The content type ({@code cty}) parameter,
+	 *                        {@code null} if not specified.
+	 * @param crit            The names of the critical header
+	 *                        ({@code crit}) parameters, empty set or
+	 *                        {@code null} if none.
+	 * @param jku             The JSON Web Key (JWK) Set URL ({@code jku})
+	 *                        parameter, {@code null} if not specified.
+	 * @param jwk             The X.509 certificate URL ({@code jwk})
+	 *                        parameter, {@code null} if not specified.
+	 * @param x5u             The X.509 certificate URL parameter
+	 *                        ({@code x5u}), {@code null} if not specified.
+	 * @param x5t             The X.509 certificate SHA-1 thumbprint
+	 *                        ({@code x5t}) parameter, {@code null} if not
+	 *                        specified.
+	 * @param x5t256          The X.509 certificate SHA-256 thumbprint
+	 *                        ({@code x5t#S256}) parameter, {@code null} if
+	 *                        not specified.
+	 * @param x5c             The X.509 certificate chain ({@code x5c})
+	 *                        parameter, {@code null} if not specified.
+	 * @param kid             The key ID ({@code kid}) parameter,
+	 *                        {@code null} if not specified.
+	 * @param b64             {@code true} to Base64URL encode the payload
+	 *                        for standard JWS serialisation, {@code false}
+	 *                        for unencoded payload (RFC 7797).
+	 * @param customParams    The custom parameters, empty map or
+	 *                        {@code null} if none.
+	 * @param parsedBase64URL The parsed Base64URL, {@code null} if the
+	 *                        header is created from scratch.
+	 */
+	public JWSHeader(final JWSAlgorithm alg,
+			 final JOSEObjectType typ,
+			 final String cty,
+			 final Set<String> crit,
+			 final URI jku,
+			 final JWK jwk,
+			 final URI x5u,
+			 final Base64URL x5t,
+			 final Base64URL x5t256,
+			 final List<Base64> x5c,
+			 final String kid,
+			 final boolean b64,
+			 final Map<String,Object> customParams,
+			 final Base64URL parsedBase64URL) {
+
 		super(alg, typ, cty, crit, jku, jwk, x5u, x5t, x5t256, x5c, kid, customParams, parsedBase64URL);
 
 		if (alg.getName().equals(Algorithm.NONE.getName())) {
 			throw new IllegalArgumentException("The JWS algorithm \"alg\" cannot be \"none\"");
 		}
+		
+		this.b64 = b64;
 	}
 
 
@@ -590,8 +682,41 @@ public final class JWSHeader extends CommonSEHeader {
 
 		return (JWSAlgorithm)super.getAlgorithm();
 	}
-
-
+	
+	
+	/**
+	 * Returns the Base64URL-encode payload ({@code b64}) parameter.
+	 *
+	 * @return {@code true} to Base64URL encode the payload for standard
+	 *         JWS serialisation, {@code false} for unencoded payload (RFC
+	 *         7797).
+	 */
+	public boolean isBase64URLEncodePayload() {
+		
+		return b64;
+	}
+	
+	
+	@Override
+	public Set<String> getIncludedParams() {
+		Set<String> includedParams = super.getIncludedParams();
+		if (! isBase64URLEncodePayload()) {
+			includedParams.add("b64");
+		}
+		return includedParams;
+	}
+	
+	
+	@Override
+	public JSONObject toJSONObject() {
+		JSONObject o = super.toJSONObject();
+		if (! isBase64URLEncodePayload()) {
+			o.put("b64", false);
+		}
+		return o;
+	}
+	
+	
 	/**
 	 * Parses a JWS header from the specified JSON object.
 	 *
@@ -670,6 +795,8 @@ public final class JWSHeader extends CommonSEHeader {
 				header = header.x509CertChain(X509CertChainUtils.toBase64List(JSONObjectUtils.getJSONArray(jsonObject, name)));
 			} else if("kid".equals(name)) {
 				header = header.keyID(JSONObjectUtils.getString(jsonObject, name));
+			} else if("b64".equals(name)) {
+				header = header.base64URLEncodePayload(JSONObjectUtils.getBoolean(jsonObject, name));
 			} else {
 				header = header.customParam(name, jsonObject.get(name));
 			}

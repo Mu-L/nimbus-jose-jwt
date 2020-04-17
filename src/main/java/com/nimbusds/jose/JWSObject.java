@@ -20,16 +20,17 @@ package com.nimbusds.jose;
 
 import java.text.ParseException;
 
+import net.jcip.annotations.ThreadSafe;
+
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.StandardCharset;
-import net.jcip.annotations.ThreadSafe;
 
 
 /**
  * JSON Web Signature (JWS) secured object. This class is thread-safe.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-08-01
+ * @version 2020-04-16
  */
 @ThreadSafe
 public class JWSObject extends JOSEObject {
@@ -71,12 +72,6 @@ public class JWSObject extends JOSEObject {
 
 	/**
 	 * The signing input for this JWS object.
-	 *
-	 * <p>Format:
-	 *
-	 * <pre>
-	 * [header-base64url].[payload-base64url]
-	 * </pre>
 	 */
 	private final String signingInputString;
 
@@ -104,26 +99,17 @@ public class JWSObject extends JOSEObject {
 	public JWSObject(final JWSHeader header, final Payload payload) {
 
 		if (header == null) {
-
 			throw new IllegalArgumentException("The JWS header must not be null");
 		}
-
 		this.header = header;
 
 		if (payload == null) {
-
 			throw new IllegalArgumentException("The payload must not be null");
 		}
-
 		setPayload(payload);
-
-		if (header.getCustomParam("b64")  == null || (Boolean) header.getCustomParam("b64")) {
-			signingInputString = composeSigningInput(header.toBase64URL(), payload.toBase64URL());
-		} else {
-			signingInputString = header.toBase64URL().toString() + '.' + payload.toString();
-		}
+		
+		signingInputString = composeSigningInput();
 		signature = null;
-
 		state = State.UNSIGNED;
 	}
 
@@ -135,8 +121,8 @@ public class JWSObject extends JOSEObject {
 	 *
 	 * @param firstPart  The first part, corresponding to the JWS header.
 	 *                   Must not be {@code null}.
-	 * @param secondPart The second part, corresponding to the payload. Must
-	 *                   not be {@code null}.
+	 * @param secondPart The second part, corresponding to the payload.
+	 *                   Must not be {@code null}.
 	 * @param thirdPart  The third part, corresponding to the signature.
 	 *                   Must not be {@code null}.
 	 *
@@ -145,62 +131,52 @@ public class JWSObject extends JOSEObject {
 	public JWSObject(final Base64URL firstPart, final Base64URL secondPart, final Base64URL thirdPart)
 		throws ParseException {
 		this(firstPart, new Payload(secondPart), thirdPart);
-		setParsedParts(firstPart, secondPart, thirdPart);
 	}
 
+	
 	/**
 	 * Creates a new signed JSON Web Signature (JWS) object with the
-	 * specified serialised parts. The state will be
-	 * {@link State#SIGNED signed}.
+	 * specified serialised parts and payload which can be optionally
+	 * unencoded (RFC 7797). The state will be {@link State#SIGNED signed}.
 	 *
-	 * @param firstPart  The first part, corresponding to the JWS header.
-	 *                   Must not be {@code null}.
-	 * @param secondPart The second part, corresponding to the payload. Must
-	 *                   not be {@code null}.
-	 * @param thirdPart  The third part, corresponding to the signature.
-	 *                   Must not be {@code null}.
+	 * @param firstPart The first part, corresponding to the JWS header.
+	 *                  Must not be {@code null}.
+	 * @param payload   The payload. Must not be {@code null}.
+	 * @param thirdPart The third part, corresponding to the signature.
+	 *                  Must not be {@code null}.
 	 *
 	 * @throws ParseException If parsing of the serialised parts failed.
 	 */
-	public JWSObject(final Base64URL firstPart, final Payload secondPart, final Base64URL thirdPart)
+	public JWSObject(final Base64URL firstPart, final Payload payload, final Base64URL thirdPart)
 		throws ParseException {
 
 		if (firstPart == null) {
-
 			throw new IllegalArgumentException("The first part must not be null");
 		}
-
 		try {
 			this.header = JWSHeader.parse(firstPart);
-
 		} catch (ParseException e) {
-
 			throw new ParseException("Invalid JWS header: " + e.getMessage(), 0);
 		}
 
-		if (secondPart == null) {
-
-			throw new IllegalArgumentException("The second part must not be null");
+		if (payload == null) {
+			throw new IllegalArgumentException("The payload (second part) must not be null");
 		}
-
-		setPayload(secondPart);
-
-		if (header.getCustomParam("b64")  == null || (Boolean) header.getCustomParam("b64")) {
-			signingInputString = composeSigningInput(firstPart, secondPart.toBase64URL());
-		} else {
-			signingInputString = firstPart.toString() + '.' + secondPart.toString();
-		}
+		setPayload(payload);
+		
+		signingInputString = composeSigningInput();
 
 		if (thirdPart == null) {
 			throw new IllegalArgumentException("The third part must not be null");
 		}
-
 		signature = thirdPart;
-
 		state = State.SIGNED; // but signature not verified yet!
 
-		// this gets overridden if called from the other constructor in order to set the second part
-		setParsedParts(firstPart, null, thirdPart);
+		if (getHeader().isBase64URLEncodePayload()) {
+			setParsedParts(firstPart, payload.toBase64URL(), thirdPart);
+		} else {
+			setParsedParts(firstPart, new Base64URL(""), thirdPart);
+		}
 	}
 
 	@Override
@@ -211,40 +187,27 @@ public class JWSObject extends JOSEObject {
 
 
 	/**
-	 * Composes the signing input for the specified JWS object parts.
-	 *
-	 * <p>Format:
-	 *
-	 * <pre>
-	 * [header-base64url].[payload-base64url]
-	 * </pre>
-	 *
-	 * @param firstPart  The first part, corresponding to the JWS header.
-	 *                   Must not be {@code null}.
-	 * @param secondPart The second part, corresponding to the payload. 
-	 *                   Must not be {@code null}.
+	 * Composes the signing input string from the header and payload.
 	 *
 	 * @return The signing input string.
 	 */
-	private static String composeSigningInput(final Base64URL firstPart, final Base64URL secondPart) {
-
-		return firstPart.toString() + '.' + secondPart.toString();
+	private String composeSigningInput() {
+		
+		if (header.isBase64URLEncodePayload()) {
+			return getHeader().toBase64URL().toString() + '.' + getPayload().toBase64URL().toString();
+		} else {
+			return getHeader().toBase64URL().toString() + '.' + getPayload().toString();
+		}
 	}
 
 
 	/**
 	 * Returns the signing input for this JWS object.
 	 *
-	 * <p>Format:
-	 *
-	 * <pre>
-	 * [header-base64url].[payload-base64url]
-	 * </pre>
-	 *
 	 * @return The signing input, to be passed to a JWS signer or verifier.
 	 */
 	public byte[] getSigningInput() {
-
+		
 		return signingInputString.getBytes(StandardCharset.UTF_8);
 	}
 
@@ -451,12 +414,12 @@ public class JWSObject extends JOSEObject {
 	 * Parses a JWS object from the specified string in compact format. The
 	 * parsed JWS object will be given a {@link State#SIGNED} state.
 	 *
-	 * @param s The string to parse. Must not be {@code null}.
+	 * @param s The JWS string to parse. Must not be {@code null}.
 	 *
 	 * @return The JWS object.
 	 *
-	 * @throws ParseException If the string couldn't be parsed to a valid 
-	 *                        JWS object.
+	 * @throws ParseException If the string couldn't be parsed to a JWS
+	 *                        object.
 	 */
 	public static JWSObject parse(final String s)
 		throws ParseException {
@@ -469,5 +432,37 @@ public class JWSObject extends JOSEObject {
 		}
 
 		return new JWSObject(parts[0], parts[1], parts[2]);
+	}
+	
+	
+	/**
+	 * Parses a JWS object from the specified string in compact format and
+	 * a detached payload which can be optionally unencoded (RFC 7797). The
+	 * parsed JWS object will be given a {@link State#SIGNED} state.
+	 *
+	 * @param s               The JWS string to parse for a detached
+	 *                        payload. Must not be {@code null}.
+	 * @param detachedPayload The detached payload, optionally unencoded
+	 *                        (RFC 7797). Must not be {@code null}.
+	 *
+	 * @return The JWS object.
+	 *
+	 * @throws ParseException If the string couldn't be parsed to a JWS
+	 *                        object.
+	 */
+	public static JWSObject parse(final String s, final Payload detachedPayload)
+		throws ParseException {
+		
+		Base64URL[] parts = JOSEObject.split(s);
+		
+		if (parts.length != 3) {
+			throw new ParseException("Unexpected number of Base64URL parts, must be three", 0);
+		}
+		
+		if (! parts[1].toString().isEmpty()) {
+			throw new ParseException("The payload Base64URL part must be empty", 0);
+		}
+		
+		return new JWSObject(parts[0], detachedPayload, parts[2]);
 	}
 }

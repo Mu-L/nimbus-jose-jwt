@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.*;
 
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
 import com.nimbusds.jose.util.Base64URL;
@@ -292,7 +293,11 @@ public abstract class Header implements Serializable {
 		}
 
 		if (crit != null && ! crit.isEmpty()) {
-			o.put("crit", new ArrayList<>(crit));
+			JSONArray jsonArray = new JSONArray();
+			for (String c: crit) {
+				jsonArray.add(c);
+			}
+			o.put("crit", jsonArray);
 		}
 
 		return o;

@@ -22,23 +22,43 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.*;
 
+import junit.framework.TestCase;
+import net.minidev.json.JSONObject;
+
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
-import junit.framework.TestCase;
-import net.minidev.json.JSONObject;
 
 
 /**
  * Tests JWS header parsing and serialisation.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-10-04
+ * @version 2020-04-17
  */
 public class JWSHeaderTest extends TestCase {
+	
+	
+	public void testRegisteredParamNames() {
+		
+		Set<String> paramNames = JWSHeader.getRegisteredParameterNames();
+		assertTrue(paramNames.contains("alg"));
+		assertTrue(paramNames.contains("jku"));
+		assertTrue(paramNames.contains("jwk"));
+		assertTrue(paramNames.contains("x5u"));
+		assertTrue(paramNames.contains("x5t"));
+		assertTrue(paramNames.contains("x5t#S256"));
+		assertTrue(paramNames.contains("x5c"));
+		assertTrue(paramNames.contains("kid"));
+		assertTrue(paramNames.contains("typ"));
+		assertTrue(paramNames.contains("cty"));
+		assertTrue(paramNames.contains("crit"));
+		assertTrue(paramNames.contains("b64"));
+		assertEquals(12, paramNames.size());
+	}
 
 
 	public void testMinimalConstructor() {
@@ -55,7 +75,12 @@ public class JWSHeaderTest extends TestCase {
 		assertNull(h.getType());
 		assertNull(h.getContentType());
 		assertNull(h.getCriticalParams());
+		assertTrue(h.isBase64URLEncodePayload());
 		assertTrue(h.getCustomParams().isEmpty());
+		
+		JSONObject o = h.toJSONObject();
+		assertEquals(h.getAlgorithm().getName(), o.get("alg"));
+		assertEquals(1, o.size());
 	}
 
 
@@ -108,6 +133,7 @@ public class JWSHeaderTest extends TestCase {
 		assertEquals("application/json", h.getContentType());
 		assertEquals(new URI("https://example.com/jku.json"), h.getJWKURL());
 		assertEquals("1234", h.getKeyID());
+		assertTrue(h.isBase64URLEncodePayload());
 
 		jwk = (RSAKey)h.getJWK();
 		assertNotNull(jwk);
@@ -157,6 +183,7 @@ public class JWSHeaderTest extends TestCase {
 		assertEquals("application/json", h.getContentType());
 		assertEquals(new URI("https://example.com/jku.json"), h.getJWKURL());
 		assertEquals("1234", h.getKeyID());
+		assertTrue(h.isBase64URLEncodePayload());
 
 		jwk = (RSAKey)h.getJWK();
 		assertNotNull(jwk);
@@ -183,7 +210,7 @@ public class JWSHeaderTest extends TestCase {
 	}
 
 
-	public void testParseJSONText()
+	public void testParseJSON()
 		throws Exception {
 
 		// Example header from JWS spec
@@ -204,7 +231,7 @@ public class JWSHeaderTest extends TestCase {
 	}
 
 
-	public void testParseBase64URLText()
+	public void testParseBase64URL()
 		throws Exception {
 
 		// Example header from JWS spec
@@ -365,6 +392,72 @@ public class JWSHeaderTest extends TestCase {
 		} catch (UnsupportedOperationException e) {
 			// ok
 		}
+	}
+	
+	
+	// https://tools.ietf.org/html/rfc7797
+	public void testB64_builder() throws ParseException {
+		
+		// Builder
+		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+			.base64URLEncodePayload(false)
+			.criticalParams(Collections.singleton("b64"))
+			.build();
+		
+		assertEquals(JWSAlgorithm.RS256, header.getAlgorithm());
+		assertFalse(header.isBase64URLEncodePayload());
+		assertEquals(Collections.singleton("b64"), header.getCriticalParams());
+		
+		assertTrue(header.getIncludedParams().contains("alg"));
+		assertTrue(header.getIncludedParams().contains("b64"));
+		assertTrue(header.getIncludedParams().contains("crit"));
+		assertEquals(3, header.getIncludedParams().size());
+		
+		// Builder copy constructor
+		header = new JWSHeader.Builder(header)
+			.build();
+		
+		assertEquals(JWSAlgorithm.RS256, header.getAlgorithm());
+		assertFalse(header.isBase64URLEncodePayload());
+		assertEquals(Collections.singleton("b64"), header.getCriticalParams());
+		
+		assertTrue(header.getIncludedParams().contains("alg"));
+		assertTrue(header.getIncludedParams().contains("b64"));
+		assertTrue(header.getIncludedParams().contains("crit"));
+		assertEquals(3, header.getIncludedParams().size());
+		
+		// Serialisation
+		JSONObject o = header.toJSONObject();
+		assertEquals(JWSAlgorithm.RS256.getName(), o.get("alg"));
+		assertFalse(JSONObjectUtils.getBoolean(o, "b64"));
+		assertEquals(Collections.singletonList("b64"), JSONObjectUtils.getStringList(o, "crit"));
+		assertEquals(3, o.size());
+		
+		Base64URL base64URL = header.toBase64URL();
+		
+		// Parse
+		header = JWSHeader.parse(base64URL);
+		
+		assertEquals(JWSAlgorithm.RS256, header.getAlgorithm());
+		assertFalse(header.isBase64URLEncodePayload());
+		assertEquals(Collections.singleton("b64"), header.getCriticalParams());
+		
+		assertEquals(base64URL, header.getParsedBase64URL());
+	}
+	
+	
+	public void testB64_parseExampleHeader() throws ParseException {
+		
+		String s = "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19";
+		JWSHeader header = JWSHeader.parse(new Base64URL(s));
+		assertEquals(JWSAlgorithm.HS256, header.getAlgorithm());
+		assertFalse(header.isBase64URLEncodePayload());
+		assertEquals(Collections.singleton("b64"), header.getCriticalParams());
+		
+		assertTrue(header.getIncludedParams().contains("alg"));
+		assertTrue(header.getIncludedParams().contains("b64"));
+		assertTrue(header.getIncludedParams().contains("crit"));
+		assertEquals(3, header.getIncludedParams().size());
 	}
 
 
