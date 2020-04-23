@@ -53,8 +53,6 @@ public class RSASSA {
 							final Provider provider)
 		throws JOSEException {
 
-		// The JCE crypto provider uses different alg names
-
 		final String jcaAlg;
 
 		PSSParameterSpec pssSpec = null;
@@ -66,17 +64,17 @@ public class RSASSA {
 		} else if (alg.equals(JWSAlgorithm.RS512)) {
 			jcaAlg = "SHA512withRSA";
 		} else if (alg.equals(JWSAlgorithm.PS256)) {
-			jcaAlg = "SHA256withRSAandMGF1";
+			jcaAlg = "RSASSA-PSS";
 			// JWA mandates salt length must equal hash
-			pssSpec = new PSSParameterSpec("SHA256", "MGF1", MGF1ParameterSpec.SHA256, 32, 1);
+			pssSpec = new PSSParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, 32, 1);
 		} else if (alg.equals(JWSAlgorithm.PS384)) {
-			jcaAlg = "SHA384withRSAandMGF1";
+			jcaAlg = "RSASSA-PSS";
 			// JWA mandates salt length must equal hash
-			pssSpec = new PSSParameterSpec("SHA384", "MGF1", MGF1ParameterSpec.SHA384, 48, 1);
+			pssSpec = new PSSParameterSpec("SHA-384", "MGF1", MGF1ParameterSpec.SHA384, 48, 1);
 		} else if (alg.equals(JWSAlgorithm.PS512)) {
-			jcaAlg = "SHA512withRSAandMGF1";
+			jcaAlg = "RSASSA-PSS";
 			// JWA mandates salt length must equal hash
-			pssSpec = new PSSParameterSpec("SHA512", "MGF1", MGF1ParameterSpec.SHA512, 64, 1);
+			pssSpec = new PSSParameterSpec("SHA-512", "MGF1", MGF1ParameterSpec.SHA512, 64, 1);
 		} else {
 			throw new JOSEException(AlgorithmSupportMessage.unsupportedJWSAlgorithm(alg, RSASSAProvider.SUPPORTED_ALGORITHMS));
 		}
