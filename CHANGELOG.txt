@@ -1138,3 +1138,6 @@ version 8.15 (2020-04-17)
     * Makes the "b64" (base64url-encode payload) JWS header parameter a
       processed header parameter in
       CriticalHeaderParamsDeferral.getProcessedCriticalHeaderParams().
+
+version 8.16 (2020-04-26)
+    * Updates the JCA algorithm names for PS256, PS384 and PS512.

@@ -45,7 +45,7 @@ import com.nimbusds.jose.util.Base64URL;
  * from the JWS spec.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-04-17
+ * @version 2020-04-26
  */
 public class RSASSATest extends TestCase {
 
@@ -411,19 +411,25 @@ public class RSASSATest extends TestCase {
 		RSAPublicKey publicKey = (RSAPublicKey)kp.getPublic();
 		RSAPrivateKey privateKey = (RSAPrivateKey)kp.getPrivate();
 
-		RSASSASigner signer = new RSASSASigner(privateKey);
-		signer.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
-
-		assertNotNull("Private key check", signer.getPrivateKey());
-
-		RSASSAVerifier verifier = new RSASSAVerifier(publicKey);
-		verifier.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
-
-		assertNotNull("Public key check", verifier.getPublicKey());
-
-		testSignAndVerifyCycle(JWSAlgorithm.PS256, signer, verifier);
-		testSignAndVerifyCycle(JWSAlgorithm.PS384, signer, verifier);
-		testSignAndVerifyCycle(JWSAlgorithm.PS512, signer, verifier);
+		for (boolean useBouncyCastleProvider: new boolean[]{false, true}) {
+		
+			RSASSASigner signer = new RSASSASigner(privateKey);
+			
+			if (useBouncyCastleProvider) {
+				signer.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
+			}
+	
+			assertNotNull("Private key check", signer.getPrivateKey());
+	
+			RSASSAVerifier verifier = new RSASSAVerifier(publicKey);
+			verifier.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
+	
+			assertNotNull("Public key check", verifier.getPublicKey());
+	
+			testSignAndVerifyCycle(JWSAlgorithm.PS256, signer, verifier);
+			testSignAndVerifyCycle(JWSAlgorithm.PS384, signer, verifier);
+			testSignAndVerifyCycle(JWSAlgorithm.PS512, signer, verifier);
+		}
 	}
 
 
