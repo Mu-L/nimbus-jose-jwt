@@ -52,7 +52,8 @@ import net.jcip.annotations.Immutable;
  *
  * @author Vladimir Dzhuvinov
  * @author Josh Cummings
- * @version 2018-06-13
+ * @author Ben Arena
+ * @version 2020-05-12
  */
 @Immutable
 public class JWKMatcher {
@@ -1035,6 +1036,14 @@ public class JWKMatcher {
 				.keyID(jwsHeader.getKeyID())
 				.privateOnly(true)
 				.algorithms(algorithm, null)
+				.build();
+		} else if (JWSAlgorithm.Family.ED.contains(algorithm)) {
+			return new JWKMatcher.Builder()
+				.keyType(KeyType.forAlgorithm(algorithm))
+				.keyID(jwsHeader.getKeyID())
+				.keyUses(KeyUse.SIGNATURE, null)
+				.algorithms(algorithm, null)
+				.curves(Curve.forJWSAlgorithm(algorithm))
 				.build();
 		} else {
 			return null; // Unsupported algorithm

@@ -1141,3 +1141,6 @@ version 8.15 (2020-04-17)
 
 version 8.16 (2020-04-26)
     * Updates the JCA algorithm names for PS256, PS384 and PS512.
+
+version 8.17 (2020-05-12)
+    * Updates JWKMatcher.forJWSHeader to support EdDSA.

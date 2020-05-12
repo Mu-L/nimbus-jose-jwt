@@ -43,7 +43,7 @@ import junit.framework.TestCase;
  * Tests the JWK matcher.
  *
  * @author Vladimir Dzhuvinov
- * @version 2018-08-24
+ * @version 2020-05-12
  */
 public class JWKMatcherTest extends TestCase {
 	
@@ -867,6 +867,20 @@ public class JWKMatcherTest extends TestCase {
 			.build();
 		
 		assertTrue(matcher.matches(okp));
+	}
+	
+	public void testMatchEdDSAJWSHeader() {
+		OctetKeyPair okp = new OctetKeyPair.Builder(Curve.Ed25519, new Base64URL("x"))
+			.algorithm(JWSAlgorithm.EdDSA)
+			.keyID("Dave")
+			.build();
+		
+		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.EdDSA)
+			.keyID("Dave")
+			.jwk(okp)
+			.build();
+		
+		assertTrue(JWKMatcher.forJWSHeader(header).matches(okp));
 	}
 
 	public void testMatchThumbprint() {
