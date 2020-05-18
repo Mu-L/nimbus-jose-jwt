@@ -53,7 +53,7 @@ import net.jcip.annotations.Immutable;
  * @author Vladimir Dzhuvinov
  * @author Josh Cummings
  * @author Ben Arena
- * @version 2020-05-12
+ * @version 2020-05-19
  */
 @Immutable
 public class JWKMatcher {
@@ -624,7 +624,7 @@ public class JWKMatcher {
 			if (curve == null) {
 				curves = null;
 			} else {
-				curves = new HashSet<>(Collections.singletonList(curve));
+				curves = Collections.singleton(curve);
 			}
 			return this;
 		}
