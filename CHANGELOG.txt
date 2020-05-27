@@ -1144,3 +1144,6 @@ version 8.16 (2020-04-26)
 
 version 8.17 (2020-05-12)
     * Updates JWKMatcher.forJWSHeader to support EdDSA.
+
+version 8.17.1 (2020-05-27)
+    * Improves ambiguous JWT claim verification error message (iss #361).
