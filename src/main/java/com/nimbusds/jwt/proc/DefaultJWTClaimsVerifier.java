@@ -280,9 +280,10 @@ public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWT
 		
 		// Check exact matches
 		for (String exactMatch: exactMatchClaims.getClaims().keySet()) {
-			Object value = claimsSet.getClaim(exactMatch);
-			if (! value.equals(exactMatchClaims.getClaim(exactMatch))) {
-				throw new BadJWTException("JWT \"" + exactMatch + "\" claim doesn't match expected value: " + value);
+			Object actualClaim = claimsSet.getClaim(exactMatch);
+			Object expectedClaim = exactMatchClaims.getClaim(exactMatch);
+			if (! actualClaim.equals(expectedClaim)) {
+				throw new BadJWTException("JWT \"" + exactMatch + "\" claim has value " + actualClaim + " but should be " + expectedClaim);
 			}
 		}
 		
