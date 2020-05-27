@@ -20,9 +20,7 @@ package com.nimbusds.jose.proc;
 
 import java.security.Key;
 import java.security.PublicKey;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import javax.crypto.SecretKey;
 
 import com.nimbusds.jose.JWSAlgorithm;
@@ -47,7 +45,7 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 	/**
 	 * The expected JWS algorithm.
 	 */
-	private final JWSAlgorithm jwsAlg;
+	private final Set<JWSAlgorithm> jwsAlgs = new HashSet<>();
 
 
 	/**
@@ -62,18 +60,33 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 		if (jwsAlg == null) {
 			throw new IllegalArgumentException("The JWS algorithm must not be null");
 		}
-		this.jwsAlg = jwsAlg;
+		this.jwsAlgs.add(jwsAlg);
 	}
 
+	/**
+	 * Creates a new JWS verification key selector.
+	 *
+	 * @param jwsAlg    The expected JWS algorithm for the objects to be
+	 *                  verified. Must not be {@code null}.
+	 * @param jwkSource The JWK source. Must not be {@code null}.
+	 */
+	public JWSVerificationKeySelector(final Collection<JWSAlgorithm> jwsAlgs, final JWKSource<C> jwkSource) {
+		super(jwkSource);
+		if (jwsAlgs == null || jwsAlgs.isEmpty()) {
+			throw new IllegalArgumentException("The JWS algorithms must not be null or empty");
+		}
+		this.jwsAlgs.addAll(jwsAlgs);
+	}
 
 	/**
-	 * Returns the expected JWS algorithm.
+	 * Determines if an algorithm is present in local algorithm set.
 	 *
-	 * @return The expected JWS algorithm.
+	 * @param jwsAlg The algorithm to check
+	 *
+	 * @return boolean if algorithm is present
 	 */
-	public JWSAlgorithm getExpectedJWSAlgorithm() {
-
-		return jwsAlg;
+	public boolean isJWSAlgorithmPresent(JWSAlgorithm jwsAlg) {
+		return jwsAlgs.contains(jwsAlg);
 	}
 
 
@@ -87,7 +100,7 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 	 */
 	protected JWKMatcher createJWKMatcher(final JWSHeader jwsHeader) {
 
-		if (! getExpectedJWSAlgorithm().equals(jwsHeader.getAlgorithm())) {
+		if (! isJWSAlgorithmPresent(jwsHeader.getAlgorithm())) {
 			// Unexpected JWS alg
 			return null;
 		} else {
@@ -100,7 +113,7 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 	public List<Key> selectJWSKeys(final JWSHeader jwsHeader, final C context)
 		throws KeySourceException {
 
-		if (! jwsAlg.equals(jwsHeader.getAlgorithm())) {
+		if (! jwsAlgs.contains(jwsHeader.getAlgorithm())) {
 			// Unexpected JWS alg
 			return Collections.emptyList();
 		}
