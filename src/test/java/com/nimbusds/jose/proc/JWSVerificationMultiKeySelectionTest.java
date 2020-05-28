@@ -48,9 +48,9 @@ public class JWSVerificationMultiKeySelectionTest {
 	
 	private JWSVerificationKeySelector<SecurityContext> keySelector;
 	
-	private String kid1 = UUID.randomUUID().toString();
-	private String kid2 = UUID.randomUUID().toString();
-	private String kid3 = UUID.randomUUID().toString();
+	private final String kid1 = UUID.randomUUID().toString();
+	private final String kid2 = UUID.randomUUID().toString();
+	private final String kid3 = UUID.randomUUID().toString();
 	
 	private RSAKey signingRS256Jwk;
 	private ECKey signingES256Jwk;
