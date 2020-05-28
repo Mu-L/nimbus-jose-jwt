@@ -18,17 +18,20 @@
 package com.nimbusds.jose.proc;
 
 
-import java.security.Key;
-import java.security.PublicKey;
-import java.util.*;
-import javax.crypto.SecretKey;
-
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.KeySourceException;
-import com.nimbusds.jose.jwk.*;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKMatcher;
+import com.nimbusds.jose.jwk.JWKSelector;
+import com.nimbusds.jose.jwk.KeyConverter;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import net.jcip.annotations.ThreadSafe;
+
+import javax.crypto.SecretKey;
+import java.security.Key;
+import java.security.PublicKey;
+import java.util.*;
 
 
 /**
@@ -45,7 +48,7 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 	/**
 	 * The expected JWS algorithm.
 	 */
-	private final Set<JWSAlgorithm> jwsAlgs = new HashSet<>();
+	private final Set<JWSAlgorithm> jwsAlgs;
 
 
 	/**
@@ -60,22 +63,25 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 		if (jwsAlg == null) {
 			throw new IllegalArgumentException("The JWS algorithm must not be null");
 		}
-		this.jwsAlgs.add(jwsAlg);
+		HashSet<JWSAlgorithm> algorithms = new HashSet<JWSAlgorithm>() {{
+			add(jwsAlg);
+		}};
+		this.jwsAlgs = Collections.unmodifiableSet(algorithms);
 	}
 
 	/**
 	 * Creates a new JWS verification key selector.
 	 *
-	 * @param jwsAlg    The expected JWS algorithm for the objects to be
+	 * @param jwsAlgs    The expected JWS algorithm for the objects to be
 	 *                  verified. Must not be {@code null}.
 	 * @param jwkSource The JWK source. Must not be {@code null}.
 	 */
-	public JWSVerificationKeySelector(final Collection<JWSAlgorithm> jwsAlgs, final JWKSource<C> jwkSource) {
+	public JWSVerificationKeySelector(final Set<JWSAlgorithm> jwsAlgs, final JWKSource<C> jwkSource) {
 		super(jwkSource);
 		if (jwsAlgs == null || jwsAlgs.isEmpty()) {
 			throw new IllegalArgumentException("The JWS algorithms must not be null or empty");
 		}
-		this.jwsAlgs.addAll(jwsAlgs);
+		this.jwsAlgs = Collections.unmodifiableSet(jwsAlgs);
 	}
 
 	/**
