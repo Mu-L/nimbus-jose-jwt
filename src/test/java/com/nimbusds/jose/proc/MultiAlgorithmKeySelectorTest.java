@@ -44,7 +44,7 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 
-public class JWSVerificationMultiKeySelectionTest {
+public class MultiAlgorithmKeySelectorTest {
 	
 	private JWSVerificationKeySelector<SecurityContext> keySelector;
 	
