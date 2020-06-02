@@ -170,4 +170,22 @@ public class Algorithm implements JSONAware, Serializable {
 
 		return "\"" + JSONObject.escape(name) + '"';
 	}
+	
+	/**
+     * Parses the optional algorithm.
+     *
+     * @param s The string to parse. May be {@code null}.
+     *
+     * @return  The intended JOSE algorithm, {@code null} if not specified.
+     *
+     */
+	public static Algorithm parse(String s) {
+	    
+	    if(s == null) {
+	        return null;
+	    }
+	    else {
+	        return new Algorithm(s);
+	    }
+	}
 }
