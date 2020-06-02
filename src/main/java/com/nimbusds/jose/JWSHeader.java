@@ -66,7 +66,7 @@ import net.minidev.json.JSONObject;
  * </pre>
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-04-17
+ * @version 2020-06-02
  */
 @Immutable
 public final class JWSHeader extends CommonSEHeader {
@@ -756,7 +756,7 @@ public final class JWSHeader extends CommonSEHeader {
 		Algorithm alg = Header.parseAlgorithm(jsonObject);
 
 		if (! (alg instanceof JWSAlgorithm)) {
-			throw new ParseException("The algorithm \"alg\" header parameter must be for signatures", 0);
+			throw new ParseException("Not a JWS header", 0);
 		}
 
 		JWSHeader.Builder header = new Builder((JWSAlgorithm)alg).parsedBase64URL(parsedBase64URL);

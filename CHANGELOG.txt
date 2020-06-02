@@ -1152,3 +1152,5 @@ version 8.18 (2020-06-02)
     * Updates JWSVerificationKeySelector to support multiple allowed JWS
       algorithms, replaces getExpectedJWSAlgorithm method with isAllowed (iss
       #353).
+    * Fixes JWSHeader.parse ParseException message for non-JWS headers (iss
+      #360).
