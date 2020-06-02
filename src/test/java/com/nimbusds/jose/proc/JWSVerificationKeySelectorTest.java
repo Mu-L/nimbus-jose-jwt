@@ -29,7 +29,9 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -120,6 +122,7 @@ public class JWSVerificationKeySelectorTest extends TestCase {
 			new ImmutableJWKSet(new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2))));
 
 		assertTrue(keySelector.isAllowed(JWSAlgorithm.RS256));
+		assertEquals(JWSAlgorithm.RS256, keySelector.getExpectedJWSAlgorithm());
 		assertNotNull(keySelector.getJWKSource());
 
 		// Test JWK matcher
@@ -178,6 +181,7 @@ public class JWSVerificationKeySelectorTest extends TestCase {
 			JWSAlgorithm.HS256,
 			new ImmutableJWKSet(new JWKSet(new OctetSequenceKey.Builder(secret).build())));
 
+		assertEquals(JWSAlgorithm.HS256, keySelector.getExpectedJWSAlgorithm());
 		assertTrue(keySelector.isAllowed(JWSAlgorithm.HS256));
 		assertNotNull(keySelector.getJWKSource());
 
@@ -223,5 +227,29 @@ public class JWSVerificationKeySelectorTest extends TestCase {
 
 		List<Key> candidates = keySelector.selectJWSKeys(new JWSHeader.Builder(unsupported).keyID("1").build(), null);
 		assertTrue(candidates.isEmpty());
+	}
+
+	public void testForBackwardCompatibility() {
+		Set<JWSAlgorithm> jwsAlgs = new HashSet<>();
+		jwsAlgs.add(JWSAlgorithm.RS256);
+		jwsAlgs.add(JWSAlgorithm.RS512);
+
+		RSAKey rsa = new RSAKey.Builder(new Base64URL("n"), new Base64URL("e"))
+				.algorithm(JWSAlgorithm.RS256)
+				.keyID("1")
+				.build();
+
+		JWSVerificationKeySelector keySelector = new JWSVerificationKeySelector(
+				jwsAlgs,
+				new ImmutableJWKSet(new JWKSet(rsa))
+		);
+
+		try {
+			keySelector.getExpectedJWSAlgorithm();
+			fail("getExpectedJWSAlgorithm should have failed since multiple algorithms " +
+					"were specified in the constructor");
+		} catch (UnsupportedOperationException e) {
+			// pass
+		}
 	}
 }
