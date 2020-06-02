@@ -18,6 +18,16 @@
 package com.nimbusds.jose.proc;
 
 
+import java.security.Key;
+import java.security.PublicKey;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import javax.crypto.SecretKey;
+
+import net.jcip.annotations.ThreadSafe;
+
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.KeySourceException;
@@ -26,12 +36,6 @@ import com.nimbusds.jose.jwk.JWKMatcher;
 import com.nimbusds.jose.jwk.JWKSelector;
 import com.nimbusds.jose.jwk.KeyConverter;
 import com.nimbusds.jose.jwk.source.JWKSource;
-import net.jcip.annotations.ThreadSafe;
-
-import javax.crypto.SecretKey;
-import java.security.Key;
-import java.security.PublicKey;
-import java.util.*;
 
 
 /**
@@ -39,14 +43,15 @@ import java.util.*;
  * retrieved from a {@link JWKSource JSON Web Key (JWK) source}.
  *
  * @author Vladimir Dzhuvinov
- * @version 2016-06-21
+ * @author Marco Vermeulen
+ * @version 2020-06-02
  */
 @ThreadSafe
 public class JWSVerificationKeySelector<C extends SecurityContext> extends AbstractJWKSelectorWithSource<C> implements JWSKeySelector<C> {
 
 
 	/**
-	 * The expected JWS algorithm.
+	 * The allowed JWS algorithms.
 	 */
 	private final Set<JWSAlgorithm> jwsAlgs;
 
@@ -54,7 +59,7 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 	/**
 	 * Creates a new JWS verification key selector.
 	 *
-	 * @param jwsAlg    The expected JWS algorithm for the objects to be
+	 * @param jwsAlg    The allowed JWS algorithm for the objects to be
 	 *                  verified. Must not be {@code null}.
 	 * @param jwkSource The JWK source. Must not be {@code null}.
 	 */
@@ -63,17 +68,15 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 		if (jwsAlg == null) {
 			throw new IllegalArgumentException("The JWS algorithm must not be null");
 		}
-		HashSet<JWSAlgorithm> algorithms = new HashSet<JWSAlgorithm>() {{
-			add(jwsAlg);
-		}};
-		this.jwsAlgs = Collections.unmodifiableSet(algorithms);
+		this.jwsAlgs = Collections.singleton(jwsAlg);
 	}
 
+	
 	/**
 	 * Creates a new JWS verification key selector.
 	 *
-	 * @param jwsAlgs    The expected JWS algorithm for the objects to be
-	 *                  verified. Must not be {@code null}.
+	 * @param jwsAlgs   The allowed JWS algorithms for the objects to be
+	 *                  verified. Must not be empty or {@code null}.
 	 * @param jwkSource The JWK source. Must not be {@code null}.
 	 */
 	public JWSVerificationKeySelector(final Set<JWSAlgorithm> jwsAlgs, final JWKSource<C> jwkSource) {
@@ -84,14 +87,15 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 		this.jwsAlgs = Collections.unmodifiableSet(jwsAlgs);
 	}
 
+	
 	/**
-	 * Determines if an algorithm is present in local algorithm set.
+	 * Checks if a JWS algorithm is allowed for key selection.
 	 *
-	 * @param jwsAlg The algorithm to check
+	 * @param jwsAlg The JWS algorithm to check.
 	 *
-	 * @return boolean if algorithm is present
+	 * @return {@code true} if allowed, else {@code false}.
 	 */
-	public boolean isJWSAlgorithmPresent(JWSAlgorithm jwsAlg) {
+	public boolean isAllowed(final JWSAlgorithm jwsAlg) {
 		return jwsAlgs.contains(jwsAlg);
 	}
 
@@ -106,7 +110,7 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 	 */
 	protected JWKMatcher createJWKMatcher(final JWSHeader jwsHeader) {
 
-		if (! isJWSAlgorithmPresent(jwsHeader.getAlgorithm())) {
+		if (! isAllowed(jwsHeader.getAlgorithm())) {
 			// Unexpected JWS alg
 			return null;
 		} else {

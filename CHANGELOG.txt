@@ -1147,3 +1147,8 @@ version 8.17 (2020-05-12)
 
 version 8.17.1 (2020-05-27)
     * Improves ambiguous JWT claim verification error message (iss #361).
+
+version 8.18 (2020-06-02)
+    * Updates JWSVerificationKeySelector to support multiple allowed JWS
+      algorithms, replaces getExpectedJWSAlgorithm method with isAllowed (iss
+      #353).

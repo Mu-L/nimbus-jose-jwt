@@ -68,30 +68,29 @@ public class MultiAlgorithmKeySelectorTest {
 
 		JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(Arrays.<JWK>asList(signingRS256Jwk, signingES256Jwk)));
 		
-		Set<JWSAlgorithm> algorithms = new HashSet<JWSAlgorithm>(Arrays.asList(JWSAlgorithm.RS256, JWSAlgorithm.RS512, JWSAlgorithm.ES256));
+		Set<JWSAlgorithm> algorithms = new HashSet<>(Arrays.asList(JWSAlgorithm.RS256, JWSAlgorithm.RS512, JWSAlgorithm.ES256));
 		
-		keySelector = new JWSVerificationKeySelector<SecurityContext>(algorithms, jwks);
-
+		keySelector = new JWSVerificationKeySelector<>(algorithms, jwks);
 	}
 	
 	@Test
 	public void selectFromMultipleSupportedAlgorithms() throws Exception {
 		List<Key> candidates = keySelector.selectJWSKeys(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(kid1).build(), null);
 		
-		assertEquals(candidates.size(), 1);
+		assertEquals(1, candidates.size());
 		assertEquals(signingRS256Jwk.toRSAPublicKey().getModulus(), ((RSAPublicKey)candidates.get(0)).getModulus());
 		assertEquals(signingRS256Jwk.toRSAPublicKey().getPublicExponent(), ((RSAPublicKey)candidates.get(0)).getPublicExponent());
 		
 		candidates = keySelector.selectJWSKeys(new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(kid2).build(), null);
 		
-		assertEquals(candidates.size(), 1);
+		assertEquals(1, candidates.size());
 		assertEquals(signingES256Jwk.toECPublicKey().getAlgorithm(), ((ECPublicKey)candidates.get(0)).getAlgorithm());
 		assertEquals(signingES256Jwk.toECPublicKey().getParams(), ((ECPublicKey)candidates.get(0)).getParams());
 	}
 
 	@Test
-	public void doNotSelectUnsupportedAlgorithm() throws Exception {
+	public void doNotSelectAlgorithmThatIsNotAllowed() throws Exception {
 		List<Key> candidates = keySelector.selectJWSKeys(new JWSHeader.Builder(JWSAlgorithm.ES512).keyID(kid3).build(), null);
-		assertEquals(candidates.size(), 0);
+		assertEquals(0, candidates.size());
 	}
 }
