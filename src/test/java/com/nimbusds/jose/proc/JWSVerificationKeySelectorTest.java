@@ -119,7 +119,7 @@ public class JWSVerificationKeySelectorTest extends TestCase {
 			JWSAlgorithm.RS256,
 			new ImmutableJWKSet(new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2))));
 
-		assertEquals(JWSAlgorithm.RS256, keySelector.getExpectedJWSAlgorithm());
+		assertTrue(keySelector.isJWSAlgorithmPresent(JWSAlgorithm.RS256));
 		assertNotNull(keySelector.getJWKSource());
 
 		// Test JWK matcher
@@ -178,7 +178,7 @@ public class JWSVerificationKeySelectorTest extends TestCase {
 			JWSAlgorithm.HS256,
 			new ImmutableJWKSet(new JWKSet(new OctetSequenceKey.Builder(secret).build())));
 
-		assertEquals(JWSAlgorithm.HS256, keySelector.getExpectedJWSAlgorithm());
+		assertTrue(keySelector.isJWSAlgorithmPresent(JWSAlgorithm.HS256));
 		assertNotNull(keySelector.getJWKSource());
 
 		// Test JWK matcher
