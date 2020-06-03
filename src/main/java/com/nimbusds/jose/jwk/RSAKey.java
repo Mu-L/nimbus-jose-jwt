@@ -132,7 +132,7 @@ import com.nimbusds.jose.util.*;
  * @author Vladimir Dzhuvinov
  * @author Justin Richer
  * @author Cedric Staub
- * @version 2019-04-15
+ * @version 2020-06-03
  */
 @Immutable
 public final class RSAKey extends JWK implements AsymmetricJWK {
@@ -2059,68 +2059,54 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 	 */
 	public static RSAKey parse(final JSONObject jsonObject)
 		throws ParseException {
-	    
-	    
-		// Parse the mandatory public key parameters first
-		Base64URL n = new Base64URL(JSONObjectUtils.getString(jsonObject, "n"));
-		Base64URL e = new Base64URL(JSONObjectUtils.getString(jsonObject, "e"));
 
 		// Check key type
-		KeyType kty = KeyType.parse(JSONObjectUtils.getString(jsonObject, "kty"));
-		if (kty != KeyType.RSA) {
+		String kty = JSONObjectUtils.getString(jsonObject, "kty");
+		if (kty == null) {
+			throw new ParseException("The key type \"kty\" must be specified", 0);
+		}
+		if (! KeyType.parse(kty).equals(KeyType.RSA)) {
 			throw new ParseException("The key type \"kty\" must be RSA", 0);
 		}
+		
+		// Parse the mandatory public key parameters
+		Base64URL n = JSONObjectUtils.getBase64URL(jsonObject, "n");
+		Base64URL e = JSONObjectUtils.getBase64URL(jsonObject, "e");
 		
 		// Parse the optional private key parameters
 
 		// 1st private representation
-		Base64URL d = null;
-		if (jsonObject.containsKey("d")) {
-		    d = JSONObjectUtils.getBase64URL(jsonObject, "d");
-		}
+		Base64URL d = JSONObjectUtils.getBase64URL(jsonObject, "d");
 
 		// 2nd private (CRT) representation
-		Base64URL p = null;
-		if (jsonObject.containsKey("p")) {
-			p = JSONObjectUtils.getBase64URL(jsonObject, "p");
-		}
-		Base64URL q = null;
-		if (jsonObject.containsKey("q")) {
-			q = JSONObjectUtils.getBase64URL(jsonObject, "q");
-		}
-		Base64URL dp = null;
-		if (jsonObject.containsKey("dp")) {
-			dp = JSONObjectUtils.getBase64URL(jsonObject, "dp");
-		}
-		Base64URL dq= null;
-		if (jsonObject.containsKey("dq")) {
-			dq = JSONObjectUtils.getBase64URL(jsonObject, "dq");
-		}
-		Base64URL qi = null;
-		if (jsonObject.containsKey("qi")) {
-			qi = JSONObjectUtils.getBase64URL(jsonObject, "qi");
-		}
+		Base64URL p = JSONObjectUtils.getBase64URL(jsonObject, "p");
+		Base64URL q = JSONObjectUtils.getBase64URL(jsonObject, "q");
+		Base64URL dp = JSONObjectUtils.getBase64URL(jsonObject, "dp");
+		Base64URL dq = JSONObjectUtils.getBase64URL(jsonObject, "dq");
+		Base64URL qi = JSONObjectUtils.getBase64URL(jsonObject, "qi");
 		
 		List<OtherPrimesInfo> oth = null;
 		if (jsonObject.containsKey("oth")) {
 
 			JSONArray arr = JSONObjectUtils.getJSONArray(jsonObject, "oth");
 			if(arr != null) {
-    			oth = new ArrayList<>(arr.size());
-    			
-    			for (Object o : arr) {
-    
-    				if (o instanceof JSONObject) {
-    					JSONObject otherJson = (JSONObject)o;
-    
-    					Base64URL r = new Base64URL(JSONObjectUtils.getString(otherJson, "r"));
-    					Base64URL odq = new Base64URL(JSONObjectUtils.getString(otherJson, "dq"));
-    					Base64URL t = new Base64URL(JSONObjectUtils.getString(otherJson, "t"));
-    
-    					OtherPrimesInfo prime = new OtherPrimesInfo(r, odq, t);
-    					oth.add(prime);
-    				}
-    			}
+				oth = new ArrayList<>(arr.size());
+				
+				for (Object o : arr) {
+	    
+					if (o instanceof JSONObject) {
+						JSONObject otherJson = (JSONObject)o;
+	    
+						Base64URL r = JSONObjectUtils.getBase64URL(otherJson, "r");
+						Base64URL odq = JSONObjectUtils.getBase64URL(otherJson, "dq");
+						Base64URL t = JSONObjectUtils.getBase64URL(otherJson, "t");
+						try {
+							oth.add(new OtherPrimesInfo(r, odq, t));
+						} catch (IllegalArgumentException iae) {
+							throw new ParseException(iae.getMessage(), 0);
+						}
+					}
+				}
 			}
 		}
 
@@ -2137,7 +2123,8 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 				null);
 		
 		} catch (IllegalArgumentException ex) {
-			// Inconsistent 2nd spec, conflicting 'use' and 'key_ops', etc.
+			// Missing mandatory n or e, inconsistent 2nd spec,
+			// conflicting 'use' and 'key_ops', etc.
 			throw new ParseException(ex.getMessage(), 0);
 		}
 	}
@@ -2214,7 +2201,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 		
 		java.security.cert.Certificate cert = keyStore.getCertificate(alias);
 		
-		if (cert == null || ! (cert instanceof X509Certificate)) {
+		if (!(cert instanceof X509Certificate)) {
 			return null;
 		}
 		

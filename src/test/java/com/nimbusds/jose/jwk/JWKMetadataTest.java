@@ -28,16 +28,53 @@ import net.minidev.json.JSONObject;
 public class JWKMetadataTest extends TestCase {
 	
 	
-	public void testParseEmptyX509CertChain() {
+	public void testParseNoMembers()
+		throws ParseException {
+		
+		JSONObject o = new JSONObject();
+		
+		assertNull(JWKMetadata.parseKeyUse(o));
+		assertNull(JWKMetadata.parseKeyOperations(o));
+		assertNull(JWKMetadata.parseAlgorithm(o));
+		assertNull(JWKMetadata.parseKeyID(o));
+		assertNull(JWKMetadata.parseX509CertURL(o));
+		assertNull(JWKMetadata.parseX509CertThumbprint(o));
+		assertNull(JWKMetadata.parseX509CertSHA256Thumbprint(o));
+		assertNull(JWKMetadata.parseX509CertChain(o));
+	}
+	
+	
+	public void testParseNullMembers()
+		throws ParseException {
+		
+		JSONObject o = new JSONObject();
+		
+		o.put("use", null);
+		o.put("key_ops", null);
+		o.put("alg", null);
+		o.put("kid", null);
+		o.put("x5u", null);
+		o.put("x5t", null);
+		o.put("x5t#S256", null);
+		o.put("x5c", null);
+		
+		assertNull(JWKMetadata.parseKeyUse(o));
+		assertNull(JWKMetadata.parseKeyOperations(o));
+		assertNull(JWKMetadata.parseAlgorithm(o));
+		assertNull(JWKMetadata.parseKeyID(o));
+		assertNull(JWKMetadata.parseX509CertURL(o));
+		assertNull(JWKMetadata.parseX509CertThumbprint(o));
+		assertNull(JWKMetadata.parseX509CertSHA256Thumbprint(o));
+		assertNull(JWKMetadata.parseX509CertChain(o));
+	}
+	
+	
+	public void testParseEmptyX509CertChain()
+		throws ParseException {
 		
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("x5c", new JSONArray()); // empty
 		
-		try {
-			JWKMetadata.parseX509CertChain(jsonObject);
-			fail();
-		} catch (ParseException e) {
-			assertEquals("The X.509 certificate chain \"x5c\" must not be empty", e.getMessage());
-		}
+		assertNull(JWKMetadata.parseX509CertChain(jsonObject));
 	}
 }

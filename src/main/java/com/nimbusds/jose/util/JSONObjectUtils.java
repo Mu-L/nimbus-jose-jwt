@@ -33,7 +33,7 @@ import net.minidev.json.parser.JSONParser;
  * JSON object helper methods for parsing and typed retrieval of member values.
  *
  * @author Vladimir Dzhuvinov
- * @version 2018-11-06
+ * @version 2020-06-03
  */
 public class JSONObjectUtils {
 
@@ -385,25 +385,25 @@ public class JSONObjectUtils {
 	
 	
 	/**
-     * Gets a string member of a JSON object as {@code Base64URL}.
-     *
-     * @param o   The JSON object. Must not be {@code null}.
-     * @param key The JSON object member key. Must not be {@code null}.
-     *
-     * @return The JSON object member value, may be {@code null}.
-     *
-     * @throws ParseException If the value is not of the expected type.
-     */
-	public static Base64URL getBase64URL(final JSONObject o, final String key) 
-	        throws ParseException {
-	    
-	    String value = getString(o, key);
-        
-        if (value == null) {
-            return null;
-        }
-        
-        return new Base64URL(value);
+         * Gets a string member of a JSON object as {@link Base64URL}.
+         *
+         * @param o   The JSON object. Must not be {@code null}.
+         * @param key The JSON object member key. Must not be {@code null}.
+         *
+         * @return The JSON object member value, may be {@code null}.
+         *
+         * @throws ParseException If the value is not of the expected type.
+         */
+	public static Base64URL getBase64URL(final JSONObject o, final String key)
+		throws ParseException {
+		
+		String value = getString(o, key);
+		
+		if (value == null) {
+			return null;
+		}
+		
+		return new Base64URL(value);
 	}
 
 

@@ -29,6 +29,7 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPrivateKeySpec;
+import java.text.ParseException;
 import java.util.*;
 
 import static org.junit.Assert.assertNotEquals;
@@ -54,7 +55,7 @@ import com.nimbusds.jose.util.*;
  * Tests the RSA JWK class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-06-24
+ * @version 2020-06-03
  */
 public class RSAKeyTest extends TestCase {
 
@@ -1661,5 +1662,58 @@ public class RSAKeyTest extends TestCase {
 		RSAKey secondPassKey = RSAKey.parse(rsaKey.toJSONObject());
 		
 		assertEquals(secondPassKey, rsaKey);
+	}
+	
+	
+	public void testParse_fromEmptyJSONObject() {
+		
+		try {
+			RSAKey.parse(new JSONObject());
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The key type \"kty\" must be specified", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_missingKty() {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("n", n);
+		jsonObject.put("e", e);
+		try {
+			RSAKey.parse(jsonObject);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The key type \"kty\" must be specified", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_missingN() {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("kty", "RSA");
+		jsonObject.put("e", e);
+		try {
+			RSAKey.parse(jsonObject);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The modulus value must not be null", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_missingE() {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("kty", "RSA");
+		jsonObject.put("n", n);
+		try {
+			RSAKey.parse(jsonObject);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The public exponent value must not be null", e.getMessage());
+		}
 	}
 }

@@ -31,7 +31,7 @@ import org.junit.Assert;
  * Tests the JSON object utilities.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-10-05
+ * @version 2020-06-03
  */
 public class JSONObjectUtilsTest extends TestCase {
 
@@ -360,5 +360,29 @@ public class JSONObjectUtilsTest extends TestCase {
 		
 		JSONObject jsonObject = new JSONObject();
 		assertNull(JSONObjectUtils.getJSONObject(jsonObject, "key"));
+	}
+	
+	
+	public void testGetBase64URL() throws ParseException {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("x5t", "abc");
+		Base64URL base64URL = JSONObjectUtils.getBase64URL(jsonObject, "x5t");
+		assertEquals("abc", base64URL.toString());
+	}
+	
+	
+	public void testGetBase64URL_null() throws ParseException {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("x5t", null);
+		assertNull(JSONObjectUtils.getBase64URL(jsonObject, "x5t"));
+	}
+	
+	
+	public void testGetBase64URL_missing() throws ParseException {
+		
+		JSONObject jsonObject = new JSONObject();
+		assertNull(JSONObjectUtils.getBase64URL(jsonObject, "x5t"));
 	}
 }

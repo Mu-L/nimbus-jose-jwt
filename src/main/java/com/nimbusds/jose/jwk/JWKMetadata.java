@@ -23,19 +23,20 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Set;
 
+import net.minidev.json.JSONObject;
+
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jose.util.X509CertChainUtils;
-import net.minidev.json.JSONObject;
 
 
 /**
  * JSON Web Key (JWK) metadata.
  *
  * @author Vladimir Dzhuvinov
- * @version 2018-02-26
+ * @version 2020-06-03
  */
 final class JWKMetadata {
 
@@ -69,11 +70,7 @@ final class JWKMetadata {
 	static KeyUse parseKeyUse(final JSONObject o)
 		throws ParseException {
 
-		if (o.containsKey("use")) {
-			return KeyUse.parse(JSONObjectUtils.getString(o, "use"));
-		} else {
-			return null;
-		}
+		return KeyUse.parse(JSONObjectUtils.getString(o, "use"));
 	}
 
 
@@ -89,11 +86,7 @@ final class JWKMetadata {
 	static Set<KeyOperation> parseKeyOperations(final JSONObject o)
 		throws ParseException {
 		
-		if(o.containsKey("key_ops")) {
-			return KeyOperation.parse(JSONObjectUtils.getStringList(o, "key_ops"));
-		} else {
-			return null;
-		}
+		return KeyOperation.parse(JSONObjectUtils.getStringList(o, "key_ops"));
 	}
 
 
@@ -109,11 +102,7 @@ final class JWKMetadata {
 	static Algorithm parseAlgorithm(final JSONObject o)
 		throws ParseException {
 
-		if (o.containsKey("alg")) {
-		    return Algorithm.parse(JSONObjectUtils.getString(o, "alg"));
-		} else {
-			return null;
-		}
+		return Algorithm.parse(JSONObjectUtils.getString(o, "alg"));
 	}
 
 
@@ -129,11 +118,7 @@ final class JWKMetadata {
 	static String parseKeyID(final JSONObject o)
 		throws ParseException {
 
-		if (o.containsKey("kid")) {
-			return JSONObjectUtils.getString(o, "kid");
-		} else {
-			return null;
-		}
+		return JSONObjectUtils.getString(o, "kid");
 	}
 
 
@@ -149,11 +134,7 @@ final class JWKMetadata {
 	static URI parseX509CertURL(final JSONObject o)
 		throws ParseException {
 
-		if (o.containsKey("x5u")) {
-			return JSONObjectUtils.getURI(o, "x5u");
-		} else {
-			return null;
-		}
+		return JSONObjectUtils.getURI(o, "x5u");
 	}
 
 
@@ -170,11 +151,7 @@ final class JWKMetadata {
 	static Base64URL parseX509CertThumbprint(final JSONObject o)
 		throws ParseException {
 
-		if (o.containsKey("x5t")) {
-			return JSONObjectUtils.getBase64URL(o, "x5t");
-		} else {
-			return null;
-		}
+		return JSONObjectUtils.getBase64URL(o, "x5t");
 	}
 
 
@@ -191,11 +168,7 @@ final class JWKMetadata {
 	static Base64URL parseX509CertSHA256Thumbprint(final JSONObject o)
 		throws ParseException {
 
-		if (o.containsKey("x5t#S256")) {
-			return JSONObjectUtils.getBase64URL(o, "x5t#S256");
-		} else {
-			return null;
-		}
+		return JSONObjectUtils.getBase64URL(o, "x5t#S256");
 	}
 
 
@@ -212,18 +185,14 @@ final class JWKMetadata {
 	 */
 	static List<Base64> parseX509CertChain(final JSONObject o)
 		throws ParseException {
-
-		if (o.containsKey("x5c")) {
-			List<Base64> chain = X509CertChainUtils.toBase64List(JSONObjectUtils.getJSONArray(o, "x5c"));
-			
-			if (chain.isEmpty()) {
-				return null;
-			}
-			
+		
+		// https://tools.ietf.org/html/rfc7517#section-4.7
+		List<Base64> chain = X509CertChainUtils.toBase64List(JSONObjectUtils.getJSONArray(o, "x5c"));
+		
+		if (chain == null || ! chain.isEmpty()) {
 			return chain;
-			
-		} else {
-			return null;
 		}
+		
+		return null; // Empty chains not allowed
 	}
 }
