@@ -382,6 +382,29 @@ public class JSONObjectUtils {
 
 		return getGeneric(o, key, JSONObject.class);
 	}
+	
+	
+	/**
+     * Gets a string member of a JSON object as {@code Base64URL}.
+     *
+     * @param o   The JSON object. Must not be {@code null}.
+     * @param key The JSON object member key. Must not be {@code null}.
+     *
+     * @return The JSON object member value, may be {@code null}.
+     *
+     * @throws ParseException If the value is not of the expected type.
+     */
+	public static Base64URL getBase64URL(final JSONObject o, final String key) 
+	        throws ParseException {
+	    
+	    String value = getString(o, key);
+        
+        if (value == null) {
+            return null;
+        }
+        
+        return new Base64URL(value);
+	}
 
 
 	/**

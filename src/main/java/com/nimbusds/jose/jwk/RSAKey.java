@@ -2059,7 +2059,8 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 	 */
 	public static RSAKey parse(final JSONObject jsonObject)
 		throws ParseException {
-
+	    
+	    
 		// Parse the mandatory public key parameters first
 		Base64URL n = new Base64URL(JSONObjectUtils.getString(jsonObject, "n"));
 		Base64URL e = new Base64URL(JSONObjectUtils.getString(jsonObject, "e"));
@@ -2075,49 +2076,51 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 		// 1st private representation
 		Base64URL d = null;
 		if (jsonObject.containsKey("d")) {
-			d = new Base64URL(JSONObjectUtils.getString(jsonObject, "d"));
+		    d = JSONObjectUtils.getBase64URL(jsonObject, "d");
 		}
 
 		// 2nd private (CRT) representation
 		Base64URL p = null;
 		if (jsonObject.containsKey("p")) {
-			p = new Base64URL(JSONObjectUtils.getString(jsonObject, "p"));
+			p = JSONObjectUtils.getBase64URL(jsonObject, "p");
 		}
 		Base64URL q = null;
 		if (jsonObject.containsKey("q")) {
-			q = new Base64URL(JSONObjectUtils.getString(jsonObject, "q"));
+			q = JSONObjectUtils.getBase64URL(jsonObject, "q");
 		}
 		Base64URL dp = null;
 		if (jsonObject.containsKey("dp")) {
-			dp = new Base64URL(JSONObjectUtils.getString(jsonObject, "dp"));
+			dp = JSONObjectUtils.getBase64URL(jsonObject, "dp");
 		}
 		Base64URL dq= null;
 		if (jsonObject.containsKey("dq")) {
-			dq = new Base64URL(JSONObjectUtils.getString(jsonObject, "dq"));
+			dq = JSONObjectUtils.getBase64URL(jsonObject, "dq");
 		}
 		Base64URL qi = null;
 		if (jsonObject.containsKey("qi")) {
-			qi = new Base64URL(JSONObjectUtils.getString(jsonObject, "qi"));
+			qi = JSONObjectUtils.getBase64URL(jsonObject, "qi");
 		}
 		
 		List<OtherPrimesInfo> oth = null;
 		if (jsonObject.containsKey("oth")) {
 
 			JSONArray arr = JSONObjectUtils.getJSONArray(jsonObject, "oth");
-			oth = new ArrayList<>(arr.size());
-			
-			for (Object o : arr) {
-
-				if (o instanceof JSONObject) {
-					JSONObject otherJson = (JSONObject)o;
-
-					Base64URL r = new Base64URL(JSONObjectUtils.getString(otherJson, "r"));
-					Base64URL odq = new Base64URL(JSONObjectUtils.getString(otherJson, "dq"));
-					Base64URL t = new Base64URL(JSONObjectUtils.getString(otherJson, "t"));
-
-					OtherPrimesInfo prime = new OtherPrimesInfo(r, odq, t);
-					oth.add(prime);
-				}
+			if(arr != null) {
+    			oth = new ArrayList<>(arr.size());
+    			
+    			for (Object o : arr) {
+    
+    				if (o instanceof JSONObject) {
+    					JSONObject otherJson = (JSONObject)o;
+    
+    					Base64URL r = new Base64URL(JSONObjectUtils.getString(otherJson, "r"));
+    					Base64URL odq = new Base64URL(JSONObjectUtils.getString(otherJson, "dq"));
+    					Base64URL t = new Base64URL(JSONObjectUtils.getString(otherJson, "t"));
+    
+    					OtherPrimesInfo prime = new OtherPrimesInfo(r, odq, t);
+    					oth.add(prime);
+    				}
+    			}
 			}
 		}
 

@@ -110,7 +110,7 @@ final class JWKMetadata {
 		throws ParseException {
 
 		if (o.containsKey("alg")) {
-			return new Algorithm(JSONObjectUtils.getString(o, "alg"));
+		    return Algorithm.parse(JSONObjectUtils.getString(o, "alg"));
 		} else {
 			return null;
 		}
@@ -171,7 +171,7 @@ final class JWKMetadata {
 		throws ParseException {
 
 		if (o.containsKey("x5t")) {
-			return new Base64URL(JSONObjectUtils.getString(o, "x5t"));
+			return JSONObjectUtils.getBase64URL(o, "x5t");
 		} else {
 			return null;
 		}
@@ -192,7 +192,7 @@ final class JWKMetadata {
 		throws ParseException {
 
 		if (o.containsKey("x5t#S256")) {
-			return new Base64URL(JSONObjectUtils.getString(o, "x5t#S256"));
+			return JSONObjectUtils.getBase64URL(o, "x5t#S256");
 		} else {
 			return null;
 		}
@@ -217,7 +217,7 @@ final class JWKMetadata {
 			List<Base64> chain = X509CertChainUtils.toBase64List(JSONObjectUtils.getJSONArray(o, "x5c"));
 			
 			if (chain.isEmpty()) {
-				throw new ParseException("The X.509 certificate chain \"x5c\" must not be empty", 0);
+				return null;
 			}
 			
 			return chain;
