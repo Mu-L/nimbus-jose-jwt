@@ -55,6 +55,10 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 	 */
 	private final Set<JWSAlgorithm> jwsAlgs;
 
+	/**
+	 * Present to maintain backward compatibility
+	 */
+	private final boolean singleJwsAlgConstructorWasCalled;
 
 	/**
 	 * Creates a new JWS verification key selector.
@@ -69,6 +73,7 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 			throw new IllegalArgumentException("The JWS algorithm must not be null");
 		}
 		this.jwsAlgs = Collections.singleton(jwsAlg);
+		this.singleJwsAlgConstructorWasCalled = true;
 	}
 
 	
@@ -85,6 +90,7 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 			throw new IllegalArgumentException("The JWS algorithms must not be null or empty");
 		}
 		this.jwsAlgs = Collections.unmodifiableSet(jwsAlgs);
+		this.singleJwsAlgConstructorWasCalled = false;
 	}
 
 	
@@ -99,6 +105,21 @@ public class JWSVerificationKeySelector<C extends SecurityContext> extends Abstr
 		return jwsAlgs.contains(jwsAlg);
 	}
 
+
+	/**
+	 * Returns the expected JWS algorithm.
+	 *
+	 * @return The expected JWS algorithm.
+	 * @deprecated Use {@link #isAllowed(JWSAlgorithm)} instead
+	 */
+	@Deprecated
+	public JWSAlgorithm getExpectedJWSAlgorithm() {
+		if (singleJwsAlgConstructorWasCalled) {
+			return jwsAlgs.iterator().next();
+		}
+		throw new UnsupportedOperationException("Since this class was constructed with multiple " +
+				"algorithms, the behavior of this method is undefined.");
+	}
 
 	/**
 	 * Creates a JWK matcher for the expected JWS algorithm and the
