@@ -37,7 +37,7 @@ import net.minidev.json.JSONObject;
  * </ul>
  *
  * @author Vladimir Dzhuvinov 
- * @version 2013-03-27
+ * @version 2020-06-03
  */
 @Immutable
 public class Algorithm implements JSONAware, Serializable {
@@ -172,20 +172,18 @@ public class Algorithm implements JSONAware, Serializable {
 	}
 	
 	/**
-     * Parses the optional algorithm.
-     *
-     * @param s The string to parse. May be {@code null}.
-     *
-     * @return  The intended JOSE algorithm, {@code null} if not specified.
-     *
-     */
-	public static Algorithm parse(String s) {
+	 * Parses an optional algorithm.
+	 *
+	 * @param s The string to parse. May be {@code null}.
+	 *
+	 * @return  The JOSE algorithm, {@code null} if not specified.
+	 */
+	public static Algorithm parse(final String s) {
 	    
-	    if(s == null) {
-	        return null;
-	    }
-	    else {
-	        return new Algorithm(s);
-	    }
+		if(s == null) {
+			return null;
+		} else {
+			return new Algorithm(s);
+		}
 	}
 }

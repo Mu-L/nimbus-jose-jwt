@@ -25,7 +25,7 @@ import junit.framework.TestCase;
  * Tests the base Algorithm class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2012-09-26
+ * @version 2020-06-03
  */
 public class AlgorithmTest extends TestCase {
 
@@ -94,5 +94,14 @@ public class AlgorithmTest extends TestCase {
 		Algorithm alg2 = new Algorithm("my-alg");
 
 		assertEquals(alg1.hashCode(), alg2.hashCode());
+	}
+	
+	
+	public void testParse() {
+		
+		assertNull(Algorithm.parse(null));
+		
+		assertEquals(Algorithm.NONE, Algorithm.parse("none"));
+		assertEquals(JWSAlgorithm.HS256, Algorithm.parse("HS256"));
 	}
 }
