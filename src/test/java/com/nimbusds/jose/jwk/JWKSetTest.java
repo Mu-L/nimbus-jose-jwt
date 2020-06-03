@@ -1033,4 +1033,76 @@ public class JWKSetTest extends TestCase {
 		assertFalse(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), ecJWK.toPublicJWK())).containsJWK(otherRsaJWK));
 		assertFalse(new JWKSet(Arrays.asList(rsaJWK.toPublicJWK(), otherRsaJWK.toPublicJWK())).containsJWK(ecJWK));
 	}
+	
+	//https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/358/the-base64-must-not-be-null-message
+	public void testNullJWKSetValues() throws Exception {
+	  
+        String s = "{" +
+                "\"keys\": [" +
+                         "{" +
+                         "\"additionalData\": {}," +
+                         "\"alg\": null," +
+                         "\"crv\": null," +
+                         "\"d\": null," +
+                         "\"dp\": null," +
+                         "\"dq\": null," +
+                         "\"e\": \"AQAB\"," +
+                         "\"k\": null," +
+                         "\"keyId\": \"yMPAp4MB5fMXz7U7kDdZpGK1-Ao069CgW01Car1Nky4\"," +
+                         "\"keyOps\": []," +
+                         "\"kid\": \"yMPAp4MB5fMXz7U7kDdZpGK1-Ao069CgW01Car1Nky4\"," +
+                         "\"kty\": \"RSA\"," +
+                         "\"n\": \"sgJ7pH6-SF4I7YSXJbEsdYvEknFej4cT0wNrVXty0gD9WyUdhiq8giTMDkKCRGBLEcAoJKDNAetsUtD6qTBPlS5aNmuvcqVpm2WHTov_YnpE3WT-0WMozVlfzdQEwgfQlllW-A0GUYT5SI1JQpAhU6jMJKyGdtpJJYFkMadmQo6Zc6eeHNFa-yliCV31K5FHHemH1CO6ufGmvg_LBlaA_MEp12GgPT3D3NmoGe_lCwCCwYAcLIqBgJppGKeFRx7xrfoH4UvyERtNJVyU5ck0hPeNlecXdfCwLczOCSFvh7GMV5U_7TyQakEbCfdwG3tF7rdL0-apZ1h1xhUMY24RAw\"," +
+                         "\"oth\": null," +
+                         "\"p\": null," +
+                         "\"q\": null," +
+                         "\"qi\": null," +
+                         "\"use\": null," +
+                         "\"x\": null," +
+                         "\"x5c\": []," +
+                         "\"x5t\": null," +
+                         "\"x5tS256\": null," +
+                         "\"x5u\": null," +
+                         "\"y\": null," +
+                         "\"keySize\": 2048," +
+                         "\"hasPrivateKey\": false," +
+                         "\"cryptoProviderFactory\": {" +
+                              "\"cryptoProviderCache\": {}," +
+                              "\"customCryptoProvider\": null," +
+                              "\"cacheSignatureProviders\": false" +
+                           "}" + 
+                         "}" +
+                       "]" +
+                     "}";
+
+        
+        JWKSet keySet = JWKSet.parse(s);
+
+
+        List<JWK> keyList = keySet.getKeys();
+        assertEquals(1, keyList.size());
+
+
+        // Check key
+        JWK key = keyList.get(0);
+
+        assertTrue(key instanceof RSAKey);
+        assertEquals("yMPAp4MB5fMXz7U7kDdZpGK1-Ao069CgW01Car1Nky4", key.getKeyID());
+        assertNull(key.getKeyUse());
+        assertNull(key.getParsedX509CertChain());
+        assertNull(key.getKeyStore());
+        assertNull(key.getX509CertChain());
+        
+        assertNull(key.getAlgorithm());
+        
+        RSAKey rsaKey = (RSAKey) key;
+       
+        assertTrue(key instanceof RSAKey);
+       
+        assertEquals("AQAB", rsaKey.getPublicExponent().toString());
+        assertFalse(key.isPrivate());
+        
+        assertTrue(rsaKey.toPublicKey() instanceof RSAPublicKey);       
+	        
+	}
 }
