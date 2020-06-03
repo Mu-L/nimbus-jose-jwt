@@ -53,7 +53,11 @@ final class JWKMetadata {
 	static KeyType parseKeyType(final JSONObject o)
 		throws ParseException {
 
-		return KeyType.parse(JSONObjectUtils.getString(o, "kty"));
+		try {
+			return KeyType.parse(JSONObjectUtils.getString(o, "kty"));
+		} catch (IllegalArgumentException e) {
+			throw new ParseException(e.getMessage(), 0);
+		}
 	}
 
 

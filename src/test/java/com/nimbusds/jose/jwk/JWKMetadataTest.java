@@ -33,6 +33,13 @@ public class JWKMetadataTest extends TestCase {
 		
 		JSONObject o = new JSONObject();
 		
+		try {
+			JWKMetadata.parseKeyType(o);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The key type to parse must not be null", e.getMessage());
+		}
+		
 		assertNull(JWKMetadata.parseKeyUse(o));
 		assertNull(JWKMetadata.parseKeyOperations(o));
 		assertNull(JWKMetadata.parseAlgorithm(o));
@@ -49,6 +56,7 @@ public class JWKMetadataTest extends TestCase {
 		
 		JSONObject o = new JSONObject();
 		
+		o.put("kty", null);
 		o.put("use", null);
 		o.put("key_ops", null);
 		o.put("alg", null);
@@ -57,6 +65,13 @@ public class JWKMetadataTest extends TestCase {
 		o.put("x5t", null);
 		o.put("x5t#S256", null);
 		o.put("x5c", null);
+		
+		try {
+			JWKMetadata.parseKeyType(o);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The key type to parse must not be null", e.getMessage());
+		}
 		
 		assertNull(JWKMetadata.parseKeyUse(o));
 		assertNull(JWKMetadata.parseKeyOperations(o));
