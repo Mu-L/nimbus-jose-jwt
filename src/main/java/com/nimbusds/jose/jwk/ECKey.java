@@ -106,7 +106,7 @@ import com.nimbusds.jose.util.JSONObjectUtils;
  *
  * @author Vladimir Dzhuvinov
  * @author Justin Richer
- * @version 2019-04-15
+ * @version 2020-06-03
  */
 @Immutable
 public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
@@ -1382,25 +1382,25 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 	public static ECKey parse(final JSONObject jsonObject)
 		throws ParseException {
 
-		// Parse the mandatory parameters first
-		Curve crv = Curve.parse(JSONObjectUtils.getString(jsonObject, "crv"));
-		Base64URL x = new Base64URL(JSONObjectUtils.getString(jsonObject, "x"));
-		Base64URL y = new Base64URL(JSONObjectUtils.getString(jsonObject, "y"));
-
 		// Check key type
-		KeyType kty = JWKMetadata.parseKeyType(jsonObject);
-
-		if (kty != KeyType.EC) {
+		if (! KeyType.EC.equals(JWKMetadata.parseKeyType(jsonObject))) {
 			throw new ParseException("The key type \"kty\" must be EC", 0);
 		}
+		
+		// Parse the mandatory public key parameters
+		Curve crv;
+		try {
+			crv = Curve.parse(JSONObjectUtils.getString(jsonObject, "crv"));
+		} catch (IllegalArgumentException e) {
+			throw new ParseException(e.getMessage(), 0);
+		}
+		
+		Base64URL x = JSONObjectUtils.getBase64URL(jsonObject, "x");
+		Base64URL y = JSONObjectUtils.getBase64URL(jsonObject, "y");
 
 		// Get optional private key
-		Base64URL d = null;
-		if (jsonObject.get("d") != null) {
-			d = new Base64URL(JSONObjectUtils.getString(jsonObject, "d"));
-		}
-
-
+		Base64URL d = JSONObjectUtils.getBase64URL(jsonObject, "d");
+		
 		try {
 			if (d == null) {
 				// Public key
@@ -1431,7 +1431,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
 		} catch (IllegalArgumentException ex) {
 
-			// Conflicting 'use' and 'key_ops'
+			// Missing x or y, conflicting 'use' and 'key_ops'
 			throw new ParseException(ex.getMessage(), 0);
 		}
 	}

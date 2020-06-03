@@ -20,6 +20,7 @@ package com.nimbusds.jose.jwk;
 
 import java.net.URI;
 import java.security.KeyStore;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -521,5 +522,61 @@ public class OctetKeyPairTest extends TestCase {
 
 		//Then
 		assertNotEquals(okpA, okpB);
+	}
+	
+	
+	public void testParse_fromEmptyJSONObject() {
+		
+		try {
+			OctetKeyPair.parse(new JSONObject());
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The key type to parse must not be null", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_missingKty() {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("crv", "Ed25519");
+		jsonObject.put("x", "ewrewrewr");
+		
+		try {
+			OctetKeyPair.parse(jsonObject);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The key type to parse must not be null", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_missingCrv() {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("kty", "OKP");
+		jsonObject.put("x", "ewrewrewr");
+		
+		try {
+			OctetKeyPair.parse(jsonObject);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The cryptographic curve string must not be null or empty", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_missingX() {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("kty", "OKP");
+		jsonObject.put("crv", "Ed25519");
+		
+		try {
+			OctetKeyPair.parse(jsonObject);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The 'x' parameter must not be null", e.getMessage());
+		}
 	}
 }

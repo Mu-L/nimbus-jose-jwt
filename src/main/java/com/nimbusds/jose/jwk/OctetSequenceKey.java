@@ -64,7 +64,7 @@ import com.nimbusds.jose.util.*;
  * 
  * @author Justin Richer
  * @author Vladimir Dzhuvinov
- * @version 2019-04-15
+ * @version 2020-06-03
  */
 @Immutable
 public final class OctetSequenceKey extends JWK implements SecretJWK {
@@ -590,29 +590,30 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
 	 */
 	public static OctetSequenceKey parse(final JSONObject jsonObject) 
 		throws ParseException {
-
-		// Parse the mandatory parameters first
-		Base64URL k = new Base64URL(JSONObjectUtils.getString(jsonObject, "k"));
-
-		// Check key type
-		KeyType kty = JWKMetadata.parseKeyType(jsonObject);
-
-		if (kty != KeyType.OCT) {
-
+		
+		// Check the key type
+		if (! KeyType.OCT.equals(JWKMetadata.parseKeyType(jsonObject))) {
 			throw new ParseException("The key type \"kty\" must be oct", 0);
 		}
 
-		return new OctetSequenceKey(k,
-			JWKMetadata.parseKeyUse(jsonObject),
-			JWKMetadata.parseKeyOperations(jsonObject),
-			JWKMetadata.parseAlgorithm(jsonObject),
-			JWKMetadata.parseKeyID(jsonObject),
-			JWKMetadata.parseX509CertURL(jsonObject),
-			JWKMetadata.parseX509CertThumbprint(jsonObject),
-			JWKMetadata.parseX509CertSHA256Thumbprint(jsonObject),
-			JWKMetadata.parseX509CertChain(jsonObject),
-			null // key store
-		);
+		// Parse the mandatory parameter
+		Base64URL k = JSONObjectUtils.getBase64URL(jsonObject, "k");
+
+		try {
+			return new OctetSequenceKey(k,
+				JWKMetadata.parseKeyUse(jsonObject),
+				JWKMetadata.parseKeyOperations(jsonObject),
+				JWKMetadata.parseAlgorithm(jsonObject),
+				JWKMetadata.parseKeyID(jsonObject),
+				JWKMetadata.parseX509CertURL(jsonObject),
+				JWKMetadata.parseX509CertThumbprint(jsonObject),
+				JWKMetadata.parseX509CertSHA256Thumbprint(jsonObject),
+				JWKMetadata.parseX509CertChain(jsonObject),
+				null // key store
+			);
+		} catch (IllegalArgumentException e) {
+			throw new ParseException(e.getMessage(), 0);
+		}
 	}
 	
 	

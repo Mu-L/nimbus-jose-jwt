@@ -1671,7 +1671,7 @@ public class RSAKeyTest extends TestCase {
 			RSAKey.parse(new JSONObject());
 			fail();
 		} catch (ParseException e) {
-			assertEquals("The key type \"kty\" must be specified", e.getMessage());
+			assertEquals("The key type to parse must not be null", e.getMessage());
 		}
 	}
 	
@@ -1685,7 +1685,7 @@ public class RSAKeyTest extends TestCase {
 			RSAKey.parse(jsonObject);
 			fail();
 		} catch (ParseException e) {
-			assertEquals("The key type \"kty\" must be specified", e.getMessage());
+			assertEquals("The key type to parse must not be null", e.getMessage());
 		}
 	}
 	

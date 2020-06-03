@@ -2061,11 +2061,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 		throws ParseException {
 
 		// Check key type
-		String kty = JSONObjectUtils.getString(jsonObject, "kty");
-		if (kty == null) {
-			throw new ParseException("The key type \"kty\" must be specified", 0);
-		}
-		if (! KeyType.parse(kty).equals(KeyType.RSA)) {
+		if (! KeyType.RSA.equals(JWKMetadata.parseKeyType(jsonObject))) {
 			throw new ParseException("The key type \"kty\" must be RSA", 0);
 		}
 		

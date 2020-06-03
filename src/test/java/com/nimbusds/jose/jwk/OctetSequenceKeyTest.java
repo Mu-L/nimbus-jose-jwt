@@ -24,6 +24,7 @@ import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
+import java.text.ParseException;
 import java.util.*;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -44,7 +45,7 @@ import com.nimbusds.jose.util.Base64URL;
  * Tests the Octet Sequence JWK class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2018-02-27
+ * @version 2020-06-03
  */
 public class OctetSequenceKeyTest extends TestCase {
 
@@ -595,5 +596,59 @@ public class OctetSequenceKeyTest extends TestCase {
 
 		//Then
 		assertNotEquals(jwkA, jwkB);
+	}
+	
+	
+	public void testParse_fromEmptyJSONObject() {
+		
+		try {
+			OctetSequenceKey.parse(new JSONObject());
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The key type to parse must not be null", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_missingKty() {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("k", "werewrwerewr");
+		
+		try {
+			OctetSequenceKey.parse(jsonObject);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The key type to parse must not be null", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_missingK() {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("kty", "oct");
+		
+		try {
+			OctetSequenceKey.parse(jsonObject);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The key value must not be null", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_nullK() {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("kty", "oct");
+		jsonObject.put("k", null);
+		
+		try {
+			OctetSequenceKey.parse(jsonObject);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The key value must not be null", e.getMessage());
+		}
 	}
 }

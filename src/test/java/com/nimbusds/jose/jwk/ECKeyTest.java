@@ -30,6 +30,7 @@ import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
+import java.text.ParseException;
 import java.util.*;
 
 import static org.junit.Assert.assertNotEquals;
@@ -54,7 +55,7 @@ import com.nimbusds.jose.util.*;
  * Tests the EC JWK class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-04-15
+ * @version 2020-06-03
  */
 public class ECKeyTest extends TestCase {
 
@@ -1160,5 +1161,61 @@ public class ECKeyTest extends TestCase {
 
 		//Then
 		assertNotEquals(ecKeyA, ecKeyB);
+	}
+	
+	
+	public void testParse_fromEmptyJSONObject() {
+		
+		try {
+			ECKey.parse(new JSONObject());
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The key type to parse must not be null", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_missingCurve() {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("kty", "EC");
+		jsonObject.put("x", "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
+		jsonObject.put("y", "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
+		try {
+			ECKey.parse(jsonObject);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The cryptographic curve string must not be null or empty", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_missingX() {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("kty", "EC");
+		jsonObject.put("crv", "P-256");
+		jsonObject.put("y", "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
+		try {
+			ECKey.parse(jsonObject);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The 'x' coordinate must not be null", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_missingY() {
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("kty", "EC");
+		jsonObject.put("crv", "P-256");
+		jsonObject.put("x", "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
+		try {
+			ECKey.parse(jsonObject);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The 'y' coordinate must not be null", e.getMessage());
+		}
 	}
 }

@@ -86,7 +86,7 @@ import com.nimbusds.jose.util.JSONObjectUtils;
  * </pre>
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-04-15
+ * @version 2020-06-03
  */
 @Immutable
 public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
@@ -789,23 +789,23 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 	public static OctetKeyPair parse(final JSONObject jsonObject)
 		throws ParseException {
 		
-		// Parse the mandatory parameters first
-		Curve crv = Curve.parse(JSONObjectUtils.getString(jsonObject, "crv"));
-		Base64URL x = new Base64URL(JSONObjectUtils.getString(jsonObject, "x"));
-		
-		// Check key type
-		KeyType kty = JWKMetadata.parseKeyType(jsonObject);
-		
-		if (kty != KeyType.OKP) {
+		// Check the key type
+		if (! KeyType.OKP.equals(JWKMetadata.parseKeyType(jsonObject))) {
 			throw new ParseException("The key type \"kty\" must be OKP", 0);
 		}
 		
-		// Get optional private key
-		Base64URL d = null;
-		if (jsonObject.get("d") != null) {
-			d = new Base64URL(JSONObjectUtils.getString(jsonObject, "d"));
+		// Parse the mandatory parameters
+		Curve crv;
+		try {
+			crv = Curve.parse(JSONObjectUtils.getString(jsonObject, "crv"));
+		} catch (IllegalArgumentException e) {
+			throw new ParseException(e.getMessage(), 0);
 		}
 		
+		Base64URL x = JSONObjectUtils.getBase64URL(jsonObject, "x");
+		
+		// Get the optional private key
+		Base64URL d = JSONObjectUtils.getBase64URL(jsonObject, "d");
 		
 		try {
 			if (d == null) {

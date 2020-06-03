@@ -1163,5 +1163,6 @@ version 8.19 (2020-06-03)
     * Adds new static Algorithm.parse method.
     * Adds new static JSONObjectUtils.getBase64URL method.
     * Updates JWKMetadata to allow parsing of null optional parameters.
-    * Updates RSAKey.parse(JSONObject) to allow null optional parameters (iss
+    * Updates the static RSAKey, ECKey, OctetSequenceKey and OctetKeyPair
+      parse(JSONObject) methods to allow null optional parameters (iss
       #358).
