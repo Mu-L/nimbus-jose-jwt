@@ -1,5 +1,6 @@
 /.idea
 /nimbus-jose-jwt.iml
+/dependency-reduced-pom.xml
 nimbus-jose-jwt-*.jar
 TEST.*
 *.class

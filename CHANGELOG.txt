@@ -1166,3 +1166,6 @@ version 8.19 (2020-06-03)
     * Updates the static RSAKey, ECKey, OctetSequenceKey and OctetKeyPair
       parse(JSONObject) methods to allow null optional parameters (iss
       #358).
+
+version 9.0 (2020-06-20)
+    * Shades the net.minidev:json-smart:1.3.1 dependency.
