@@ -20,10 +20,10 @@ package com.nimbusds.jose;
 
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Map;
 
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
-import net.minidev.json.JSONObject;
 
 
 /**
@@ -279,7 +279,7 @@ public abstract class JOSEObject implements Serializable {
 
 		Base64URL[] parts = split(s);
 
-		JSONObject jsonObject;
+		Map<String, Object> jsonObject;
 
 		try {
 			jsonObject = JSONObjectUtils.parse(parts[0].decodeToString());

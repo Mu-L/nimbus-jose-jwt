@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.Set;
 
 import junit.framework.TestCase;
-import net.minidev.json.JSONObject;
 
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONObjectUtils;
 
 
 /**
@@ -197,12 +197,12 @@ public class PlainHeaderTest extends TestCase {
 	public void testParseHeaderWithNullTyp()
 		throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("alg", Algorithm.NONE.getName());
 		jsonObject.put("typ", null);
 		assertEquals(2, jsonObject.size());
 		
-		Header header = PlainHeader.parse(jsonObject.toJSONString());
+		Header header = PlainHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
 		assertNull(header.getType());
 	}
 	
@@ -211,12 +211,12 @@ public class PlainHeaderTest extends TestCase {
 	public void testParseHeaderWithNullCrit()
 		throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("alg", Algorithm.NONE.getName());
 		jsonObject.put("crit", null);
 		assertEquals(2, jsonObject.size());
 		
-		Header header = PlainHeader.parse(jsonObject.toJSONString());
+		Header header = PlainHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
 		assertNull(header.getCriticalParams());
 	}
 }

@@ -35,8 +35,6 @@ import java.util.*;
 import static org.junit.Assert.assertNotEquals;
 
 import junit.framework.TestCase;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -170,7 +168,7 @@ public class RSAKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = key.toJSONObject().toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
 
 		key = RSAKey.parse(jwkString);
 
@@ -274,7 +272,7 @@ public class RSAKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = key.toJSONObject().toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
 
 		key = RSAKey.parse(jwkString);
 
@@ -388,7 +386,7 @@ public class RSAKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = key.toJSONObject().toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
 
 		key = RSAKey.parse(jwkString);
 
@@ -477,7 +475,7 @@ public class RSAKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = key.toJSONObject().toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
 
 		key = RSAKey.parse(jwkString);
 
@@ -1287,7 +1285,7 @@ public class RSAKeyTest extends TestCase {
 		assertNotNull(kpOut.getPublic());
 		assertEquals(privateKey, kpOut.getPrivate());
 		
-		JSONObject json = rsaJWK.toJSONObject();
+		Map<String, Object> json = rsaJWK.toJSONObject();
 		assertEquals("RSA", json.get("kty"));
 		assertEquals("1", json.get("kid"));
 		assertEquals(Base64URL.encode(publicKey.getPublicExponent()).toString(), json.get("e"));
@@ -1653,8 +1651,8 @@ public class RSAKeyTest extends TestCase {
 		RSAKey rsaKey = RSAKey.parse(
 			"{\"kty\":\"RSA\",\"x5t#S256\":\"QOjjUwPhfMBMIT2zn5nrUxc4GocujsSHziKh-FlvmiU\",\"e\":\"AQAB\",\"kid\":\"18031265869169735523\",\"x5c\":[\"MIIDljCCAn4CCQD6O+zGNny3YzANBgkqhkiG9w0BAQsFADCBpTELMAkGA1UEBhMCQkUxEDAOBgNVBAgTB0JlbGdpdW0xETAPBgNVBAcTCEJydXNzZWxzMRwwGgYDVQQKExNFdXJvcGVhbiBDb21taXNzaW9uMRAwDgYDVQQLEwdTRkMyMDE0MR8wHQYDVQQDExZTRkMyMDE0IENBIERFVkVMT1BNRU5UMSAwHgYJKoZIhvcNAQkBFhF2YW53b2JlQHlhaG9vLkNvbTAeFw0xNjEwMTgxNTE4NTdaFw0yNjEwMTYxNTE4NTdaMHQxCzAJBgNVBAYTAkJFMRAwDgYDVQQIEwdCRUxHSVVNMREwDwYDVQQHEwhCcnVzc2VsczEcMBoGA1UEChMTRXVyb3BlYW4gQ29tbWlzc2lvbjEQMA4GA1UECxMHU0ZDMjAxNDEQMA4GA1UEAxMHdmFud29iZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMC7n95a0Yp\\/anE2ya3VhUjJ8KhoC8mAiblGJYMPsB2QfLKJEoZ2eSCD\\/GwkxufEb8UPauQDFogMshUZwwZ08k0OXywh3a9xO9zI+CCz23TNvueACQzWbtwWrx6lU5ljOOhBdt+c\\/CRXXgG2kH+hhs8MaV5KgN6iPf0HilH3QP2pwLNVLrupm\\/0r9CwuEc\\/wWLbi1nLno366vn\\/+jdsuxSrWnr\\/S8SCY3+L6CzZfhWMzF1SrsiCn+v6MirAwcG2IckNomGiL+X7PjObOSIWDVa7G9\\/Ouh4EaZN0w\\/zUvMSZ8mXkTo\\/Qk48kQlzm\\/KoQpEcoa9Dng4EdGyXzsipxsCNsCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAlBtx8Lh3PL1PBoiki5VkPUqfNlYNE6C+3faPzjEKu0D8+g\\/y1AbFp7442J3QqX0yfS\\/qG3BIc2dU8ICDhmstn7d2yr+FDFF4raQ8OfMocQy66Rf6wgAQy0YETWF+gBx8bKhd3D+V12paZg8ocDE7+V0UOCmxRMSz8hRvycCYGlf5pD2v2DIfPatNgwyASZK+qu+w++OrilC3wXKG2XD8AWaoTWMWz1ycov6pSnRGEr0DNxF4DBWrJWe\\/b+HH1K1hiKG0lnD520Ldoy3VRF86uRBnAjKX0yy7LHZy1QaB6M5DHtzOQFg7GldjhuZVFA01smyadepiOI0jc6jTwghT2Q==\"],\"n\":\"wLuf3lrRin9qcTbJrdWFSMnwqGgLyYCJuUYlgw-wHZB8sokShnZ5IIP8bCTG58RvxQ9q5AMWiAyyFRnDBnTyTQ5fLCHdr3E73Mj4ILPbdM2-54AJDNZu3BavHqVTmWM46EF235z8JFdeAbaQf6GGzwxpXkqA3qI9_QeKUfdA_anAs1Uuu6mb_Sv0LC4Rz_BYtuLWcuejfrq-f_6N2y7FKtaev9LxIJjf4voLNl-FYzMXVKuyIKf6_oyKsDBwbYhyQ2iYaIv5fs-M5s5IhYNVrsb3866HgRpk3TD_NS8xJnyZeROj9CTjyRCXOb8qhCkRyhr0OeDgR0bJfOyKnGwI2w\"}");
 		
-		JSONObject jsonObject = rsaKey.toJSONObject();
-		JSONArray x5cArray = (JSONArray) jsonObject.get("x5c");
+		Map<String, Object> jsonObject = rsaKey.toJSONObject();
+		List<Object> x5cArray = (List<Object>) jsonObject.get("x5c");
 		assertEquals(rsaKey.getX509CertChain().get(0).toString(), x5cArray.get(0));
 		assertEquals(1, x5cArray.size());
 		
@@ -1668,7 +1666,7 @@ public class RSAKeyTest extends TestCase {
 	public void testParse_fromEmptyJSONObject() {
 		
 		try {
-			RSAKey.parse(new JSONObject());
+			RSAKey.parse(JSONObjectUtils.newJSONObject());
 			fail();
 		} catch (ParseException e) {
 			assertEquals("The key type to parse must not be null", e.getMessage());
@@ -1678,7 +1676,7 @@ public class RSAKeyTest extends TestCase {
 	
 	public void testParse_missingKty() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("n", n);
 		jsonObject.put("e", e);
 		try {
@@ -1692,7 +1690,7 @@ public class RSAKeyTest extends TestCase {
 	
 	public void testParse_missingN() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("kty", "RSA");
 		jsonObject.put("e", e);
 		try {
@@ -1706,7 +1704,7 @@ public class RSAKeyTest extends TestCase {
 	
 	public void testParse_missingE() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("kty", "RSA");
 		jsonObject.put("n", n);
 		try {

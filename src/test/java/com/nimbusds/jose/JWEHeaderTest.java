@@ -20,16 +20,22 @@ package com.nimbusds.jose;
 
 import java.net.URI;
 import java.text.ParseException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import junit.framework.TestCase;
-import net.minidev.json.JSONObject;
-
+import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONObjectUtils;
+
+import junit.framework.TestCase;
 
 
 /**
@@ -400,14 +406,14 @@ public class JWEHeaderTest extends TestCase {
 	// iss #333
 	public void testParseHeaderWithNullTyp()
 		throws ParseException {
-		
-		JSONObject jsonObject = new JSONObject();
+
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("alg", JWEAlgorithm.DIR.getName());
 		jsonObject.put("enc", EncryptionMethod.A128GCM.getName());
 		jsonObject.put("typ", null);
 		assertEquals(3, jsonObject.size());
-		
-		Header header = JWEHeader.parse(jsonObject.toJSONString());
+
+		JWEHeader header = JWEHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
 		assertNull(header.getType());
 	}
 	
@@ -415,28 +421,28 @@ public class JWEHeaderTest extends TestCase {
 	// iss #334
 	public void testParseHeaderWithNullCrit()
 		throws ParseException {
-		
-		JSONObject jsonObject = new JSONObject();
+
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("alg", JWEAlgorithm.DIR.getName());
 		jsonObject.put("enc", EncryptionMethod.A128GCM.getName());
 		jsonObject.put("crit", null);
 		assertEquals(3, jsonObject.size());
-		
-		Header header = JWEHeader.parse(jsonObject.toJSONString());
+
+		JWEHeader header = JWEHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
 		assertNull(header.getCriticalParams());
 	}
 	
 	
 	public void testParseHeaderWithNullJWK()
 		throws ParseException {
-		
-		JSONObject jsonObject = new JSONObject();
+
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("alg", JWEAlgorithm.DIR.getName());
 		jsonObject.put("enc", EncryptionMethod.A128GCM.getName());
 		jsonObject.put("jwk", null);
 		assertEquals(3, jsonObject.size());
 		
-		JWEHeader header = JWEHeader.parse(jsonObject.toJSONString());
+		JWEHeader header = JWEHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
 		assertNull(header.getJWK());
 	}
 	
@@ -444,13 +450,13 @@ public class JWEHeaderTest extends TestCase {
 	public void testParseHeaderWithNullZIP()
 		throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("alg", JWEAlgorithm.DIR.getName());
 		jsonObject.put("enc", EncryptionMethod.A128GCM.getName());
 		jsonObject.put("zip", null);
 		assertEquals(3, jsonObject.size());
 		
-		JWEHeader header = JWEHeader.parse(jsonObject.toJSONString());
+		JWEHeader header = JWEHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
 		assertNull(header.getCompressionAlgorithm());
 	}
 }

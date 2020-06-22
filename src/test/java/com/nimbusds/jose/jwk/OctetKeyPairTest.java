@@ -24,17 +24,18 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertNotEquals;
 
 import junit.framework.TestCase;
-import net.minidev.json.JSONObject;
 import org.junit.Assert;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONObjectUtils;
 
 
 public class OctetKeyPairTest extends TestCase {
@@ -186,12 +187,12 @@ public class OctetKeyPairTest extends TestCase {
 		
 		assertTrue(key.isPrivate());
 		
-		JSONObject jsonObject = key.toJSONObject();
+		Map<String, Object> jsonObject = key.toJSONObject();
 		assertEquals(Curve.Ed25519.getName(), jsonObject.get("crv"));
 		assertEquals(EXAMPLE_OKP_ED25519.X.toString(), jsonObject.get("x"));
 		assertEquals(EXAMPLE_OKP_ED25519.D.toString(), jsonObject.get("d"));
 		
-		String jwkString = jsonObject.toString();
+		String jwkString = JSONObjectUtils.toJSONString(jsonObject);
 		
 		key = OctetKeyPair.parse(jwkString);
 		
@@ -271,12 +272,12 @@ public class OctetKeyPairTest extends TestCase {
 		
 		assertFalse(key.isPrivate());
 		
-		JSONObject jsonObject = key.toJSONObject();
+		Map<String, Object> jsonObject = key.toJSONObject();
 		assertEquals(Curve.Ed25519.getName(), jsonObject.get("crv"));
 		assertEquals(EXAMPLE_OKP_ED25519.X.toString(), jsonObject.get("x"));
 		assertFalse(jsonObject.containsKey("d"));
 		
-		String jwkString = jsonObject.toString();
+		String jwkString = JSONObjectUtils.toJSONString(jsonObject);
 		
 		key = OctetKeyPair.parse(jwkString);
 		
@@ -340,7 +341,7 @@ public class OctetKeyPairTest extends TestCase {
 		assertTrue(key.isPrivate());
 		
 		
-		String jwkString = key.toJSONObject().toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
 		
 		key = OctetKeyPair.parse(jwkString);
 		
@@ -528,7 +529,7 @@ public class OctetKeyPairTest extends TestCase {
 	public void testParse_fromEmptyJSONObject() {
 		
 		try {
-			OctetKeyPair.parse(new JSONObject());
+			OctetKeyPair.parse(JSONObjectUtils.newJSONObject());
 			fail();
 		} catch (ParseException e) {
 			assertEquals("The key type to parse must not be null", e.getMessage());
@@ -537,8 +538,8 @@ public class OctetKeyPairTest extends TestCase {
 	
 	
 	public void testParse_missingKty() {
-		
-		JSONObject jsonObject = new JSONObject();
+
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("crv", "Ed25519");
 		jsonObject.put("x", "ewrewrewr");
 		
@@ -553,7 +554,7 @@ public class OctetKeyPairTest extends TestCase {
 	
 	public void testParse_missingCrv() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("kty", "OKP");
 		jsonObject.put("x", "ewrewrewr");
 		
@@ -568,7 +569,7 @@ public class OctetKeyPairTest extends TestCase {
 	
 	public void testParse_missingX() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("kty", "OKP");
 		jsonObject.put("crv", "Ed25519");
 		

@@ -25,10 +25,9 @@ import java.text.ParseException;
 import java.util.*;
 
 import com.nimbusds.jose.util.DateUtils;
+import com.nimbusds.jose.util.JSONArrayUtils;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import net.jcip.annotations.Immutable;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 
 
 /**
@@ -758,7 +757,7 @@ public final class JWTClaimsSet implements Serializable {
 
 	/**
 	 * Gets the specified claim (registered or custom) as a
-	 * {@link net.minidev.json.JSONObject}.
+	 * {@link JSONObject}.
 	 *
 	 * @param name The name of the claim. Must not be {@code null}.
 	 *
@@ -767,17 +766,15 @@ public final class JWTClaimsSet implements Serializable {
 	 * @throws ParseException If the claim value is not of the required
 	 *                        type.
 	 */
-	public JSONObject getJSONObjectClaim(final String name)
+	public Map<String, Object> getJSONObjectClaim(final String name)
 		throws ParseException {
 
 		Object value = getClaim(name);
 
 		if (value == null) {
 			return null;
-		} else if (value instanceof JSONObject) {
-			return (JSONObject)value;
 		} else if (value instanceof Map) {
-			JSONObject jsonObject = new JSONObject();
+			Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 			Map<?,?> map = (Map<?,?>)value;
 			for (Map.Entry<?,?> entry: map.entrySet()) {
 				if (entry.getKey() instanceof String) {
@@ -813,7 +810,7 @@ public final class JWTClaimsSet implements Serializable {
 	 *
 	 * @return The JSON object representation.
 	 */
-	public JSONObject toJSONObject() {
+	public Map<String, Object> toJSONObject() {
 
 		return toJSONObject(false);
 	}
@@ -829,9 +826,9 @@ public final class JWTClaimsSet implements Serializable {
 	 *
 	 * @return The JSON object representation.
 	 */
-	public JSONObject toJSONObject(final boolean includeClaimsWithNullValues) {
+	public Map<String, Object> toJSONObject(final boolean includeClaimsWithNullValues) {
 		
-		JSONObject o = new JSONObject();
+		Map<String, Object> o = JSONObjectUtils.newJSONObject();
 		
 		for (Map.Entry<String,Object> claim: claims.entrySet()) {
 			
@@ -850,7 +847,7 @@ public final class JWTClaimsSet implements Serializable {
 					if (audList.size() == 1) {
 						o.put(AUDIENCE_CLAIM, audList.get(0));
 					} else {
-						JSONArray audArray = new JSONArray();
+						List<Object> audArray = JSONArrayUtils.newJSONArray();
 						audArray.addAll(audList);
 						o.put(AUDIENCE_CLAIM, audArray);
 					}
@@ -872,9 +869,13 @@ public final class JWTClaimsSet implements Serializable {
 	@Override
 	public String toString() {
 
-		return toJSONObject().toJSONString();
+		return JSONObjectUtils.toJSONString(toJSONObject());
 	}
 
+	public String toString(final boolean includeClaimsWithNullValues) {
+
+		return JSONObjectUtils.toJSONString(toJSONObject(includeClaimsWithNullValues));
+	}
 
 	/**
 	 * Returns a transformation of this JWT claims set.
@@ -902,7 +903,7 @@ public final class JWTClaimsSet implements Serializable {
 	 * @throws ParseException If the specified JSON object doesn't 
 	 *                        represent a valid JWT claims set.
 	 */
-	public static JWTClaimsSet parse(final JSONObject json)
+	public static JWTClaimsSet parse(final Map<String, Object> json)
 		throws ParseException {
 
 		JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();

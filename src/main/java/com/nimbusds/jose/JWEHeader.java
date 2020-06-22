@@ -24,8 +24,6 @@ import java.util.*;
 
 import net.jcip.annotations.Immutable;
 
-import net.minidev.json.JSONObject;
-
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jose.util.Base64URL;
@@ -1073,9 +1071,9 @@ public final class JWEHeader extends CommonSEHeader {
 
 
 	@Override
-	public JSONObject toJSONObject() {
+	public Map<String, Object> toJSONObject() {
 
-		JSONObject o = super.toJSONObject();
+		Map<String, Object> o = super.toJSONObject();
 
 		if (enc != null) {
 			o.put("enc", enc.toString());
@@ -1128,7 +1126,7 @@ public final class JWEHeader extends CommonSEHeader {
 	 * @throws ParseException If the {@code enc} parameter couldn't be 
 	 *                        parsed.
 	 */
-	private static EncryptionMethod parseEncryptionMethod(final JSONObject json)
+	private static EncryptionMethod parseEncryptionMethod(final Map<String, Object> json)
 		throws ParseException {
 
 		return EncryptionMethod.parse(JSONObjectUtils.getString(json, "enc"));
@@ -1146,7 +1144,7 @@ public final class JWEHeader extends CommonSEHeader {
 	 * @throws ParseException If the specified JSON object doesn't
 	 *                        represent a valid JWE header.
 	 */
-	public static JWEHeader parse(final JSONObject jsonObject)
+	public static JWEHeader parse(final Map<String, Object> jsonObject)
 		throws ParseException {
 
 		return parse(jsonObject, null);
@@ -1166,7 +1164,7 @@ public final class JWEHeader extends CommonSEHeader {
 	 * @throws ParseException If the specified JSON object doesn't 
 	 *                        represent a valid JWE header.
 	 */
-	public static JWEHeader parse(final JSONObject jsonObject,
+	public static JWEHeader parse(final Map<String, Object> jsonObject,
 				      final Base64URL parsedBase64URL)
 		throws ParseException {
 
@@ -1204,7 +1202,7 @@ public final class JWEHeader extends CommonSEHeader {
 			} else if("jku".equals(name)) {
 				header = header.jwkURL(JSONObjectUtils.getURI(jsonObject, name));
 			} else if("jwk".equals(name)) {
-				JSONObject jwkObject = JSONObjectUtils.getJSONObject(jsonObject, name);
+				Map<String, Object> jwkObject = JSONObjectUtils.getJSONObject(jsonObject, name);
 				if (jwkObject != null) {
 					header = header.jwk(JWK.parse(jwkObject));
 				}

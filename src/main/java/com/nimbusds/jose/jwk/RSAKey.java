@@ -33,8 +33,6 @@ import java.text.ParseException;
 import java.util.*;
 
 import net.jcip.annotations.Immutable;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JOSEException;
@@ -840,7 +838,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 			throws JOSEException {
 
 			// Put mandatory params in sorted order
-			LinkedHashMap<String,String> requiredParams = new LinkedHashMap<>();
+			LinkedHashMap<String,Object> requiredParams = new LinkedHashMap<>();
 			requiredParams.put("e", e.toString());
 			requiredParams.put("kty", KeyType.RSA.getValue());
 			requiredParams.put("n", n.toString());
@@ -1981,9 +1979,9 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 	
 	
 	@Override
-	public JSONObject toJSONObject() {
+	public  Map<String, Object> toJSONObject() {
 
-		JSONObject o = super.toJSONObject();
+		Map<String, Object> o = super.toJSONObject();
 
 		// Append public RSA key specific attributes
 		o.put("n", n.toString());
@@ -2008,11 +2006,11 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 		}
 		if (oth != null && !oth.isEmpty()) {
 
-			JSONArray a = new JSONArray();
+			List<Object> a = JSONArrayUtils.newJSONArray();
 
 			for (OtherPrimesInfo other : oth) {
 
-				JSONObject oo = new JSONObject();
+				 Map<String, Object> oo = JSONObjectUtils.newJSONObject();
 				oo.put("r", other.r.toString());
 				oo.put("d", other.d.toString());
 				oo.put("t", other.t.toString());
@@ -2057,7 +2055,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 	 * @throws ParseException If the JSON object couldn't be parsed to an
 	 *                        RSA JWK.
 	 */
-	public static RSAKey parse(final JSONObject jsonObject)
+	public static RSAKey parse(final Map<String, Object> jsonObject)
 		throws ParseException {
 
 		// Check key type
@@ -2084,14 +2082,14 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 		List<OtherPrimesInfo> oth = null;
 		if (jsonObject.containsKey("oth")) {
 
-			JSONArray arr = JSONObjectUtils.getJSONArray(jsonObject, "oth");
+			List<Object> arr = JSONObjectUtils.getJSONArray(jsonObject, "oth");
 			if(arr != null) {
 				oth = new ArrayList<>(arr.size());
 				
 				for (Object o : arr) {
 	    
-					if (o instanceof JSONObject) {
-						JSONObject otherJson = (JSONObject)o;
+					if (o instanceof Map) {
+						 Map<String, Object> otherJson = ( Map<String, Object>)o;
 	    
 						Base64URL r = JSONObjectUtils.getBase64URL(otherJson, "r");
 						Base64URL odq = JSONObjectUtils.getBase64URL(otherJson, "dq");

@@ -30,10 +30,6 @@ import java.security.spec.ECParameterSpec;
 import java.text.ParseException;
 import java.util.*;
 
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONAware;
-import net.minidev.json.JSONObject;
-
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.util.Base64;
@@ -76,7 +72,7 @@ import com.nimbusds.jose.util.*;
  * @author Stefan Larsson
  * @version 2020-02-09
  */
-public abstract class JWK implements JSONAware, Serializable {
+public abstract class JWK implements Serializable {
 
 
 	private static final long serialVersionUID = 1L;
@@ -491,9 +487,9 @@ public abstract class JWK implements JSONAware, Serializable {
 	 *
 	 * @return The JSON object representation.
 	 */
-	public JSONObject toJSONObject() {
+	public Map<String, Object> toJSONObject() {
 
-		JSONObject o = new JSONObject();
+		Map<String, Object> o = JSONObjectUtils.newJSONObject();
 
 		o.put("kty", kty.getValue());
 
@@ -502,7 +498,7 @@ public abstract class JWK implements JSONAware, Serializable {
 		}
 
 		if (ops != null) {
-			JSONArray stringValues = new JSONArray();
+			List<Object> stringValues = JSONArrayUtils.newJSONArray();
 			for (KeyOperation op: ops) {
 				stringValues.add(op.identifier());
 			}
@@ -530,7 +526,7 @@ public abstract class JWK implements JSONAware, Serializable {
 		}
 
 		if (x5c != null) {
-			JSONArray stringValues = new JSONArray();
+			List<Object> stringValues = JSONArrayUtils.newJSONArray();
 			for (Base64 base64: x5c) {
 				stringValues.add(base64.toString());
 			}
@@ -546,10 +542,8 @@ public abstract class JWK implements JSONAware, Serializable {
 	 *
 	 * @return The JSON object string representation.
 	 */
-	@Override
 	public String toJSONString() {
-
-		return toJSONObject().toString();
+		return JSONObjectUtils.toJSONString(toJSONObject());
 	}
 
 
@@ -559,7 +553,7 @@ public abstract class JWK implements JSONAware, Serializable {
 	@Override
 	public String toString() {
 
-		return toJSONObject().toString();
+		return JSONObjectUtils.toJSONString(toJSONObject());
 	}
 
 
@@ -595,7 +589,7 @@ public abstract class JWK implements JSONAware, Serializable {
 	 * @throws ParseException If the JSON object couldn't be parsed to a 
 	 *                        supported JWK.
 	 */
-	public static JWK parse(final JSONObject jsonObject)
+	public static JWK parse(final Map<String, Object> jsonObject)
 		throws ParseException {
 
 		KeyType kty = KeyType.parse(JSONObjectUtils.getString(jsonObject, "kty"));

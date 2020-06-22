@@ -21,9 +21,9 @@ package com.nimbusds.jose;
 import java.text.ParseException;
 
 import junit.framework.TestCase;
-import net.minidev.json.JSONObject;
 
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONObjectUtils;
 
 
 /**
@@ -83,7 +83,7 @@ public class HeaderTest extends TestCase {
 	public void testParseAlgorithm_nullAlg() {
 		
 		try {
-			Header.parseAlgorithm(new JSONObject());
+			Header.parseAlgorithm(JSONObjectUtils.newJSONObject());
 			fail();
 		} catch (ParseException e) {
 			assertEquals("Missing \"alg\" in header JSON object", e.getMessage());
@@ -94,7 +94,7 @@ public class HeaderTest extends TestCase {
 	public void testParseHeader_nullAlg() {
 		
 		try {
-			Header.parse(new JSONObject());
+			Header.parse(JSONObjectUtils.newJSONObject());
 			fail();
 		} catch (ParseException e) {
 			assertEquals("Missing \"alg\" in header JSON object", e.getMessage());

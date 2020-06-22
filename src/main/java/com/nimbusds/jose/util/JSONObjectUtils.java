@@ -22,9 +22,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 
@@ -51,8 +52,8 @@ public class JSONObjectUtils {
 	 *             <li>JSON fraction numbers map to {@code double}.
 	 *         </ul>
 	 *     <li>JSON strings map to {@code java.lang.String}.
-	 *     <li>JSON arrays map to {@code net.minidev.json.JSONArray}.
-	 *     <li>JSON objects map to {@code net.minidev.json.JSONObject}.
+	 *     <li>JSON arrays map to {@code java.util.List<Object>}.
+	 *     <li>JSON objects map to {@code java.util.Map<String,Object>}.
 	 * </ul>
 	 *
 	 * @param s The JSON object string to parse. Must not be {@code null}.
@@ -62,14 +63,13 @@ public class JSONObjectUtils {
 	 * @throws ParseException If the string cannot be parsed to a valid JSON 
 	 *                        object.
 	 */
-	public static JSONObject parse(final String s)
+	public static Map<String, Object> parse(final String s)
 		throws ParseException {
 
 		Object o;
 
 		try {
 			o = new JSONParser(JSONParser.USE_HI_PRECISION_FLOAT | JSONParser.ACCEPT_TAILLING_SPACE).parse(s);
-
 		} catch (net.minidev.json.parser.ParseException e) {
 
 			throw new ParseException("Invalid JSON: " + e.getMessage(), 0);
@@ -78,7 +78,7 @@ public class JSONObjectUtils {
 		}
 
 		if (o instanceof JSONObject) {
-			return (JSONObject)o;
+			return (Map<String, Object>) o;
 		} else {
 			throw new ParseException("JSON entity is not an object", 0);
 		}
@@ -96,7 +96,7 @@ public class JSONObjectUtils {
 	 *                        object.
 	 */
 	@Deprecated
-	public static JSONObject parseJSONObject(final String s)
+	public static Map<String, Object> parseJSONObject(final String s)
 		throws ParseException {
 
 		return parse(s);
@@ -116,7 +116,7 @@ public class JSONObjectUtils {
 	 * @throws ParseException If the value is not of the expected type.
 	 */
 	@SuppressWarnings("unchecked")
-	private static <T> T getGeneric(final JSONObject o, final String key, final Class<T> clazz)
+	private static <T> T getGeneric(final Map<String, Object> o, final String key, final Class<T> clazz)
 		throws ParseException {
 
 		if (o.get(key) == null) {
@@ -144,7 +144,7 @@ public class JSONObjectUtils {
 	 * @throws ParseException If the member is missing, the value is
 	 *                        {@code null} or not of the expected type.
 	 */
-	public static boolean getBoolean(final JSONObject o, final String key)
+	public static boolean getBoolean(final Map<String, Object> o, final String key)
 		throws ParseException {
 
 		Boolean value = getGeneric(o, key, Boolean.class);
@@ -168,7 +168,7 @@ public class JSONObjectUtils {
 	 * @throws ParseException If the member is missing, the value is
 	 *                        {@code null} or not of the expected type.
 	 */
-	public static int getInt(final JSONObject o, final String key)
+	public static int getInt(final Map<String, Object> o, final String key)
 		throws ParseException {
 
 		Number value = getGeneric(o, key, Number.class);
@@ -192,7 +192,7 @@ public class JSONObjectUtils {
 	 * @throws ParseException If the member is missing, the value is
 	 *                        {@code null} or not of the expected type.
 	 */
-	public static long getLong(final JSONObject o, final String key)
+	public static long getLong(final Map<String, Object> o, final String key)
 		throws ParseException {
 
 		Number value = getGeneric(o, key, Number.class);
@@ -216,7 +216,7 @@ public class JSONObjectUtils {
 	 * @throws ParseException If the member is missing, the value is
 	 *                        {@code null} or not of the expected type.
 	 */
-	public static float getFloat(final JSONObject o, final String key)
+	public static float getFloat(final Map<String, Object> o, final String key)
 		throws ParseException {
 
 		Number value = getGeneric(o, key, Number.class);
@@ -240,7 +240,7 @@ public class JSONObjectUtils {
 	 * @throws ParseException If the member is missing, the value is
 	 *                        {@code null} or not of the expected type.
 	 */
-	public static double getDouble(final JSONObject o, final String key)
+	public static double getDouble(final Map<String, Object> o, final String key)
 		throws ParseException {
 
 		Number value = getGeneric(o, key, Number.class);
@@ -263,7 +263,7 @@ public class JSONObjectUtils {
 	 *
 	 * @throws ParseException If the value is not of the expected type.
 	 */
-	public static String getString(final JSONObject o, final String key)
+	public static String getString(final Map<String, Object> o, final String key)
 		throws ParseException {
 
 		return getGeneric(o, key, String.class);
@@ -280,7 +280,7 @@ public class JSONObjectUtils {
 	 *
 	 * @throws ParseException If the value is not of the expected type.
 	 */
-	public static URI getURI(final JSONObject o, final String key)
+	public static URI getURI(final Map<String, Object> o, final String key)
 			throws ParseException {
 
 		String value = getString(o, key);
@@ -309,10 +309,10 @@ public class JSONObjectUtils {
 	 *
 	 * @throws ParseException If the value is not of the expected type.
 	 */
-	public static JSONArray getJSONArray(final JSONObject o, final String key)
+	public static List<Object> getJSONArray(final Map<String, Object> o, final String key)
 			throws ParseException {
 
-		return getGeneric(o, key, JSONArray.class);
+		return getGeneric(o, key, List.class);
 	}
 
 
@@ -326,10 +326,10 @@ public class JSONObjectUtils {
 	 *
 	 * @throws ParseException If the value is not of the expected type.
 	 */
-	public static String[] getStringArray(final JSONObject o, final String key)
+	public static String[] getStringArray(final Map<String, Object> o, final String key)
 			throws ParseException {
 
-		JSONArray jsonArray = getJSONArray(o, key);
+		List<Object> jsonArray = getJSONArray(o, key);
 		
 		if (jsonArray == null) {
 			return null;
@@ -355,7 +355,7 @@ public class JSONObjectUtils {
 	 *
 	 * @throws ParseException If the value is not of the expected type.
 	 */
-	public static List<String> getStringList(final JSONObject o, final String key) throws ParseException {
+	public static List<String> getStringList(final Map<String, Object> o, final String key) throws ParseException {
 
 		String[] array = getStringArray(o, key);
 		
@@ -377,12 +377,29 @@ public class JSONObjectUtils {
 	 *
 	 * @throws ParseException If the value is not of the expected type.
 	 */
-	public static JSONObject getJSONObject(final JSONObject o, final String key)
+	public static Map<String, Object> getJSONObject(final Map<String, Object> o, final String key)
 			throws ParseException {
 
 		return getGeneric(o, key, JSONObject.class);
 	}
-	
+
+	/**
+	 * Converts a text snippet (String Value) to its JSON representation.
+	 * @param string - the text to convert to JSON String
+	 * @return the JSON representation of a String
+	 */
+	public static String toJSONString(String string) {
+		return "\"" + JSONObject.escape(string) + "\"";
+	}
+
+	/**
+	 * Converts a JSON object to String
+	 * @param o - the JSON Object to convert
+	 * @return the String representation of the JSON Object
+	 */
+	public static String toJSONString(Map<String, ?> o) {
+		return JSONObject.toJSONString(o);
+	}
 	
 	/**
          * Gets a string member of a JSON object as {@link Base64URL}.
@@ -394,7 +411,7 @@ public class JSONObjectUtils {
          *
          * @throws ParseException If the value is not of the expected type.
          */
-	public static Base64URL getBase64URL(final JSONObject o, final String key)
+	public static Base64URL getBase64URL(final Map<String, Object> o, final String key)
 		throws ParseException {
 		
 		String value = getString(o, key);
@@ -411,5 +428,17 @@ public class JSONObjectUtils {
 	 * Prevents public instantiation.
 	 */
 	private JSONObjectUtils() { }
+
+
+	/**
+	 * 
+	 * Creates a new JSON Object
+	 * 
+	 * @return new empty JSON Object
+	 */
+	public static Map<String, Object> newJSONObject() {
+		return new HashMap<String, Object>();
+	}
+
 }
 

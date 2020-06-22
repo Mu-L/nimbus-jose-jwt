@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 
 import com.nimbusds.jose.RemoteKeySourceException;
 import com.nimbusds.jose.jwk.*;
-import com.nimbusds.jose.util.DefaultResourceRetriever;
+import com.nimbusds.jose.util.*;
 import net.jadler.Request;
 import net.jadler.stubbing.Responder;
 import net.jadler.stubbing.StubResponse;
@@ -98,7 +98,7 @@ public class RemoteJWKSetTest {
 			.respond()
 			.withStatus(200)
 			.withHeader("Content-Type", "application/json")
-			.withBody(jwkSet.toJSONObject(true).toJSONString());
+			.withBody( JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true)));
 
 		RemoteJWKSet jwkSetSource = new RemoteJWKSet(jwkSetURL, null);
 
@@ -157,7 +157,7 @@ public class RemoteJWKSetTest {
 			.respond()
 			.withStatus(200)
 			.withHeader("Content-Type", "application/json")
-			.withBody(jwkSet.toJSONObject(true).toJSONString());
+			.withBody(JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true)));
 
 		RemoteJWKSet jwkSetSource = new RemoteJWKSet(jwkSetURL, null);
 
@@ -222,7 +222,7 @@ public class RemoteJWKSetTest {
 						return StubResponse.builder()
 							.status(200)
 							.header("Content-Type", "application/json")
-							.body(new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2)).toJSONObject().toJSONString(), Charset.forName("UTF-8"))
+							.body( JSONObjectUtils.toJSONString(new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2)).toJSONObject()), Charset.forName("UTF-8"))
 							.build();
 					}
 
@@ -230,7 +230,7 @@ public class RemoteJWKSetTest {
 					return StubResponse.builder()
 						.status(200)
 						.header("Content-Type", "application/json")
-						.body(new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2, (JWK)rsaJWK3)).toJSONObject().toJSONString(), Charset.forName("UTF-8"))
+						.body( JSONObjectUtils.toJSONString(new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2, (JWK)rsaJWK3)).toJSONObject()), Charset.forName("UTF-8"))
 						.build();
 				}
 			});
@@ -308,7 +308,7 @@ public class RemoteJWKSetTest {
 			.respond()
 			.withStatus(200)
 			.withHeader("Content-Type", "application/json")
-			.withBody(jwkSet.toJSONObject(true).toJSONString());
+			.withBody(JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true)));
 
 		RemoteJWKSet jwkSetSource = new RemoteJWKSet(jwkSetURL, null);
 
