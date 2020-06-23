@@ -28,7 +28,6 @@ import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jose.util.X509CertChainUtils;
 import net.jcip.annotations.Immutable;
-import net.minidev.json.JSONObject;
 
 
 /**
@@ -708,8 +707,8 @@ public final class JWSHeader extends CommonSEHeader {
 	
 	
 	@Override
-	public JSONObject toJSONObject() {
-		JSONObject o = super.toJSONObject();
+	public Map<String, Object> toJSONObject() {
+		Map<String, Object> o = super.toJSONObject();
 		if (! isBase64URLEncodePayload()) {
 			o.put("b64", false);
 		}
@@ -728,7 +727,7 @@ public final class JWSHeader extends CommonSEHeader {
 	 * @throws ParseException If the specified JSON object doesn't
 	 *                        represent a valid JWS header.
 	 */
-	public static JWSHeader parse(final JSONObject jsonObject)
+	public static JWSHeader parse(final Map<String, Object> jsonObject)
 		throws ParseException {
 
 		return parse(jsonObject, null);
@@ -748,7 +747,7 @@ public final class JWSHeader extends CommonSEHeader {
 	 * @throws ParseException If the specified JSON object doesn't 
 	 *                        represent a valid JWS header.
 	 */
-	public static JWSHeader parse(final JSONObject jsonObject,
+	public static JWSHeader parse(final Map<String, Object> jsonObject,
 				      final Base64URL parsedBase64URL)
 		throws ParseException {
 
@@ -781,7 +780,7 @@ public final class JWSHeader extends CommonSEHeader {
 			} else if("jku".equals(name)) {
 				header = header.jwkURL(JSONObjectUtils.getURI(jsonObject, name));
 			} else if("jwk".equals(name)) {
-				JSONObject jwkObject = JSONObjectUtils.getJSONObject(jsonObject, name);
+				Map<String, Object> jwkObject = JSONObjectUtils.getJSONObject(jsonObject, name);
 				if (jwkObject != null) {
 					header = header.jwk(JWK.parse(jwkObject));
 				}

@@ -36,7 +36,6 @@ import java.util.*;
 import static org.junit.Assert.assertNotEquals;
 
 import junit.framework.TestCase;
-import net.minidev.json.JSONObject;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -217,7 +216,7 @@ public class ECKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = key.toJSONObject().toString();
+		String jwkString = JSONObjectUtils.toJSONString(key.toJSONObject());
 
 		key = ECKey.parse(jwkString);
 
@@ -296,7 +295,7 @@ public class ECKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = key.toJSONObject().toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
 
 		key = ECKey.parse(jwkString);
 
@@ -381,7 +380,7 @@ public class ECKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = key.toJSONObject().toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
 
 		key = ECKey.parse(jwkString);
 
@@ -689,7 +688,7 @@ public class ECKeyTest extends TestCase {
 
 		assertEquals(256 / 8, thumbprint.decode().length);
 
-		String orderedJSON = JSONObject.toJSONString(ecKey.getRequiredParams());
+		String orderedJSON = JSONObjectUtils.toJSONString(ecKey.getRequiredParams());
 
 		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(Charset.forName("UTF-8"))));
 
@@ -797,7 +796,7 @@ public class ECKeyTest extends TestCase {
 		assertNotNull(kpOut.getPublic());
 		assertEquals(privateKey, kpOut.getPrivate());
 		
-		JSONObject json = ecJWK.toJSONObject();
+		Map<String, Object> json = ecJWK.toJSONObject();
 		assertEquals("EC", json.get("kty"));
 		assertEquals("1", json.get("kid"));
 		assertEquals("P-256", json.get("crv"));
@@ -1167,7 +1166,7 @@ public class ECKeyTest extends TestCase {
 	public void testParse_fromEmptyJSONObject() {
 		
 		try {
-			ECKey.parse(new JSONObject());
+			ECKey.parse(JSONObjectUtils.newJSONObject());
 			fail();
 		} catch (ParseException e) {
 			assertEquals("The key type to parse must not be null", e.getMessage());
@@ -1177,7 +1176,7 @@ public class ECKeyTest extends TestCase {
 	
 	public void testParse_missingCurve() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("kty", "EC");
 		jsonObject.put("x", "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
 		jsonObject.put("y", "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
@@ -1192,7 +1191,7 @@ public class ECKeyTest extends TestCase {
 	
 	public void testParse_missingX() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("kty", "EC");
 		jsonObject.put("crv", "P-256");
 		jsonObject.put("y", "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
@@ -1207,7 +1206,7 @@ public class ECKeyTest extends TestCase {
 	
 	public void testParse_missingY() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("kty", "EC");
 		jsonObject.put("crv", "P-256");
 		jsonObject.put("x", "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");

@@ -19,10 +19,9 @@ package com.nimbusds.jwt;
 
 
 import java.text.ParseException;
+import java.util.Map;
 
 import net.jcip.annotations.ThreadSafe;
-
-import net.minidev.json.JSONObject;
 
 import com.nimbusds.jose.JOSEObject;
 import com.nimbusds.jose.JWSHeader;
@@ -83,7 +82,7 @@ public class SignedJWT extends JWSObject implements JWT {
 	public JWTClaimsSet getJWTClaimsSet()
 		throws ParseException {
 
-		JSONObject json = getPayload().toJSONObject();
+		Map<String, Object> json = getPayload().toJSONObject();
 
 		if (json == null) {
 			throw new ParseException("Payload of JWS object is not a valid JSON object", 0);

@@ -28,7 +28,6 @@ import java.text.ParseException;
 import java.util.*;
 
 import net.jcip.annotations.Immutable;
-import net.minidev.json.JSONObject;
 
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JOSEException;
@@ -733,9 +732,9 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 	
 	
 	@Override
-	public JSONObject toJSONObject() {
+	public Map<String, Object> toJSONObject() {
 		
-		JSONObject o = super.toJSONObject();
+		Map<String, Object> o = super.toJSONObject();
 		
 		// Append OKP specific attributes
 		o.put("crv", crv.toString());
@@ -786,7 +785,7 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 	 * @throws ParseException If the JSON object couldn't be parsed to an
 	 *                        Octet Key Pair JWK.
 	 */
-	public static OctetKeyPair parse(final JSONObject jsonObject)
+	public static OctetKeyPair parse(final Map<String, Object> jsonObject)
 		throws ParseException {
 		
 		// Check the key type

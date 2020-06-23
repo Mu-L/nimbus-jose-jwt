@@ -23,7 +23,6 @@ import java.text.ParseException;
 import java.util.*;
 
 import junit.framework.TestCase;
-import net.minidev.json.JSONObject;
 
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
@@ -78,7 +77,7 @@ public class JWSHeaderTest extends TestCase {
 		assertTrue(h.isBase64URLEncodePayload());
 		assertTrue(h.getCustomParams().isEmpty());
 		
-		JSONObject o = h.toJSONObject();
+		Map<String, Object> o = h.toJSONObject();
 		assertEquals(h.getAlgorithm().getName(), o.get("alg"));
 		assertEquals(1, o.size());
 	}
@@ -427,7 +426,7 @@ public class JWSHeaderTest extends TestCase {
 		assertEquals(3, header.getIncludedParams().size());
 		
 		// Serialisation
-		JSONObject o = header.toJSONObject();
+		Map<String, Object> o = header.toJSONObject();
 		assertEquals(JWSAlgorithm.RS256.getName(), o.get("alg"));
 		assertFalse(JSONObjectUtils.getBoolean(o, "b64"));
 		assertEquals(Collections.singletonList("b64"), JSONObjectUtils.getStringList(o, "crit"));
@@ -494,7 +493,7 @@ public class JWSHeaderTest extends TestCase {
 			.customParam("aud", audList)
 			.build();
 
-		assertTrue(header.toJSONObject().toJSONString().contains("\"aud\":[\"a\",\"b\"]"));
+		assertTrue( JSONObjectUtils.toJSONString(header.toJSONObject()).contains("\"aud\":[\"a\",\"b\"]"));
 	}
 	
 	
@@ -502,20 +501,20 @@ public class JWSHeaderTest extends TestCase {
 	public void testHeaderParameterAsJSONObject()
 		throws Exception {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", "value");
 		
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
 			.customParam("prm", jsonObject)
 			.build();
 		
-		jsonObject = (JSONObject) header.getCustomParam("prm");
+		jsonObject = (Map) header.getCustomParam("prm");
 		assertEquals("value", jsonObject.get("key"));
 		assertEquals(1, jsonObject.size());
 		
-		JSONObject headerJSONObject = header.toJSONObject();
+		Map<String, Object> headerJSONObject = header.toJSONObject();
 		assertEquals("HS256", headerJSONObject.get("alg"));
-		jsonObject = (JSONObject) headerJSONObject.get("prm");
+		jsonObject = (Map) headerJSONObject.get("prm");
 		assertEquals("value", jsonObject.get("key"));
 		assertEquals(1, jsonObject.size());
 		assertEquals(2, headerJSONObject.size());
@@ -524,13 +523,13 @@ public class JWSHeaderTest extends TestCase {
 		
 		header = JWSHeader.parse(encodedHeader);
 		
-		jsonObject = (JSONObject) header.getCustomParam("prm");
+		jsonObject = (Map<String, Object> ) header.getCustomParam("prm");
 		assertEquals("value", jsonObject.get("key"));
 		assertEquals(1, jsonObject.size());
 		
 		headerJSONObject = header.toJSONObject();
 		assertEquals("HS256", headerJSONObject.get("alg"));
-		jsonObject = (JSONObject) headerJSONObject.get("prm");
+		jsonObject = (Map<String, Object> ) headerJSONObject.get("prm");
 		assertEquals("value", jsonObject.get("key"));
 		assertEquals(1, jsonObject.size());
 		assertEquals(2, headerJSONObject.size());
@@ -543,7 +542,7 @@ public class JWSHeaderTest extends TestCase {
 		
 		String header = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6bnVsbH0";
 		
-		JSONObject jsonObject = JSONObjectUtils.parse(new Base64URL(header).decodeToString());
+		Map<String, Object>  jsonObject = JSONObjectUtils.parse(new Base64URL(header).decodeToString());
 		
 		assertEquals("HS256", jsonObject.get("alg"));
 		assertEquals("JWT", jsonObject.get("typ"));
@@ -562,12 +561,12 @@ public class JWSHeaderTest extends TestCase {
 	public void testParseHeaderWithNullTyp()
 		throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object>  jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("alg", "HS256");
 		jsonObject.put("typ", null);
 		assertEquals(2, jsonObject.size());
 		
-		Header header = JWSHeader.parse(jsonObject.toJSONString());
+		Header header = JWSHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
 		assertNull(header.getType());
 	}
 	
@@ -575,12 +574,12 @@ public class JWSHeaderTest extends TestCase {
 	public void testParseHeaderWithNullCrit()
 		throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object>  jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("alg", "HS256");
 		jsonObject.put("crit", null);
 		assertEquals(2, jsonObject.size());
 		
-		Header header = JWSHeader.parse(jsonObject.toJSONString());
+		Header header = JWSHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
 		assertNull(header.getCriticalParams());
 	}
 	
@@ -588,23 +587,23 @@ public class JWSHeaderTest extends TestCase {
 	public void testParseHeaderWithNullJWK()
 		throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object>  jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("alg", "HS256");
 		jsonObject.put("jwk", null);
 		assertEquals(2, jsonObject.size());
 		
-		JWSHeader header = JWSHeader.parse(jsonObject.toJSONString());
+		JWSHeader header = JWSHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
 		assertNull(header.getJWK());
 	}
 	
 	
 	public void testParsePlainHeader() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object>  jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("alg", "none");
 		
 		try {
-			JWSHeader.parse(jsonObject.toJSONString());
+			JWSHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
 			fail();
 		} catch (ParseException e) {
 			assertEquals("Not a JWS header", e.getMessage());

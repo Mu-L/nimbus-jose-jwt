@@ -50,9 +50,9 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jose.util.X509CertUtils;
 import junit.framework.TestCase;
-import net.minidev.json.JSONObject;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -79,7 +79,7 @@ public class JWKSetTest extends TestCase {
 		assertTrue(jwkSet.getKeys().isEmpty());
 		assertTrue(jwkSet.getAdditionalMembers().isEmpty());
 		
-		String json = jwkSet.toJSONObject().toJSONString();
+		String json = JSONObjectUtils.toJSONString(jwkSet.toJSONObject());
 		
 		assertEquals("{\"keys\":[]}" ,json);
 		
@@ -467,7 +467,7 @@ public class JWKSetTest extends TestCase {
 
 
 		// Strip all private parameters
-		s = keySet.toJSONObject(publicParamsOnly).toString();
+		s = JSONObjectUtils.toJSONString(keySet.toJSONObject(publicParamsOnly));
 
 		keySet = JWKSet.parse(s);
 
@@ -588,9 +588,9 @@ public class JWKSetTest extends TestCase {
 		JWKSet privateSet = new JWKSet(keyList);
 
 		final boolean publicParamsOnly = true;
-		JSONObject jsonObject = privateSet.toJSONObject(publicParamsOnly);
+		Map<String, Object> jsonObject = privateSet.toJSONObject(publicParamsOnly);
 
-		JWKSet publicSet = JWKSet.parse(jsonObject.toJSONString());
+		JWKSet publicSet = JWKSet.parse(jsonObject);
 
 		assertEquals(0, publicSet.getKeys().size());
 	}

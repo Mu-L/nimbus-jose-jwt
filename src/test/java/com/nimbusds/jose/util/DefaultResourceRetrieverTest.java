@@ -23,12 +23,12 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static net.jadler.Jadler.*;
 import static org.junit.Assert.*;
 
-import net.minidev.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -126,7 +126,7 @@ public class DefaultResourceRetrieverTest {
 	public void testRetrieveOK()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("A", "B");
 
 		onRequest()
@@ -135,7 +135,7 @@ public class DefaultResourceRetrieverTest {
 			.respond()
 			.withStatus(200)
 			.withHeader("Content-Type", "application/json")
-			.withBody(jsonObject.toJSONString());
+			.withBody(JSONObjectUtils.toJSONString(jsonObject));
 
 		RestrictedResourceRetriever resourceRetriever = new DefaultResourceRetriever();
 		Resource resource = resourceRetriever.retrieveResource(new URL("http://localhost:" + port() + "/c2id/jwks.json"));
@@ -149,7 +149,7 @@ public class DefaultResourceRetrieverTest {
 	public void testRetrieveOK_noDisconnectAfterUse()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("A", "B");
 
 		onRequest()
@@ -158,7 +158,7 @@ public class DefaultResourceRetrieverTest {
 			.respond()
 			.withStatus(200)
 			.withHeader("Content-Type", "application/json")
-			.withBody(jsonObject.toJSONString());
+			.withBody(JSONObjectUtils.toJSONString(jsonObject));
 
 		RestrictedResourceRetriever resourceRetriever = new DefaultResourceRetriever(0, 0, 0, false);
 		Resource resource = resourceRetriever.retrieveResource(new URL("http://localhost:" + port() + "/c2id/jwks.json"));
@@ -172,7 +172,7 @@ public class DefaultResourceRetrieverTest {
 	public void testRetrieveOK_noDisconnectAfterUse_loop()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("A", "B");
 
 		onRequest()
@@ -181,7 +181,7 @@ public class DefaultResourceRetrieverTest {
 			.respond()
 			.withStatus(200)
 			.withHeader("Content-Type", "application/json")
-			.withBody(jsonObject.toJSONString());
+			.withBody(JSONObjectUtils.toJSONString(jsonObject));
 
 		RestrictedResourceRetriever resourceRetriever = new DefaultResourceRetriever(0, 0, 0, false);
 		
@@ -198,7 +198,7 @@ public class DefaultResourceRetrieverTest {
 	public void testRetrieveOKWithoutContentType()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("A", "B");
 
 		onRequest()
@@ -206,7 +206,7 @@ public class DefaultResourceRetrieverTest {
 			.havingPathEqualTo("/c2id/jwks.json")
 			.respond()
 			.withStatus(200)
-			.withBody(jsonObject.toJSONString());
+			.withBody(JSONObjectUtils.toJSONString(jsonObject));
 
 		RestrictedResourceRetriever resourceRetriever = new DefaultResourceRetriever();
 		Resource resource = resourceRetriever.retrieveResource(new URL("http://localhost:" + port() + "/c2id/jwks.json"));
@@ -220,7 +220,7 @@ public class DefaultResourceRetrieverTest {
 	public void testIgnoreInvalidContentType()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("A", "B");
 
 		String invalidContentType = "moo/boo/foo";
@@ -231,7 +231,7 @@ public class DefaultResourceRetrieverTest {
 			.respond()
 			.withStatus(200)
 			.withContentType(invalidContentType)
-			.withBody(jsonObject.toJSONString());
+			.withBody(JSONObjectUtils.toJSONString(jsonObject));
 
 		RestrictedResourceRetriever resourceRetriever = new DefaultResourceRetriever();
 
@@ -244,7 +244,7 @@ public class DefaultResourceRetrieverTest {
 	public void testRetrieve2xxWithProxy()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("A", "B");
 
 		onRequest()
@@ -253,7 +253,7 @@ public class DefaultResourceRetrieverTest {
 			.respond()
 			.withStatus(201)
 			.withHeader("Content-Type", "application/json")
-			.withBody(jsonObject.toJSONString());
+			.withBody(JSONObjectUtils.toJSONString(jsonObject));
 
 		DefaultResourceRetriever resourceRetriever = new DefaultResourceRetriever();
 		resourceRetriever.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost", port())));
@@ -268,7 +268,7 @@ public class DefaultResourceRetrieverTest {
 	public void testRetrieve2xx()
 			throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("A", "B");
 
 		onRequest()
@@ -277,7 +277,7 @@ public class DefaultResourceRetrieverTest {
 				.respond()
 				.withStatus(201)
 				.withHeader("Content-Type", "application/json")
-				.withBody(jsonObject.toJSONString());
+				.withBody(JSONObjectUtils.toJSONString(jsonObject));
 
 		RestrictedResourceRetriever resourceRetriever = new DefaultResourceRetriever();
 		Resource resource = resourceRetriever.retrieveResource(new URL("http://localhost:" + port() + "/c2id/jwks.json"));
@@ -330,7 +330,7 @@ public class DefaultResourceRetrieverTest {
 	public void testReadTimeout()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("A", "B");
 
 		onRequest()
@@ -340,7 +340,7 @@ public class DefaultResourceRetrieverTest {
 				.withDelay(100L, TimeUnit.MILLISECONDS)
 				.withStatus(200)
 				.withHeader("Content-Type", "application/json")
-				.withBody(jsonObject.toJSONString());
+				.withBody(JSONObjectUtils.toJSONString(jsonObject));
 
 		RestrictedResourceRetriever resourceRetriever = new DefaultResourceRetriever(0, 50);
 

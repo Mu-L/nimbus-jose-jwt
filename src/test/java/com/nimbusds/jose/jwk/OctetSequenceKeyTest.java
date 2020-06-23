@@ -33,12 +33,12 @@ import javax.crypto.spec.SecretKeySpec;
 import static org.junit.Assert.assertNotEquals;
 
 import junit.framework.TestCase;
-import net.minidev.json.JSONObject;
 
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONObjectUtils;
 
 
 /**
@@ -92,7 +92,7 @@ public class OctetSequenceKeyTest extends TestCase {
 
 		assertTrue(key.isPrivate());
 
-		String jwkString = key.toJSONObject().toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
 
 		key = OctetSequenceKey.parse(jwkString);
 
@@ -159,7 +159,7 @@ public class OctetSequenceKeyTest extends TestCase {
 
 		assertTrue(key.isPrivate());
 
-		String jwkString = key.toJSONObject().toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
 
 		key = OctetSequenceKey.parse(jwkString);
 
@@ -262,7 +262,7 @@ public class OctetSequenceKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = key.toJSONObject().toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
 
 		key = OctetSequenceKey.parse(jwkString);
 
@@ -430,7 +430,7 @@ public class OctetSequenceKeyTest extends TestCase {
 
 		assertEquals(256 / 8, thumbprint.decode().length);
 
-		String orderedJSON = JSONObject.toJSONString(jwk.getRequiredParams());
+		String orderedJSON = JSONObjectUtils.toJSONString(jwk.getRequiredParams());
 
 		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(Charset.forName("UTF-8"))));
 
@@ -602,7 +602,7 @@ public class OctetSequenceKeyTest extends TestCase {
 	public void testParse_fromEmptyJSONObject() {
 		
 		try {
-			OctetSequenceKey.parse(new JSONObject());
+			OctetSequenceKey.parse(JSONObjectUtils.newJSONObject());
 			fail();
 		} catch (ParseException e) {
 			assertEquals("The key type to parse must not be null", e.getMessage());
@@ -612,7 +612,7 @@ public class OctetSequenceKeyTest extends TestCase {
 	
 	public void testParse_missingKty() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject =JSONObjectUtils.newJSONObject();
 		jsonObject.put("k", "werewrwerewr");
 		
 		try {
@@ -626,7 +626,7 @@ public class OctetSequenceKeyTest extends TestCase {
 	
 	public void testParse_missingK() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("kty", "oct");
 		
 		try {
@@ -640,7 +640,7 @@ public class OctetSequenceKeyTest extends TestCase {
 	
 	public void testParse_nullK() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("kty", "oct");
 		jsonObject.put("k", null);
 		

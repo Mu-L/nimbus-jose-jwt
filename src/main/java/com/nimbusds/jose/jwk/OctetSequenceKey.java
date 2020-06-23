@@ -23,13 +23,13 @@ import java.security.*;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import net.jcip.annotations.Immutable;
-import net.minidev.json.JSONObject;
 
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JOSEException;
@@ -547,9 +547,9 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
 
 
 	@Override
-	public JSONObject toJSONObject() {
+	public Map<String, Object> toJSONObject() {
 
-		JSONObject o = super.toJSONObject();
+		Map<String, Object> o = super.toJSONObject();
 
 		// Append key value
 		o.put("k", k.toString());
@@ -588,7 +588,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
 	 * @throws ParseException If the JSON object couldn't be parsed to an
 	 *                        octet sequence JWK.
 	 */
-	public static OctetSequenceKey parse(final JSONObject jsonObject) 
+	public static OctetSequenceKey parse(final Map<String, Object> jsonObject) 
 		throws ParseException {
 		
 		// Check the key type

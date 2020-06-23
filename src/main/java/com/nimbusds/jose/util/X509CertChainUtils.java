@@ -33,7 +33,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import net.minidev.json.JSONArray;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.openssl.PEMParser;
 
@@ -58,7 +57,7 @@ public class X509CertChainUtils {
 	 *
 	 * @throws ParseException If parsing failed.
 	 */
-	public static List<Base64> toBase64List(final JSONArray jsonArray)
+	public static List<Base64> toBase64List(final List<Object> jsonArray)
 		throws ParseException {
 		
 		if (jsonArray == null)

@@ -20,13 +20,13 @@ package com.nimbusds.jose;
 
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Map;
 
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jose.util.StandardCharset;
 import com.nimbusds.jwt.SignedJWT;
 import net.jcip.annotations.Immutable;
-import net.minidev.json.JSONObject;
 
 
 /**
@@ -110,7 +110,7 @@ public final class Payload implements Serializable {
 	/**
 	 * The JSON object representation.
 	 */
-	private final JSONObject jsonObject;
+	private final Map<String, Object> jsonObject;
 
 
 	/**
@@ -175,13 +175,14 @@ public final class Payload implements Serializable {
 	 * @param jsonObject The JSON object representing the payload. Must not
 	 *                   be {@code null}.
 	 */
-	public Payload(final JSONObject jsonObject) {
+	public Payload(final Map<String, Object> jsonObject) {
 
 		if (jsonObject == null) {
 			throw new IllegalArgumentException("The JSON object must not be null");
 		}
 
-		this.jsonObject = jsonObject;
+		this.jsonObject = JSONObjectUtils.newJSONObject();
+		this.jsonObject.putAll(jsonObject);
 		string = null;
 		bytes = null;
 		base64URL = null;
@@ -334,7 +335,7 @@ public final class Payload implements Serializable {
 	 * @return The JSON object representation, {@code null} if the payload
 	 *         couldn't be converted to a JSON object.
 	 */
-	public JSONObject toJSONObject() {
+	public Map<String, Object> toJSONObject() {
 
 		if (jsonObject != null) {
 			return jsonObject;
@@ -357,7 +358,6 @@ public final class Payload implements Serializable {
 			return null;
 		}
 	}
-
 
 	/**
 	 * Returns a string representation of this payload.
@@ -383,7 +383,7 @@ public final class Payload implements Serializable {
 
 		} else if (jsonObject != null) {
 
-			return jsonObject.toString();
+			return JSONObjectUtils.toJSONString(jsonObject);
 
 		} else if (bytes != null) {
 

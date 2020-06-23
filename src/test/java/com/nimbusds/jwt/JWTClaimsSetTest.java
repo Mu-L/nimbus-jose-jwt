@@ -23,9 +23,9 @@ import java.text.ParseException;
 import java.util.*;
 
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONObjectUtils;
+
 import junit.framework.TestCase;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 
 
 /**
@@ -118,7 +118,7 @@ public class JWTClaimsSetTest extends TestCase {
 
 
 		// serialise
-		JSONObject json = builder.build().toJSONObject();
+		Map<String, Object> json = builder.build().toJSONObject();
 
 		assertEquals(8, json.size());
 
@@ -167,7 +167,7 @@ public class JWTClaimsSetTest extends TestCase {
 			.expirationTime(ONE_MIN_AFTER_EPOCH)
 			.build();
 
-		JSONObject json = cs.toJSONObject();
+		Map<String, Object> json = cs.toJSONObject();
 
 		assertEquals(new Long(60L), json.get("iat"));
 		assertEquals(new Long(60L), json.get("nbf"));
@@ -408,10 +408,10 @@ public class JWTClaimsSetTest extends TestCase {
 	public void testStringAudience()
 		throws Exception {
 
-		JSONObject o = new JSONObject();
+		Map<String, Object> o = new LinkedHashMap<>();
 		o.put("aud", "http://example.com");
 
-		JWTClaimsSet jwtClaimsSet = JWTClaimsSet.parse(o.toJSONString());
+		JWTClaimsSet jwtClaimsSet = JWTClaimsSet.parse(JSONObjectUtils.toJSONString(o));
 
 		assertEquals("http://example.com", jwtClaimsSet.getAudience().get(0));
 		assertEquals(1, jwtClaimsSet.getAudience().size());
@@ -421,10 +421,10 @@ public class JWTClaimsSetTest extends TestCase {
 	public void testStringArrayAudience()
 		throws Exception {
 
-		JSONObject o = new JSONObject();
+		Map<String, Object> o = new LinkedHashMap<>();
 		o.put("aud", Collections.singletonList("http://example.com"));
 
-		JWTClaimsSet jwtClaimsSet = JWTClaimsSet.parse(o.toJSONString());
+		JWTClaimsSet jwtClaimsSet = JWTClaimsSet.parse(JSONObjectUtils.toJSONString(o));
 
 		assertEquals("http://example.com", jwtClaimsSet.getAudience().get(0));
 		assertEquals(1, jwtClaimsSet.getAudience().size());
@@ -434,10 +434,10 @@ public class JWTClaimsSetTest extends TestCase {
 	public void testStringArrayMultipleAudience()
 		throws Exception {
 
-		JSONObject o = new JSONObject();
+		Map<String, Object> o = new LinkedHashMap<>();
 		o.put("aud", Arrays.asList("http://example.com", "http://example2.com"));
 
-		JWTClaimsSet jwtClaimsSet = JWTClaimsSet.parse(o.toJSONString());
+		JWTClaimsSet jwtClaimsSet = JWTClaimsSet.parse(JSONObjectUtils.toJSONString(o));
 
 		assertEquals("http://example.com", jwtClaimsSet.getAudience().get(0));
 		assertEquals("http://example2.com", jwtClaimsSet.getAudience().get(1));
@@ -471,7 +471,7 @@ public class JWTClaimsSetTest extends TestCase {
 
 		assertEquals("185.7.248.1", claimsSet.getStringClaim("login_ip"));
 
-		JSONObject geoLoc = (JSONObject)claimsSet.getClaim("login_geo");
+		Map<String, Object> geoLoc = (Map<String, Object>)claimsSet.getClaim("login_geo");
 
 		// {"long":"37.3956","lat":"-122.076"}
 		assertEquals("37.3956", (String)geoLoc.get("long"));
@@ -498,12 +498,12 @@ public class JWTClaimsSetTest extends TestCase {
 
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().audience("123").build();
 
-		JSONObject jsonObject = claimsSet.toJSONObject();
+		Map<String, Object> jsonObject = claimsSet.toJSONObject();
 
 		assertEquals("123", (String)jsonObject.get("aud"));
 		assertEquals(1, jsonObject.size());
 
-		claimsSet = JWTClaimsSet.parse(jsonObject.toJSONString());
+		claimsSet = JWTClaimsSet.parse(claimsSet.toString());
 		assertEquals("123", claimsSet.getAudience().get(0));
 		assertEquals(1, claimsSet.getAudience().size());
 	}
@@ -526,8 +526,8 @@ public class JWTClaimsSetTest extends TestCase {
 	public void testAudienceParsing()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
-		JSONArray aud = new JSONArray();
+		Map<String, Object> jsonObject = new LinkedHashMap<>();
+		List<Object> aud = new ArrayList<>();
 		aud.add("client-1");
 		aud.add("client-2");
 		jsonObject.put("aud", aud);
@@ -542,8 +542,8 @@ public class JWTClaimsSetTest extends TestCase {
 	public void testGetStringArrayClaim()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
-		JSONArray jsonArray = new JSONArray();
+		Map<String, Object> jsonObject = new LinkedHashMap<>();
+		List<Object> jsonArray = new ArrayList<>();
 		jsonArray.add("client-1");
 		jsonArray.add("client-2");
 		jsonObject.put("array", jsonArray);
@@ -560,8 +560,8 @@ public class JWTClaimsSetTest extends TestCase {
 	public void testGetInvalidStringArrayClaim()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
-		JSONArray jsonArray = new JSONArray();
+		Map<String, Object> jsonObject = new LinkedHashMap<>();
+		List<Object> jsonArray = new ArrayList<>();
 		jsonArray.add("client-1");
 		jsonArray.add(0);
 		jsonObject.put("array", jsonArray);
@@ -580,7 +580,7 @@ public class JWTClaimsSetTest extends TestCase {
 	public void testGetNullStringArrayClaim()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = new LinkedHashMap<>();
 
 		JWTClaimsSet claimsSet = JWTClaimsSet.parse(jsonObject);
 
@@ -591,8 +591,8 @@ public class JWTClaimsSetTest extends TestCase {
 	public void testGetStringListClaim()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
-		JSONArray jsonArray = new JSONArray();
+		Map<String, Object> jsonObject = new LinkedHashMap<>();
+		List<Object> jsonArray = new ArrayList<>();
 		jsonArray.add("client-1");
 		jsonArray.add("client-2");
 		jsonObject.put("array", jsonArray);
@@ -609,8 +609,8 @@ public class JWTClaimsSetTest extends TestCase {
 	public void testGetInvalidStringListClaim()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
-		JSONArray jsonArray = new JSONArray();
+		Map<String, Object> jsonObject = new LinkedHashMap<>();
+		List<Object> jsonArray = new ArrayList<>();
 		jsonArray.add("client-1");
 		jsonArray.add(0);
 		jsonObject.put("array", jsonArray);
@@ -629,7 +629,7 @@ public class JWTClaimsSetTest extends TestCase {
 	public void testGetNullStringListClaim()
 		throws Exception {
 
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = new LinkedHashMap<>();
 
 		JWTClaimsSet claimsSet = JWTClaimsSet.parse(jsonObject);
 
@@ -642,7 +642,7 @@ public class JWTClaimsSetTest extends TestCase {
 
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().subject("Владимир Джувинов").build();
 
-		String json = claimsSet.toJSONObject().toJSONString();
+		String json = JSONObjectUtils.toJSONString(claimsSet.toJSONObject());
 
 		claimsSet = JWTClaimsSet.parse(json);
 
@@ -655,7 +655,7 @@ public class JWTClaimsSetTest extends TestCase {
 
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().claim("fullName", "João").build();
 
-		String json = claimsSet.toJSONObject().toJSONString();
+		String json = JSONObjectUtils.toJSONString(claimsSet.toJSONObject());
 
 		Base64URL base64URL = Base64URL.encode(json);
 
@@ -670,7 +670,7 @@ public class JWTClaimsSetTest extends TestCase {
 		
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().claim("uri", URI.create("https://example.com").toString()).build();
 		
-		String json = claimsSet.toJSONObject().toJSONString();
+		String json = JSONObjectUtils.toJSONString(claimsSet.toJSONObject());
 		
 		claimsSet = JWTClaimsSet.parse(json);
 		
@@ -685,7 +685,7 @@ public class JWTClaimsSetTest extends TestCase {
 		
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().claim("uri", "a b c").build();
 		
-		String json = claimsSet.toJSONObject().toJSONString();
+		String json = JSONObjectUtils.toJSONString(claimsSet.toJSONObject());
 		
 		claimsSet = JWTClaimsSet.parse(json);
 		
@@ -765,14 +765,14 @@ public class JWTClaimsSetTest extends TestCase {
 			.claim("aud", audList)
 			.build();
 
-		assertEquals("{\"aud\":[\"a\",\"b\"]}", claimsSet.toJSONObject().toString());
+		assertEquals("{\"aud\":[\"a\",\"b\"]}", claimsSet.toString());
 	}
 
 
 	public void testJSONObjectClaim()
 		throws Exception {
 
-		JSONObject actor = new JSONObject();
+		Map<String, Object> actor = new LinkedHashMap<>();
 		actor.put("sub", "claire");
 		actor.put("iss", "https://openid.c2id.com");
 
@@ -780,7 +780,7 @@ public class JWTClaimsSetTest extends TestCase {
 			.claim("act", actor)
 			.build();
 
-		JSONObject out = claimsSet.getJSONObjectClaim("act");
+		Map<String, Object> out = claimsSet.getJSONObjectClaim("act");
 		assertEquals("claire", out.get("sub"));
 		assertEquals("https://openid.c2id.com", out.get("iss"));
 		assertEquals(2, out.size());
@@ -799,7 +799,7 @@ public class JWTClaimsSetTest extends TestCase {
 			.claim("act", actor)
 			.build();
 
-		JSONObject out = claimsSet.getJSONObjectClaim("act");
+		Map<String, Object> out = claimsSet.getJSONObjectClaim("act");
 		assertEquals("claire", out.get("sub"));
 		assertEquals("https://openid.c2id.com", out.get("iss"));
 		assertEquals(2, out.size());
@@ -833,8 +833,8 @@ public class JWTClaimsSetTest extends TestCase {
 	
 	public void testClaimAsJSONObject()
 		throws Exception {
-		
-		JSONObject jsonObject = new JSONObject();
+
+		Map<String, Object> jsonObject = new LinkedHashMap<>();
 		jsonObject.put("key", "value");
 		
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
@@ -845,8 +845,8 @@ public class JWTClaimsSetTest extends TestCase {
 		assertEquals("value", jsonObject.get("key"));
 		assertEquals(1, jsonObject.size());
 		
-		JSONObject claimsJSONObject = claimsSet.toJSONObject();
-		jsonObject = (JSONObject) claimsJSONObject.get("prm");
+		Map<String, Object> claimsJSONObject = claimsSet.toJSONObject();
+		jsonObject = (Map<String, Object>) claimsJSONObject.get("prm");
 		assertEquals("value", jsonObject.get("key"));
 		assertEquals(1, jsonObject.size());
 		
@@ -882,7 +882,7 @@ public class JWTClaimsSetTest extends TestCase {
 			.claim("aud", "1")
 			.build();
 		
-		JSONObject jsonObject = claimsSet.toJSONObject();
+		Map<String, Object> jsonObject = claimsSet.toJSONObject();
 		assertEquals("1", jsonObject.get("aud"));
 		assertEquals(1, jsonObject.size());
 	}
@@ -899,13 +899,13 @@ public class JWTClaimsSetTest extends TestCase {
 		assertNull(claimsSet.getClaim("myclaim"));
 		assertTrue(claimsSet.getClaims().containsKey("myclaim"));
 		
-		JSONObject jsonObject = claimsSet.toJSONObject(true);
+		Map<String, Object> jsonObject = claimsSet.toJSONObject(true);
 
 		assertTrue(jsonObject.containsKey("myclaim"));
 		assertNull(jsonObject.get("myclaim"));
 		
 		// null claim preserved on parse back
-		claimsSet = JWTClaimsSet.parse(jsonObject.toJSONString());
+		claimsSet = JWTClaimsSet.parse(JSONObjectUtils.toJSONString(jsonObject));
 		
 		assertNull(claimsSet.getClaim("myclaim"));
 		assertTrue(claimsSet.getClaims().containsKey("myclaim"));
@@ -925,13 +925,13 @@ public class JWTClaimsSetTest extends TestCase {
 		assertTrue(claimsSet.getAudience().isEmpty());
 		assertTrue(claimsSet.getClaims().containsKey("aud"));
 		
-		JSONObject jsonObject = claimsSet.toJSONObject(true);
+		Map<String, Object> jsonObject = claimsSet.toJSONObject(true);
 
 		assertTrue(jsonObject.containsKey("aud"));
 		assertNull(jsonObject.get("aud"));
 		
 		// null aud claim preserved on parse back
-		claimsSet = JWTClaimsSet.parse(jsonObject.toJSONString());
+		claimsSet = JWTClaimsSet.parse(JSONObjectUtils.toJSONString(jsonObject));
 		
 		assertTrue(claimsSet.getAudience().isEmpty());
 		assertTrue(claimsSet.getClaims().containsKey("aud"));
@@ -951,13 +951,13 @@ public class JWTClaimsSetTest extends TestCase {
 		assertTrue(claimsSet.getAudience().isEmpty());
 		assertTrue(claimsSet.getClaims().containsKey("aud"));
 		
-		JSONObject jsonObject = claimsSet.toJSONObject(true);
+		Map<String, Object> jsonObject = claimsSet.toJSONObject(true);
 
 		assertTrue(jsonObject.containsKey("aud"));
 		assertNull(jsonObject.get("aud"));
 		
 		// null aud claim preserved on parse back
-		claimsSet = JWTClaimsSet.parse(jsonObject.toJSONString());
+		claimsSet = JWTClaimsSet.parse(JSONObjectUtils.toJSONString(jsonObject));
 		
 		assertTrue(claimsSet.getAudience().isEmpty());
 		assertTrue(claimsSet.getClaims().containsKey("aud"));
