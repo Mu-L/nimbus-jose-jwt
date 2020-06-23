@@ -67,7 +67,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
  *
  * @author Vladimir Dzhuvinov
  * @author Vedran Pavic
- * @version 2020-04-06
+ * @version 2020-06-23
  */
 public class JWKSetTest extends TestCase {
 	
@@ -1077,38 +1077,37 @@ public class JWKSetTest extends TestCase {
                      "}";
 
         
-        JWKSet keySet = JWKSet.parse(s);
-
-
-        List<JWK> keyList = keySet.getKeys();
-        assertEquals(1, keyList.size());
-
-
-        // Check key
-        JWK key = keyList.get(0);
-
-        assertTrue(key instanceof RSAKey);
-        assertEquals("yMPAp4MB5fMXz7U7kDdZpGK1-Ao069CgW01Car1Nky4", key.getKeyID());
-        assertNull(key.getKeyUse());
-        assertNull(key.getParsedX509CertChain());
-        assertNull(key.getKeyStore());
-        assertNull(key.getX509CertChain());
-        
-        assertNull(key.getAlgorithm());
-        
-        RSAKey rsaKey = (RSAKey) key;
-       
-        assertTrue(key instanceof RSAKey);
-       
-        assertEquals("AQAB", rsaKey.getPublicExponent().toString());
-        assertFalse(key.isPrivate());
-        
-        assertTrue(rsaKey.toPublicKey() instanceof RSAPublicKey);       
-	        
+		JWKSet keySet = JWKSet.parse(s);
+	
+	
+		List<JWK> keyList = keySet.getKeys();
+		assertEquals(1, keyList.size());
+	
+	
+		// Check key
+		JWK key = keyList.get(0);
+	
+		assertTrue(key instanceof RSAKey);
+		assertEquals("yMPAp4MB5fMXz7U7kDdZpGK1-Ao069CgW01Car1Nky4", key.getKeyID());
+		assertNull(key.getKeyUse());
+		assertNull(key.getParsedX509CertChain());
+		assertNull(key.getKeyStore());
+		assertNull(key.getX509CertChain());
+		
+		assertNull(key.getAlgorithm());
+		
+		RSAKey rsaKey = (RSAKey) key;
+	 
+		assertTrue(key instanceof RSAKey);
+	 
+		assertEquals("AQAB", rsaKey.getPublicExponent().toString());
+		assertFalse(key.isPrivate());
+		
+		assertTrue(rsaKey.toPublicKey() instanceof RSAPublicKey);
 	}
 	
 	
-	public void testParseJSONObject_genericsDoesntMatch() {
+	public void testParseJSONObject_illegalKeysType() {
 		
 		List<Object> keys = JSONArrayUtils.newJSONArray();
 		keys.add("illegal-item");
@@ -1118,8 +1117,26 @@ public class JWKSetTest extends TestCase {
 		
 		try {
 			JWKSet.parse(input);
+			fail();
 		} catch (ParseException e) {
 			assertEquals("The \"keys\" JSON array must contain JSON objects only", e.getMessage());
+		}
+	}
+	
+	
+	public void testParseJSONObject_emptyKeyJSONObject() {
+		
+		List<Object> keys = JSONArrayUtils.newJSONArray();
+		keys.add(new HashMap<String, Object>());
+		
+		Map<String, Object> input = new HashMap<>();
+		input.put("keys", keys);
+		
+		try {
+			JWKSet.parse(input);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("Invalid JWK at position 0: Missing key type \"kty\" parameter", e.getMessage());
 		}
 	}
 }

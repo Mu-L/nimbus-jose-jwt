@@ -591,8 +591,14 @@ public abstract class JWK implements Serializable {
 	 */
 	public static JWK parse(final Map<String, Object> jsonObject)
 		throws ParseException {
+		
+		String ktyString = JSONObjectUtils.getString(jsonObject, "kty");
+		
+		if (ktyString == null) {
+			throw new ParseException("Missing key type \"kty\" parameter", 0);
+		}
 
-		KeyType kty = KeyType.parse(JSONObjectUtils.getString(jsonObject, "kty"));
+		KeyType kty = KeyType.parse(ktyString);
 
 		if (kty == KeyType.EC) {
 			
