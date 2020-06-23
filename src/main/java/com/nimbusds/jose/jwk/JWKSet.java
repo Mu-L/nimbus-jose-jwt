@@ -356,18 +356,13 @@ public class JWKSet implements Serializable {
 
 		for (int i=0; i < keyArray.size(); i++) {
 
-			if (! (keyArray.get(i) instanceof Map)) {
-				throw new ParseException("The \"keys\" JSON array must contain JSON objects only", 0);
-			}
-
 			try {
-				Map<String, Object> keyJSON = (Map<String, Object>)keyArray.get(i);
-
-			
-				keys.add(JWK.parse(keyJSON));
+				Map<String, Object> keyJSONObject = (Map<String, Object>)keyArray.get(i);
+				keys.add(JWK.parse(keyJSONObject));
+				
 			} catch (ClassCastException e) {
 				
-				throw new ParseException("Invalid JSON key type: " + e.getMessage(), 0);
+				throw new ParseException("The \"keys\" JSON array must contain JSON objects only", 0);
 				
 			} catch (ParseException e) {
 

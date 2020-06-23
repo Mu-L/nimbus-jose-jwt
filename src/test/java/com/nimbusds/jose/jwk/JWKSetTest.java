@@ -50,6 +50,7 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONArrayUtils;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jose.util.X509CertUtils;
 import junit.framework.TestCase;
@@ -1104,5 +1105,21 @@ public class JWKSetTest extends TestCase {
         
         assertTrue(rsaKey.toPublicKey() instanceof RSAPublicKey);       
 	        
+	}
+	
+	
+	public void testParseJSONObject_genericsDoesntMatch() {
+		
+		List<Object> keys = JSONArrayUtils.newJSONArray();
+		keys.add("illegal-item");
+		
+		Map<String, Object> input = new HashMap<>();
+		input.put("keys", keys);
+		
+		try {
+			JWKSet.parse(input);
+		} catch (ParseException e) {
+			assertEquals("The \"keys\" JSON array must contain JSON objects only", e.getMessage());
+		}
 	}
 }
