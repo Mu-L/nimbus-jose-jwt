@@ -47,8 +47,10 @@ import net.jcip.annotations.Immutable;
  *                       &lt;=&gt; SignedJWT
  * </pre>
  *
+ * <p>The {@link }
+ *
  * @author Vladimir Dzhuvinov
- * @version 2016-07-26
+ * @version 2020-06-27
  */
 @Immutable
 public final class Payload implements Serializable {
@@ -420,7 +422,8 @@ public final class Payload implements Serializable {
 
 
 	/**
-	 * Returns a Base64URL representation of this payload.
+	 * Returns a Base64URL representation of this payload, as required for
+	 * JOSE serialisation (see RFC 7515, section 7).
 	 *
 	 * @return The Base64URL representation.
 	 */

@@ -1167,7 +1167,7 @@ version 8.19 (2020-06-03)
       parse(JSONObject) methods to allow null optional parameters (iss
       #358).
 
-version 9.0 (2020-06-23)
+version 9.0 (2020-06-27)
     * Replaces or removes all JSON Smart interfaces and classes from all
       visible classes and methods in the library. Replaces all
       net.minidev.json.JSONObject method arguments and return types with
