@@ -20,7 +20,7 @@ package com.nimbusds.jose;
 
 import java.io.Serializable;
 
-import com.nimbusds.jose.util.JSONObjectUtils;
+import com.nimbusds.jose.util.JSONStringUtils;
 
 import net.jcip.annotations.Immutable;
 
@@ -136,6 +136,6 @@ public final class CompressionAlgorithm implements Serializable {
 	 * @return The JSON string representation.
 	 */
 	public String toJSONString() {
-		return JSONObjectUtils.toJSONString(name);
+		return JSONStringUtils.toJSONString(name);
 	}
 }

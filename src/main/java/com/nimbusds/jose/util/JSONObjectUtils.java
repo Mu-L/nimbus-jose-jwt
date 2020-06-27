@@ -31,10 +31,10 @@ import net.minidev.json.parser.JSONParser;
 
 
 /**
- * JSON object helper methods for parsing and typed retrieval of member values.
+ * JSON object helper methods.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-06-03
+ * @version 2020-06-27
  */
 public class JSONObjectUtils {
 
@@ -67,18 +67,16 @@ public class JSONObjectUtils {
 		throws ParseException {
 
 		Object o;
-
 		try {
 			o = new JSONParser(JSONParser.USE_HI_PRECISION_FLOAT | JSONParser.ACCEPT_TAILLING_SPACE).parse(s);
 		} catch (net.minidev.json.parser.ParseException e) {
-
 			throw new ParseException("Invalid JSON: " + e.getMessage(), 0);
 		} catch (Exception e) {
 			throw new ParseException("Unexpected exception: " + e.getMessage(), 0);
 		}
 
 		if (o instanceof JSONObject) {
-			return (Map<String, Object>) o;
+			return (JSONObject)o;
 		} else {
 			throw new ParseException("JSON entity is not an object", 0);
 		}
@@ -382,35 +380,18 @@ public class JSONObjectUtils {
 
 		return getGeneric(o, key, JSONObject.class);
 	}
-
-	/**
-	 * Converts a text snippet (String Value) to its JSON representation.
-	 * @param string - the text to convert to JSON String
-	 * @return the JSON representation of a String
-	 */
-	public static String toJSONString(String string) {
-		return "\"" + JSONObject.escape(string) + "\"";
-	}
-
-	/**
-	 * Converts a JSON object to String
-	 * @param o - the JSON Object to convert
-	 * @return the String representation of the JSON Object
-	 */
-	public static String toJSONString(Map<String, ?> o) {
-		return JSONObject.toJSONString(o);
-	}
+	
 	
 	/**
-         * Gets a string member of a JSON object as {@link Base64URL}.
-         *
-         * @param o   The JSON object. Must not be {@code null}.
-         * @param key The JSON object member key. Must not be {@code null}.
-         *
-         * @return The JSON object member value, may be {@code null}.
-         *
-         * @throws ParseException If the value is not of the expected type.
-         */
+	 * Gets a string member of a JSON object as {@link Base64URL}.
+	 *
+	 * @param o   The JSON object. Must not be {@code null}.
+	 * @param key The JSON object member key. Must not be {@code null}.
+	 *
+	 * @return The JSON object member value, may be {@code null}.
+	 *
+	 * @throws ParseException If the value is not of the expected type.
+	 */
 	public static Base64URL getBase64URL(final Map<String, Object> o, final String key)
 		throws ParseException {
 		
@@ -422,23 +403,34 @@ public class JSONObjectUtils {
 		
 		return new Base64URL(value);
 	}
+	
+	
+	/**
+	 * Serialises the specified map to a JSON object using the entity
+	 * mapping specified in {@link #parse(String)}.
+	 *
+	 * @param o The map. Must not be {@code null}.
+	 *
+	 * @return The JSON object as string.
+	 */
+	public static String toJSONString(final Map<String, ?> o) {
+		return JSONObject.toJSONString(o);
+	}
 
 
+	/**
+	 * Creates a new JSON object (unordered).
+	 *
+	 * @return The new empty JSON object.
+	 */
+	public static Map<String, Object> newJSONObject() {
+		return new HashMap<>();
+	}
+	
+	
 	/**
 	 * Prevents public instantiation.
 	 */
 	private JSONObjectUtils() { }
-
-
-	/**
-	 * 
-	 * Creates a new JSON Object
-	 * 
-	 * @return new empty JSON Object
-	 */
-	public static Map<String, Object> newJSONObject() {
-		return new HashMap<String, Object>();
-	}
-
 }
 

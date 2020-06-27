@@ -94,7 +94,7 @@ public class Base64 implements Serializable {
 	 * @return The JSON string representation of this object.
 	 */
 	public String toJSONString() {
-		return JSONObjectUtils.toJSONString(value);
+		return JSONStringUtils.toJSONString(value);
 	}
 
 	/**

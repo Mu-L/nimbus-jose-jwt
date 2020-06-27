@@ -31,7 +31,7 @@ import org.junit.Assert;
  * Tests the JSON object utilities.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-06-03
+ * @version 2020-06-27
  */
 public class JSONObjectUtilsTest extends TestCase {
 
@@ -308,6 +308,18 @@ public class JSONObjectUtilsTest extends TestCase {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.parse("{\"key\":[\"apple\",\"pear\"]}");
 		Assert.assertArrayEquals(new String[]{"apple", "pear"}, JSONObjectUtils.getStringArray(jsonObject, "key"));
+	}
+	
+	
+	public void testGetStringArray_otherTypes() throws ParseException {
+		
+		Map<String, Object> jsonObject = JSONObjectUtils.parse("{\"key\":[10,true]}");
+		try {
+			JSONObjectUtils.getStringArray(jsonObject, "key");
+			fail();
+		} catch (ParseException e) {
+			assertEquals("JSON object member with key \"key\" is not an array of strings", e.getMessage());
+		}
 	}
 	
 	

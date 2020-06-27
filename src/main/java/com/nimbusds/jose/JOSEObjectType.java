@@ -20,7 +20,7 @@ package com.nimbusds.jose;
 
 import java.io.Serializable;
 
-import com.nimbusds.jose.util.JSONObjectUtils;
+import com.nimbusds.jose.util.JSONStringUtils;
 
 import net.jcip.annotations.Immutable;
 
@@ -149,6 +149,6 @@ public final class JOSEObjectType implements  Serializable {
 	 * @return The JSON string representation.
 	 */
 	public String toJSONString() {
-		return JSONObjectUtils.toJSONString(type);
+		return JSONStringUtils.toJSONString(type);
 	}
 }

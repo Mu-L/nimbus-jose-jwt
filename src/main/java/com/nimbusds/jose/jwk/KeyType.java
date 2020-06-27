@@ -24,7 +24,7 @@ import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.Requirement;
-import com.nimbusds.jose.util.JSONObjectUtils;
+import com.nimbusds.jose.util.JSONStringUtils;
 
 import net.jcip.annotations.Immutable;
 
@@ -184,7 +184,7 @@ public final class KeyType implements Serializable {
 	 * @return The JSON string representation.
 	 */
 	public String toJSONString() {
-		return JSONObjectUtils.toJSONString(value);
+		return JSONStringUtils.toJSONString(value);
 	}
 
 
