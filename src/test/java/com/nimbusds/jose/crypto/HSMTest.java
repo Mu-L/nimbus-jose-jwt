@@ -21,6 +21,7 @@ package com.nimbusds.jose.crypto;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.*;
@@ -55,8 +56,11 @@ import com.nimbusds.jwt.SignedJWT;
 /**
  * HSM tests with Nitrokey.
  *
+ * https://www.nitrokey.com/
+ *
  * @author Vladimir Dzhuvinov
- * @version 2019-04-17
+ * @author Simon Kissane
+ * @version 2020-07-24
  */
 public class HSMTest {
 	
@@ -78,10 +82,34 @@ public class HSMTest {
 	
 	private static final String HSM_PIN = "648219";
 	
+	private static Method getConfigureMethod(Class<?> clsSunPKCS11) {
+		try {
+			return clsSunPKCS11.getMethod("configure", String.class);
+		} catch (NoSuchMethodException e) {
+			return null;
+		}
+	}
 
 	private static Provider loadHSMProvider(final String hsmConfig) {
-		InputStream is = new ByteArrayInputStream(hsmConfig.getBytes(Charset.forName("UTF-8")));
-		return new sun.security.pkcs11.SunPKCS11(is);
+		try {
+			// This code is necessary because the SunPKCS11 API was incompatibly changed.
+			// Java 8 uses the old API on Linux, the new API on macOS
+			// Java 11 uses the new API on both platforms
+			// We try the new API first, then fallback to old if it doesn't work
+			Class<?> clsSunPKCS11 = Class.forName("sun.security.pkcs11.SunPKCS11");
+			// "configure(String)" method indicates new API is present
+			Method configureMethod = getConfigureMethod(clsSunPKCS11);
+			if (configureMethod != null) {
+				Object o = clsSunPKCS11.getDeclaredConstructor().newInstance();
+				configureMethod.invoke(o, "--\n" + hsmConfig);
+				return (Provider)o;
+			}
+			// configure method was not found, fall back to old API
+			InputStream is = new ByteArrayInputStream(hsmConfig.getBytes(Charset.forName("UTF-8")));
+			return (Provider)clsSunPKCS11.getDeclaredConstructor(InputStream.class).newInstance(is);
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
