@@ -24,6 +24,8 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 
 import net.jcip.annotations.ThreadSafe;
 
@@ -39,39 +41,39 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public class DefaultResourceRetriever extends AbstractRestrictedResourceRetriever implements RestrictedResourceRetriever {
-	
-	
+
+
 	/**
 	 * If {@code true} the disconnect method of the underlying
 	 * HttpURLConnection is called after a successful or failed retrieval.
 	 */
 	private boolean disconnectAfterUse;
 
-	
+
 	/**
 	 * The proxy to use when opening the HttpURLConnection. Can be
 	 * {@code null}.
 	 */
 	private Proxy proxy;
-	
-	
+
+
 	/**
 	 * Creates a new resource retriever. The HTTP timeouts and entity size
 	 * limit are set to zero (infinite).
 	 */
 	public DefaultResourceRetriever() {
-	
-		this(0, 0);	
+
+		this(0, 0);
 	}
-	
-	
+
+
 	/**
 	 * Creates a new resource retriever. The HTTP entity size limit is set
 	 * to zero (infinite).
 	 *
-	 * @param connectTimeout The HTTP connects timeout, in milliseconds, 
+	 * @param connectTimeout The HTTP connects timeout, in milliseconds,
 	 *                       zero for infinite. Must not be negative.
-	 * @param readTimeout    The HTTP read timeout, in milliseconds, zero 
+	 * @param readTimeout    The HTTP read timeout, in milliseconds, zero
 	 *                       for infinite. Must not be negative.
 	 */
 	public DefaultResourceRetriever(final int connectTimeout, final int readTimeout) {
@@ -91,7 +93,7 @@ public class DefaultResourceRetriever extends AbstractRestrictedResourceRetrieve
 	 *                       infinite. Must not be negative.
 	 */
 	public DefaultResourceRetriever(final int connectTimeout, final int readTimeout, final int sizeLimit) {
-	
+
 		this(connectTimeout, readTimeout, sizeLimit, true);
 	}
 
@@ -119,12 +121,12 @@ public class DefaultResourceRetriever extends AbstractRestrictedResourceRetrieve
 					final int readTimeout,
 					final int sizeLimit,
 					final boolean disconnectAfterUse) {
-	
+
 		super(connectTimeout, readTimeout, sizeLimit);
 		this.disconnectAfterUse = disconnectAfterUse;
 	}
-	
-	
+
+
 	/**
 	 * Returns {@code true} if the disconnect method of the underlying
 	 * {@link HttpURLConnection} will be called after trying to retrieve
@@ -137,11 +139,11 @@ public class DefaultResourceRetriever extends AbstractRestrictedResourceRetrieve
 	 *         retrieve the resource.
 	 */
 	public boolean disconnectsAfterUse() {
-		
+
 		return disconnectAfterUse;
 	}
-	
-	
+
+
 	/**
 	 * Controls calling of the disconnect method the underlying
 	 * {@link HttpURLConnection} after trying to retrieve the resource.
@@ -154,7 +156,7 @@ public class DefaultResourceRetriever extends AbstractRestrictedResourceRetrieve
 	 * retrieve the resource.
 	 */
 	public void setDisconnectsAfterUse(final boolean disconnectAfterUse) {
-		
+
 		this.disconnectAfterUse = disconnectAfterUse;
 	}
 
@@ -167,7 +169,7 @@ public class DefaultResourceRetriever extends AbstractRestrictedResourceRetrieve
 	 * @return The proxy to use or {@code null} if no proxy should be used.
 	 */
 	public Proxy getProxy() {
-		
+
 		return proxy;
 	}
 
@@ -181,38 +183,46 @@ public class DefaultResourceRetriever extends AbstractRestrictedResourceRetrieve
 	 *              used.
 	 */
 	public void setProxy(final Proxy proxy) {
-		
+
 		this.proxy = proxy;
 	}
 
-	
+
 	@Override
 	public Resource retrieveResource(final URL url)
 		throws IOException {
-		
+
 		HttpURLConnection con = null;
 		try {
 			con = openConnection(url);
-			
+
 			con.setConnectTimeout(getConnectTimeout());
 			con.setReadTimeout(getReadTimeout());
-			
+
+			if(getHeaders() != null && !getHeaders().isEmpty()) {
+				for (Map.Entry<String, List<String>> entry : getHeaders().entrySet()) {
+					for (String value: entry.getValue()) {
+						con.addRequestProperty(entry.getKey(), value);
+					}
+				}
+			}
+
 			final String content;
 			try (InputStream inputStream = getInputStream(con, getSizeLimit())) {
 				content = IOUtils.readInputStreamToString(inputStream, StandardCharsets.UTF_8);
 			}
-	
+
 			// Check HTTP code + message
 			final int statusCode = con.getResponseCode();
 			final String statusMessage = con.getResponseMessage();
-	
+
 			// Ensure 2xx status code
 			if (statusCode > 299 || statusCode < 200) {
 				throw new IOException("HTTP " + statusCode + ": " + statusMessage);
 			}
-	
+
 			return new Resource(content, con.getContentType());
-		
+
 		} catch (ClassCastException e) {
 			throw new IOException("Couldn't open HTTP(S) connection: " + e.getMessage(), e);
 		} finally {
@@ -242,12 +252,12 @@ public class DefaultResourceRetriever extends AbstractRestrictedResourceRetrieve
 		}
 	}
 
-	
+
 	private InputStream getInputStream(final HttpURLConnection con, final int sizeLimit)
 		throws IOException {
-		
+
 		InputStream inputStream = con.getInputStream();
-		
+
 		return sizeLimit > 0 ? new BoundedInputStream(inputStream, getSizeLimit()) : inputStream;
 	}
 }
