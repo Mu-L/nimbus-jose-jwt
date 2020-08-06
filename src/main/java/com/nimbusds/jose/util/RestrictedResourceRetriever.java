@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * Retriever of resources specified by URL which permits setting of HTTP
- * connect and read timeouts as well as a size limit.
+ * connect and read timeouts, size limit and headers.
  */
 public interface RestrictedResourceRetriever extends ResourceRetriever {
 	
@@ -79,15 +79,21 @@ public interface RestrictedResourceRetriever extends ResourceRetriever {
 	 */
 	void setSizeLimit(int sizeLimitBytes);
 
+	
 	/**
-	 * Gets the HTTP set of headers.
-	 * @return Map containing pairs {header key} -> {List of values} or null if not set before.
+	 * Gets the headers to set for the HTTP request.
+	 *
+	 * @return The HTTP headers as name - values map, {@code null} if not
+	 *         set.
 	 */
 	Map<String, List<String>> getHeaders();
 
+	
 	/**
-	 * Sets the HTTP set of headers.
-	 * @param headers Map {header key} -> {List of values}. Null allowed to represent no headers.
+	 * Sets the headers to set for the HTTP request.
+	 *
+	 * @param headers The HTTP headers as name - values map, {@code null}
+	 *                if none.
 	 */
-	void setHeaders(Map<String, List<String>> headers);
+	void setHeaders(final Map<String, List<String>> headers);
 }
