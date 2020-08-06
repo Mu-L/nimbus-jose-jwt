@@ -23,9 +23,14 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static net.jadler.Jadler.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
 
 import net.minidev.json.JSONObject;
@@ -384,5 +389,37 @@ public class DefaultResourceRetrieverTest {
 			// Size overrun exception poses as file not found
 			assertEquals("Exceeded configured input limit of 50000 bytes", e.getMessage());
 		}
+	}
+
+	@Test
+	public void testHeaders()
+		throws Exception {
+
+		List<String> userAgentHeaderValue = Arrays.asList("NewAgent");
+		List<String> multipleValueHeader = Arrays.asList("Value1", "Value2");
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("A", "B");
+
+		onRequest()
+			.havingMethodEqualTo("GET")
+			.havingPathEqualTo("/c2id/jwks.json")
+			.respond()
+			.withStatus(200)
+			.withHeader("Content-Type", "application/json")
+			.withBody(jsonObject.toJSONString());
+
+		RestrictedResourceRetriever resourceRetriever = new DefaultResourceRetriever();
+		Map<String, List<String>> headers = new HashMap<>();
+		headers.put("User-Agent", userAgentHeaderValue);
+		headers.put("MultipleValues", multipleValueHeader);
+		resourceRetriever.setHeaders(headers);
+
+		Resource resource = resourceRetriever.retrieveResource(new URL("http://localhost:" + port() + "/c2id/jwks.json"));
+
+		verifyThatRequest()
+			.havingHeader("User-Agent", equalTo(userAgentHeaderValue))
+			.havingHeader("MultipleValues", equalTo(multipleValueHeader))
+			.receivedOnce();
 	}
 }

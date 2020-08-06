@@ -18,6 +18,9 @@
 package com.nimbusds.jose.util;
 
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Retriever of resources specified by URL which permits setting of HTTP
  * connect and read timeouts as well as a size limit.
@@ -75,4 +78,16 @@ public interface RestrictedResourceRetriever extends ResourceRetriever {
 	 *                       infinite. Must not be negative.
 	 */
 	void setSizeLimit(int sizeLimitBytes);
+
+	/**
+	 * Gets the HTTP set of headers.
+	 * @return Map containing pairs {header key} -> {List of values} or null if not set before.
+	 */
+	Map<String, List<String>> getHeaders();
+
+	/**
+	 * Sets the HTTP set of headers.
+	 * @param headers Map {header key} -> {List of values}. Null allowed to represent no headers.
+	 */
+	void setHeaders(Map<String, List<String>> headers);
 }

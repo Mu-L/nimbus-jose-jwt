@@ -20,6 +20,9 @@ package com.nimbusds.jose.util;
 
 import net.jcip.annotations.ThreadSafe;
 
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * Abstract retrieval of resources by URL with HTTP timeout and entity size
@@ -46,6 +49,8 @@ public abstract class AbstractRestrictedResourceRetriever implements RestrictedR
 	 */
 	private int sizeLimit;
 
+
+	private Map<String, List<String>> headers;
 
 	/**
 	 * Creates a new abstract restricted resource retriever.
@@ -115,5 +120,15 @@ public abstract class AbstractRestrictedResourceRetriever implements RestrictedR
 		}
 
 		this.sizeLimit = sizeLimitBytes;
+	}
+
+	@Override
+	public Map<String, List<String>> getHeaders() {
+		return headers;
+	}
+
+	@Override
+	public void setHeaders(Map<String, List<String>> headers) {
+		this.headers = headers;
 	}
 }
