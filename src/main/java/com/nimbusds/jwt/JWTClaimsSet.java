@@ -24,10 +24,11 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
 
+import net.jcip.annotations.Immutable;
+
 import com.nimbusds.jose.util.DateUtils;
 import com.nimbusds.jose.util.JSONArrayUtils;
 import com.nimbusds.jose.util.JSONObjectUtils;
-import net.jcip.annotations.Immutable;
 
 
 /**
@@ -95,7 +96,7 @@ public final class JWTClaimsSet implements Serializable {
 	private static final Set<String> REGISTERED_CLAIM_NAMES;
 
 
-	/**
+	/*
 	 * Initialises the registered claim name set.
 	 */
 	static {
@@ -756,8 +757,7 @@ public final class JWTClaimsSet implements Serializable {
 
 
 	/**
-	 * Gets the specified claim (registered or custom) as a
-	 * {@link JSONObject}.
+	 * Gets the specified claim (registered or custom) as a JSON object.
 	 *
 	 * @param name The name of the claim. Must not be {@code null}.
 	 *

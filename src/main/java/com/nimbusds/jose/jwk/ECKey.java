@@ -1252,10 +1252,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 		if (! getX().decodeToBigInteger().equals(certECKey.getW().getAffineX())) {
 			return false;
 		}
-		if (! getY().decodeToBigInteger().equals(certECKey.getW().getAffineY())) {
-			return false;
-		}
-		return true;
+		return getY().decodeToBigInteger().equals(certECKey.getW().getAffineY());
 	}
 	
 	
@@ -1521,7 +1518,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 		
 		Certificate cert = keyStore.getCertificate(alias);
 		
-		if (cert == null || ! (cert instanceof X509Certificate)) {
+		if (!(cert instanceof X509Certificate)) {
 			return null;
 		}
 		

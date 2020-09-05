@@ -516,9 +516,8 @@ public class JOSEMatcher {
 				// Plain object
 				kid = null; // kid not supported by unsecured JOSE objects
 			}
-
-			if (! kids.contains(kid))
-				return false;
+			
+			return kids.contains(kid);
 		}
 
 		return true;

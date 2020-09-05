@@ -132,7 +132,7 @@ public class Base64 implements Serializable {
 	@Override
 	public boolean equals(final Object object) {
 
-		return object != null && object instanceof Base64 && this.toString().equals(object.toString());
+		return object instanceof Base64 && this.toString().equals(object.toString());
 	}
 
 	/**

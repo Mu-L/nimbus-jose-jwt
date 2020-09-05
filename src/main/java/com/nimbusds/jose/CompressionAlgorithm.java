@@ -110,9 +110,8 @@ public final class CompressionAlgorithm implements Serializable {
 	@Override
 	public boolean equals(final Object object) {
 
-		return object != null && 
-				object instanceof CompressionAlgorithm && 
-				this.toString().equals(object.toString());
+		return object instanceof CompressionAlgorithm &&
+			this.toString().equals(object.toString());
 	}
 
 

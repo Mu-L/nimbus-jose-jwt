@@ -46,7 +46,7 @@ public class PBKDF2 {
 	/**
 	 * Zero byte array of length one.
 	 */
-	public static byte[] ZERO_BYTE = { 0 };
+	public static final byte[] ZERO_BYTE = { 0 };
 
 
 	/**

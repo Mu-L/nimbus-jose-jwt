@@ -156,8 +156,8 @@ final class Base64Codec {
 		final int as_uppercase = digit_idx -  0 + 65;
 		final int as_lowercase = digit_idx - 26 + 97;
 		final int as_decimal   = digit_idx - 52 + 48;
-		final int as_62        = (int) '+';
-		final int as_63        = (int) '/';
+		final int as_62        = '+';
+		final int as_63        = '/';
 
 		// Zero out all scenarios except for the right one, and combine
 		final int ascii =
@@ -195,8 +195,8 @@ final class Base64Codec {
 		final int as_uppercase = digit_idx -  0 + 65;
 		final int as_lowercase = digit_idx - 26 + 97;
 		final int as_decimal   = digit_idx - 52 + 48;
-		final int as_62        = (int) '-';
-		final int as_63        = (int) '_';
+		final int as_62        = '-';
+		final int as_63        = '_';
 
 		// Zero out all scenarios except for the right one, and combine
 		final int ascii =
@@ -226,8 +226,8 @@ final class Base64Codec {
 		final int is_uppercase = tpGT(ascii, 64) & tpLT(ascii, 91);
 		final int is_lowercase = tpGT(ascii, 96) & tpLT(ascii, 123);
 		final int is_decimal   = tpGT(ascii, 47) & tpLT(ascii, 58);
-		final int is_62        = tpEq(ascii, (int) '-') | tpEq(ascii, (int) '+');
-		final int is_63        = tpEq(ascii, (int) '_') | tpEq(ascii, (int) '/');
+		final int is_62        = tpEq(ascii, '-') | tpEq(ascii, '+');
+		final int is_63        = tpEq(ascii, '_') | tpEq(ascii, '/');
 
 		// It should be one of the five categories
 		final int is_valid = is_uppercase | is_lowercase | is_decimal | is_62 | is_63;

@@ -166,7 +166,7 @@ public class AESGCM {
 	 *                       the cipher failed, or the parameters are
 	 *                       deemed unusable.
 	 *
-	 * @see {@link #actualParamsOf(Cipher)}
+	 * @see #actualParamsOf(Cipher)
 	 * @see #validate(byte[], int)
 	 */
 	private static byte[] actualIVOf(final Cipher cipher)

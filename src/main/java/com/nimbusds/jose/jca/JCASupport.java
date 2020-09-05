@@ -286,12 +286,8 @@ public final class JCASupport {
 			}
 			return provider.getService("KeyGenerator", hmac) != null;
 		}
-
-		if (JWEAlgorithm.DIR.equals(alg)) {
-			return true; // Always supported
-		}
-
-		return false;
+		
+		return JWEAlgorithm.DIR.equals(alg); // Always supported
 	}
 
 

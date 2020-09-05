@@ -35,7 +35,7 @@ class KeyUseAndOpsConsistency {
 	/**
 	 * Defines the consistent key use / key operations mappings.
 	 */
-	static Map<KeyUse,Set<KeyOperation>> MAP;
+	static final Map<KeyUse,Set<KeyOperation>> MAP;
 	
 	
 	static {

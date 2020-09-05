@@ -125,7 +125,7 @@ public class BoundedInputStream extends InputStream {
 			if(bytesRead == -1) {
 				return -1;
 			} else {
-				this.pos += (long)bytesRead;
+				this.pos += bytesRead;
 				
 				if (this.max >= 0L && this.pos >= this.max)
 					throw new IOException("Exceeded configured input limit of " + this.max + " bytes");

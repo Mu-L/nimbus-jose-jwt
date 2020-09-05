@@ -139,9 +139,8 @@ public class Algorithm implements Serializable {
 	@Override
 	public boolean equals(final Object object) {
 
-		return object != null && 
-		       object instanceof Algorithm && 
-		       this.toString().equals(object.toString());
+		return object instanceof Algorithm &&
+			this.toString().equals(object.toString());
 	}
 
 

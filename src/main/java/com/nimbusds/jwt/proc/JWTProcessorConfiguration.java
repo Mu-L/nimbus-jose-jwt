@@ -98,7 +98,7 @@ public interface JWTProcessorConfiguration<C extends SecurityContext> extends JO
 
 
 	/**
-	 * Use {@link #getJWTClaimsVerifier()} instead.
+	 * Use {@link #getJWTClaimsSetVerifier()} instead.
 	 *
 	 * @return The JWT claims set verifier, {@code null} if not specified.
 	 */

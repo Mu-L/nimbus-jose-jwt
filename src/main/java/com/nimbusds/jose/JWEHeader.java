@@ -88,7 +88,7 @@ public final class JWEHeader extends CommonSEHeader {
 	private static final Set<String> REGISTERED_PARAMETER_NAMES;
 
 
-	/**
+	/*
 	 * Initialises the registered parameter name set.
 	 */
 	static {

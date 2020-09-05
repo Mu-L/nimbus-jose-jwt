@@ -654,6 +654,7 @@ public final class JWSHeader extends CommonSEHeader {
 			jwsHeader.getX509CertSHA256Thumbprint(),
 			jwsHeader.getX509CertChain(),
 			jwsHeader.getKeyID(),
+			jwsHeader.isBase64URLEncodePayload(),
 			jwsHeader.getCustomParams(),
 			jwsHeader.getParsedBase64URL()
 		);

@@ -78,7 +78,7 @@ class ECParameterTable {
 		/**
 		 * The field size.
 		 */
-		private int size;
+		private final int size;
 
 
 		/**

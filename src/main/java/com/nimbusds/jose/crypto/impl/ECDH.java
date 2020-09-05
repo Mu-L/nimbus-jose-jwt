@@ -18,7 +18,7 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -29,6 +29,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.google.crypto.tink.subtle.X25519;
+
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
@@ -271,7 +272,7 @@ public class ECDH {
 		return concatKDF.deriveKey(
 			Z,
 			sharedKeyLength,
-			ConcatKDF.encodeDataWithLength(algID.getBytes(Charset.forName("ASCII"))),
+			ConcatKDF.encodeDataWithLength(algID.getBytes(StandardCharsets.US_ASCII)),
 			ConcatKDF.encodeDataWithLength(header.getAgreementPartyUInfo()),
 			ConcatKDF.encodeDataWithLength(header.getAgreementPartyVInfo()),
 			ConcatKDF.encodeIntData(sharedKeyLength),

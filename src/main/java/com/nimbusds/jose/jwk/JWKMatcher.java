@@ -1307,8 +1307,7 @@ public class JWKMatcher {
 		}
 
 		if (x5tS256s != null) {
-			if (! x5tS256s.contains(key.getX509CertSHA256Thumbprint()) )
-				return false;
+			return x5tS256s.contains(key.getX509CertSHA256Thumbprint());
 		}
 
 		return true;

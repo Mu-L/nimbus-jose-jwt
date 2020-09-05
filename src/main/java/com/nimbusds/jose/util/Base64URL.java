@@ -63,9 +63,8 @@ public class Base64URL extends Base64 {
 	@Override
 	public boolean equals(final Object object) {
 
-		return object != null && 
-		       object instanceof Base64URL && 
-		       this.toString().equals(object.toString());
+		return object instanceof Base64URL &&
+			this.toString().equals(object.toString());
 	}
 	
 	

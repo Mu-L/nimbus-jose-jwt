@@ -65,8 +65,7 @@ public class IOUtils {
 		final char[] buffer = new char[bufferSize];
 		final StringBuilder out = new StringBuilder();
 		
-		Reader in = new InputStreamReader(stream, charset);
-		try {
+		try (Reader in = new InputStreamReader(stream, charset)) {
 			while (true) {
 				int rsz = in.read(buffer, 0, buffer.length);
 				if (rsz < 0)
@@ -74,8 +73,6 @@ public class IOUtils {
 				out.append(buffer, 0, rsz);
 			}
 			return out.toString();
-		} finally {
-			in.close();
 		}
 	}
 	

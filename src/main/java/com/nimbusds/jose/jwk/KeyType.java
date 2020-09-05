@@ -158,9 +158,8 @@ public final class KeyType implements Serializable {
 	@Override
 	public boolean equals(final Object object) {
 
-		return object != null && 
-		       object instanceof KeyType && 
-		       this.toString().equals(object.toString());
+		return object instanceof KeyType &&
+			this.toString().equals(object.toString());
 	}
 
 

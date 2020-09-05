@@ -19,7 +19,7 @@ package com.nimbusds.jose.crypto.impl;
 
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import com.nimbusds.jose.JWEHeader;
 import com.nimbusds.jose.util.Base64URL;
@@ -63,7 +63,7 @@ public class AAD {
 	 */
 	public static byte[] compute(final Base64URL encodedJWEHeader) {
 
-		return encodedJWEHeader.toString().getBytes(Charset.forName("ASCII"));
+		return encodedJWEHeader.toString().getBytes(StandardCharsets.US_ASCII);
 	}
 
 

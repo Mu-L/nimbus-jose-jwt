@@ -1924,10 +1924,7 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 		if (! e.decodeToBigInteger().equals(certRSAKey.getPublicExponent())) {
 			return false;
 		}
-		if (! n.decodeToBigInteger().equals(certRSAKey.getModulus())) {
-			return false;
-		}
-		return true;
+		return n.decodeToBigInteger().equals(certRSAKey.getModulus());
 	}
 	
 	

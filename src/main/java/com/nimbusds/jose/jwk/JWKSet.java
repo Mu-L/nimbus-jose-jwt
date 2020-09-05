@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.Proxy;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
@@ -33,9 +33,10 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.*;
 
+import net.jcip.annotations.Immutable;
+
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.util.*;
-import net.jcip.annotations.Immutable;
 
 
 /**
@@ -399,7 +400,7 @@ public class JWKSet implements Serializable {
 	public static JWKSet load(final InputStream inputStream)
 		throws IOException, ParseException {
 
-		return parse(IOUtils.readInputStreamToString(inputStream, Charset.forName("UTF-8")));
+		return parse(IOUtils.readInputStreamToString(inputStream, StandardCharsets.UTF_8));
 	}
 
 
@@ -417,7 +418,7 @@ public class JWKSet implements Serializable {
 	public static JWKSet load(final File file)
 		throws IOException, ParseException {
 
-		return parse(IOUtils.readFileToString(file, Charset.forName("UTF-8")));
+		return parse(IOUtils.readFileToString(file, StandardCharsets.UTF_8));
 	}
 
 
@@ -562,9 +563,6 @@ public class JWKSet implements Serializable {
 				if (ecJWK != null) {
 					jwks.add(ecJWK);
 				}
-				
-			} else {
-				continue;
 			}
 		}
 		
