@@ -22,9 +22,6 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.*;
 
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
 
@@ -275,11 +272,12 @@ public abstract class Header implements Serializable {
 	 *
 	 * @return The JSON object representation of the header.
 	 */
-	public JSONObject toJSONObject() {
+	public Map<String, Object> toJSONObject() {
 
 		// Include custom parameters, they will be overwritten if their
 		// names match specified registered ones
-		JSONObject o = new JSONObject(customParams);
+		Map<String, Object> o = JSONObjectUtils.newJSONObject();
+		o.putAll(customParams);
 
 		// Alg is always defined
 		o.put("alg", alg.toString());
@@ -293,11 +291,7 @@ public abstract class Header implements Serializable {
 		}
 
 		if (crit != null && ! crit.isEmpty()) {
-			JSONArray jsonArray = new JSONArray();
-			for (String c: crit) {
-				jsonArray.add(c);
-			}
-			o.put("crit", jsonArray);
+			o.put("crit", new ArrayList<>(crit));
 		}
 
 		return o;
@@ -313,7 +307,7 @@ public abstract class Header implements Serializable {
 	 */
 	public String toString() {
 
-		return toJSONObject().toString();
+		return JSONObjectUtils.toJSONString(toJSONObject());
 	}
 
 
@@ -359,7 +353,7 @@ public abstract class Header implements Serializable {
 	 * @throws ParseException If the {@code alg} parameter couldn't be 
 	 *                        parsed.
 	 */
-	public static Algorithm parseAlgorithm(final JSONObject json)
+	public static Algorithm parseAlgorithm(final Map<String, Object> json)
 		throws ParseException {
 
 		String algName = JSONObjectUtils.getString(json, "alg");
@@ -394,7 +388,7 @@ public abstract class Header implements Serializable {
 	 * @throws ParseException If the specified JSON object doesn't
 	 *                        represent a valid header.
 	 */
-	public static Header parse(final JSONObject jsonObject)
+	public static Header parse(final Map<String, Object> jsonObject)
 		throws ParseException {
 
 		return parse(jsonObject, null);
@@ -415,7 +409,7 @@ public abstract class Header implements Serializable {
 	 * @throws ParseException If the specified JSON object doesn't 
 	 *                        represent a valid header.
 	 */
-	public static Header parse(final JSONObject jsonObject,
+	public static Header parse(final Map<String, Object> jsonObject,
 				   final Base64URL parsedBase64URL)
 		throws ParseException {
 
@@ -477,7 +471,7 @@ public abstract class Header implements Serializable {
 				   final Base64URL parsedBase64URL)
 		throws ParseException {
 
-		JSONObject jsonObject = JSONObjectUtils.parse(jsonString);
+		Map<String, Object> jsonObject = JSONObjectUtils.parse(jsonString);
 
 		return parse(jsonObject, parsedBase64URL);
 	}

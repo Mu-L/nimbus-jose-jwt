@@ -1170,3 +1170,18 @@ version 8.19 (2020-06-03)
 version 8.20 (2020-08-06)
     * Adds RestrictedResourceRetriever.getHeaders and setHeaders methods.
     * Updates optional com.google.crypto.tink:tink dependency to 1.3.0.
+
+version 9.0 (2020-09-06)
+    * Replaces or removes all JSON Smart interfaces and classes from all
+      visible classes and methods in the library. Replaces all
+      net.minidev.json.JSONObject method arguments and return types with
+      java.util.Map<String,Object>. Replaces all net.minidev.json.JSONArray
+      method arguments and return types with java.util.List<Object>. Removes
+      all net.minidev.json.JSONAware interfaces of classes, leaving their
+      toJSONString methods intact.
+    * Adds new JSONObjectUtils.toJSONString static methods for serialising a
+      java.util.Map<String,Object> to a JSON object entity.
+    * Adds new JSONObjectUtils.newJSONObject static helper method.
+    * Adds new JSONArrayUtils.newJSONArray static helper method.
+    * Shades the net.minidev:json-smart:1.3.1 dependency.
+    * JWK.parse with missing "kty" member must throw ParseException (iss #363).

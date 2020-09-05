@@ -50,9 +50,10 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONArrayUtils;
+import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jose.util.X509CertUtils;
 import junit.framework.TestCase;
-import net.minidev.json.JSONObject;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -66,7 +67,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
  *
  * @author Vladimir Dzhuvinov
  * @author Vedran Pavic
- * @version 2020-04-06
+ * @version 2020-06-23
  */
 public class JWKSetTest extends TestCase {
 	
@@ -79,7 +80,7 @@ public class JWKSetTest extends TestCase {
 		assertTrue(jwkSet.getKeys().isEmpty());
 		assertTrue(jwkSet.getAdditionalMembers().isEmpty());
 		
-		String json = jwkSet.toJSONObject().toJSONString();
+		String json = JSONObjectUtils.toJSONString(jwkSet.toJSONObject());
 		
 		assertEquals("{\"keys\":[]}" ,json);
 		
@@ -467,7 +468,7 @@ public class JWKSetTest extends TestCase {
 
 
 		// Strip all private parameters
-		s = keySet.toJSONObject(publicParamsOnly).toString();
+		s = JSONObjectUtils.toJSONString(keySet.toJSONObject(publicParamsOnly));
 
 		keySet = JWKSet.parse(s);
 
@@ -588,9 +589,9 @@ public class JWKSetTest extends TestCase {
 		JWKSet privateSet = new JWKSet(keyList);
 
 		final boolean publicParamsOnly = true;
-		JSONObject jsonObject = privateSet.toJSONObject(publicParamsOnly);
+		Map<String, Object> jsonObject = privateSet.toJSONObject(publicParamsOnly);
 
-		JWKSet publicSet = JWKSet.parse(jsonObject.toJSONString());
+		JWKSet publicSet = JWKSet.parse(jsonObject);
 
 		assertEquals(0, publicSet.getKeys().size());
 	}
@@ -1076,33 +1077,66 @@ public class JWKSetTest extends TestCase {
                      "}";
 
         
-        JWKSet keySet = JWKSet.parse(s);
-
-
-        List<JWK> keyList = keySet.getKeys();
-        assertEquals(1, keyList.size());
-
-
-        // Check key
-        JWK key = keyList.get(0);
-
-        assertTrue(key instanceof RSAKey);
-        assertEquals("yMPAp4MB5fMXz7U7kDdZpGK1-Ao069CgW01Car1Nky4", key.getKeyID());
-        assertNull(key.getKeyUse());
-        assertNull(key.getParsedX509CertChain());
-        assertNull(key.getKeyStore());
-        assertNull(key.getX509CertChain());
-        
-        assertNull(key.getAlgorithm());
-        
-        RSAKey rsaKey = (RSAKey) key;
-       
-        assertTrue(key instanceof RSAKey);
-       
-        assertEquals("AQAB", rsaKey.getPublicExponent().toString());
-        assertFalse(key.isPrivate());
-        
-        assertTrue(rsaKey.toPublicKey() instanceof RSAPublicKey);       
-	        
+		JWKSet keySet = JWKSet.parse(s);
+	
+	
+		List<JWK> keyList = keySet.getKeys();
+		assertEquals(1, keyList.size());
+	
+	
+		// Check key
+		JWK key = keyList.get(0);
+	
+		assertTrue(key instanceof RSAKey);
+		assertEquals("yMPAp4MB5fMXz7U7kDdZpGK1-Ao069CgW01Car1Nky4", key.getKeyID());
+		assertNull(key.getKeyUse());
+		assertNull(key.getParsedX509CertChain());
+		assertNull(key.getKeyStore());
+		assertNull(key.getX509CertChain());
+		
+		assertNull(key.getAlgorithm());
+		
+		RSAKey rsaKey = (RSAKey) key;
+	 
+		assertTrue(key instanceof RSAKey);
+	 
+		assertEquals("AQAB", rsaKey.getPublicExponent().toString());
+		assertFalse(key.isPrivate());
+		
+		assertTrue(rsaKey.toPublicKey() instanceof RSAPublicKey);
+	}
+	
+	
+	public void testParseJSONObject_illegalKeysType() {
+		
+		List<Object> keys = JSONArrayUtils.newJSONArray();
+		keys.add("illegal-item");
+		
+		Map<String, Object> input = new HashMap<>();
+		input.put("keys", keys);
+		
+		try {
+			JWKSet.parse(input);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The \"keys\" JSON array must contain JSON objects only", e.getMessage());
+		}
+	}
+	
+	
+	public void testParseJSONObject_emptyKeyJSONObject() {
+		
+		List<Object> keys = JSONArrayUtils.newJSONArray();
+		keys.add(new HashMap<String, Object>());
+		
+		Map<String, Object> input = new HashMap<>();
+		input.put("keys", keys);
+		
+		try {
+			JWKSet.parse(input);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("Invalid JWK at position 0: Missing key type \"kty\" parameter", e.getMessage());
+		}
 	}
 }

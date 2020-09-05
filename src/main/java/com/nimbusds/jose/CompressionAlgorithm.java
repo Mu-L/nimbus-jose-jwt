@@ -20,9 +20,9 @@ package com.nimbusds.jose;
 
 import java.io.Serializable;
 
+import com.nimbusds.jose.util.JSONStringUtils;
+
 import net.jcip.annotations.Immutable;
-import net.minidev.json.JSONAware;
-import net.minidev.json.JSONObject;
 
 
 /**
@@ -42,7 +42,7 @@ import net.minidev.json.JSONObject;
  * @version 2013-01-15
  */
 @Immutable
-public final class CompressionAlgorithm implements JSONAware, Serializable {
+public final class CompressionAlgorithm implements Serializable {
 
 
 	private static final long serialVersionUID = 1L;
@@ -135,9 +135,7 @@ public final class CompressionAlgorithm implements JSONAware, Serializable {
 	 * 
 	 * @return The JSON string representation.
 	 */
-	@Override
 	public String toJSONString() {
-
-		return "\"" + JSONObject.escape(name) + '"';
+		return JSONStringUtils.toJSONString(name);
 	}
 }

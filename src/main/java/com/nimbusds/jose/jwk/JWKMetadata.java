@@ -21,9 +21,8 @@ package com.nimbusds.jose.jwk;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
-import net.minidev.json.JSONObject;
 
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.util.Base64;
@@ -50,7 +49,7 @@ final class JWKMetadata {
 	 *
 	 * @throws ParseException If parsing failed.
 	 */
-	static KeyType parseKeyType(final JSONObject o)
+	static KeyType parseKeyType(final Map<String, Object> o)
 		throws ParseException {
 
 		try {
@@ -71,7 +70,7 @@ final class JWKMetadata {
 	 *
 	 * @throws ParseException If parsing failed.
 	 */
-	static KeyUse parseKeyUse(final JSONObject o)
+	static KeyUse parseKeyUse(final Map<String, Object> o)
 		throws ParseException {
 
 		return KeyUse.parse(JSONObjectUtils.getString(o, "use"));
@@ -87,7 +86,7 @@ final class JWKMetadata {
 	 *
 	 * @throws ParseException If parsing failed.
 	 */
-	static Set<KeyOperation> parseKeyOperations(final JSONObject o)
+	static Set<KeyOperation> parseKeyOperations(final Map<String, Object> o)
 		throws ParseException {
 		
 		return KeyOperation.parse(JSONObjectUtils.getStringList(o, "key_ops"));
@@ -103,7 +102,7 @@ final class JWKMetadata {
 	 *
 	 * @throws ParseException If parsing failed.
 	 */
-	static Algorithm parseAlgorithm(final JSONObject o)
+	static Algorithm parseAlgorithm(final Map<String, Object> o)
 		throws ParseException {
 
 		return Algorithm.parse(JSONObjectUtils.getString(o, "alg"));
@@ -119,7 +118,7 @@ final class JWKMetadata {
 	 *
 	 * @throws ParseException If parsing failed.
 	 */
-	static String parseKeyID(final JSONObject o)
+	static String parseKeyID(final Map<String, Object> o)
 		throws ParseException {
 
 		return JSONObjectUtils.getString(o, "kid");
@@ -135,7 +134,7 @@ final class JWKMetadata {
 	 *
 	 * @throws ParseException If parsing failed.
 	 */
-	static URI parseX509CertURL(final JSONObject o)
+	static URI parseX509CertURL(final Map<String, Object> o)
 		throws ParseException {
 
 		return JSONObjectUtils.getURI(o, "x5u");
@@ -152,7 +151,7 @@ final class JWKMetadata {
 	 *
 	 * @throws ParseException If parsing failed.
 	 */
-	static Base64URL parseX509CertThumbprint(final JSONObject o)
+	static Base64URL parseX509CertThumbprint(final Map<String, Object> o)
 		throws ParseException {
 
 		return JSONObjectUtils.getBase64URL(o, "x5t");
@@ -169,7 +168,7 @@ final class JWKMetadata {
 	 *
 	 * @throws ParseException If parsing failed.
 	 */
-	static Base64URL parseX509CertSHA256Thumbprint(final JSONObject o)
+	static Base64URL parseX509CertSHA256Thumbprint(final Map<String, Object> o)
 		throws ParseException {
 
 		return JSONObjectUtils.getBase64URL(o, "x5t#S256");
@@ -187,7 +186,7 @@ final class JWKMetadata {
 	 *
 	 * @throws ParseException If parsing failed.
 	 */
-	static List<Base64> parseX509CertChain(final JSONObject o)
+	static List<Base64> parseX509CertChain(final Map<String, Object> o)
 		throws ParseException {
 		
 		// https://tools.ietf.org/html/rfc7517#section-4.7

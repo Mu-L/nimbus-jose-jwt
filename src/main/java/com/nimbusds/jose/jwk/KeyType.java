@@ -24,9 +24,9 @@ import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.Requirement;
+import com.nimbusds.jose.util.JSONStringUtils;
+
 import net.jcip.annotations.Immutable;
-import net.minidev.json.JSONAware;
-import net.minidev.json.JSONObject;
 
 
 /**
@@ -49,7 +49,7 @@ import net.minidev.json.JSONObject;
  * @version 2017-08-23
  */
 @Immutable
-public final class KeyType implements JSONAware, Serializable {
+public final class KeyType implements Serializable {
 
 
 	private static final long serialVersionUID = 1L;
@@ -183,10 +183,8 @@ public final class KeyType implements JSONAware, Serializable {
 	 * 
 	 * @return The JSON string representation.
 	 */
-	@Override
 	public String toJSONString() {
-
-		return "\"" + JSONObject.escape(value) + '"';
+		return JSONStringUtils.toJSONString(value);
 	}
 
 

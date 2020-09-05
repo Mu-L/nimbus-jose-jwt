@@ -23,8 +23,6 @@ import java.util.*;
 
 import net.jcip.annotations.Immutable;
 
-import net.minidev.json.JSONObject;
-
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
 
@@ -361,7 +359,7 @@ public final class PlainHeader extends Header {
 	 * @throws ParseException If the specified JSON object doesn't
 	 *                        represent a valid unsecured header.
 	 */
-	public static PlainHeader parse(final JSONObject jsonObject)
+	public static PlainHeader parse(final Map<String, Object> jsonObject)
 		throws ParseException {
 
 		return parse(jsonObject, null);
@@ -381,7 +379,7 @@ public final class PlainHeader extends Header {
 	 * @throws ParseException If the specified JSON object doesn't
 	 *                        represent a valid unsecured header.
 	 */
-	public static PlainHeader parse(final JSONObject jsonObject,
+	public static PlainHeader parse(final Map<String, Object> jsonObject,
 					final Base64URL parsedBase64URL)
 		throws ParseException {
 

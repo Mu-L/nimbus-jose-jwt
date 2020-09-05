@@ -59,7 +59,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
  * Tests the base JWK class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-04-09
+ * @version 2020-06-23
  */
 public class JWKTest extends TestCase {
 	
@@ -472,5 +472,16 @@ public class JWKTest extends TestCase {
 		RSAKey parsed = RSAKey.parse(rsaKey.toJSONObject());
 		
 		assertEquals(rsaKey.getKeyOperations(), parsed.getKeyOperations());
+	}
+	
+	
+	public void testParseMissingKty() {
+		
+		try {
+			JWK.parse(Collections.<String, Object>emptyMap());
+			fail();
+		} catch (ParseException e) {
+			assertEquals("Missing key type \"kty\" parameter", e.getMessage());
+		}
 	}
 }

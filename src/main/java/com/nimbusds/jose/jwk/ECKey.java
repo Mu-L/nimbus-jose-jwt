@@ -31,7 +31,6 @@ import java.text.ParseException;
 import java.util.*;
 
 import net.jcip.annotations.Immutable;
-import net.minidev.json.JSONObject;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 
 import com.nimbusds.jose.Algorithm;
@@ -1332,9 +1331,9 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 	
 
 	@Override
-	public JSONObject toJSONObject() {
+	public Map<String, Object> toJSONObject() {
 
-		JSONObject o = super.toJSONObject();
+		Map<String, Object> o = super.toJSONObject();
 
 		// Append EC specific attributes
 		o.put("crv", crv.toString());
@@ -1379,7 +1378,7 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 	 * @throws ParseException If the JSON object couldn't be parsed to an 
 	 *                        Elliptic Curve JWK.
 	 */
-	public static ECKey parse(final JSONObject jsonObject)
+	public static ECKey parse(final Map<String, Object> jsonObject)
 		throws ParseException {
 
 		// Check key type

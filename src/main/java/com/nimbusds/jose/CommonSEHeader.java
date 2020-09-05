@@ -24,7 +24,6 @@ import java.util.*;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jose.util.Base64URL;
-import net.minidev.json.JSONObject;
 
 
 /**
@@ -290,9 +289,9 @@ abstract class CommonSEHeader extends Header {
 
 
 	@Override
-	public JSONObject toJSONObject() {
+	public Map<String, Object> toJSONObject() {
 
-		JSONObject o = super.toJSONObject();
+		Map<String, Object> o = super.toJSONObject();
 
 		if (jku != null) {
 			o.put("jku", jku.toString());
@@ -315,7 +314,11 @@ abstract class CommonSEHeader extends Header {
 		}
 
 		if (x5c != null && ! x5c.isEmpty()) {
-			o.put("x5c", x5c);
+			List<String> x5cJson = new ArrayList<>(x5c.size());
+			for (Base64 item : x5c) {
+			    x5cJson.add(item.toString());
+			}
+			o.put("x5c", x5cJson);
 		}
 
 		if (kid != null) {

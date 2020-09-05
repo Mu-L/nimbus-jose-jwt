@@ -24,8 +24,8 @@ import java.util.LinkedHashMap;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jose.util.StandardCharset;
-import net.minidev.json.JSONObject;
 
 
 /**
@@ -69,7 +69,7 @@ public final class ThumbprintUtils {
 	public static Base64URL compute(final String hashAlg, final JWK jwk)
 		throws JOSEException {
 
-		final LinkedHashMap<String,?> orderedParams = jwk.getRequiredParams();
+		final LinkedHashMap<String, ?> orderedParams =  jwk.getRequiredParams();
 
 		return compute(hashAlg, orderedParams);
 	}
@@ -90,7 +90,7 @@ public final class ThumbprintUtils {
 	public static Base64URL compute(final String hashAlg, final LinkedHashMap<String,?> params)
 		throws JOSEException {
 
-		final String json = JSONObject.toJSONString(params);
+		final String json = JSONObjectUtils.toJSONString(params);
 
 		final MessageDigest md;
 

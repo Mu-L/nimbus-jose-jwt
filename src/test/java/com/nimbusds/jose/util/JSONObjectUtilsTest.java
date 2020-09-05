@@ -21,9 +21,9 @@ package com.nimbusds.jose.util;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Map;
 
 import junit.framework.TestCase;
-import net.minidev.json.JSONObject;
 import org.junit.Assert;
 
 
@@ -31,7 +31,7 @@ import org.junit.Assert;
  * Tests the JSON object utilities.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-06-03
+ * @version 2020-06-27
  */
 public class JSONObjectUtilsTest extends TestCase {
 
@@ -48,7 +48,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	public void testGetBoolean_true()
 		throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", true);
 		assertTrue(JSONObjectUtils.getBoolean(jsonObject, "key"));
 	}
@@ -57,7 +57,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	public void testGetBoolean_false()
 		throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", false);
 		assertFalse(JSONObjectUtils.getBoolean(jsonObject, "key"));
 	}
@@ -65,7 +65,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetBoolean_null() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", null);
 		
 		try {
@@ -80,7 +80,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetBoolean_missing() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		
 		try {
 			JSONObjectUtils.getBoolean(jsonObject, "key");
@@ -94,7 +94,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetInt_null() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", null);
 		
 		try {
@@ -109,7 +109,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetInt_missing() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		
 		try {
 			JSONObjectUtils.getInt(jsonObject, "key");
@@ -123,7 +123,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetInt_notNumber() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", "abc");
 		
 		try {
@@ -138,7 +138,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetLong_null() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", null);
 		
 		try {
@@ -153,7 +153,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetLong_missing() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		
 		try {
 			JSONObjectUtils.getLong(jsonObject, "key");
@@ -167,7 +167,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetFloat_null() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", null);
 		
 		try {
@@ -182,7 +182,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetFloat_missing() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		
 		try {
 			JSONObjectUtils.getFloat(jsonObject, "key");
@@ -196,7 +196,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetDouble_null() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", null);
 		
 		try {
@@ -211,7 +211,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetDouble_missing() {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		
 		try {
 			JSONObjectUtils.getDouble(jsonObject, "key");
@@ -225,7 +225,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetIntegerNumberAs_int_long_float_double() throws ParseException {
 		
-		JSONObject jsonObject = JSONObjectUtils.parse("{\"key\":10}");
+		Map<String, Object> jsonObject = JSONObjectUtils.parse("{\"key\":10}");
 		assertEquals(10, JSONObjectUtils.getInt(jsonObject, "key"));
 		assertEquals(10L, JSONObjectUtils.getLong(jsonObject, "key"));
 		assertEquals(10.0F, JSONObjectUtils.getFloat(jsonObject, "key"));
@@ -235,7 +235,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetDecimalNumberAs_int_long_float_double() throws ParseException {
 		
-		JSONObject jsonObject = JSONObjectUtils.parse("{\"key\":3.14}");
+		Map<String, Object> jsonObject = JSONObjectUtils.parse("{\"key\":3.14}");
 		assertEquals(3, JSONObjectUtils.getInt(jsonObject, "key"));
 		assertEquals(3L, JSONObjectUtils.getLong(jsonObject, "key"));
 		assertEquals(3.14F, JSONObjectUtils.getFloat(jsonObject, "key"));
@@ -245,7 +245,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetString() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", "value");
 		assertEquals("value", JSONObjectUtils.getString(jsonObject, "key"));
 	}
@@ -253,7 +253,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetString_null() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", null);
 		assertNull(JSONObjectUtils.getString(jsonObject, "key"));
 	}
@@ -261,14 +261,14 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetString_missing() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		assertNull(JSONObjectUtils.getString(jsonObject, "key"));
 	}
 	
 	
 	public void testGetURI() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", "https://c2id.net");
 		assertEquals(URI.create("https://c2id.net"), JSONObjectUtils.getURI(jsonObject, "key"));
 	}
@@ -276,7 +276,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetURI_null() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", null);
 		assertNull(JSONObjectUtils.getURI(jsonObject, "key"));
 	}
@@ -284,14 +284,14 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetURI_missing() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		assertNull(JSONObjectUtils.getURI(jsonObject, "key"));
 	}
 	
 	
 	public void testGetJSONArray_null() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", null);
 		assertNull(JSONObjectUtils.getJSONArray(jsonObject, "key"));
 	}
@@ -299,21 +299,33 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetJSONArray_missing() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		assertNull(JSONObjectUtils.getJSONArray(jsonObject, "key"));
 	}
 	
 	
 	public void testGetStringArray() throws ParseException {
 		
-		JSONObject jsonObject = JSONObjectUtils.parse("{\"key\":[\"apple\",\"pear\"]}");
+		Map<String, Object> jsonObject = JSONObjectUtils.parse("{\"key\":[\"apple\",\"pear\"]}");
 		Assert.assertArrayEquals(new String[]{"apple", "pear"}, JSONObjectUtils.getStringArray(jsonObject, "key"));
+	}
+	
+	
+	public void testGetStringArray_otherTypes() throws ParseException {
+		
+		Map<String, Object> jsonObject = JSONObjectUtils.parse("{\"key\":[10,true]}");
+		try {
+			JSONObjectUtils.getStringArray(jsonObject, "key");
+			fail();
+		} catch (ParseException e) {
+			assertEquals("JSON object member with key \"key\" is not an array of strings", e.getMessage());
+		}
 	}
 	
 	
 	public void testGetStringArray_null() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", null);
 		assertNull(JSONObjectUtils.getStringArray(jsonObject, "key"));
 	}
@@ -321,21 +333,21 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetStringArray_missing() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		assertNull(JSONObjectUtils.getStringArray(jsonObject, "key"));
 	}
 	
 	
 	public void testGetStringList() throws ParseException {
 		
-		JSONObject jsonObject = JSONObjectUtils.parse("{\"key\":[\"apple\",\"pear\"]}");
+		Map<String, Object> jsonObject = JSONObjectUtils.parse("{\"key\":[\"apple\",\"pear\"]}");
 		assertEquals(Arrays.asList("apple", "pear"), JSONObjectUtils.getStringList(jsonObject, "key"));
 	}
 	
 	
 	public void testGetStringList_null() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", null);
 		assertNull(JSONObjectUtils.getStringList(jsonObject, "key"));
 	}
@@ -343,14 +355,14 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetStringList_missing() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		assertNull(JSONObjectUtils.getStringList(jsonObject, "key"));
 	}
 	
 	
 	public void testGetJSONObject_null() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", null);
 		assertNull(JSONObjectUtils.getJSONObject(jsonObject, "key"));
 	}
@@ -358,14 +370,14 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetJSONObject_missing() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		assertNull(JSONObjectUtils.getJSONObject(jsonObject, "key"));
 	}
 	
 	
 	public void testGetBase64URL() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("x5t", "abc");
 		Base64URL base64URL = JSONObjectUtils.getBase64URL(jsonObject, "x5t");
 		assertEquals("abc", base64URL.toString());
@@ -374,7 +386,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetBase64URL_null() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("x5t", null);
 		assertNull(JSONObjectUtils.getBase64URL(jsonObject, "x5t"));
 	}
@@ -382,7 +394,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	public void testGetBase64URL_missing() throws ParseException {
 		
-		JSONObject jsonObject = new JSONObject();
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		assertNull(JSONObjectUtils.getBase64URL(jsonObject, "x5t"));
 	}
 }

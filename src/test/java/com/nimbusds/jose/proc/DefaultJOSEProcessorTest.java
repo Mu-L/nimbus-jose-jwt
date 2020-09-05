@@ -25,11 +25,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import junit.framework.TestCase;
-import net.minidev.json.JSONObject;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.DirectEncrypter;
@@ -443,7 +444,7 @@ public class DefaultJOSEProcessorTest extends TestCase {
 		assertNotNull(joseProcessor.getJWSKeySelector());
 		assertNotNull(joseProcessor.getJWEKeySelector());
 
-		JSONObject jsonObject = joseProcessor.process(jwt, new SimpleSecurityContext()).toJSONObject();
+		Map<String, Object> jsonObject = joseProcessor.process(jwt, new SimpleSecurityContext()).toJSONObject();
 
 		assertEquals("joe", jsonObject.get("iss"));
 		assertEquals(1300819380, ((Number)jsonObject.get("exp")).intValue());
@@ -584,7 +585,7 @@ public class DefaultJOSEProcessorTest extends TestCase {
 			}
 		});
 
-		JSONObject jsonObject = processor.process(jws, null).toJSONObject();
+		Map<String, Object> jsonObject = processor.process(jws, null).toJSONObject();
 
 		assertEquals("joe", jsonObject.get("iss"));
 		assertEquals(1300819380, ((Number)jsonObject.get("exp")).intValue());

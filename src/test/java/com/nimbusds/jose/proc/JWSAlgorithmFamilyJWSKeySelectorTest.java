@@ -31,6 +31,8 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.util.JSONObjectUtils;
+
 import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
@@ -134,7 +136,7 @@ public class JWSAlgorithmFamilyJWSKeySelectorTest extends TestCase {
 				.respond()
 				.withStatus(200)
 				.withHeader("Content-Type", "application/json")
-				.withBody(jwks.toJSONObject(true).toJSONString());
+				.withBody(JSONObjectUtils.toJSONString(jwks.toJSONObject(true)));
 
 		JWSAlgorithmFamilyJWSKeySelector<SecurityContext> selector =
 				JWSAlgorithmFamilyJWSKeySelector.fromJWKSetURL(jwkSetURL);

@@ -20,10 +20,10 @@ package com.nimbusds.jose;
 
 import java.io.Serializable;
 
+import com.nimbusds.jose.util.JSONStringUtils;
+
 import net.jcip.annotations.Immutable;
 
-import net.minidev.json.JSONAware;
-import net.minidev.json.JSONObject;
 
 
 /**
@@ -45,7 +45,7 @@ import net.minidev.json.JSONObject;
  * @version 2019-10-14
  */
 @Immutable
-public final class JOSEObjectType implements JSONAware, Serializable {
+public final class JOSEObjectType implements  Serializable {
 
 
 	private static final long serialVersionUID = 1L;
@@ -148,9 +148,7 @@ public final class JOSEObjectType implements JSONAware, Serializable {
 	 * 
 	 * @return The JSON string representation.
 	 */
-	@Override
 	public String toJSONString() {
-
-		return "\"" + JSONObject.escape(type) + '"';
+		return JSONStringUtils.toJSONString(type);
 	}
 }

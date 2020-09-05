@@ -17,14 +17,10 @@
 
 package com.nimbusds.jose.util;
 
-
 import java.io.Serializable;
 import java.math.BigInteger;
 
 import net.jcip.annotations.Immutable;
-import net.minidev.json.JSONAware;
-import net.minidev.json.JSONValue;
-
 
 /**
  * Base64-encoded object.
@@ -33,24 +29,21 @@ import net.minidev.json.JSONValue;
  * @version 2019-10-04
  */
 @Immutable
-public class Base64 implements JSONAware, Serializable {
-
+public class Base64 implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
 
 	/**
 	 * The Base64 value.
 	 */
 	private final String value;
 
-
 	/**
 	 * Creates a new Base64-encoded object.
 	 *
-	 * @param base64 The Base64-encoded object value. The value is not 
-	 *               validated for having characters from a Base64 
-	 *               alphabet. Must not be {@code null}.
+	 * @param base64 The Base64-encoded object value. The value is not validated for
+	 *               having characters from a Base64 alphabet. Must not be
+	 *               {@code null}.
 	 */
 	public Base64(final String base64) {
 
@@ -62,7 +55,6 @@ public class Base64 implements JSONAware, Serializable {
 		value = base64;
 	}
 
-
 	/**
 	 * Decodes this Base64 object to a byte array.
 	 *
@@ -73,11 +65,11 @@ public class Base64 implements JSONAware, Serializable {
 		return Base64Codec.decode(value);
 	}
 
-
 	/**
 	 * Decodes this Base64 object to an unsigned big integer.
 	 *
-	 * <p>Same as {@code new BigInteger(1, base64.decode())}.
+	 * <p>
+	 * Same as {@code new BigInteger(1, base64.decode())}.
 	 *
 	 * @return The resulting big integer.
 	 */
@@ -85,7 +77,6 @@ public class Base64 implements JSONAware, Serializable {
 
 		return new BigInteger(1, decode());
 	}
-
 
 	/**
 	 * Decodes this Base64 object to a string.
@@ -97,32 +88,27 @@ public class Base64 implements JSONAware, Serializable {
 		return new String(decode(), StandardCharset.UTF_8);
 	}
 
-
 	/**
 	 * Returns a JSON string representation of this object.
 	 *
 	 * @return The JSON string representation of this object.
 	 */
-	@Override
 	public String toJSONString() {
-
-		return "\"" + JSONValue.escape(value) + "\"";
+		return JSONStringUtils.toJSONString(value);
 	}
 
-
 	/**
-	 * Returns a Base64 string representation of this object. The string 
-	 * will be chunked into 76 character blocks separated by CRLF.
+	 * Returns a Base64 string representation of this object. The string will be
+	 * chunked into 76 character blocks separated by CRLF.
 	 *
-	 * @return The Base64 string representation, chunked into 76 character 
-	 *         blocks separated by CRLF.
+	 * @return The Base64 string representation, chunked into 76 character blocks
+	 *         separated by CRLF.
 	 */
 	@Override
 	public String toString() {
 
 		return value;
 	}
-
 
 	/**
 	 * Overrides {@code Object.hashCode()}.
@@ -135,7 +121,6 @@ public class Base64 implements JSONAware, Serializable {
 		return value.hashCode();
 	}
 
-
 	/**
 	 * Overrides {@code Object.equals()}.
 	 *
@@ -147,33 +132,29 @@ public class Base64 implements JSONAware, Serializable {
 	@Override
 	public boolean equals(final Object object) {
 
-		return object != null && 
-		       object instanceof Base64 && 
-		       this.toString().equals(object.toString());
+		return object != null && object instanceof Base64 && this.toString().equals(object.toString());
 	}
-	
-	
+
 	/**
 	 * Creates a new Base64-encoded object from the specified string.
 	 *
-	 * @param base64 The Base64-encoded object value, {@code null} if not
-	 *               specified. The value is not validated for having
-	 *               characters from the Base64 alphabet.
+	 * @param base64 The Base64-encoded object value, {@code null} if not specified.
+	 *               The value is not validated for having characters from the
+	 *               Base64 alphabet.
 	 *
 	 * @return The Base64-encoded object, {@code null} if not specified.
 	 */
 	public static Base64 from(final String base64) {
-		
+
 		if (base64 == null) {
 			return null;
 		}
-		
+
 		return new Base64(base64);
 	}
 
-
 	/**
-	 * Base64-encodes the specified byte array. 
+	 * Base64-encodes the specified byte array.
 	 *
 	 * @param bytes The byte array to encode. Must not be {@code null}.
 	 *
@@ -183,7 +164,6 @@ public class Base64 implements JSONAware, Serializable {
 
 		return new Base64(Base64Codec.encodeToString(bytes, false));
 	}
-
 
 	/**
 	 * Base64-encodes the specified big integer, without the sign bit.
@@ -197,12 +177,11 @@ public class Base64 implements JSONAware, Serializable {
 		return encode(BigIntegerUtils.toBytesUnsigned(bigInt));
 	}
 
-
 	/**
 	 * Base64-encodes the specified string.
 	 *
-	 * @param text The string to encode. Must be in the UTF-8 character set
-	 *             and not {@code null}.
+	 * @param text The string to encode. Must be in the UTF-8 character set and not
+	 *             {@code null}.
 	 *
 	 * @return The resulting Base64 object.
 	 */

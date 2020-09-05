@@ -36,8 +36,6 @@ import java.util.*;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.util.*;
 import net.jcip.annotations.Immutable;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 
 
 /**
@@ -258,7 +256,7 @@ public class JWKSet implements Serializable {
 	 *
 	 * @return The JSON object representation.
 	 */
-	public JSONObject toJSONObject() {
+	public Map<String, Object> toJSONObject() {
 
 		return toJSONObject(true);
 	}
@@ -276,11 +274,11 @@ public class JWKSet implements Serializable {
 	 *
 	 * @return The JSON object representation.
 	 */
-	public JSONObject toJSONObject(final boolean publicKeysOnly) {
+	public Map<String, Object> toJSONObject(final boolean publicKeysOnly) {
 
-		JSONObject o = new JSONObject(customMembers);
-
-		JSONArray a = new JSONArray();
+		Map<String, Object> o = JSONObjectUtils.newJSONObject();
+		o.putAll(customMembers);
+		List<Object> a = JSONArrayUtils.newJSONArray();
 
 		for (JWK key: keys) {
 
@@ -313,7 +311,7 @@ public class JWKSet implements Serializable {
 	@Override
 	public String toString() {
 
-		return toJSONObject().toString();
+		return JSONObjectUtils.toJSONString(toJSONObject());
 	}
 
 
@@ -345,10 +343,10 @@ public class JWKSet implements Serializable {
 	 * @throws ParseException If the string couldn't be parsed to a valid
 	 *                        JSON Web Key (JWK) set.
 	 */
-	public static JWKSet parse(final JSONObject json)
+	public static JWKSet parse(final Map<String, Object> json)
 		throws ParseException {
 
-		JSONArray keyArray = JSONObjectUtils.getJSONArray(json, "keys");
+		List<Object> keyArray = JSONObjectUtils.getJSONArray(json, "keys");
 		
 		if (keyArray == null) {
 			throw new ParseException("Missing required \"keys\" member", 0);
@@ -358,15 +356,14 @@ public class JWKSet implements Serializable {
 
 		for (int i=0; i < keyArray.size(); i++) {
 
-			if (! (keyArray.get(i) instanceof JSONObject)) {
-				throw new ParseException("The \"keys\" JSON array must contain JSON objects only", 0);
-			}
-
-			JSONObject keyJSON = (JSONObject)keyArray.get(i);
-
 			try {
-				keys.add(JWK.parse(keyJSON));
-
+				Map<String, Object> keyJSONObject = (Map<String, Object>)keyArray.get(i);
+				keys.add(JWK.parse(keyJSONObject));
+				
+			} catch (ClassCastException e) {
+				
+				throw new ParseException("The \"keys\" JSON array must contain JSON objects only", 0);
+				
 			} catch (ParseException e) {
 
 				throw new ParseException("Invalid JWK at position " + i + ": " + e.getMessage(), 0);

@@ -19,8 +19,7 @@ package com.nimbusds.jwt;
 
 
 import java.text.ParseException;
-
-import net.minidev.json.JSONObject;
+import java.util.Map;
 
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.Header;
@@ -62,7 +61,7 @@ public final class JWTParser {
 			
 		Base64URL header = new Base64URL(s.substring(0, firstDotPos));
 		
-		JSONObject jsonObject;
+		Map<String, Object> jsonObject;
 
 		try {
 			jsonObject = JSONObjectUtils.parse(header.decodeToString());

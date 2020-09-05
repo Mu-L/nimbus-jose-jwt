@@ -19,10 +19,12 @@ package com.nimbusds.jose.jwk;
 
 
 import java.text.ParseException;
+import java.util.Map;
+
+import com.nimbusds.jose.util.JSONArrayUtils;
+import com.nimbusds.jose.util.JSONObjectUtils;
 
 import junit.framework.TestCase;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 
 
 public class JWKMetadataTest extends TestCase {
@@ -31,7 +33,7 @@ public class JWKMetadataTest extends TestCase {
 	public void testParseNoMembers()
 		throws ParseException {
 		
-		JSONObject o = new JSONObject();
+		Map<String, Object> o = JSONObjectUtils.newJSONObject();
 		
 		try {
 			JWKMetadata.parseKeyType(o);
@@ -53,8 +55,8 @@ public class JWKMetadataTest extends TestCase {
 	
 	public void testParseNullMembers()
 		throws ParseException {
-		
-		JSONObject o = new JSONObject();
+
+		Map<String, Object> o = JSONObjectUtils.newJSONObject();
 		
 		o.put("kty", null);
 		o.put("use", null);
@@ -86,9 +88,9 @@ public class JWKMetadataTest extends TestCase {
 	
 	public void testParseEmptyX509CertChain()
 		throws ParseException {
-		
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("x5c", new JSONArray()); // empty
+
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
+		jsonObject.put("x5c", JSONArrayUtils.newJSONArray()); // empty
 		
 		assertNull(JWKMetadata.parseX509CertChain(jsonObject));
 	}

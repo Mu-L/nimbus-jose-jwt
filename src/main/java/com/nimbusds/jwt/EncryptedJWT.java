@@ -19,10 +19,9 @@ package com.nimbusds.jwt;
 
 
 import java.text.ParseException;
+import java.util.Map;
 
 import net.jcip.annotations.ThreadSafe;
-
-import net.minidev.json.JSONObject;
 
 import com.nimbusds.jose.JOSEObject;
 import com.nimbusds.jose.JWEHeader;
@@ -97,7 +96,7 @@ public class EncryptedJWT extends JWEObject implements JWT {
 			return null;
 		}
 
-		JSONObject json = payload.toJSONObject();
+		Map<String, Object> json = payload.toJSONObject();
 
 		if (json == null) {
 			throw new ParseException("Payload of JWE object is not a valid JSON object", 0);
