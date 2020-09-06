@@ -123,19 +123,6 @@
                     <execution>
                         <id>default-compile</id>
                     </execution>
-                    <execution>
-                        <id>jdk6-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <source>1.7</source>
-                            <target>1.6</target>
-                            <compilerId>eclipse</compilerId>
-                            <outputDirectory>${project.build.outputDirectory}_jdk6</outputDirectory>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -187,16 +174,6 @@
                 <executions>
                     <execution>
                         <id>default-jar</id>
-                    </execution>
-                    <execution>
-                        <id>jdk6-jar</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <classesDirectory>${project.build.outputDirectory}_jdk6</classesDirectory>
-                            <classifier>jdk6</classifier>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
