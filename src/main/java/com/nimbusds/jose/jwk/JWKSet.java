@@ -368,6 +368,12 @@ public class JWKSet implements Serializable {
 				keys.add(JWK.parse(keyJSON));
 
 			} catch (ParseException e) {
+				
+				if (e.getMessage() != null && e.getMessage().startsWith("Unsupported key type")) {
+					// Ignore unknown key type
+					// https://tools.ietf.org/html/rfc7517#section-5
+					continue;
+				}
 
 				throw new ParseException("Invalid JWK at position " + i + ": " + e.getMessage(), 0);
 			}

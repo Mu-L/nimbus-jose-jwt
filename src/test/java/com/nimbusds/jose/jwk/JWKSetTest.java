@@ -44,14 +44,8 @@ import javax.crypto.SecretKey;
 
 import static net.jadler.Jadler.*;
 
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWEAlgorithm;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
-import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
-import com.nimbusds.jose.util.Base64URL;
-import com.nimbusds.jose.util.X509CertUtils;
 import junit.framework.TestCase;
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -60,13 +54,21 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWEAlgorithm;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
+import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.X509CertUtils;
+
 
 /**
  * Tests JSON Web Key (JWK) set parsing and serialisation.
  *
  * @author Vladimir Dzhuvinov
  * @author Vedran Pavic
- * @version 2020-04-06
+ * @version 2020-09-14
  */
 public class JWKSetTest extends TestCase {
 	
@@ -1104,5 +1106,23 @@ public class JWKSetTest extends TestCase {
         
         assertTrue(rsaKey.toPublicKey() instanceof RSAPublicKey);       
 	        
+	}
+	
+	
+	public void testParse_ignoreUnknownKeyType()
+		throws ParseException, JOSEException {
+		
+		JSONArray keys = new JSONArray();
+		
+		keys.add(new RSAKeyGenerator(2048).generate().toJSONObject());
+		
+		JSONObject unknownKey = new JSONObject();
+		unknownKey.put("kty", "UNKNOWN");
+		keys.add(unknownKey);
+		
+		JSONObject input = new JSONObject();
+		input.put("keys", keys);
+		
+		JWKSet.parse(input);
 	}
 }
