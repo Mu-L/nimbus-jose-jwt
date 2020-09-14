@@ -44,6 +44,14 @@ import javax.crypto.SecretKey;
 
 import static net.jadler.Jadler.*;
 
+import junit.framework.TestCase;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -53,13 +61,6 @@ import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONArrayUtils;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jose.util.X509CertUtils;
-import junit.framework.TestCase;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 
 /**
@@ -67,7 +68,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
  *
  * @author Vladimir Dzhuvinov
  * @author Vedran Pavic
- * @version 2020-06-23
+ * @version 2020-09-14
  */
 public class JWKSetTest extends TestCase {
 	
@@ -1138,5 +1139,23 @@ public class JWKSetTest extends TestCase {
 		} catch (ParseException e) {
 			assertEquals("Invalid JWK at position 0: Missing key type \"kty\" parameter", e.getMessage());
 		}
+	}
+	
+	
+	public void testParse_ignoreUnknownKeyType()
+		throws ParseException, JOSEException {
+		
+		List<Object> keys = JSONArrayUtils.newJSONArray();
+		
+		keys.add(new RSAKeyGenerator(2048).generate().toJSONObject());
+		
+		Map<String, Object> unknownKey = new HashMap<>();
+		unknownKey.put("kty", "UNKNOWN");
+		keys.add(unknownKey);
+		
+		Map<String, Object> input = new HashMap<>();
+		input.put("keys", keys);
+		
+		JWKSet.parse(input);
 	}
 }

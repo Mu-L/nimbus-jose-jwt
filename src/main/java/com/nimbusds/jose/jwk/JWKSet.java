@@ -366,6 +366,12 @@ public class JWKSet implements Serializable {
 				throw new ParseException("The \"keys\" JSON array must contain JSON objects only", 0);
 				
 			} catch (ParseException e) {
+				
+				if (e.getMessage() != null && e.getMessage().startsWith("Unsupported key type")) {
+					// Ignore unknown key type
+					// https://tools.ietf.org/html/rfc7517#section-5
+					continue;
+				}
 
 				throw new ParseException("Invalid JWK at position " + i + ": " + e.getMessage(), 0);
 			}
