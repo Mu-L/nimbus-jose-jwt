@@ -42,6 +42,11 @@ public class EncryptedJWT extends JWEObject implements JWT {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * The JWT claims set.
+	 */
+	private JWTClaimsSet claimsSet;
+
 
 	/**
 	 * Creates a new to-be-encrypted JSON Web Token (JWT) with the specified
@@ -54,6 +59,7 @@ public class EncryptedJWT extends JWEObject implements JWT {
 	public EncryptedJWT(final JWEHeader header, final JWTClaimsSet claimsSet) {
 
 		super(header, new Payload(claimsSet.toJSONObject()));
+		this.claimsSet = claimsSet;
 	}
 
 
@@ -90,6 +96,10 @@ public class EncryptedJWT extends JWEObject implements JWT {
 	public JWTClaimsSet getJWTClaimsSet()
 		throws ParseException {
 
+		if (claimsSet != null) {
+			return claimsSet;
+		}
+
 		Payload payload = getPayload();
 
 		if (payload == null) {
@@ -102,9 +112,18 @@ public class EncryptedJWT extends JWEObject implements JWT {
 			throw new ParseException("Payload of JWE object is not a valid JSON object", 0);
 		}
 
-		return JWTClaimsSet.parse(json);
+		claimsSet = JWTClaimsSet.parse(json);
+		return claimsSet;
 	}
 
+	@Override
+	protected void setPayload(Payload payload) {
+
+		// setPayload() changes the result of getJWTClaimsSet().
+		// set claimsSet = null and reparse payload again when called getJWTClaimsSet().
+		claimsSet = null;
+		super.setPayload(payload);
+	}
 
 	/**
 	 * Parses an encrypted JSON Web Token (JWT) from the specified string in

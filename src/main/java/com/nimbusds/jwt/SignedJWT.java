@@ -42,6 +42,11 @@ public class SignedJWT extends JWSObject implements JWT {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * The JWT claims set.
+	 */
+	private JWTClaimsSet claimsSet;
+
 
 	/**
 	 * Creates a new to-be-signed JSON Web Token (JWT) with the specified
@@ -54,6 +59,7 @@ public class SignedJWT extends JWSObject implements JWT {
 	public SignedJWT(final JWSHeader header, final JWTClaimsSet claimsSet) {
 
 		super(header, new Payload(claimsSet.toJSONObject()));
+		this.claimsSet = claimsSet;
 	}
 
 
@@ -82,15 +88,28 @@ public class SignedJWT extends JWSObject implements JWT {
 	public JWTClaimsSet getJWTClaimsSet()
 		throws ParseException {
 
+		if (claimsSet != null) {
+			return claimsSet;
+		}
+
 		Map<String, Object> json = getPayload().toJSONObject();
 
 		if (json == null) {
 			throw new ParseException("Payload of JWS object is not a valid JSON object", 0);
 		}
 
+		claimsSet = JWTClaimsSet.parse(json);
 		return JWTClaimsSet.parse(json);
 	}
 
+	@Override
+	protected void setPayload(Payload payload) {
+
+		// setPayload() changes the result of getJWTClaimsSet().
+		// set claimsSet = null and reparse payload again when called getJWTClaimsSet().
+		claimsSet = null;
+		super.setPayload(payload);
+	}
 
 	/**
 	 * Parses a signed JSON Web Token (JWT) from the specified string in 
