@@ -173,4 +173,18 @@ public class SignedJWTTest extends TestCase {
 		assertTrue(claimsSet.getClaims().containsKey("myclaim"));
 		assertEquals(2, claimsSet.getClaims().size());
 	}
+
+	public void testPayloadUpdated()
+			throws Exception {
+
+		SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), new JWTClaimsSet.Builder()
+				.subject("before").build());
+
+		assertEquals("before", jwt.getJWTClaimsSet().getSubject());
+
+		jwt.setPayload(new Payload(new JWTClaimsSet.Builder()
+				.subject("after").build().toJSONObject()));
+
+		assertEquals("after", jwt.getJWTClaimsSet().getSubject());
+	}
 }

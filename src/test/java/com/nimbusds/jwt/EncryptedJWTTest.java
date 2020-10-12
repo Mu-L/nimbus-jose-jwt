@@ -18,6 +18,7 @@
 package com.nimbusds.jwt;
 
 
+import com.nimbusds.jose.Payload;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
@@ -250,5 +251,19 @@ public class EncryptedJWTTest extends TestCase {
 		
 		jwt.decrypt(new DirectDecrypter(key));
 		assertTrue(jwt.getJWTClaimsSet().toJSONObject().isEmpty());
+	}
+
+	public void testPayloadUpdated()
+			throws Exception {
+
+		EncryptedJWT jwt = new EncryptedJWT(new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A128GCM), new JWTClaimsSet.Builder()
+				.subject("before").build());
+
+		assertEquals("before", jwt.getJWTClaimsSet().getSubject());
+
+		jwt.setPayload(new Payload(new JWTClaimsSet.Builder()
+				.subject("after").build().toJSONObject()));
+
+		assertEquals("after", jwt.getJWTClaimsSet().getSubject());
 	}
 }

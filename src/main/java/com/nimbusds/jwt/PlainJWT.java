@@ -42,6 +42,11 @@ public class PlainJWT extends PlainObject implements JWT {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * The JWT claims set.
+	 */
+	private JWTClaimsSet claimsSet;
+
 
 	/**
 	 * Creates a new unsecured (plain) JSON Web Token (JWT) with a default
@@ -53,6 +58,7 @@ public class PlainJWT extends PlainObject implements JWT {
 	public PlainJWT(final JWTClaimsSet claimsSet) {
 
 		super(new Payload(claimsSet.toJSONObject()));
+		this.claimsSet = claimsSet;
 	}
 
 
@@ -66,6 +72,7 @@ public class PlainJWT extends PlainObject implements JWT {
 	public PlainJWT(final PlainHeader header, final JWTClaimsSet claimsSet) {
 
 		super(header, new Payload(claimsSet.toJSONObject()));
+		this.claimsSet = claimsSet;
 	}
 
 
@@ -91,6 +98,11 @@ public class PlainJWT extends PlainObject implements JWT {
 	public JWTClaimsSet getJWTClaimsSet()
 		throws ParseException {
 
+		if (claimsSet != null) {
+
+			return claimsSet;
+		}
+
 		Map<String, Object> json = getPayload().toJSONObject();
 
 		if (json == null) {
@@ -98,9 +110,19 @@ public class PlainJWT extends PlainObject implements JWT {
 			throw new ParseException("Payload of unsecured JOSE object is not a valid JSON object", 0);
 		}
 
-		return JWTClaimsSet.parse(json);
+		claimsSet = JWTClaimsSet.parse(json);
+		return claimsSet;
 	}
 
+
+	@Override
+	protected void setPayload(Payload payload) {
+
+		// setPayload() changes the result of getJWTClaimsSet().
+		// set claimsSet = null and reparse payload again when called getJWTClaimsSet().
+		claimsSet = null;
+		super.setPayload(payload);
+	}
 
 	/**
 	 * Parses an unsecured (plain) JSON Web Token (JWT) from the specified

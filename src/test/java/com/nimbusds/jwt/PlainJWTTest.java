@@ -18,6 +18,7 @@
 package com.nimbusds.jwt;
 
 
+import com.nimbusds.jose.Payload;
 import java.util.Date;
 
 import junit.framework.TestCase;
@@ -158,5 +159,19 @@ public class PlainJWTTest extends TestCase {
 		PlainJWT jwt = new PlainJWT(new JWTClaimsSet.Builder().build());
 		String jwtString = " " + jwt.serialize() + " ";
 		PlainJWT.parse(jwtString);
+	}
+
+	public void testPayloadUpdated()
+		throws Exception {
+
+		PlainJWT jwt = new PlainJWT(new JWTClaimsSet.Builder()
+				.subject("before").build());
+
+		assertEquals("before", jwt.getJWTClaimsSet().getSubject());
+
+		jwt.setPayload(new Payload(new JWTClaimsSet.Builder()
+				.subject("after").build().toJSONObject()));
+
+		assertEquals("after", jwt.getJWTClaimsSet().getSubject());
 	}
 }
