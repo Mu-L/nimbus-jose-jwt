@@ -1188,3 +1188,7 @@ version 9.0 (2020-09-06)
 
 version 9.0.1 (2020-09-14)
     * JWKSet.parse must ignore unknown key types (kty) (iss #377).
+
+version 9.0.2 (2020-09-xx)
+    * Caches JWT.getJWTClaimsSet() result in implementations to improve
+      performance (iss #380).
