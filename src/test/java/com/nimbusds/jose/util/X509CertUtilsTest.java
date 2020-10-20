@@ -19,27 +19,24 @@ package com.nimbusds.jose.util;
 
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.*;
+import java.security.KeyStore;
+import java.security.MessageDigest;
+import java.security.Provider;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.List;
 import java.util.UUID;
-
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
-import com.nimbusds.jose.jwk.Curve;
-import com.nimbusds.jose.jwk.ECKey;
-import com.nimbusds.jose.jwk.JWK;
 
 import junit.framework.TestCase;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.junit.Assert;
+
+import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
+import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWK;
 
 
 /**
