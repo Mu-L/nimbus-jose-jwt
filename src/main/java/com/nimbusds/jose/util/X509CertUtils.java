@@ -29,7 +29,8 @@ import java.util.UUID;
  *  X.509 certificate utilities.
  *
  *  @author Vladimir Dzhuvinov
- *  @version 2020-02-22
+ *  @author Simon Kissane
+ *  @version 2020-10-20
  */
 public class X509CertUtils {
 
@@ -44,6 +45,35 @@ public class X509CertUtils {
 	 * The PEM end marker.
 	 */
 	public static final String PEM_END_MARKER = "-----END CERTIFICATE-----";
+
+
+	/**
+	 * The JCA provider to use for certificate operations, {@code null}
+	 * implies the default provider.
+	 */
+	private static Provider jcaProvider;
+
+
+	/**
+	 * Returns the JCA provider to use for certification operations.
+	 *
+	 * @return The JCA provider to use for certificate operations,
+	 *         {@code null} implies the default provider.
+	 */
+	public static Provider getProvider() {
+		return jcaProvider;
+	}
+
+
+	/**
+	 * Sets the JCA provider to use for certification operations.
+	 *
+	 * @param provider The JCA provider to use for certificate operations,
+	 *                 {@code null} implies the default provider.
+	 */
+	public static void setProvider(final Provider provider) {
+		jcaProvider = provider;
+	}
 
 
 	/**
@@ -82,7 +112,9 @@ public class X509CertUtils {
 			return null;
 		}
 
-		CertificateFactory cf = CertificateFactory.getInstance("X.509");
+		CertificateFactory cf = jcaProvider != null ?
+			CertificateFactory.getInstance("X.509", jcaProvider) :
+			CertificateFactory.getInstance("X.509");
 		final Certificate cert = cf.generateCertificate(new ByteArrayInputStream(derEncodedCert));
 
 		if (! (cert instanceof X509Certificate)) {

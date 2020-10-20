@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
@@ -120,6 +121,25 @@ public class X509CertUtilsTest extends TestCase {
 		assertEquals("X.509", cert.getType());
 		assertEquals("CN=connect2id.com,OU=Domain Control Validated", cert.getSubjectX500Principal().getName());
 		assertTrue(cert.getPublicKey() instanceof RSAPublicKey);
+	}
+
+	
+	public void testParsePEMWithAlternativeJCAProvider() {
+
+		assertNull(X509CertUtils.getProvider());
+		
+		Provider jcaProvider = BouncyCastleProviderSingleton.getInstance();
+		X509CertUtils.setProvider(jcaProvider);
+		assertEquals(jcaProvider, X509CertUtils.getProvider());
+		
+		X509Certificate cert = X509CertUtils.parse(PEM_CERT);
+
+		assertEquals("X.509", cert.getType());
+		assertEquals("CN=connect2id.com,OU=Domain Control Validated", cert.getSubjectX500Principal().getName());
+		assertTrue(cert.getPublicKey() instanceof RSAPublicKey);
+		
+		X509CertUtils.setProvider(null);
+		assertNull(X509CertUtils.getProvider());
 	}
 
 
