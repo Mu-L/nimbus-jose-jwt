@@ -162,4 +162,10 @@ public class DefaultJWKSetCacheTest extends TestCase {
 		assertEquals(DefaultJWKSetCache.DEFAULT_REFRESH_TIME_MINUTES, cache.getRefreshTime(TimeUnit.MINUTES));
 		assertFalse(cache.requiresRefresh());
 	}
+
+	public void testCovertTimeUnit() {
+		DefaultJWKSetCache cache = new DefaultJWKSetCache();
+		assertEquals(DefaultJWKSetCache.DEFAULT_LIFESPAN_MINUTES *  60, cache.getLifespan(TimeUnit.SECONDS));
+		assertEquals(DefaultJWKSetCache.DEFAULT_REFRESH_TIME_MINUTES *  60, cache.getRefreshTime(TimeUnit.SECONDS));
+	}
 }
