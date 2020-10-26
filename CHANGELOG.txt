@@ -1196,3 +1196,7 @@ version 9.1 (2020-10-20)
       for setting a preferred JCA provider for the certification operations.
       The X509CertUtils.getProvider method returns the currently configured JCA
       provider (iss #382).
+
+version 9.1.1 (2020-10-26)
+    * Fixes time unit conversion in DefaultJWKSetCache.getLifespan and
+      getRefreshTime (iss #384).
