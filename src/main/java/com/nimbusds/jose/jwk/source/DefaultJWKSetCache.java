@@ -182,8 +182,8 @@ public class DefaultJWKSetCache implements JWKSetCache {
 		if (lifespan < 0) {
 			return lifespan;
 		}
-		
-		return timeUnit.convert(lifespan, timeUnit);
+
+		return timeUnit.convert(lifespan, this.timeUnit);
 	}
 
 
@@ -200,6 +200,6 @@ public class DefaultJWKSetCache implements JWKSetCache {
 			return refreshTime;
 		}
 
-		return timeUnit.convert(refreshTime, timeUnit);
+		return timeUnit.convert(refreshTime, this.timeUnit);
 	}
 }
