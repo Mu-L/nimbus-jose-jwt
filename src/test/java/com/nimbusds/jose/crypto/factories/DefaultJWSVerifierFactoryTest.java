@@ -22,15 +22,17 @@ import java.security.SecureRandom;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import junit.framework.TestCase;
+
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSProvider;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.jca.JCAAware;
+import com.nimbusds.jose.jca.JCAContext;
 import com.nimbusds.jose.proc.JWSVerifierFactory;
 import com.nimbusds.jose.util.ByteUtils;
-import junit.framework.TestCase;
 
 
 /**
@@ -72,9 +74,13 @@ public class DefaultJWSVerifierFactoryTest extends TestCase {
 	}
 
 
-	public void testSetSecureRandom()
+	// https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/385/avoid-creating-new-securerandom-to-reduce
+	public void testSecureRandomNotSet()
 		throws Exception {
-
+		
+		JCAContext defaultJCAContext = new JCAContext();
+		String defaultSecureRandomAlg = defaultJCAContext.getSecureRandom().getAlgorithm();
+		
 		SecureRandom secureRandom = new SecureRandom() {
 			@Override
 			public String getAlgorithm() {
@@ -91,7 +97,7 @@ public class DefaultJWSVerifierFactoryTest extends TestCase {
 
 		JWSVerifier verifier = factory.createJWSVerifier(new JWSHeader(JWSAlgorithm.HS256), key);
 
-		assertEquals("test", verifier.getJCAContext().getSecureRandom().getAlgorithm());
+		assertEquals(defaultSecureRandomAlg, verifier.getJCAContext().getSecureRandom().getAlgorithm());
 	}
 
 

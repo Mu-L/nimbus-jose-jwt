@@ -1200,3 +1200,7 @@ version 9.1 (2020-10-20)
 version 9.1.1 (2020-10-26)
     * Fixes time unit conversion in DefaultJWKSetCache.getLifespan and
       getRefreshTime (iss #384).
+
+version 9.1.2 (2020-10-30)
+    * Prevent instantiation of unneeded new SecureRandom in
+      DefaultJWSVerifierFactory to save resources (iss #385).
