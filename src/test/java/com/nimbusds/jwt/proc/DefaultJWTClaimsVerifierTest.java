@@ -363,17 +363,29 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 	}
 	
 	
-	public void testRequiresNBF() throws BadJWTException {
+	public void testRequiresMultiple() throws BadJWTException {
 		
-		DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier(null, null, Collections.singleton("nbf"));
+		DefaultJWTClaimsVerifier<?> verifier = new DefaultJWTClaimsVerifier<>(
+			new JWTClaimsSet.Builder()
+				.issuer("https://example.com")
+				.build(),
+			new HashSet<>(Arrays.asList("iss", "iat", "jti")));
 		
-		verifier.verify(new JWTClaimsSet.Builder().notBeforeTime(new Date()).build(), null);
+		assertEquals(new HashSet<>(Arrays.asList("iss", "iat", "jti")), verifier.getRequiredClaims());
+		
+		verifier.verify(
+			new JWTClaimsSet.Builder()
+				.issuer("https://example.com")
+				.issueTime(new Date())
+				.jwtID("34f8774a-1ede-45be-9b68-595f91a0ab35")
+				.build(),
+			null);
 		
 		try {
 			verifier.verify(new JWTClaimsSet.Builder().build(), null);
 			fail();
 		} catch (BadJWTException e) {
-			assertEquals("JWT missing required claims: [nbf]", e.getMessage());
+			assertEquals("JWT missing required claims: [iss, iat, jti]", e.getMessage());
 		}
 	}
 }
