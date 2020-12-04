@@ -34,7 +34,7 @@ import com.nimbusds.jose.util.Base64URL;
  * Signed JSON Web Token (JWT).
  *
  * @author Vladimir Dzhuvinov
- * @version 2015-08-19
+ * @version 2020-12-04
  */
 @ThreadSafe
 public class SignedJWT extends JWSObject implements JWT {
@@ -99,8 +99,9 @@ public class SignedJWT extends JWSObject implements JWT {
 		}
 
 		claimsSet = JWTClaimsSet.parse(json);
-		return JWTClaimsSet.parse(json);
+		return claimsSet;
 	}
+	
 
 	@Override
 	protected void setPayload(Payload payload) {
@@ -111,6 +112,7 @@ public class SignedJWT extends JWSObject implements JWT {
 		super.setPayload(payload);
 	}
 
+	
 	/**
 	 * Parses a signed JSON Web Token (JWT) from the specified string in 
 	 * compact format. 

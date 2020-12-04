@@ -116,6 +116,7 @@ public class EncryptedJWT extends JWEObject implements JWT {
 		return claimsSet;
 	}
 
+	
 	@Override
 	protected void setPayload(Payload payload) {
 
@@ -125,6 +126,7 @@ public class EncryptedJWT extends JWEObject implements JWT {
 		super.setPayload(payload);
 	}
 
+	
 	/**
 	 * Parses an encrypted JSON Web Token (JWT) from the specified string in
 	 * compact format. 
