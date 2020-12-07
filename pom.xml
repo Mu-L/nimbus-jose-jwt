@@ -282,6 +282,7 @@
                 <configuration>
                     <instructions>
                         <Export-Package>com.nimbusds.jose.*,com.nimbusds.jwt.*</Export-Package>
+                        <Import-Package>!net.minidev.json*,*</Import-Package>
                     </instructions>
                 </configuration>
                 <executions>
