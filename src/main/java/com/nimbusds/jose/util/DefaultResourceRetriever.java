@@ -26,6 +26,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 
 import net.jcip.annotations.ThreadSafe;
 
@@ -37,17 +39,25 @@ import net.jcip.annotations.ThreadSafe;
  *
  * @author Vladimir Dzhuvinov
  * @author Artun Subasi
- * @version 2019-08-23
+ * @author Imre Paladji
+ * @version 2020-12-14
  */
 @ThreadSafe
 public class DefaultResourceRetriever extends AbstractRestrictedResourceRetriever implements RestrictedResourceRetriever {
-
-
+	
+	
 	/**
 	 * If {@code true} the disconnect method of the underlying
 	 * HttpURLConnection is called after a successful or failed retrieval.
 	 */
 	private boolean disconnectAfterUse;
+	
+	
+	/**
+	 * For establishing the TLS connections, {@code null} to use the
+	 * default one.
+	 */
+	private final SSLSocketFactory sslSocketFactory;
 
 
 	/**
@@ -121,12 +131,44 @@ public class DefaultResourceRetriever extends AbstractRestrictedResourceRetrieve
 					final int readTimeout,
 					final int sizeLimit,
 					final boolean disconnectAfterUse) {
-
+		
+		this(connectTimeout, readTimeout, sizeLimit, disconnectAfterUse, null);
+	}
+	
+	
+	/**
+	 * Creates a new resource retriever.
+	 *
+	 * @param connectTimeout     The HTTP connects timeout, in
+	 *                           milliseconds, zero for infinite. Must not
+	 *                           be negative.
+	 * @param readTimeout        The HTTP read timeout, in milliseconds,
+	 *                           zero for infinite. Must not be negative.
+	 * @param sizeLimit          The HTTP entity size limit, in bytes, zero
+	 *                           for infinite. Must not be negative.
+	 * @param disconnectAfterUse If {@code true} the disconnect method of
+	 *                           the underlying {@link HttpURLConnection}
+	 *                           will be called after trying to retrieve
+	 *                           the resource. Whether the TCP socket is
+	 *                           actually closed or reused depends on the
+	 *                           underlying HTTP implementation and the
+	 *                           setting of the {@code keep.alive} system
+	 *                           property.
+	 * @param sslSocketFactory   An SSLSocketFactory for establishing the
+	 *                           TLS connections, {@code null} to use the
+	 *                           default one.
+	 */
+	public DefaultResourceRetriever(final int connectTimeout,
+					final int readTimeout,
+					final int sizeLimit,
+					final boolean disconnectAfterUse,
+					final SSLSocketFactory sslSocketFactory) {
 		super(connectTimeout, readTimeout, sizeLimit);
 		this.disconnectAfterUse = disconnectAfterUse;
+		this.sslSocketFactory = sslSocketFactory;
 	}
-
-
+	
+	
 	/**
 	 * Returns {@code true} if the disconnect method of the underlying
 	 * {@link HttpURLConnection} will be called after trying to retrieve
@@ -198,7 +240,11 @@ public class DefaultResourceRetriever extends AbstractRestrictedResourceRetrieve
 
 			con.setConnectTimeout(getConnectTimeout());
 			con.setReadTimeout(getReadTimeout());
-
+			
+			if (sslSocketFactory != null && con instanceof HttpsURLConnection) {
+				((HttpsURLConnection)con).setSSLSocketFactory(sslSocketFactory);
+			}
+			
 			if(getHeaders() != null && !getHeaders().isEmpty()) {
 				for (Map.Entry<String, List<String>> entry : getHeaders().entrySet()) {
 					for (String value: entry.getValue()) {
