@@ -21,6 +21,8 @@ package com.nimbusds.jose.jwk.source;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import net.jcip.annotations.ThreadSafe;
+
 import com.nimbusds.jose.jwk.JWKSet;
 
 
@@ -29,8 +31,9 @@ import com.nimbusds.jose.jwk.JWKSet;
  *
  * @author Vladimir Dzhuvinov
  * @author Sarvesh Sharma
- * @version 2020-03-11
+ * @version 2020-12-27
  */
+@ThreadSafe
 public class DefaultJWKSetCache implements JWKSetCache {
 	
 	
@@ -67,9 +70,9 @@ public class DefaultJWKSetCache implements JWKSetCache {
 	
 	
 	/**
-	 * The cache put timestamp, negative if not specified.
+	 * The cached JWK set, {@code null} if none.
 	 */
-	private long putTimestamp = -1;
+	private volatile JWKSetWithTimestamp jwkSetWithTimestamp;
 	
 	
 	/**
@@ -106,22 +109,14 @@ public class DefaultJWKSetCache implements JWKSetCache {
 	}
 	
 	
-	/**
-	 * The cached JWK set, {@code null} if none.
-	 */
-	private JWKSet jwkSet;
-	
-	
 	@Override
 	public void put(final JWKSet jwkSet) {
 		
-		this.jwkSet = jwkSet;
-		
 		if (jwkSet != null) {
-			putTimestamp = new Date().getTime();
+			jwkSetWithTimestamp = new JWKSetWithTimestamp(jwkSet);
 		} else {
-			// cache cleared
-			putTimestamp = -1;
+			// clear cache
+			jwkSetWithTimestamp = null;
 		}
 	}
 	
@@ -129,20 +124,20 @@ public class DefaultJWKSetCache implements JWKSetCache {
 	@Override
 	public JWKSet get() {
 		
-		if (isExpired()) {
-			jwkSet = null; // clear
+		if (jwkSetWithTimestamp == null || isExpired()) {
+			return null;
 		}
 		
-		return jwkSet;
+		return jwkSetWithTimestamp.getJWKSet();
 	}
 
 
 	@Override
 	public boolean requiresRefresh() {
 
-		return putTimestamp > -1 &&
+		return jwkSetWithTimestamp != null &&
 			refreshTime > -1 &&
-			new Date().getTime() > putTimestamp + TimeUnit.MILLISECONDS.convert(refreshTime, timeUnit);
+			new Date().getTime() > jwkSetWithTimestamp.getDate().getTime() + TimeUnit.MILLISECONDS.convert(refreshTime, timeUnit);
 	}
 
 	
@@ -153,7 +148,7 @@ public class DefaultJWKSetCache implements JWKSetCache {
 	 */
 	public long getPutTimestamp() {
 		
-		return putTimestamp;
+		return jwkSetWithTimestamp != null ? jwkSetWithTimestamp.getDate().getTime() : -1L;
 	}
 	
 	
@@ -164,9 +159,9 @@ public class DefaultJWKSetCache implements JWKSetCache {
 	 */
 	public boolean isExpired() {
 	
-		return putTimestamp > -1 &&
+		return jwkSetWithTimestamp != null &&
 			lifespan > -1 &&
-			new Date().getTime() > putTimestamp + TimeUnit.MILLISECONDS.convert(lifespan, timeUnit);
+			new Date().getTime() > jwkSetWithTimestamp.getDate().getTime() + TimeUnit.MILLISECONDS.convert(lifespan, timeUnit);
 	}
 	
 	

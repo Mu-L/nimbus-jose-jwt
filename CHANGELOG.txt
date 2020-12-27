@@ -1220,3 +1220,8 @@ version 9.1.5 (2020-12-07)
 version 9.2 (2020-12-14)
     * Updates DefaultResourceRetriever to allow setting of a SSLSocketFactory
       (iss #301).
+
+version 9.3 (2020-12-27)
+    * Makes DefaultJWKSetCache thread-safe (iss #392).
+    * Adds new JWKSetWithTimestamp class, for use by DefaultJWKSetCache.
+    * Bumps minimal optional BouncyCastle dependency to 1.68.
