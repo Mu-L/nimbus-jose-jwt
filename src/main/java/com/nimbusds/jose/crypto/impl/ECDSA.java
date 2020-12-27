@@ -34,7 +34,7 @@ import com.nimbusds.jose.jwk.Curve;
  *
  * @author Vladimir Dzhuvinov
  * @author Aleksei Doroganov
- * @version 2019-10-03
+ * @version 2020-12-27
  */
 public class ECDSA {
 
@@ -181,7 +181,7 @@ public class ECDSA {
 	 *
 	 * @throws JOSEException If the ASN.1/DER signature format is invalid.
 	 */
-	public static byte[] transcodeSignatureToConcat(final byte[] derSignature, int outputLength)
+	public static byte[] transcodeSignatureToConcat(final byte[] derSignature, final int outputLength)
 		throws JOSEException {
 
 		if (derSignature.length < 8 || derSignature[0] != 48) {
@@ -243,7 +243,7 @@ public class ECDSA {
 	 *
 	 * @throws JOSEException If the ECDSA JWS signature format is invalid.
 	 */
-	public static byte[] transcodeSignatureToDER(byte[] jwsSignature)
+	public static byte[] transcodeSignatureToDER(final byte[] jwsSignature)
 		throws JOSEException {
 
 		// Adapted from org.apache.xml.security.algorithms.implementations.SignatureECDSA
