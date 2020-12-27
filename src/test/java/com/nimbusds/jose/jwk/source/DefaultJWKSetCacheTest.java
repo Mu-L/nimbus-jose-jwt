@@ -19,10 +19,8 @@ package com.nimbusds.jose.jwk.source;
 
 
 import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import com.vmlens.api.AllInterleavings;
 import junit.framework.TestCase;
 
 import com.nimbusds.jose.JOSEException;
