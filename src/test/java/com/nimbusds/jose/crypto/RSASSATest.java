@@ -27,9 +27,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import junit.framework.TestCase;
 
@@ -38,6 +36,7 @@ import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jwt.util.DateUtils;
 
 
 /**
@@ -45,7 +44,7 @@ import com.nimbusds.jose.util.Base64URL;
  * from the JWS spec.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-04-26
+ * @version 2020-12-27
  */
 public class RSASSATest extends TestCase {
 
@@ -832,5 +831,41 @@ public class RSASSATest extends TestCase {
 		assertEquals(JWSObject.State.SIGNED, jws.getState());
 		
 		assertTrue(jws.verify(new RSASSAVerifier(rsaJWK)));
+	}
+	
+	
+	public void testWithDetachedSignatureAndCriticalParams()
+		throws Exception {
+		
+		RSAKey rsaJWK = new RSAKeyGenerator(2048)
+			.keyID("1")
+			.generate();
+		
+		JWSSigner signer = new RSASSASigner(rsaJWK);
+		
+		Map<String, Object> criticalParameters = new HashMap<>();
+		criticalParameters.put("iss", "https://issuer.example.com");
+		criticalParameters.put("iat", DateUtils.toSecondsSinceEpoch(new Date()));
+		
+		Payload payload = new Payload("Hello, world!");
+		
+		JWSObject jwsObject = new JWSObject(
+			new JWSHeader.Builder(JWSAlgorithm.RS256)
+				.base64URLEncodePayload(false)
+				.keyID(rsaJWK.getKeyID())
+				.criticalParams(criticalParameters.keySet())
+				.customParams(criticalParameters)
+				.build(),
+			payload);
+		
+		jwsObject.sign(signer);
+		
+		String jwsString = jwsObject.serialize(true);
+		
+		JWSVerifier jwsVerifier = new RSASSAVerifier(rsaJWK.toRSAPublicKey(), criticalParameters.keySet());
+		
+		JWSObject parsedJWSObject = JWSObject.parse(jwsString, payload);
+		
+		assertTrue(parsedJWSObject.verify(jwsVerifier));
 	}
 }
