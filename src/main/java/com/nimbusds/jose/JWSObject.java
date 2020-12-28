@@ -19,6 +19,7 @@ package com.nimbusds.jose;
 
 
 import java.text.ParseException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import net.jcip.annotations.ThreadSafe;
 
@@ -30,7 +31,7 @@ import com.nimbusds.jose.util.StandardCharset;
  * JSON Web Signature (JWS) secured object. This class is thread-safe.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-04-16
+ * @version 2020-12-27
  */
 @ThreadSafe
 public class JWSObject extends JOSEObject {
@@ -85,7 +86,7 @@ public class JWSObject extends JOSEObject {
 	/**
 	 * The JWS object state.
 	 */
-	private State state;
+	private final AtomicReference<State> state = new AtomicReference<>();
 
 
 	/**
@@ -110,7 +111,7 @@ public class JWSObject extends JOSEObject {
 		
 		signingInputString = composeSigningInput();
 		signature = null;
-		state = State.UNSIGNED;
+		state.set(State.UNSIGNED);
 	}
 
 
@@ -170,7 +171,7 @@ public class JWSObject extends JOSEObject {
 			throw new IllegalArgumentException("The third part must not be null");
 		}
 		signature = thirdPart;
-		state = State.SIGNED; // but signature not verified yet!
+		state.set(State.SIGNED); // but signature not verified yet!
 
 		if (getHeader().isBase64URLEncodePayload()) {
 			setParsedParts(firstPart, payload.toBase64URL(), thirdPart);
@@ -231,7 +232,7 @@ public class JWSObject extends JOSEObject {
 	 */
 	public State getState() {
 
-		return state;
+		return state.get();
 	}
 
 
@@ -242,7 +243,7 @@ public class JWSObject extends JOSEObject {
 	 */
 	private void ensureUnsignedState() {
 
-		if (state != State.UNSIGNED) {
+		if (state.get() != State.UNSIGNED) {
 
 			throw new IllegalStateException("The JWS object must be in an unsigned state");
 		}
@@ -258,7 +259,7 @@ public class JWSObject extends JOSEObject {
 	 */
 	private void ensureSignedOrVerifiedState() {
 
-		if (state != State.SIGNED && state != State.VERIFIED) {
+		if (state.get() != State.SIGNED && state.get() != State.VERIFIED) {
 
 			throw new IllegalStateException("The JWS object must be in a signed or verified state");
 		}
@@ -301,6 +302,21 @@ public class JWSObject extends JOSEObject {
 
 		try {
 			signature = signer.sign(getHeader(), getSigningInput());
+			
+		} catch (final ActionRequiredForJWSCompletionException e) {
+			// Catch to enable state SIGNED update
+			throw new ActionRequiredForJWSCompletionException(
+				e.getMessage(),
+				e.getTriggeringOption(),
+				new CompletableJWSObjectSigning() {
+					@Override
+					public Base64URL complete() throws JOSEException {
+						signature = e.getCompletableJWSObjectSigning().complete();
+						state.set(State.SIGNED);
+						return signature;
+					}
+				}
+			);
 
 		} catch (JOSEException e) {
 
@@ -313,7 +329,7 @@ public class JWSObject extends JOSEObject {
 			throw new JOSEException(e.getMessage(), e);
 		}
 
-		state = State.SIGNED;
+		state.set(State.SIGNED);
 	}
 
 
@@ -355,7 +371,7 @@ public class JWSObject extends JOSEObject {
 
 		if (verified) {
 
-			state = State.VERIFIED;
+			state.set(State.VERIFIED);
 		}
 
 		return verified;
