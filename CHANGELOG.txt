@@ -1225,3 +1225,19 @@ version 9.3 (2020-12-27)
     * Makes DefaultJWKSetCache thread-safe (iss #392).
     * Adds new JWKSetWithTimestamp class, for use by DefaultJWKSetCache.
     * Bumps minimal optional BouncyCastle dependency to 1.68.
+
+version 9.4 (2020-12-28)
+    * Adds new JWSSignerOption marker interface for passing optional
+      configurations to a JWSSigner. Implemented the option
+      UserAuthenticationRequired for triggering a PIN or biometric prompt to
+      unlock a private signing key in Android. Implemented the option
+      AllowWeakRSAKey to accept weak RSA keys shorter than 2048 bits.
+    * Adds new checked ActionRequiredForJWSCompletionException and a
+      CompletableJWSObjectSigning interface to handle
+      UserAuthenticationRequired in a JWSSigner implementation.
+    * Updates the RSASSASigner for the RSxxx and PSxxx JWS algorithms to
+      support the new UserAuthenticationRequired and AllowWeakRSAKey options.
+    * Deprecates the RSASSASigner constructors with the boolean argument for
+      accepting weak RSA keys.
+    * Updates JWSObject to support JWSSigners which throw an
+      ActionRequiredForJWSCompletionException.

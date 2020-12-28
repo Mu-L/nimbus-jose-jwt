@@ -33,6 +33,7 @@ import junit.framework.TestCase;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
+import com.nimbusds.jose.crypto.opts.UserAuthenticationRequired;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
@@ -865,6 +866,64 @@ public class RSASSATest extends TestCase {
 		JWSVerifier jwsVerifier = new RSASSAVerifier(rsaJWK.toRSAPublicKey(), criticalParameters.keySet());
 		
 		JWSObject parsedJWSObject = JWSObject.parse(jwsString, payload);
+		
+		assertTrue(parsedJWSObject.verify(jwsVerifier));
+	}
+	
+	
+	public void testWithRequireUserAuthenticationOption()
+		throws Exception {
+		
+		RSAKey rsaJWK = new RSAKeyGenerator(2048)
+			.generate();
+		
+		// Option to trigger a user authentication prompt after the
+		// signature gets initiated
+		Set<JWSSignerOption> opts = new HashSet<>();
+		opts.add(UserAuthenticationRequired.getInstance());
+		
+		JWSSigner signer = new RSASSASigner(rsaJWK.toPrivateKey(), opts);
+		
+		Payload payload = new Payload("Hello, world!");
+		
+		JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.RS256), payload);
+		
+		ActionRequiredForJWSCompletionException actionRequired = null;
+		
+		try {
+			jwsObject.sign(signer);
+		} catch (ActionRequiredForJWSCompletionException arException) {
+			// Copy the exception for processing
+			actionRequired = arException;
+		} catch (JOSEException e) {
+			throw new RuntimeException("Signing failed: " + e.getMessage(), e);
+		}
+		
+		assertEquals(JWSObject.State.UNSIGNED, jwsObject.getState());
+		
+		assertNotNull(actionRequired);
+		
+		if (actionRequired != null) {
+			
+			assertEquals("Authenticate user to complete signing", actionRequired.getMessage());
+			assertEquals(UserAuthenticationRequired.getInstance(), actionRequired.getTriggeringOption());
+			assertEquals("UserAuthenticationRequired", actionRequired.getTriggeringOption().toString());
+			
+			// Perform user authentication to unlock the private key,
+			// e.g. with biometric prompt
+			// ...
+			
+			// Complete the signing after the key is unlocked
+			actionRequired.getCompletableJWSObjectSigning().complete();
+		}
+		
+		assertEquals(JWSObject.State.SIGNED, jwsObject.getState());
+		
+		String jwsString = jwsObject.serialize();
+		
+		JWSVerifier jwsVerifier = new RSASSAVerifier(rsaJWK.toRSAPublicKey());
+		
+		JWSObject parsedJWSObject = JWSObject.parse(jwsString);
 		
 		assertTrue(parsedJWSObject.verify(jwsVerifier));
 	}
