@@ -1,11 +1,12 @@
 # Nimbus JOSE + JWT
 
-* The most popular and robust Java library for JSON Web Tokens (JWT)
-* All standard signature (JWS) and encryption (JWE) algorithms are supported,
-  including *secp256k1* used in Bitcoin and Ethereum
+* The most popular and robust Java and Android library for JSON Web Tokens 
+  (JWT)
+* Supports all standard signature (JWS) and encryption (JWE) algorithms plus 
+  secp256k1 used in Bitcoin and Ethereum
 * Open source Apache 2.0 license
 
-Check out the [library homepage](http://connect2id.com/products/nimbus-jose-jwt) 
+Check out the [library homepage](https://connect2id.com/products/nimbus-jose-jwt) 
 for more info and examples.
 
 
@@ -69,10 +70,9 @@ The library can handle all standard JOSE algorithms:
 
 The Nimbus JOSE+JWT library requires Java 7+ and has minimal dependencies.
 
-* JSON Smart for highly efficient parsing and serialisation of JSON.
 * JCIP for concurrency annotations.
-* [optional] BouncyCastle as an alternative JCA provider.
-* [optional] Tink for EdDSA with Ed25519 and ECDH with X25519.
+* (optional) BouncyCastle as an alternative JCA provider.
+* (optional) Tink for EdDSA with Ed25519 and ECDH with X25519.
 
 
 For Maven add:
