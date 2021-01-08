@@ -31,7 +31,7 @@ import com.nimbusds.jose.jwk.JWKSet;
  *
  * @author Vladimir Dzhuvinov
  * @author Sarvesh Sharma
- * @version 2020-12-27
+ * @version 2021-01-08
  */
 @ThreadSafe
 public class DefaultJWKSetCache implements JWKSetCache {
@@ -112,12 +112,15 @@ public class DefaultJWKSetCache implements JWKSetCache {
 	@Override
 	public void put(final JWKSet jwkSet) {
 		
+		final JWKSetWithTimestamp updatedJWKSetWithTs;
 		if (jwkSet != null) {
-			jwkSetWithTimestamp = new JWKSetWithTimestamp(jwkSet);
+			updatedJWKSetWithTs = new JWKSetWithTimestamp(jwkSet);
 		} else {
 			// clear cache
-			jwkSetWithTimestamp = null;
+			updatedJWKSetWithTs = null;
 		}
+		
+		jwkSetWithTimestamp = updatedJWKSetWithTs;
 	}
 	
 	
