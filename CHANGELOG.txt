@@ -1244,3 +1244,8 @@ version 9.4 (2020-12-28)
 
 version 9.4.1 (2021-01-08)
     * Makes DefaultJWKSetCache.put NPE safe in concurrent scenarios (iss #392).
+
+version 9.4.2 (2021-01-28)
+    * Adds quick check in ECDSAVerifier to reject ESxxx signatures which length
+      doesn't match the expected for the ESxxx algorithm (iss #399).
+

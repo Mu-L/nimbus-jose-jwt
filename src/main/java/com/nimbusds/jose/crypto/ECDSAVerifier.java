@@ -34,6 +34,7 @@ import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64URL;
 import net.jcip.annotations.ThreadSafe;
+import org.bouncycastle.jcajce.provider.digest.SHA256;
 
 
 /**
@@ -177,6 +178,12 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier, Critica
 		final byte[] jwsSignature = signature.decode();
 
 		final byte[] derSignature;
+		
+		if (ECDSA.getSignatureByteArrayLength(header.getAlgorithm()) != jwsSignature.length) {
+			// Quick format check, concatenation of R+S (may be padded
+			// to match lengths) in ESxxx signatures has fixed length
+			return false;
+		}
 
 		try {
 			derSignature = ECDSA.transcodeSignatureToDER(jwsSignature);
