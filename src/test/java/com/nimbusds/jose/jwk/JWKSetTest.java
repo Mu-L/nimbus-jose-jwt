@@ -56,6 +56,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
+import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONArrayUtils;
@@ -68,7 +69,7 @@ import com.nimbusds.jose.util.X509CertUtils;
  *
  * @author Vladimir Dzhuvinov
  * @author Vedran Pavic
- * @version 2020-09-14
+ * @version 2021-02-01
  */
 public class JWKSetTest extends TestCase {
 	
@@ -1157,5 +1158,28 @@ public class JWKSetTest extends TestCase {
 		input.put("keys", keys);
 		
 		JWKSet.parse(input);
+	}
+	
+	
+	public void testToString()
+		throws JOSEException, ParseException {
+	
+		RSAKey rsaJWK = new RSAKeyGenerator(2048).generate();
+		OctetSequenceKey secret = new OctetSequenceKeyGenerator(256).generate();
+		
+		JWKSet jwkSet = new JWKSet(Arrays.asList(rsaJWK, secret));
+		
+		assertEquals(jwkSet.toString(), jwkSet.toString(true));
+		assertEquals(JSONObjectUtils.toJSONString(jwkSet.toJSONObject(false)), jwkSet.toString(false));
+		
+		JWKSet parsedJWKSetPublic = JWKSet.parse(jwkSet.toString(true));
+		for (JWK jwk: parsedJWKSetPublic.getKeys()) {
+			assertFalse(jwk.isPrivate());
+		}
+		
+		JWKSet parsedJWKSetPrivate = JWKSet.parse(jwkSet.toString(false));
+		for (JWK jwk: parsedJWKSetPrivate.getKeys()) {
+			assertTrue(jwk.isPrivate());
+		}
 	}
 }

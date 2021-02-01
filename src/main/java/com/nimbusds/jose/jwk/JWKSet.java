@@ -70,7 +70,7 @@ import com.nimbusds.jose.util.*;
  *
  * @author Vladimir Dzhuvinov
  * @author Vedran Pavic
- * @version 2020-04-06
+ * @version 2021-02-01
  */
 @Immutable
 public class JWKSet implements Serializable {
@@ -307,12 +307,30 @@ public class JWKSet implements Serializable {
 	 * Returns the JSON object string representation of this JSON Web Key
 	 * (JWK) set.
 	 *
+	 * @param publicKeysOnly Controls the inclusion of private keys and
+	 *                       parameters into the output JWK members. If
+	 *                       {@code true} private keys and parameters will
+	 *                       be omitted. If {@code false} all available key
+	 *                       parameters will be included.
+	 *
+	 * @return The JSON object string representation.
+	 */
+	public String toString(final boolean publicKeysOnly) {
+
+		return JSONObjectUtils.toJSONString(toJSONObject(publicKeysOnly));
+	}
+
+
+	/**
+	 * Returns the JSON object string representation of this JSON Web Key
+	 * (JWK) set.
+	 *
 	 * @return The JSON object string representation.
 	 */
 	@Override
 	public String toString() {
 
-		return JSONObjectUtils.toJSONString(toJSONObject());
+		return toString(true);
 	}
 
 
