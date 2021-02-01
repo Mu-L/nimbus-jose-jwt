@@ -1,5 +1,6 @@
 package com.nimbusds.jwt.mint;
 
+import java.net.URL;
 import java.util.List;
 
 import com.nimbusds.jose.JOSEException;
@@ -9,6 +10,7 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKMatcher;
 import com.nimbusds.jose.jwk.JWKSelector;
 import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.jwk.source.RemoteJWKSet;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jose.produce.JWSSignerFactory;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -44,8 +46,60 @@ public class DefaultJWSMinter<C extends SecurityContext> implements Configurable
 
 	private JWSSignerFactory jwsSignerFactory = new DefaultJWSSignerFactory();
 
+	/**
+	 * Signs and serializes a new JWT using the provided {@link JWSHeader}
+	 * and {@link JWTClaimsSet}.
+	 *
+	 * Derives the signing key from the {@link JWSHeader} as well as any
+	 * application-specific {@link SecurityContext context}.
+	 *
+	 * If multiple keys are matched against the header's criteria, the
+	 * first will be used to sign the JWT. To customize this, you can
+	 * set a custom {@link JWKSource} like so:
+	 *
+	 * <code>
+	 *  public static class MyJWKSource implements JWKSource&lt;SecurityContext&gt; {
+	 *     private final JWKSource&lt;SecurityContext&gt; delegate;
+	 *
+	 *     public List&lt;JWK&gt; get(final JWKSelector jwkSelector, final SecurityContext context)
+	 *         throws KeySourceException {
+	 *         List&lt;JWK&gt; jwks = this.delegate.get(jwkSelector, context);
+	 *         return jwks.get(jwks.size() - 1); // get last one instead
+	 *     }
+	 *  }
+	 *
+	 *  minter.setJWKSource(new MyJWKSource(jwkSource));
+	 * </code>
+	 *
+	 * or you can select your own {@link JWK} and do:
+	 *
+	 * <code>
+	 *  minter.setJWKSource(new JWKSecurityContextJWKSet());
+	 *
+	 *  // ...
+	 *
+	 *  JWK jwk = findJWK();
+	 *  minter.mint(header, claims, new JWKSecurityContext(jwks));
+	 * </code>
+	 *
+	 * Once the key is discovered, adds any headers related to the discovered
+	 * signing key, including {@code kid}, {@code x5u}, {@code x5c}, and
+	 * {@code x5t#256}.
+	 *
+	 * All other headers and claims remain as-is. This method
+	 * expects the caller to add the {@code typ}, {@code alg},
+	 * and any other needed headers.
+	 *
+	 * @param header the {@link JWSHeader} to use, less the {@code kid}, which
+	 *               this method will derive
+	 * @param claims the {@link JWTClaimsSet} to use
+	 * @param context a {@link SecurityContext}
+	 * @return a signed JWT
+	 * @throws JOSEException if the instance is improperly configured,
+	 * if no appropriate JWK can be found, or if signing fails
+	 */
 	@Override
-	public String mint(JWSHeader header, JWTClaimsSet claims, C context) throws JOSEException {
+	public SignedJWT mint(JWSHeader header, JWTClaimsSet claims, C context) throws JOSEException {
 		JWKMatcher matcher = JWKMatcher.forJWSHeader(header);
 		JWKSelector selector = new JWKSelector(matcher);
 		if (this.jwkSource == null) {
@@ -58,13 +112,16 @@ public class DefaultJWSMinter<C extends SecurityContext> implements Configurable
 		JWK jwk = jwks.get(0);
 		JWSHeader withJwk = new JWSHeader.Builder(header)
 				.keyID(jwk.getKeyID())
+				.x509CertURL(jwk.getX509CertURL())
+				.x509CertChain(jwk.getX509CertChain())
+				.x509CertThumbprint(jwk.getX509CertThumbprint())
 				.build();
 		SignedJWT jwt = new SignedJWT(withJwk, claims);
 		if (this.jwsSignerFactory == null) {
 			throw new JOSEException("No JWS signer factory configured");
 		}
 		jwt.sign(this.jwsSignerFactory.createJWSSigner(jwk));
-		return jwt.serialize();
+		return jwt;
 	}
 
 	@Override

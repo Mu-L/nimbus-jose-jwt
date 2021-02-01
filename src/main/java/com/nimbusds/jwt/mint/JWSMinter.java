@@ -2,8 +2,10 @@ package com.nimbusds.jwt.mint;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 
 /**
  * Interface for minting and serializing {@link com.nimbusds.jwt.SignedJWT signed}
@@ -18,12 +20,13 @@ import com.nimbusds.jwt.JWTClaimsSet;
  */
 public interface JWSMinter<C extends SecurityContext> {
 	/**
-	 * Signs and serializes a new JWT using the provided {@link JWSHeader}
+	 * Signs a new JWT using the provided {@link JWSHeader}
 	 * and {@link JWTClaimsSet}.
 	 *
 	 * Derives the signing key from the {@link JWSHeader} as well as any
 	 * application-specific {@link SecurityContext context}. Once discovered,
-	 * adds the {@code kid} header accordingly.
+	 * adds any headers related to the discovered signing key, including
+	 * {@code kid}, {@code x5u}, {@code x5c}, and {@code x5t#256}.
 	 *
 	 * All other headers and claims remain as-is. This method
 	 * expects the caller to add the {@code typ}, {@code alg},
@@ -32,10 +35,11 @@ public interface JWSMinter<C extends SecurityContext> {
 	 * @param header the {@link JWSHeader} to use, less the {@code kid}, which
 	 *               this method will derive
 	 * @param claims the {@link JWTClaimsSet} to use
-	 * @param context a {@link SecurityContext}
-	 * @return a signed and serialized JWT
+	 * @param context a {@link SecurityContext} for communicating application-specific
+	 * key information
+	 * @return a signed JWT
 	 * @throws JOSEException if the instance is improperly configured,
-	 * or if no appropriate JWK can be found
+	 * if no appropriate JWK can be found, or if signing fails
 	 */
-	String mint(JWSHeader header, JWTClaimsSet claims, C context) throws JOSEException;
+	SignedJWT mint(JWSHeader header, JWTClaimsSet claims, C context) throws JOSEException;
 }

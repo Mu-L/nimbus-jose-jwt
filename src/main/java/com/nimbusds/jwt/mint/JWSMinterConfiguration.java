@@ -1,5 +1,6 @@
 package com.nimbusds.jwt.mint;
 
+import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jose.produce.JWSSignerFactory;
