@@ -26,7 +26,7 @@ import java.util.*;
 
 import net.jcip.annotations.Immutable;
 
-import com.nimbusds.jose.util.DateUtils;
+import com.nimbusds.jwt.util.DateUtils;
 import com.nimbusds.jose.util.JSONArrayUtils;
 import com.nimbusds.jose.util.JSONObjectUtils;
 
@@ -34,7 +34,7 @@ import com.nimbusds.jose.util.JSONObjectUtils;
 /**
  * JSON Web Token (JWT) claims set. This class is immutable.
  *
- * <p>Supports all {@link #getRegisteredNames()}  registered claims} of the JWT
+ * <p>Supports all {@link #getRegisteredNames()} registered claims} of the JWT
  * specification:
  *
  * <ul>
@@ -72,7 +72,7 @@ import com.nimbusds.jose.util.JSONObjectUtils;
  *
  * @author Vladimir Dzhuvinov
  * @author Justin Richer
- * @version 2019-12-21
+ * @version 2021-02-01
  */
 @Immutable
 public final class JWTClaimsSet implements Serializable {
@@ -403,7 +403,7 @@ public final class JWTClaimsSet implements Serializable {
 		} catch (ParseException e) {
 			return Collections.emptyList();
 		}
-		return aud != null ? Collections.unmodifiableList(aud) : Collections.<String>emptyList();
+		return aud != null ? aud : Collections.<String>emptyList();
 	}
 
 
@@ -910,47 +910,41 @@ public final class JWTClaimsSet implements Serializable {
 
 		// Parse registered + custom params
 		for (final String name: json.keySet()) {
-
-			if (name.equals(ISSUER_CLAIM)) {
-
-				builder.issuer(JSONObjectUtils.getString(json, ISSUER_CLAIM));
-
-			} else if (name.equals(SUBJECT_CLAIM)) {
-
-				builder.subject(JSONObjectUtils.getString(json, SUBJECT_CLAIM));
-
-			} else if (name.equals(AUDIENCE_CLAIM)) {
-
-				Object audValue = json.get(AUDIENCE_CLAIM);
-
-				if (audValue instanceof String) {
-					List<String> singleAud = new ArrayList<>();
-					singleAud.add(JSONObjectUtils.getString(json, AUDIENCE_CLAIM));
-					builder.audience(singleAud);
-				} else if (audValue instanceof List) {
-					builder.audience(JSONObjectUtils.getStringList(json, AUDIENCE_CLAIM));
-				} else if (audValue == null) {
-					builder.audience((String)null);
-				}
-
-			} else if (name.equals(EXPIRATION_TIME_CLAIM)) {
-
-				builder.expirationTime(new Date(JSONObjectUtils.getLong(json, EXPIRATION_TIME_CLAIM) * 1000));
-
-			} else if (name.equals(NOT_BEFORE_CLAIM)) {
-
-				builder.notBeforeTime(new Date(JSONObjectUtils.getLong(json, NOT_BEFORE_CLAIM) * 1000));
-
-			} else if (name.equals(ISSUED_AT_CLAIM)) {
-
-				builder.issueTime(new Date(JSONObjectUtils.getLong(json, ISSUED_AT_CLAIM) * 1000));
-
-			} else if (name.equals(JWT_ID_CLAIM)) {
-
-				builder.jwtID(JSONObjectUtils.getString(json, JWT_ID_CLAIM));
-
-			} else {
-				builder.claim(name, json.get(name));
+			
+			switch (name) {
+				case ISSUER_CLAIM:
+					builder.issuer(JSONObjectUtils.getString(json, ISSUER_CLAIM));
+					break;
+				case SUBJECT_CLAIM:
+					builder.subject(JSONObjectUtils.getString(json, SUBJECT_CLAIM));
+					break;
+				case AUDIENCE_CLAIM:
+					Object audValue = json.get(AUDIENCE_CLAIM);
+					if (audValue instanceof String) {
+						List<String> singleAud = new ArrayList<>();
+						singleAud.add(JSONObjectUtils.getString(json, AUDIENCE_CLAIM));
+						builder.audience(singleAud);
+					} else if (audValue instanceof List) {
+						builder.audience(JSONObjectUtils.getStringList(json, AUDIENCE_CLAIM));
+					} else if (audValue == null) {
+						builder.audience((String) null);
+					}
+					break;
+				case EXPIRATION_TIME_CLAIM:
+					builder.expirationTime(new Date(JSONObjectUtils.getLong(json, EXPIRATION_TIME_CLAIM) * 1000));
+					break;
+				case NOT_BEFORE_CLAIM:
+					builder.notBeforeTime(new Date(JSONObjectUtils.getLong(json, NOT_BEFORE_CLAIM) * 1000));
+					break;
+				case ISSUED_AT_CLAIM:
+					builder.issueTime(new Date(JSONObjectUtils.getLong(json, ISSUED_AT_CLAIM) * 1000));
+					break;
+				case JWT_ID_CLAIM:
+					builder.jwtID(JSONObjectUtils.getString(json, JWT_ID_CLAIM));
+					break;
+				default:
+					builder.claim(name, json.get(name));
+					break;
 			}
 		}
 
