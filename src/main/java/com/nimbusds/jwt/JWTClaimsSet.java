@@ -72,7 +72,7 @@ import com.nimbusds.jose.util.JSONObjectUtils;
  *
  * @author Vladimir Dzhuvinov
  * @author Justin Richer
- * @version 2021-02-01
+ * @version 2021-02-02
  */
 @Immutable
 public final class JWTClaimsSet implements Serializable {
@@ -804,9 +804,9 @@ public final class JWTClaimsSet implements Serializable {
 
 
 	/**
-	 * Returns the JSON object representation of the claims set. The claims
-	 * are serialised according to their insertion order. Claims with
-	 * {@code null} values are not output.
+	 * Returns the JSON object representation of this claims set. The
+	 * claims are serialised according to their insertion order. Claims
+	 * with {@code null} values are not output.
 	 *
 	 * @return The JSON object representation.
 	 */
@@ -817,8 +817,8 @@ public final class JWTClaimsSet implements Serializable {
 	
 	
 	/**
-	 * Returns the JSON object representation of the claims set. The claims
-	 * are serialised according to their insertion order.
+	 * Returns the JSON object representation of this claims set. The
+	 * claims are serialised according to their insertion order.
 	 *
 	 * @param includeClaimsWithNullValues If {@code true} claims with
 	 *                                    {@code null} values will also be
@@ -864,19 +864,38 @@ public final class JWTClaimsSet implements Serializable {
 		
 		return o;
 	}
-
-
+	
+	
+	/**
+	 * Returns a JSON object string representation of this claims set. The
+	 * claims are serialised according to their insertion order. Claims
+	 * with {@code null} values are not output.
+	 *
+	 * @return The JSON object string representation.
+	 */
 	@Override
 	public String toString() {
 
 		return JSONObjectUtils.toJSONString(toJSONObject());
 	}
-
+	
+	
+	/**
+	 * Returns a JSON object string representation of this claims set. The
+	 * claims are serialised according to their insertion order.
+	 *
+	 * @param includeClaimsWithNullValues If {@code true} claims with
+	 *                                    {@code null} values will also be
+	 *                                    output.
+	 *
+	 * @return The JSON object string representation.
+	 */
 	public String toString(final boolean includeClaimsWithNullValues) {
 
 		return JSONObjectUtils.toJSONString(toJSONObject(includeClaimsWithNullValues));
 	}
 
+	
 	/**
 	 * Returns a transformation of this JWT claims set.
 	 *
