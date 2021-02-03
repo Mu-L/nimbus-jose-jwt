@@ -1181,3 +1181,5 @@ version 8.20.2 (2021-02-03)
       getRefreshTime (iss #384).
     * Prevent instantiation of unneeded new SecureRandom in
       DefaultJWSVerifierFactory to save resources (iss #385).
+    * Makes DefaultJWKSetCache thread-safe (iss #392).
+    * Adds new JWKSetWithTimestamp class, for use by DefaultJWKSetCache.

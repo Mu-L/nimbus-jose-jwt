@@ -23,7 +23,9 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 
 
 public class DefaultJWKSetCacheTest extends TestCase {
@@ -167,5 +169,40 @@ public class DefaultJWKSetCacheTest extends TestCase {
 		DefaultJWKSetCache cache = new DefaultJWKSetCache();
 		assertEquals(DefaultJWKSetCache.DEFAULT_LIFESPAN_MINUTES *  60, cache.getLifespan(TimeUnit.SECONDS));
 		assertEquals(DefaultJWKSetCache.DEFAULT_REFRESH_TIME_MINUTES *  60, cache.getRefreshTime(TimeUnit.SECONDS));
+	}
+	
+	
+	// https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/392/defaultjwksetcache-thread-safety
+	public void testConcurrentAccess() throws InterruptedException, JOSEException {
+	
+		final DefaultJWKSetCache cache = new DefaultJWKSetCache();
+		
+		final JWKSet jwkSetOne = new JWKSet(new OctetSequenceKeyGenerator(256).keyID("1").generate());
+		JWKSet jwkSetTwo = new JWKSet(new OctetSequenceKeyGenerator(256).keyID("2").generate());
+		
+		Thread first = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				cache.put(jwkSetOne);
+			}
+		});
+		
+		Thread second = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (cache.get() == null) {
+					JWKSet jwkSet = cache.get();
+					if (jwkSet != null) {
+						break;
+					}
+				}
+			}
+		});
+		
+		first.start();
+		second.start();
+		
+		first.join();
+		second.join();
 	}
 }

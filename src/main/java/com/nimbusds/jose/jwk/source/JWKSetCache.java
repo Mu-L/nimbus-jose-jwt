@@ -22,7 +22,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 
 
 /**
- * JSON Web Key (JWK) set cache.
+ * JSON Web Key (JWK) set cache. Implementations should be thread-safe.
  *
  * @author Vladimir Dzhuvinov
  * @author Sarvesh Sharma
