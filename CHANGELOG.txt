@@ -1177,3 +1177,5 @@ version 8.20.1 (2020-09-14)
 version 8.20.2 (2021-02-03)
     * Adds quick check in ECDSAVerifier to reject ESxxx signatures which length
       doesn't match the expected for the ESxxx algorithm (iss #399).
+    * Fixes time unit conversion in DefaultJWKSetCache.getLifespan and
+      getRefreshTime (iss #384).
