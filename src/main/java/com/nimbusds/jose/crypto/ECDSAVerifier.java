@@ -24,6 +24,8 @@ import java.security.SignatureException;
 import java.security.interfaces.ECPublicKey;
 import java.util.Set;
 
+import net.jcip.annotations.ThreadSafe;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.impl.AlgorithmSupportMessage;
 import com.nimbusds.jose.crypto.impl.CriticalHeaderParamsDeferral;
@@ -33,7 +35,6 @@ import com.nimbusds.jose.crypto.utils.ECChecks;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64URL;
-import net.jcip.annotations.ThreadSafe;
 
 
 /**
@@ -177,6 +178,12 @@ public class ECDSAVerifier extends ECDSAProvider implements JWSVerifier, Critica
 		final byte[] jwsSignature = signature.decode();
 
 		final byte[] derSignature;
+		
+		if (ECDSA.getSignatureByteArrayLength(header.getAlgorithm()) != jwsSignature.length) {
+			// Quick format check, concatenation of R+S (may be padded
+			// to match lengths) in ESxxx signatures has fixed length
+			return false;
+		}
 
 		try {
 			derSignature = ECDSA.transcodeSignatureToDER(jwsSignature);
