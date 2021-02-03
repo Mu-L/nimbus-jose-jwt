@@ -42,7 +42,7 @@ import net.jcip.annotations.ThreadSafe;
  * {@link com.nimbusds.jose.crypto} package.
  *
  * @author Vladimir Dzhuvinov
- * @version 2015-11-16
+ * @version 2020-10-30
  */
 @ThreadSafe
 public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
@@ -124,8 +124,7 @@ public class DefaultJWSVerifierFactory implements JWSVerifierFactory {
 			throw new JOSEException("Unsupported JWS algorithm: " + header.getAlgorithm());
 		}
 
-		// Apply JCA context
-		verifier.getJCAContext().setSecureRandom(jcaContext.getSecureRandom());
+		// Apply JCA context, SecureRandom expensive and not needed for verification (iss #385)
 		verifier.getJCAContext().setProvider(jcaContext.getProvider());
 
 		return verifier;
