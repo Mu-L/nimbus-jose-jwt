@@ -1224,7 +1224,6 @@ version 9.2 (2020-12-14)
 version 9.3 (2020-12-27)
     * Makes DefaultJWKSetCache thread-safe (iss #392).
     * Adds new JWKSetWithTimestamp class, for use by DefaultJWKSetCache.
-<<<<<<< HEAD
     * Bumps minimal optional BouncyCastle dependency to 1.68.
 
 version 9.4 (2020-12-28)
