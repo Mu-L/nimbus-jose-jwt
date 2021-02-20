@@ -21,13 +21,16 @@ package com.nimbusds.jose.jca;
 import java.security.Provider;
 import java.security.Security;
 
+import org.junit.Test;
+
+import com.nimbusds.jose.crypto.bc.BouncyCastleFIPSProviderSingleton;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
-import junit.framework.TestCase;
 
 
-public class DumpSupportedJCAAlgs extends TestCase {
+public class DumpSupportedJCAAlgs {
 	
 
+	@Test
 	public void testDumpAlgs() {
 
 		for (Provider provider: Security.getProviders()) {
@@ -37,9 +40,21 @@ public class DumpSupportedJCAAlgs extends TestCase {
 		}
 	}
 
-	public void testDumpBC() {
+	@Test
+	public void testDumpBouncyCastle() {
 
 		Provider provider = BouncyCastleProviderSingleton.getInstance();
+
+		for (String key: provider.stringPropertyNames())
+		System.out.println("\t" + key + "\t" + provider.getProperty(key));
+	}
+	
+	// To run the test without class loading clashes disable the optional
+	// plain BC provider in pom.xml
+//	@Test
+	public void testDumpBouncyCastleFIPS() {
+
+		Provider provider = BouncyCastleFIPSProviderSingleton.getInstance();
 
 		for (String key: provider.stringPropertyNames())
 		System.out.println("\t" + key + "\t" + provider.getProperty(key));

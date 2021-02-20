@@ -69,9 +69,12 @@ The library can handle all standard JOSE algorithms:
 
 The Nimbus JOSE+JWT library requires Java 7+ and has minimal dependencies.
 
-* JSON Smart for highly efficient parsing and serialisation of JSON.
+* JSON Smart for efficient parsing and serialisation of JSON.
 * JCIP for concurrency annotations.
-* [optional] BouncyCastle as an alternative JCA provider.
+* [optional] BouncyCastle as an alternative JCA provider. Must not be imported
+  together with the BouncyCastle FIPS provider!
+* [optional] BouncyCastle FIPS as a FIPS 140-2, Level 1 compliant JCA provider. 
+  Must not be imported together with the plain BouncyCastle provider!
 * [optional] Tink for EdDSA with Ed25519 and ECDH with X25519.
 
 

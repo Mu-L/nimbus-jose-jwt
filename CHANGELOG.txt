@@ -1184,3 +1184,16 @@ version 8.20.2 (2021-02-03)
     * Makes DefaultJWKSetCache thread-safe (iss #392).
     * Makes DefaultJWKSetCache.put NPE safe in concurrent scenarios (iss #392).
     * Adds new JWKSetWithTimestamp class, for use by DefaultJWKSetCache.
+
+version 8.21 (2021-02-20)
+    * Adds optional org.bouncycastle:bc-fips:[1.0.2,2.0.0) dependency as a FIPS
+      140-2, Level 1 compliant JCA provider.
+    * Updates RSASSASigner and RSASSAVerifier to support PS256, PS384 and PS512
+      with the BouncyCastle FIPS JCA provider using the alternative JCA
+      "SHA256withRSAandMGF1", "SHA384withRSAandMGF1" and "SHA512withRSAandMGF1"
+      names (iss #403).
+    * New BouncyCastleFIPSProviderSingleton class.
+    * Updates JCASupport.isSupported(JWSAlgorithm, Provider) for the
+      alternative JCA "SHA256withRSAandMGF1", "SHA384withRSAandMGF1" and
+      "SHA512withRSAandMGF1" names to "RSASSA-PSS".
+    * Bumps to org.bouncycastle:bcprov-jdk15on:1.68
