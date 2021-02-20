@@ -22,6 +22,7 @@ import java.security.Provider;
 import java.security.Security;
 
 import org.junit.Test;
+import sun.security.rsa.SunRsaSign;
 
 import com.nimbusds.jose.crypto.bc.BouncyCastleFIPSProviderSingleton;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
@@ -34,10 +35,23 @@ public class DumpSupportedJCAAlgs {
 	public void testDumpAlgs() {
 
 		for (Provider provider: Security.getProviders()) {
-			System.out.println(provider.getName());
+			System.out.println("Name: " + provider.getName());
+			System.out.println("Info: " + provider.getInfo());
+			System.out.println("Version: " + provider.getVersion());
 			for (String key: provider.stringPropertyNames())
 				System.out.println("\t" + key + "\t" + provider.getProperty(key));
 		}
+	}
+
+	@Test
+	public void testDumpSunRsaSign() {
+		
+		Provider provider = new SunRsaSign();
+		System.out.println("Name: " + provider.getName());
+		System.out.println("Info: " + provider.getInfo());
+		System.out.println("Version: " + provider.getVersion());
+		for (String key: provider.stringPropertyNames())
+			System.out.println("\t" + key + "\t" + provider.getProperty(key));
 	}
 
 	@Test
@@ -46,7 +60,7 @@ public class DumpSupportedJCAAlgs {
 		Provider provider = BouncyCastleProviderSingleton.getInstance();
 
 		for (String key: provider.stringPropertyNames())
-		System.out.println("\t" + key + "\t" + provider.getProperty(key));
+			System.out.println("\t" + key + "\t" + provider.getProperty(key));
 	}
 	
 	// To run the test without class loading clashes disable the optional
@@ -57,6 +71,6 @@ public class DumpSupportedJCAAlgs {
 		Provider provider = BouncyCastleFIPSProviderSingleton.getInstance();
 
 		for (String key: provider.stringPropertyNames())
-		System.out.println("\t" + key + "\t" + provider.getProperty(key));
+			System.out.println("\t" + key + "\t" + provider.getProperty(key));
 	}
 }
