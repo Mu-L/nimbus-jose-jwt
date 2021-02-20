@@ -1224,6 +1224,7 @@ version 9.2 (2020-12-14)
 version 9.3 (2020-12-27)
     * Makes DefaultJWKSetCache thread-safe (iss #392).
     * Adds new JWKSetWithTimestamp class, for use by DefaultJWKSetCache.
+<<<<<<< HEAD
     * Bumps minimal optional BouncyCastle dependency to 1.68.
 
 version 9.4 (2020-12-28)
@@ -1254,3 +1255,16 @@ version 9.5 (2021-02-01)
     * Adds JWKSet.toString(boolean) to return a JSON string representation of
       the JWK set with boolean parameter to control inclusion of non-public
       keys.
+
+version 9.6 (2021-02-20)
+    * Adds optional org.bouncycastle:bc-fips:[1.0.2,2.0.0) dependency as a FIPS
+      140-2, Level 1 compliant JCA provider.
+    * Updates RSASSASigner and RSASSAVerifier to support PS256, PS384 and PS512
+      with the BouncyCastle FIPS JCA provider using the alternative JCA
+      "SHA256withRSAandMGF1", "SHA384withRSAandMGF1" and "SHA512withRSAandMGF1"
+      names (iss #403).
+    * New BouncyCastleFIPSProviderSingleton class.
+    * Updates JCASupport.isSupported(JWSAlgorithm, Provider) for the
+      alternative JCA "SHA256withRSAandMGF1", "SHA384withRSAandMGF1" and
+      "SHA512withRSAandMGF1" names to "RSASSA-PSS".
+

@@ -27,6 +27,20 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  * needs a BouncyCastle JCA provider should use the {@link #getInstance()}
  * method to obtain an instance.
  *
+ * <p>Requires the following optional dependency:
+ *
+ * <pre>
+ * &lt;dependency&gt;
+ *     &lt;groupId&gt;org.bouncycastle&lt;/groupId&gt;
+ *     &lt;artifactId&gt;bcprov-jdk15on&lt;/artifactId&gt;
+ *     &lt;version&gt;[1.68,2.0.0)&lt;/version&gt;
+ *     &lt;optional&gt;true&lt;/optional&gt;
+ * &lt;/dependency&gt;
+ * </pre>
+ *
+ * <p><strong>Important:</strong> The BouncyCastle FIPS JCA provider dependency
+ * must not be present to prevent class conflicts!
+ *
  * @author Vladimir Dzhuvinov
  */
 public final class BouncyCastleProviderSingleton {

@@ -29,9 +29,12 @@ import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.*;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.bc.BouncyCastleFIPSProviderSingleton;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.crypto.opts.UserAuthenticationRequired;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -45,9 +48,9 @@ import com.nimbusds.jwt.util.DateUtils;
  * from the JWS spec.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-12-27
+ * @version 2021-02-20
  */
-public class RSASSATest extends TestCase {
+public class RSASSATest {
 
 
 	private final static byte[] MOD = {
@@ -181,6 +184,7 @@ public class RSASSATest extends TestCase {
 		"p0igcN_IoypGlUPQGe77Rw");
 
 
+	@Test
 	public void testSupportedAlgorithms() {
 
 		RSASSASigner signer = new RSASSASigner(PRIVATE_KEY);
@@ -203,8 +207,9 @@ public class RSASSATest extends TestCase {
 		assertTrue(verifier.supportedJWSAlgorithms().contains(JWSAlgorithm.PS512));
 		assertEquals(6, verifier.supportedJWSAlgorithms().size());
 	}
-
-
+	
+	
+	@Test
 	public void testSignAndVerify()
 		throws Exception {
 
@@ -234,8 +239,9 @@ public class RSASSATest extends TestCase {
 
 		assertEquals("State check", JWSObject.State.VERIFIED, jwsObject.getState());
 	}
-
-
+	
+	
+	@Test
 	public void testSignAndVerifyWithJWKConstructors()
 		throws Exception {
 
@@ -266,8 +272,9 @@ public class RSASSATest extends TestCase {
 
 		assertEquals("State check", JWSObject.State.VERIFIED, jwsObject.getState());
 	}
-
-
+	
+	
+	@Test
 	public void testSignWithReadyVector()
 		throws Exception {
 
@@ -279,8 +286,9 @@ public class RSASSATest extends TestCase {
 
 		assertEquals("Signature check", B64_SIG, b64sigComputed);
 	}
-
-
+	
+	
+	@Test
 	public void testVerifyWithReadyVector()
 		throws Exception {
 
@@ -292,8 +300,9 @@ public class RSASSATest extends TestCase {
 
 		assertTrue("Signature check", verified);
 	}
-
-
+	
+	
+	@Test
 	public void testParseAndVerify()
 		throws Exception {
 
@@ -313,8 +322,9 @@ public class RSASSATest extends TestCase {
 
 		assertEquals("State check", JWSObject.State.VERIFIED, jwsObject.getState());
 	}
-
-
+	
+	
+	@Test
 	public void testVerifyTruncatedSignature()
 		throws Exception {
 
@@ -332,8 +342,9 @@ public class RSASSATest extends TestCase {
 
 		assertFalse("Signature check", verified);
 	}
-
-
+	
+	
+	@Test
 	public void testVerifyAppendedSignature()
 		throws Exception {
 
@@ -357,8 +368,9 @@ public class RSASSATest extends TestCase {
 		int L = s.length();
 		return (L < 2) ? s : s.substring(0, 1) + s.substring(L-1, L) + transpose(s.substring(1, L-1));
 	}
-
-
+	
+	
+	@Test
 	public void testVerifyBadSignatureOfExpectedLength()
 		throws Exception {
 
@@ -376,8 +388,9 @@ public class RSASSATest extends TestCase {
 
 		assertFalse("Signature check", verified);
 	}
-
-
+	
+	
+	@Test
 	public void testRSASSASignAndVerifyCycle()
 		throws Exception {
 
@@ -399,8 +412,9 @@ public class RSASSATest extends TestCase {
 		testSignAndVerifyCycle(JWSAlgorithm.RS384, signer, verifier);
 		testSignAndVerifyCycle(JWSAlgorithm.RS512, signer, verifier);
 	}
-
-
+	
+	
+	@Test
 	public void testPSSSignAndVerifyCycle()
 		throws Exception {
 
@@ -431,6 +445,36 @@ public class RSASSATest extends TestCase {
 			testSignAndVerifyCycle(JWSAlgorithm.PS512, signer, verifier);
 		}
 	}
+	
+	
+	// To run the test without class loading clashes disable the optional
+	// plain BC provider in pom.xml
+//	@Test
+	public void testPSSSignAndVerifyCycle_withBouncyCastleFIPS()
+		throws Exception {
+
+		KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+		kpg.initialize(2048);
+
+		KeyPair kp = kpg.genKeyPair();
+		RSAPublicKey publicKey = (RSAPublicKey)kp.getPublic();
+		RSAPrivateKey privateKey = (RSAPrivateKey)kp.getPrivate();
+
+		RSASSASigner signer = new RSASSASigner(privateKey);
+		
+		signer.getJCAContext().setProvider(BouncyCastleFIPSProviderSingleton.getInstance());
+	
+		assertNotNull("Private key check", signer.getPrivateKey());
+
+		RSASSAVerifier verifier = new RSASSAVerifier(publicKey);
+		verifier.getJCAContext().setProvider(BouncyCastleFIPSProviderSingleton.getInstance());
+
+		assertNotNull("Public key check", verifier.getPublicKey());
+
+		testSignAndVerifyCycle(JWSAlgorithm.PS256, signer, verifier);
+		testSignAndVerifyCycle(JWSAlgorithm.PS384, signer, verifier);
+		testSignAndVerifyCycle(JWSAlgorithm.PS512, signer, verifier);
+	}
 
 
 	private void testSignAndVerifyCycle(final JWSAlgorithm alg, final JWSSigner signer, final JWSVerifier verifier)
@@ -459,8 +503,9 @@ public class RSASSATest extends TestCase {
 
 		assertEquals("State check", JWSObject.State.VERIFIED, jwsObject.getState());
 	}
-
-
+	
+	
+	@Test
 	public void testExample()
 		throws Exception {
 
@@ -501,8 +546,9 @@ public class RSASSATest extends TestCase {
 
 		assertEquals("In RSA we trust!", jwsObject.getPayload().toString());
 	}
-
-
+	
+	
+	@Test
 	public void testCompareSignatureFromRawKeyAndJWK()
 		throws Exception {
 
@@ -538,8 +584,9 @@ public class RSASSATest extends TestCase {
 		assertTrue(jwsObject1.verify(verifier));
 		assertTrue(jwsObject2.verify(verifier));
 	}
-
-
+	
+	
+	@Test
 	public void testRS256CookbookExample()
 		throws Exception {
 
@@ -617,8 +664,9 @@ public class RSASSATest extends TestCase {
 			"b24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcm" +
 			"UgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4", jwsObject.getPayload().toBase64URL().toString());
 	}
-
-
+	
+	
+	@Test
 	public void testPS384CookbookExample()
 		throws Exception {
 
@@ -697,8 +745,9 @@ public class RSASSATest extends TestCase {
 			"b24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcm" +
 			"UgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4", jwsObject.getPayload().toBase64URL().toString());
 	}
-
-
+	
+	
+	@Test
 	public void testCritHeaderParamsDefer()
 		throws Exception {
 
@@ -726,8 +775,9 @@ public class RSASSATest extends TestCase {
 
 		assertEquals("State check", JWSObject.State.VERIFIED, jwsObject.getState());
 	}
-
-
+	
+	
+	@Test
 	public void testCritHeaderParamReject()
 		throws Exception {
 
@@ -750,8 +800,9 @@ public class RSASSATest extends TestCase {
 
 		assertEquals("State check", JWSObject.State.SIGNED, jwsObject.getState());
 	}
-
-
+	
+	
+	@Test
 	public void testRejectPrivateKeyWithNonRSAAlg() {
 
 		try {
@@ -780,6 +831,7 @@ public class RSASSATest extends TestCase {
 	}
 	
 	
+	@Test
 	public void testRejectWeakKey()
 		throws JOSEException {
 		
@@ -803,6 +855,7 @@ public class RSASSATest extends TestCase {
 	}
 	
 	
+	@Test
 	public void testAllowWeakKey_JWK()
 		throws JOSEException {
 		
@@ -819,6 +872,7 @@ public class RSASSATest extends TestCase {
 	}
 	
 	
+	@Test
 	public void testAllowWeakKey_RSAPrivateKey()
 		throws JOSEException {
 		

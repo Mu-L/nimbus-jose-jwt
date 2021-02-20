@@ -21,20 +21,26 @@ package com.nimbusds.jose.jca;
 import java.security.Provider;
 import java.security.Security;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.crypto.bc.BouncyCastleFIPSProviderSingleton;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
-import junit.framework.TestCase;
 
 
 /**
  * JCA provider support tests.
  */
-public class JCASupportTest extends TestCase {
+public class JCASupportTest {
 
 
+	@Test
 	public void testUnlimitedCrypto() {
 
 		String msg = "Unlimited JCE cryptography strength not supported, go to http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html";
@@ -43,6 +49,7 @@ public class JCASupportTest extends TestCase {
 	}
 
 
+	@Test
 	public void testJWSSupport_Default_Java_7() {
 
 		if (! System.getProperty("java.version").startsWith("1.7")) {
@@ -62,8 +69,9 @@ public class JCASupportTest extends TestCase {
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.ES384));
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.ES512));
 	}
-
-
+	
+	
+	@Test
 	public void testJWSSupport_SUN_Java_7() {
 
 		if (! System.getProperty("java.version").startsWith("1.7")) {
@@ -87,8 +95,9 @@ public class JCASupportTest extends TestCase {
 			assertTrue(JCASupport.isSupported(JWSAlgorithm.ES512, Security.getProvider("SunEC")));
 		}
 	}
-
-
+	
+	
+	@Test
 	public void testJWSSupport_Default_Java_8() {
 
 		if (! System.getProperty("java.version").startsWith("1.8")) {
@@ -101,15 +110,16 @@ public class JCASupportTest extends TestCase {
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.RS256));
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.RS384));
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.RS512));
-		assertFalse(JCASupport.isSupported(JWSAlgorithm.PS512));
-		assertFalse(JCASupport.isSupported(JWSAlgorithm.PS256));
-		assertFalse(JCASupport.isSupported(JWSAlgorithm.PS384));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.PS512));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.PS256));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.PS384));
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.ES256));
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.ES384));
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.ES512));
 	}
-
-
+	
+	
+	@Test
 	public void testJWSSupport_SUN_Java_8() {
 
 		if (! System.getProperty("java.version").startsWith("1.8")) {
@@ -122,9 +132,9 @@ public class JCASupportTest extends TestCase {
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.RS256, Security.getProvider("SunRsaSign")));
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.RS384, Security.getProvider("SunRsaSign")));
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.RS512, Security.getProvider("SunRsaSign")));
-		assertFalse(JCASupport.isSupported(JWSAlgorithm.PS512, Security.getProvider("SunRsaSign")));
-		assertFalse(JCASupport.isSupported(JWSAlgorithm.PS256, Security.getProvider("SunRsaSign")));
-		assertFalse(JCASupport.isSupported(JWSAlgorithm.PS384, Security.getProvider("SunRsaSign")));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.PS512, Security.getProvider("SunRsaSign")));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.PS256, Security.getProvider("SunRsaSign")));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.PS384, Security.getProvider("SunRsaSign")));
 
 		if (Security.getProvider("SunEC") != null) {
 			// Not supported on OpenJDK
@@ -133,8 +143,9 @@ public class JCASupportTest extends TestCase {
 			assertTrue(JCASupport.isSupported(JWSAlgorithm.ES512, Security.getProvider("SunEC")));
 		}
 	}
-
-
+	
+	
+	@Test
 	public void testJWSSupport_BC() {
 
 		Provider bc = BouncyCastleProviderSingleton.getInstance();
@@ -152,8 +163,31 @@ public class JCASupportTest extends TestCase {
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.ES384, bc));
 		assertTrue(JCASupport.isSupported(JWSAlgorithm.ES512, bc));
 	}
+	
+	
+	// To run the test without class loading clashes disable the optional
+	// plain BC provider in pom.xml
+//	@Test
+	public void testJWSSupport_BC_FIPS() {
 
+		Provider bc = BouncyCastleFIPSProviderSingleton.getInstance();
 
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.HS256, bc));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.HS384, bc));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.HS512, bc));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.RS256, bc));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.RS384, bc));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.RS512, bc));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.PS256, bc));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.PS384, bc));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.PS512, bc));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.ES256, bc));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.ES384, bc));
+		assertTrue(JCASupport.isSupported(JWSAlgorithm.ES512, bc));
+	}
+	
+	
+	@Test
 	public void testJWESupport_Default_Java_7() {
 
 		if (! System.getProperty("java.version").startsWith("1.7")) {
@@ -183,8 +217,9 @@ public class JCASupportTest extends TestCase {
 
 		assertTrue(JCASupport.isSupported(JWEAlgorithm.DIR));
 	}
-
-
+	
+	
+	@Test
 	public void testJWESupport_SUN_Java_7() {
 
 		if (! System.getProperty("java.version").startsWith("1.7")) {
@@ -217,8 +252,9 @@ public class JCASupportTest extends TestCase {
 
 		assertTrue(JCASupport.isSupported(JWEAlgorithm.DIR, Security.getProvider("SUN")));
 	}
-
-
+	
+	
+	@Test
 	public void testJWESupport_BC() {
 
 		Provider bc = BouncyCastleProviderSingleton.getInstance();
@@ -240,8 +276,9 @@ public class JCASupportTest extends TestCase {
 		assertTrue(JCASupport.isSupported(JWEAlgorithm.A192GCMKW, bc));
 		assertTrue(JCASupport.isSupported(JWEAlgorithm.A256GCMKW, bc));
 	}
-
-
+	
+	
+	@Test
 	public void testEncryptionMethodSupport_Default_Java_7() {
 
 		if (! System.getProperty("java.version").startsWith("1.7")) {
@@ -256,8 +293,9 @@ public class JCASupportTest extends TestCase {
 		assertFalse(JCASupport.isSupported(EncryptionMethod.A192GCM));
 		assertFalse(JCASupport.isSupported(EncryptionMethod.A256GCM));
 	}
-
-
+	
+	
+	@Test
 	public void testEncryptionMethodSupport_SUN_Java_7() {
 
 		if (! System.getProperty("java.version").startsWith("1.7")) {
@@ -272,8 +310,9 @@ public class JCASupportTest extends TestCase {
 		assertFalse(JCASupport.isSupported(EncryptionMethod.A192GCM, Security.getProvider("SunJCE")));
 		assertFalse(JCASupport.isSupported(EncryptionMethod.A256GCM, Security.getProvider("SunJCE")));
 	}
-
-
+	
+	
+	@Test
 	public void testEncryptionMethodSupport_BC() {
 
 		Provider bc = BouncyCastleProviderSingleton.getInstance();
@@ -288,12 +327,14 @@ public class JCASupportTest extends TestCase {
 	}
 	
 	
+	@Test
 	public void testAlgNoneAlwaysSupported() {
 		
 		assertTrue(JCASupport.isSupported(new JWSAlgorithm("none")));
 	}
 	
 	
+	@Test
 	public void testJOSEAlgorithmSupport_Default_Java_8() {
 		
 		if (! System.getProperty("java.version").startsWith("1.8")) {
@@ -307,9 +348,9 @@ public class JCASupportTest extends TestCase {
 		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.RS256));
 		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.RS384));
 		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.RS512));
-		assertFalse(JCASupport.isSupported((Algorithm) JWSAlgorithm.PS512));
-		assertFalse(JCASupport.isSupported((Algorithm) JWSAlgorithm.PS256));
-		assertFalse(JCASupport.isSupported((Algorithm) JWSAlgorithm.PS384));
+		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.PS512));
+		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.PS256));
+		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.PS384));
 		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.ES256));
 		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.ES384));
 		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.ES512));
@@ -348,6 +389,7 @@ public class JCASupportTest extends TestCase {
 	}
 	
 	
+	@Test
 	public void testJOSEAlgorithmSupport_SUN_Java8() {
 		
 		if (! System.getProperty("java.version").startsWith("1.8")) {
@@ -361,9 +403,9 @@ public class JCASupportTest extends TestCase {
 		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.RS256, Security.getProvider("SunRsaSign")));
 		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.RS384, Security.getProvider("SunRsaSign")));
 		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.RS512, Security.getProvider("SunRsaSign")));
-		assertFalse(JCASupport.isSupported((Algorithm) JWSAlgorithm.PS512, Security.getProvider("SunRsaSign")));
-		assertFalse(JCASupport.isSupported((Algorithm) JWSAlgorithm.PS256, Security.getProvider("SunRsaSign")));
-		assertFalse(JCASupport.isSupported((Algorithm) JWSAlgorithm.PS384, Security.getProvider("SunRsaSign")));
+		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.PS512, Security.getProvider("SunRsaSign")));
+		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.PS256, Security.getProvider("SunRsaSign")));
+		assertTrue(JCASupport.isSupported((Algorithm) JWSAlgorithm.PS384, Security.getProvider("SunRsaSign")));
 		
 		if (Security.getProvider("SunEC") != null) {
 			// Not supported on OpenJDK

@@ -62,7 +62,13 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>[1.68,)</version>
+            <version>[1.68,2.0.0)</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bc-fips</artifactId>
+            <version>[1.0.2,2.0.0)</version>
             <optional>true</optional>
         </dependency>
         <dependency>

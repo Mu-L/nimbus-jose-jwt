@@ -161,6 +161,7 @@ public final class JCASupport {
 
 		if (JWSAlgorithm.Family.RSA.contains(alg)) {
 			String jcaName;
+			String jcaNameAlt = null;
 			if (alg.equals(JWSAlgorithm.RS256)) {
 				jcaName = "SHA256withRSA";
 			} else if (alg.equals(JWSAlgorithm.RS384)) {
@@ -168,15 +169,20 @@ public final class JCASupport {
 			} else if (alg.equals(JWSAlgorithm.RS512)) {
 				jcaName = "SHA512withRSA";
 			} else if (alg.equals(JWSAlgorithm.PS256)) {
-				jcaName = "SHA256withRSAandMGF1";
+				jcaName = "RSASSA-PSS";
+				jcaNameAlt = "SHA256withRSAandMGF1";
 			} else if (alg.equals(JWSAlgorithm.PS384)) {
-				jcaName = "SHA384withRSAandMGF1";
+				jcaName = "RSASSA-PSS";
+				jcaNameAlt = "SHA384withRSAandMGF1";
 			} else if (alg.equals(JWSAlgorithm.PS512)) {
-				jcaName = "SHA512withRSAandMGF1";
+				jcaName = "RSASSA-PSS";
+				jcaNameAlt = "SHA512withRSAandMGF1";
 			} else {
 				return false;
 			}
-			return provider.getService("Signature", jcaName) != null;
+			// Also try with alternative JCA name if set
+			return provider.getService("Signature", jcaName) != null ||
+				(jcaNameAlt != null && provider.getService("Signature", jcaNameAlt) != null);
 		}
 
 		if (JWSAlgorithm.Family.EC.contains(alg)) {
@@ -247,9 +253,7 @@ public final class JCASupport {
 			// Do direct test
 			try {
 				Cipher.getInstance(jcaName, provider);
-			} catch (NoSuchAlgorithmException e) {
-				return false;
-			} catch (NoSuchPaddingException e) {
+			} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
 				return false;
 			}
 			return true;
@@ -267,9 +271,7 @@ public final class JCASupport {
 			// Do direct test
 			try {
 				Cipher.getInstance("AES/GCM/NoPadding", provider);
-			} catch (NoSuchAlgorithmException e) {
-				return false;
-			} catch (NoSuchPaddingException e) {
+			} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
 				return false;
 			}
 			return true;
@@ -329,9 +331,7 @@ public final class JCASupport {
 			// Do direct test
 			try {
 				Cipher.getInstance("AES/CBC/PKCS5Padding", provider);
-			} catch (NoSuchAlgorithmException e) {
-				return false;
-			} catch (NoSuchPaddingException e) {
+			} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
 				return false;
 			}
 			// Check hmac
@@ -350,9 +350,7 @@ public final class JCASupport {
 			// Do direct test
 			try {
 				Cipher.getInstance("AES/GCM/NoPadding", provider);
-			} catch (NoSuchAlgorithmException e) {
-				return false;
-			} catch (NoSuchPaddingException e) {
+			} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
 				return false;
 			}
 			return true;

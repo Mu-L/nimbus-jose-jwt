@@ -75,6 +75,10 @@ import com.nimbusds.jose.util.Base64URL;
  *         than {@link com.nimbusds.jose.jwk.gen.RSAKeyGenerator#MIN_KEY_SIZE_BITS
  *         2048 bits}
  * </ul>
+ *
+ * <p>Supports the
+ * {@link com.nimbusds.jose.crypto.bc.BouncyCastleFIPSProviderSingleton
+ * BouncyCastle FIPS provider} for the PSxxx family of JWS algorithms.
  * 
  * @author Vladimir Dzhuvinov
  * @author Omer Levi Hevroni
