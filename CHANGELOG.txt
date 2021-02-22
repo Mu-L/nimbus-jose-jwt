@@ -1267,3 +1267,6 @@ version 9.6 (2021-02-20)
       alternative JCA "SHA256withRSAandMGF1", "SHA384withRSAandMGF1" and
       "SHA512withRSAandMGF1" names to "RSASSA-PSS".
 
+version 9.6.1 (2021-02-22)
+    * Fixes new RSASSASigner(RSAKey) conversion to PrivateKey (iss #404).
+

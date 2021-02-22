@@ -189,7 +189,7 @@ public class RSASSASigner extends RSASSAProvider implements JWSSigner {
 	public RSASSASigner(final RSAKey rsaJWK)
 		throws JOSEException {
 
-		this(rsaJWK.toRSAPrivateKey());
+		this(RSAKeyUtils.toRSAPrivateKey(rsaJWK));
 	}
 
 
