@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -48,6 +47,7 @@ import com.nimbusds.jose.crypto.impl.RSAKeyUtils;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.StandardCharset;
 import com.nimbusds.jose.util.X509CertUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
@@ -60,7 +60,7 @@ import com.nimbusds.jwt.SignedJWT;
  *
  * @author Vladimir Dzhuvinov
  * @author Simon Kissane
- * @version 2020-07-24
+ * @version 2021-02-22
  */
 public class HSMTest {
 	
@@ -71,7 +71,7 @@ public class HSMTest {
 	private static final String HSM_CONFIG =
 		"name = NitroKeyHSM\n" +
 		"library = /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so\n" +
-		"slotListIndex = 1\n" +
+		"slotListIndex = 0\n" +
 		"attributes(*,CKO_PRIVATE_KEY,CKK_RSA) = {\n" +
 		"  CKA_SIGN = true\n" +
 		"}\n" +
@@ -105,7 +105,7 @@ public class HSMTest {
 				return (Provider)o;
 			}
 			// configure method was not found, fall back to old API
-			InputStream is = new ByteArrayInputStream(hsmConfig.getBytes(Charset.forName("UTF-8")));
+			InputStream is = new ByteArrayInputStream(hsmConfig.getBytes(StandardCharset.UTF_8));
 			return (Provider)clsSunPKCS11.getDeclaredConstructor(InputStream.class).newInstance(is);
 		} catch (ReflectiveOperationException e) {
 			throw new RuntimeException(e);
