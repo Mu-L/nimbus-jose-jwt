@@ -34,7 +34,7 @@ import com.nimbusds.jose.util.Base64URL;
  * Encrypted JSON Web Token (JWT). This class is thread-safe.
  *
  * @author Vladimir Dzhuvinov
- * @version 2015-08-19
+ * @version 2021-02-22
  */
 @ThreadSafe
 public class EncryptedJWT extends JWEObject implements JWT {
@@ -58,7 +58,7 @@ public class EncryptedJWT extends JWEObject implements JWT {
 	 */
 	public EncryptedJWT(final JWEHeader header, final JWTClaimsSet claimsSet) {
 
-		super(header, new Payload(claimsSet.toJSONObject()));
+		super(header, claimsSet.toPayload());
 		this.claimsSet = claimsSet;
 	}
 

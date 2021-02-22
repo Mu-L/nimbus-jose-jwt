@@ -34,7 +34,7 @@ import com.nimbusds.jose.util.Base64URL;
  * Signed JSON Web Token (JWT).
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-12-04
+ * @version 2021-02-22
  */
 @ThreadSafe
 public class SignedJWT extends JWSObject implements JWT {
@@ -58,7 +58,7 @@ public class SignedJWT extends JWSObject implements JWT {
 	 */
 	public SignedJWT(final JWSHeader header, final JWTClaimsSet claimsSet) {
 
-		super(header, new Payload(claimsSet.toJSONObject()));
+		super(header, claimsSet.toPayload());
 		this.claimsSet = claimsSet;
 	}
 

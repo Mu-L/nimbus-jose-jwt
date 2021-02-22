@@ -1270,3 +1270,6 @@ version 9.6 (2021-02-20)
 version 9.6.1 (2021-02-22)
     * Fixes new RSASSASigner(RSAKey) conversion to PrivateKey (iss #404).
 
+version 9.7 (2021-02-22)
+    * Adds JWTClaimsSet.toPayload() convenience method.
+

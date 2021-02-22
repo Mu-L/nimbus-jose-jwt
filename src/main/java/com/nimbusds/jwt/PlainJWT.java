@@ -34,7 +34,7 @@ import com.nimbusds.jose.util.Base64URL;
  * Unsecured (plain) JSON Web Token (JWT).
  *
  * @author Vladimir Dzhuvinov
- * @version 2015-08-19
+ * @version 2021-02-22
  */
 @ThreadSafe
 public class PlainJWT extends PlainObject implements JWT {
@@ -57,7 +57,7 @@ public class PlainJWT extends PlainObject implements JWT {
 	 */
 	public PlainJWT(final JWTClaimsSet claimsSet) {
 
-		super(new Payload(claimsSet.toJSONObject()));
+		super(claimsSet.toPayload());
 		this.claimsSet = claimsSet;
 	}
 
@@ -71,7 +71,7 @@ public class PlainJWT extends PlainObject implements JWT {
 	 */
 	public PlainJWT(final PlainHeader header, final JWTClaimsSet claimsSet) {
 
-		super(header, new Payload(claimsSet.toJSONObject()));
+		super(header, claimsSet.toPayload());
 		this.claimsSet = claimsSet;
 	}
 

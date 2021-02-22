@@ -26,6 +26,7 @@ import java.util.*;
 
 import net.jcip.annotations.Immutable;
 
+import com.nimbusds.jose.Payload;
 import com.nimbusds.jwt.util.DateUtils;
 import com.nimbusds.jose.util.JSONArrayUtils;
 import com.nimbusds.jose.util.JSONObjectUtils;
@@ -72,7 +73,7 @@ import com.nimbusds.jose.util.JSONObjectUtils;
  *
  * @author Vladimir Dzhuvinov
  * @author Justin Richer
- * @version 2021-02-02
+ * @version 2021-02-22
  */
 @Immutable
 public final class JWTClaimsSet implements Serializable {
@@ -800,6 +801,17 @@ public final class JWTClaimsSet implements Serializable {
 	public Map<String,Object> getClaims() {
 
 		return Collections.unmodifiableMap(claims);
+	}
+	
+	
+	/**
+	 * Returns a JOSE object payload representation of this claims set.
+	 *
+	 * @return The payload representation.
+	 */
+	public Payload toPayload() {
+		
+		return new Payload(toJSONObject());
 	}
 
 

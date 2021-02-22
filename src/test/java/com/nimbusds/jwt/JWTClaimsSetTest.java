@@ -33,7 +33,7 @@ import junit.framework.TestCase;
  *
  * @author Vladimir Dzhuvinov
  * @author Justin Richer
- * @version 2019-12-21
+ * @version 2021-02-22
  */
 public class JWTClaimsSetTest extends TestCase {
 
@@ -154,6 +154,16 @@ public class JWTClaimsSetTest extends TestCase {
 		assertEquals("jti parse check map", "123", (String)all.get("jti"));
 		assertEquals("abc", (String)all.get("x-custom"));
 		assertEquals(8, all.size());
+	}
+	
+	
+	public void testToPayload() {
+		
+		JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+			.subject("alice")
+			.build();
+		
+		assertEquals(jwtClaimsSet.toJSONObject(), jwtClaimsSet.toPayload().toJSONObject());
 	}
 
 
