@@ -114,6 +114,7 @@ public class DefaultJWSMinter<C extends SecurityContext> implements Configurable
 				.keyID(jwk.getKeyID())
 				.x509CertURL(jwk.getX509CertURL())
 				.x509CertChain(jwk.getX509CertChain())
+				.x509CertSHA256Thumbprint(jwk.getX509CertSHA256Thumbprint())
 				.x509CertThumbprint(jwk.getX509CertThumbprint())
 				.build();
 		JWSObject jws = new JWSObject(withJwk, payload);
