@@ -1,11 +1,11 @@
-package com.nimbusds.jwt.mint;
+package com.nimbusds.jose.mint;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
 
 /**
  * Interface for minting and serializing {@link com.nimbusds.jwt.SignedJWT signed}
@@ -41,5 +41,5 @@ public interface JWSMinter<C extends SecurityContext> {
 	 * @throws JOSEException if the instance is improperly configured,
 	 * if no appropriate JWK can be found, or if signing fails
 	 */
-	SignedJWT mint(JWSHeader header, JWTClaimsSet claims, C context) throws JOSEException;
+	JWSObject mint(JWSHeader header, Payload payload, C context) throws JOSEException;
 }

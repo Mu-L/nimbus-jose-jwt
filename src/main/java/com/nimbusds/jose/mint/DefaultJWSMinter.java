@@ -1,16 +1,16 @@
-package com.nimbusds.jwt.mint;
+package com.nimbusds.jose.mint;
 
-import java.net.URL;
 import java.util.List;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.factories.DefaultJWSSignerFactory;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKMatcher;
 import com.nimbusds.jose.jwk.JWKSelector;
 import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.jwk.source.RemoteJWKSet;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jose.produce.JWSSignerFactory;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -92,14 +92,14 @@ public class DefaultJWSMinter<C extends SecurityContext> implements Configurable
 	 *
 	 * @param header the {@link JWSHeader} to use, less the {@code kid}, which
 	 *               this method will derive
-	 * @param claims the {@link JWTClaimsSet} to use
+	 * @param payload the {@link Payload} to use
 	 * @param context a {@link SecurityContext}
 	 * @return a signed JWT
 	 * @throws JOSEException if the instance is improperly configured,
 	 * if no appropriate JWK can be found, or if signing fails
 	 */
 	@Override
-	public SignedJWT mint(JWSHeader header, JWTClaimsSet claims, C context) throws JOSEException {
+	public JWSObject mint(JWSHeader header, Payload payload, C context) throws JOSEException {
 		JWKMatcher matcher = JWKMatcher.forJWSHeader(header);
 		JWKSelector selector = new JWKSelector(matcher);
 		if (this.jwkSource == null) {
@@ -116,12 +116,12 @@ public class DefaultJWSMinter<C extends SecurityContext> implements Configurable
 				.x509CertChain(jwk.getX509CertChain())
 				.x509CertThumbprint(jwk.getX509CertThumbprint())
 				.build();
-		SignedJWT jwt = new SignedJWT(withJwk, claims);
+		JWSObject jws = new JWSObject(withJwk, payload);
 		if (this.jwsSignerFactory == null) {
 			throw new JOSEException("No JWS signer factory configured");
 		}
-		jwt.sign(this.jwsSignerFactory.createJWSSigner(jwk));
-		return jwt;
+		jws.sign(this.jwsSignerFactory.createJWSSigner(jwk));
+		return jws;
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package com.nimbusds.jwt.mint;
+package com.nimbusds.jose.mint;
 
 import com.nimbusds.jose.proc.SecurityContext;
 

@@ -1,4 +1,4 @@
-package com.nimbusds.jwt.mint;
+package com.nimbusds.jose.mint;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -8,6 +8,7 @@ import java.util.List;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.KeySourceException;
 import com.nimbusds.jose.crypto.factories.DefaultJWSSignerFactory;
 import com.nimbusds.jose.jwk.JWK;
@@ -25,7 +26,6 @@ import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import junit.framework.TestCase;
@@ -57,7 +57,7 @@ public class DefaultJWSMinterTest extends TestCase {
 				.type(JOSEObjectType.JWT)
 				.build();
 
-		SignedJWT jws = minter.mint(header, claimsIn, null);
+		JWSObject jws = minter.mint(header, claimsIn.toPayload(), null);
 
 		assertEquals(jws.getHeader().getKeyID(), key.getKeyID());
 		assertNull(jws.getHeader().getX509CertSHA256Thumbprint());
@@ -65,7 +65,7 @@ public class DefaultJWSMinterTest extends TestCase {
 		assertNull(jws.getHeader().getX509CertChain());
 		ConfigurableJWTProcessor<SecurityContext> processor = new DefaultJWTProcessor<>();
 		processor.setJWSKeySelector(new JWSVerificationKeySelector<>(JWSAlgorithm.HS256, jwkSource));
-		JWTClaimsSet claimsOut = processor.process(jws, null);
+		JWTClaimsSet claimsOut = processor.process(jws.serialize(), null);
 		assertEquals(claimsOut.getIssuer(), claimsIn.getIssuer());
 		assertEquals(claimsOut.getSubject(), claimsIn.getSubject());
 	}
@@ -88,12 +88,12 @@ public class DefaultJWSMinterTest extends TestCase {
 				.type(JOSEObjectType.JWT)
 				.build();
 
-		final SignedJWT jws = minter.mint(header, claimsIn, new JWKSecurityContext(Collections.singletonList(key)));
+		final JWSObject jws = minter.mint(header, claimsIn.toPayload(), new JWKSecurityContext(Collections.singletonList(key)));
 
 		final ConfigurableJWTProcessor<SecurityContext> processor = new DefaultJWTProcessor<>();
 		final JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(new JWKSet(key));
 		processor.setJWSKeySelector(new JWSVerificationKeySelector<>(JWSAlgorithm.HS256, jwkSource));
-		final JWTClaimsSet claimsOut = processor.process(jws, null);
+		final JWTClaimsSet claimsOut = processor.process(jws.serialize(), null);
 		assertEquals(claimsOut.getIssuer(), claimsIn.getIssuer());
 		assertEquals(claimsOut.getSubject(), claimsIn.getSubject());
 	}
@@ -139,12 +139,12 @@ public class DefaultJWSMinterTest extends TestCase {
 				.type(JOSEObjectType.JWT)
 				.build();
 
-		final SignedJWT jws = minter.mint(header, claimsIn, null);
+		final JWSObject jws = minter.mint(header, claimsIn.toPayload(), null);
 
 		assertEquals(jws.getHeader().getKeyID(), two.getKeyID());
 		ConfigurableJWTProcessor<SecurityContext> processor = new DefaultJWTProcessor<>();
 		processor.setJWSKeySelector(new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, jwkSource));
-		final JWTClaimsSet claimsOut = processor.process(jws, null);
+		final JWTClaimsSet claimsOut = processor.process(jws.serialize(), null);
 		assertEquals(claimsOut.getIssuer(), claimsIn.getIssuer());
 		assertEquals(claimsOut.getSubject(), claimsIn.getSubject());
 	}
@@ -180,7 +180,7 @@ public class DefaultJWSMinterTest extends TestCase {
 				.type(JOSEObjectType.JWT)
 				.build();
 
-		final SignedJWT jws = minter.mint(header, claimsIn, null);
+		final JWSObject jws = minter.mint(header, claimsIn.toPayload(), null);
 
 		assertEquals(jws.getHeader().getKeyID(), two.getKeyID());
 		assertEquals(jws.getHeader().getX509CertSHA256Thumbprint(), two.getX509CertSHA256Thumbprint());
@@ -188,7 +188,7 @@ public class DefaultJWSMinterTest extends TestCase {
 		assertEquals(jws.getHeader().getX509CertURL(), two.getX509CertURL());
 		final ConfigurableJWTProcessor<SecurityContext> processor = new DefaultJWTProcessor<>();
 		processor.setJWSKeySelector(new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, jwkSource));
-		final JWTClaimsSet claimsOut = processor.process(jws, null);
+		final JWTClaimsSet claimsOut = processor.process(jws.serialize(), null);
 		assertEquals(claimsOut.getIssuer(), claimsIn.getIssuer());
 		assertEquals(claimsOut.getSubject(), claimsIn.getSubject());
 	}
