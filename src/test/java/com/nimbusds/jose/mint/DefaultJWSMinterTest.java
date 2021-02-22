@@ -33,7 +33,7 @@ import junit.framework.TestCase;
 public class DefaultJWSMinterTest extends TestCase {
 	public void testConstructor() {
 
-		ConfigurableJWSMinter<SecurityContext> minter = new DefaultJWSMinter<>();
+		final ConfigurableJWSMinter<SecurityContext> minter = new DefaultJWSMinter<>();
 
 		assertTrue(minter.getJWSSignerFactory() instanceof DefaultJWSSignerFactory);
 		assertNull(minter.getJWKSource());
@@ -42,28 +42,28 @@ public class DefaultJWSMinterTest extends TestCase {
 	public void testMintRoundTrip()
 			throws Exception {
 
-		OctetSequenceKeyGenerator generator = new OctetSequenceKeyGenerator(256);
-		OctetSequenceKey key = generator.generate();
-		JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(new JWKSet(key));
+		final OctetSequenceKeyGenerator generator = new OctetSequenceKeyGenerator(256);
+		final OctetSequenceKey key = generator.generate();
+		final JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(new JWKSet(key));
 
-		ConfigurableJWSMinter<SecurityContext> minter = new DefaultJWSMinter<>();
+		final ConfigurableJWSMinter<SecurityContext> minter = new DefaultJWSMinter<>();
 		minter.setJWKSource(jwkSource);
 
-		JWTClaimsSet claimsIn = new JWTClaimsSet.Builder()
+		final JWTClaimsSet claimsIn = new JWTClaimsSet.Builder()
 				.issuer("https://openid.c2id.com")
 				.subject("alice")
 				.build();
-		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
+		final JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
 				.type(JOSEObjectType.JWT)
 				.build();
 
-		JWSObject jws = minter.mint(header, claimsIn.toPayload(), null);
+		final JWSObject jws = minter.mint(header, claimsIn.toPayload(), null);
 
 		assertEquals(jws.getHeader().getKeyID(), key.getKeyID());
 		assertNull(jws.getHeader().getX509CertSHA256Thumbprint());
 		assertNull(jws.getHeader().getX509CertURL());
 		assertNull(jws.getHeader().getX509CertChain());
-		ConfigurableJWTProcessor<SecurityContext> processor = new DefaultJWTProcessor<>();
+		final ConfigurableJWTProcessor<SecurityContext> processor = new DefaultJWTProcessor<>();
 		processor.setJWSKeySelector(new JWSVerificationKeySelector<>(JWSAlgorithm.HS256, jwkSource));
 		JWTClaimsSet claimsOut = processor.process(jws.serialize(), null);
 		assertEquals(claimsOut.getIssuer(), claimsIn.getIssuer());
@@ -142,7 +142,7 @@ public class DefaultJWSMinterTest extends TestCase {
 		final JWSObject jws = minter.mint(header, claimsIn.toPayload(), null);
 
 		assertEquals(jws.getHeader().getKeyID(), two.getKeyID());
-		ConfigurableJWTProcessor<SecurityContext> processor = new DefaultJWTProcessor<>();
+		final ConfigurableJWTProcessor<SecurityContext> processor = new DefaultJWTProcessor<>();
 		processor.setJWSKeySelector(new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, jwkSource));
 		final JWTClaimsSet claimsOut = processor.process(jws.serialize(), null);
 		assertEquals(claimsOut.getIssuer(), claimsIn.getIssuer());
