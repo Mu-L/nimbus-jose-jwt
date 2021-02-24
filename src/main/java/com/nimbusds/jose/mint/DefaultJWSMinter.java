@@ -10,7 +10,9 @@ import com.nimbusds.jose.crypto.factories.DefaultJWSSignerFactory;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKMatcher;
 import com.nimbusds.jose.jwk.JWKSelector;
+import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.JWKSecurityContext;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jose.produce.JWSSignerFactory;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -100,12 +102,7 @@ public class DefaultJWSMinter<C extends SecurityContext> implements Configurable
 	 */
 	@Override
 	public JWSObject mint(JWSHeader header, Payload payload, C context) throws JOSEException {
-		JWKMatcher matcher = JWKMatcher.forJWSHeader(header);
-		JWKSelector selector = new JWKSelector(matcher);
-		if (this.jwkSource == null) {
-			throw new JOSEException("No JWK source configured");
-		}
-		List<JWK> jwks = this.jwkSource.get(selector, context);
+		List<JWK> jwks = jwks(header, context);
 		if (jwks.isEmpty()) {
 			throw new JOSEException("No JWKs found for signing");
 		}
@@ -123,6 +120,18 @@ public class DefaultJWSMinter<C extends SecurityContext> implements Configurable
 		}
 		jws.sign(this.jwsSignerFactory.createJWSSigner(jwk));
 		return jws;
+	}
+
+	private List<JWK> jwks(JWSHeader header, C context) throws JOSEException {
+		JWKMatcher matcher = JWKMatcher.forJWSHeader(header);
+		JWKSelector selector = new JWKSelector(matcher);
+		if (context instanceof JWKSecurityContext) {
+			return selector.select(new JWKSet(((JWKSecurityContext) context).getKeys()));
+		}
+		if (this.jwkSource == null) {
+			throw new JOSEException("No JWK source configured");
+		}
+		return this.jwkSource.get(selector, context);
 	}
 
 	@Override

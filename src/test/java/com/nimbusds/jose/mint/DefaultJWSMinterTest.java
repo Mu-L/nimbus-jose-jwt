@@ -77,7 +77,6 @@ public class DefaultJWSMinterTest extends TestCase {
 				.keyID("kid").generate();
 
 		final ConfigurableJWSMinter<JWKSecurityContext> minter = new DefaultJWSMinter<>();
-		minter.setJWKSource(new JWKSecurityContextJWKSet());
 
 		final JWTClaimsSet claimsIn = new JWTClaimsSet.Builder()
 				.issuer("https://openid.c2id.com")
