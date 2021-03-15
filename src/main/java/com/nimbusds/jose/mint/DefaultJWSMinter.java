@@ -38,7 +38,7 @@ import com.nimbusds.jwt.SignedJWT;
  *
  * <p>See sections 6 of RFC 7515 (JWS) for guidelines on key selection.
  *
- * <p>This minter adds the "kid" header based on the JWK that it finds.
+ * <p>This minter adds any key-identifying  header based on the JWK that it selects.
  *
  * @author Josh Cummings
  * @version 2021-01-14
@@ -76,10 +76,6 @@ public class DefaultJWSMinter<C extends SecurityContext> implements Configurable
 	 * or you can select your own {@link JWK} and do:
 	 *
 	 * <code>
-	 *  minter.setJWKSource(new JWKSecurityContextJWKSet());
-	 *
-	 *  // ...
-	 *
 	 *  JWK jwk = findJWK();
 	 *  minter.mint(header, claims, new JWKSecurityContext(jwks));
 	 * </code>
@@ -92,8 +88,8 @@ public class DefaultJWSMinter<C extends SecurityContext> implements Configurable
 	 * expects the caller to add the {@code typ}, {@code alg},
 	 * and any other needed headers.
 	 *
-	 * @param header the {@link JWSHeader} to use, less the {@code kid}, which
-	 *               this method will derive
+	 * @param header the {@link JWSHeader} to use, less any key-identifying headers,
+	 *               which this method will derive
 	 * @param payload the {@link Payload} to use
 	 * @param context a {@link SecurityContext}
 	 * @return a signed JWT
