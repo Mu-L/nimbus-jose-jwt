@@ -6,48 +6,51 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jose.produce.JWSSignerFactory;
 
 /**
- * JWT minter configuration.
+ * JSON Web Signature (JWS) minter configuration.
  *
- * <p>Specifies the required components to mint JWTs:
+ * <p>Specifies the required components to mint JWS objects:
  *
  * <ul>
- *     <li>JWK source to determine key candidate(s) for JWS
- *     signing based on the JWS header and application-specific
- *     context information.
+ *     <li>JWK source to determine key candidate(s) for the JWS based on the
+ *     JWS header and application-specific context information.
  *
- *     <li>Optional JWS signer factory. Creates the appropriate {@link com.nimbusds.jose.JWSSigner}
- *     for signing the JWT
+ *     <li>Optional JWS signer factory. Creates the appropriate
+ *     {@link com.nimbusds.jose.JWSSigner} for signing the object.
  * </ul>
  *
  * @author Josh Cummings
  * @version 2021-01-14
  */
 public interface JWSMinterConfiguration<C extends SecurityContext> {
+	
 	/**
-	 * Gets the JWK source for looking up JWKs
+	 * Gets the source for looking up JWKs.
 	 *
-	 * @return the {@link JWKSource} in use
+	 * @return The {@link JWKSource} in use.
 	 */
 	JWKSource<C> getJWKSource();
 
+	
 	/**
-	 * Sets the source for to look up JWKs from
+	 * Sets the source for to look up JWKs from.
 	 *
-	 * @param jwkSource the JWK source to use
+	 * @param jwkSource The JWK source to use.
 	 */
-	void setJWKSource(JWKSource<C> jwkSource);
+	void setJWKSource(final JWKSource<C> jwkSource);
 
+	
 	/**
-	 * Gets the JWS signer factory for generating {@link JWSSigner}s
+	 * Gets the factory for generating {@link JWSSigner}s.
 	 *
-	 * @return the {@link JWSSignerFactory} in use
+	 * @return The {@link JWSSignerFactory} in use.
 	 */
 	JWSSignerFactory getJWSSignerFactory();
 
+	
 	/**
-	 * Sets the JWS signer factory to use
+	 * Sets the factory for generating {@link JWSSigner}s.
 	 *
-	 * @param jwsSignerFactory the JWS signer factory to use
+	 * @param jwsSignerFactory The JWS signer factory to use.
 	 */
-	void setJWSSignerFactory(JWSSignerFactory jwsSignerFactory);
+	void setJWSSignerFactory(final JWSSignerFactory jwsSignerFactory);
 }
