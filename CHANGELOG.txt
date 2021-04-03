@@ -1273,3 +1273,5 @@ version 9.6.1 (2021-02-22)
 version 9.7 (2021-02-22)
     * Adds JWTClaimsSet.toPayload() convenience method.
 
+version 9.8 (2021-04-03)
+    * Adds new package com.nimbusds.jose.mint with a JWS minter framework.
