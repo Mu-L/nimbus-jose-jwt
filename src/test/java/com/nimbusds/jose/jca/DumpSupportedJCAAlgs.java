@@ -22,7 +22,6 @@ import java.security.Provider;
 import java.security.Security;
 
 import org.junit.Test;
-import sun.security.rsa.SunRsaSign;
 
 import com.nimbusds.jose.crypto.bc.BouncyCastleFIPSProviderSingleton;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
@@ -42,17 +41,7 @@ public class DumpSupportedJCAAlgs {
 				System.out.println("\t" + key + "\t" + provider.getProperty(key));
 		}
 	}
-
-	@Test
-	public void testDumpSunRsaSign() {
-		
-		Provider provider = new SunRsaSign();
-		System.out.println("Name: " + provider.getName());
-		System.out.println("Info: " + provider.getInfo());
-		System.out.println("Version: " + provider.getVersion());
-		for (String key: provider.stringPropertyNames())
-			System.out.println("\t" + key + "\t" + provider.getProperty(key));
-	}
+	
 
 	@Test
 	public void testDumpBouncyCastle() {

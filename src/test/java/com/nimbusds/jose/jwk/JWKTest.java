@@ -35,6 +35,14 @@ import java.util.Date;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import junit.framework.TestCase;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
@@ -46,13 +54,6 @@ import com.nimbusds.jose.util.IOUtils;
 import com.nimbusds.jose.util.X509CertUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import junit.framework.TestCase;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 
 /**
@@ -185,7 +186,7 @@ public class JWKTest extends TestCase {
 			JWK.load(keyStore, "1", "".toCharArray());
 			fail();
 		} catch (JOSEException e) {
-			assertEquals("Couldn't retrieve private RSA key (bad pin?): Cannot recover key", e.getMessage());
+			assertTrue(e.getMessage().startsWith("Couldn't retrieve private RSA key (bad pin?): "));
 			assertTrue(e.getCause() instanceof UnrecoverableKeyException);
 		}
 	}
@@ -246,7 +247,7 @@ public class JWKTest extends TestCase {
 			JWK.load(keyStore, "1", "".toCharArray());
 			fail();
 		} catch (JOSEException e) {
-			assertEquals("Couldn't retrieve private EC key (bad pin?): Cannot recover key", e.getMessage());
+			assertTrue(e.getMessage().startsWith("Couldn't retrieve private EC key (bad pin?): "));
 			assertTrue(e.getCause() instanceof UnrecoverableKeyException);
 		}
 	}
