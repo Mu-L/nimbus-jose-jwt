@@ -301,8 +301,10 @@ public class DefaultResourceRetrieverTest {
 
 		RestrictedResourceRetriever resourceRetriever = new DefaultResourceRetriever(50, 0);
 
+		URL url = new URL("http://localhost:" + port + "/c2id/jwks.json");
+		
 		try {
-			resourceRetriever.retrieveResource(new URL("http://localhost:" + port + "/c2id/jwks.json"));
+			resourceRetriever.retrieveResource(url);
 			fail();
 		} catch (IOException e) {
 			assertTrue(e.getMessage().startsWith("Connection refused"));
@@ -321,8 +323,10 @@ public class DefaultResourceRetrieverTest {
 		DefaultResourceRetriever resourceRetriever = new DefaultResourceRetriever(50, 0);
 		resourceRetriever.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost", proxyPort)));
 
+		URL url = new URL("http://localhost:" + port() + "/c2id/jwks.json");
+		
 		try {
-			resourceRetriever.retrieveResource(new URL("http://localhost:" + port() + "/c2id/jwks.json"));
+			resourceRetriever.retrieveResource(url);
 			fail();
 		} catch (IOException e) {
 			assertTrue(e.getMessage().startsWith("Connection refused"));
@@ -348,8 +352,10 @@ public class DefaultResourceRetrieverTest {
 
 		RestrictedResourceRetriever resourceRetriever = new DefaultResourceRetriever(0, 50);
 
+		URL url = new URL("http://localhost:" + port() + "/c2id/jwks.json");
+		
 		try {
-			resourceRetriever.retrieveResource(new URL("http://localhost:" + port() + "/c2id/jwks.json"));
+			resourceRetriever.retrieveResource(url);
 			fail();
 		} catch (IOException e) {
 			assertEquals("Read timed out", e.getMessage());
