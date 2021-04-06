@@ -24,6 +24,8 @@ import java.security.SignatureException;
 import java.security.interfaces.ECPublicKey;
 import java.util.Set;
 
+import net.jcip.annotations.ThreadSafe;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.impl.AlgorithmSupportMessage;
 import com.nimbusds.jose.crypto.impl.CriticalHeaderParamsDeferral;
@@ -33,8 +35,6 @@ import com.nimbusds.jose.crypto.utils.ECChecks;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64URL;
-import net.jcip.annotations.ThreadSafe;
-import org.bouncycastle.jcajce.provider.digest.SHA256;
 
 
 /**
