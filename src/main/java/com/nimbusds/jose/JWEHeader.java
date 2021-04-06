@@ -73,7 +73,7 @@ import com.nimbusds.jose.util.X509CertChainUtils;
  * </pre>
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-10-04
+ * @version 2021-03-06
  */
 @Immutable
 public final class JWEHeader extends CommonSEHeader {
@@ -916,6 +916,7 @@ public final class JWEHeader extends CommonSEHeader {
 	 *
 	 * @return The algorithm parameter.
 	 */
+	@Override
 	public JWEAlgorithm getAlgorithm() {
 
 		return (JWEAlgorithm)super.getAlgorithm();
