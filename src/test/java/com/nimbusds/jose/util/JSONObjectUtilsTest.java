@@ -46,6 +46,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	
 	
 	// https://github.com/netplex/json-smart-v1/issues/7
+	// 2021-04-06: JSON Smart 1.3.2 fixes CVE
 	public void testParse_catchNumberFormatException() {
 		
 		String json = "{\"key\":2e+}";
@@ -53,7 +54,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			JSONObjectUtils.parse(json);
 			fail();
 		} catch (ParseException e) {
-			assertEquals("Unexpected exception: For input string: \"2e+\"", e.getMessage());
+			assertEquals("Invalid JSON: Unexpected token 2e+ at position 10.", e.getMessage());
 			assertNull(e.getCause());
 		}
 	}
