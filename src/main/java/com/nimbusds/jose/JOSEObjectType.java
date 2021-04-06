@@ -42,7 +42,7 @@ import net.jcip.annotations.Immutable;
  * <p>Additional types can be defined using the constructor.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-10-14
+ * @version 2021-04-06
  */
 @Immutable
 public final class JOSEObjectType implements  Serializable {
@@ -125,7 +125,7 @@ public final class JOSEObjectType implements  Serializable {
 	public boolean equals(final Object object) {
 
 		return object instanceof JOSEObjectType &&
-			this.type.toLowerCase().equals(((JOSEObjectType) object).type.toLowerCase());
+			this.type.equalsIgnoreCase(((JOSEObjectType) object).type);
 	}
 
 
