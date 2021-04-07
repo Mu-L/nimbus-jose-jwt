@@ -56,14 +56,14 @@ public class DefaultJWSMinter<C extends SecurityContext> implements Configurable
 	 * Token (JWT) use the {@link JWTClaimsSet#toPayload()} method to
 	 * obtain a {@link Payload} representation of the JWT claims.
 	 *
-	 * Derives the signing key from the {@link JWSHeader} as well as any
+	 * <p>Derives the signing key from the {@link JWSHeader} as well as any
 	 * application-specific {@link SecurityContext context}.
 	 *
-	 * If multiple keys are matched against the header's criteria, the
+	 * <p>If multiple keys are matched against the header's criteria, the
 	 * first will be used to sign the object. To customise the key
 	 * selection you can set a custom {@link JWKSource} like so:
 	 *
-	 * <code>
+	 * <pre>
 	 * public static class MyJWKSource implements JWKSource&lt;SecurityContext&gt; {
 	 *     private final JWKSource&lt;SecurityContext&gt; delegate;
 	 *
@@ -75,21 +75,21 @@ public class DefaultJWSMinter<C extends SecurityContext> implements Configurable
 	 * }
 	 *
 	 * minter.setJWKSource(new MyJWKSource(jwkSource));
-	 * </code>
+	 * </pre>
 	 *
-	 * or you can select your own {@link JWK} and do:
+	 * <p>or you can select your own {@link JWK} and do:
 	 *
-	 * <code>
+	 * <pre>
 	 * JWK jwk = findJWK();
 	 * minter.mint(header, claims, new JWKSecurityContext(jwks));
-	 * </code>
+	 * </pre>
 	 *
-	 * Once the key is discovered, adds any headers related to the
+	 * <p>Once the key is discovered, adds any headers related to the
 	 * discovered signing key, including {@code kid}, {@code x5u},
 	 * {@code x5c}, and {@code x5t#256}.
 	 *
-	 * All other headers and claims remain as-is. This method expects the
-	 * caller to add the {@code typ}, {@code alg}, and any other needed
+	 * <p>All other headers and claims remain as-is. This method expects
+	 * the caller to add the {@code typ}, {@code alg}, and any other needed
 	 * headers.
 	 *
 	 * @param header  The {@link JWSHeader} to use, less any
