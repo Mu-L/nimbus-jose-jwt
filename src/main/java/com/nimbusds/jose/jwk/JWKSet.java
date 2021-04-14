@@ -251,9 +251,8 @@ public class JWKSet implements Serializable {
 
 	/**
 	 * Returns the JSON object representation of this JSON Web Key (JWK) 
-	 * set. Private keys and parameters will be omitted from the output.
-	 * Use the alternative {@link #toJSONObject(boolean)} method if you
-	 * wish to include them.
+	 * set. Only public keys will be included. Use the alternative
+	 * {@link #toJSONObject(boolean)} method to include all key material.
 	 *
 	 * @return The JSON object representation.
 	 */
@@ -269,9 +268,9 @@ public class JWKSet implements Serializable {
 	 *
 	 * @param publicKeysOnly Controls the inclusion of private keys and
 	 *                       parameters into the output JWK members. If
-	 *                       {@code true} private keys and parameters will
-	 *                       be omitted. If {@code false} all available key
-	 *                       parameters will be included.
+	 *                       {@code true} only public keys will be
+	 *                       included. If {@code false} all available keys
+	 *                       with their parameters will be included.
 	 *
 	 * @return The JSON object representation.
 	 */
@@ -309,9 +308,9 @@ public class JWKSet implements Serializable {
 	 *
 	 * @param publicKeysOnly Controls the inclusion of private keys and
 	 *                       parameters into the output JWK members. If
-	 *                       {@code true} private keys and parameters will
-	 *                       be omitted. If {@code false} all available key
-	 *                       parameters will be included.
+	 *                       {@code true} only public keys will be
+	 *                       included. If {@code false} all available keys
+	 *                       with their parameters will be included.
 	 *
 	 * @return The JSON object string representation.
 	 */
@@ -323,9 +322,11 @@ public class JWKSet implements Serializable {
 
 	/**
 	 * Returns the JSON object string representation of this JSON Web Key
-	 * (JWK) set.
+	 * (JWK) set. Only public keys will be included. Use the alternative
+	 * {@link #toString(boolean)} method to include all key material.
 	 *
-	 * @return The JSON object string representation.
+	 * @return The JSON object string representation. Only public keys will
+	 *         be included.
 	 */
 	@Override
 	public String toString() {
