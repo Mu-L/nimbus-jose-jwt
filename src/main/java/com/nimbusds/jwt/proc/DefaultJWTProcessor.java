@@ -86,7 +86,7 @@ import com.nimbusds.jwt.*;
  * {@link com.nimbusds.jose.proc.DefaultJOSEProcessor} class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-10-15
+ * @version 2021-04-26
  */
 public class DefaultJWTProcessor<C extends SecurityContext> implements ConfigurableJWTProcessor<C> {
 
@@ -137,7 +137,7 @@ public class DefaultJWTProcessor<C extends SecurityContext> implements Configura
 	/**
 	 * The claims verifier.
 	 */
-	private JWTClaimsSetVerifier<C> claimsVerifier = new DefaultJWTClaimsVerifier<>();
+	private JWTClaimsSetVerifier<C> claimsVerifier = new DefaultJWTClaimsVerifier<>(null, null);
 	
 	
 	/**

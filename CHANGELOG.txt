@@ -1281,4 +1281,7 @@ version 9.8.1 (2021-04-06)
     * Cleans up / refactors code and tests.
 
 version 9.9 (2021-04-26)
+    * Deprecates the default DefaultJWTClaimsVerifier constructor to prevent
+      insecure use (iss #417).
+    * Edits the DefaultJWTClaimsVerifier JavaDoc.
     * Bumps JSON Smart to 1.3.3.

@@ -28,22 +28,55 @@ import com.nimbusds.jwt.util.DateUtils;
 
 
 /**
- * {@link JWTClaimsSetVerifier JWT claims verifier} implementation. This class
- * is thread-safe.
+ * A {@link JWTClaimsSetVerifier JWT claims verifier} implementation.
  *
- * <p>Performs the following checks:
+ * <p>Configurable checks:
  *
  * <ol>
- *     <li>If an expiration time (exp) claim is present, makes sure it is ahead
- *         of the current time, else the JWT claims set is rejected.
- *     <li>If a not-before-time (nbf) claim is present, makes sure it is
+ *     <li>Specify JWT claims that must be present and which values must match
+ *         exactly, for example the expected JWT issuer ("iss") and audience
+ *         ("aud").
+ *     <li>Specify JWT claims that must be present, for example expiration
+ *         ("exp") and not-before ("nbf") times. If the "exp" or "nbf" claims
+ *         are marked as required they will be automatically checked against
+ *         the current time.
+ *     <li>Specify JWT claims that are prohibited, for example to prevent
+ *         cross-JWT confusion in situations when explicit JWT typing via the
+ *         type ("typ") header is not used.
+ * </ol>
+ *
+ * <p>Performs the following time validity checks:
+ *
+ * <ol>
+ *     <li>If an expiration time ("exp") claim is present, makes sure it is
+ *         ahead of the current time, else the JWT claims set is rejected.
+ *     <li>If a not-before-time ("nbf") claim is present, makes sure it is
  *         before the current time, else the JWT claims set is rejected.
  * </ol>
  *
+ * <p>Note, to enforce a time validity check the claim ("exp" and / or "nbf" )
+ * must be set as required.
+ *
+ * <p>Example verifier with exact matches for "iss" and "aud", and setting the
+ * "exp", "nbf" and "jti" claims as required to be present:
+ *
+ * <pre>
+ * DefaultJWTClaimsVerifier<?> verifier = new DefaultJWTClaimsVerifier<>(
+ * 	new JWTClaimsSet.Builder()
+ * 		.issuer("https://issuer.example.com")
+ * 		.audience("https://client.example.com")
+ * 		.build(),
+ * 	new HashSet<>(Arrays.asList("exp", "nbf", "jti")));
+ *
+ * verifier.verify(jwtClaimsSet, null);
+ * </pre>
+ *
  * <p>This class may be extended to perform additional checks.
  *
+ * <p>This class is thread-safe.
+ *
  * @author Vladimir Dzhuvinov
- * @version 2019-10-17
+ * @version 2021-04-26
  */
 @ThreadSafe
 public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWTClaimsSetVerifier<C>, JWTClaimsVerifier, ClockSkewAware {
@@ -89,9 +122,14 @@ public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWT
 	
 	/**
 	 * Creates a new JWT claims verifier. No audience ("aud"), required and
-	 * prohibited claims are specified. Will check the expiration ("exp")
-	 * and not-before ("nbf") times if present.
+	 * prohibited claims are specified. The expiration ("exp") and
+	 * not-before ("nbf") claims will be checked only if they are present
+	 * and parsed successfully.
+	 *
+	 * @deprecated Use a more specific constructor that at least specifies
+	 * a list of required JWT claims.
 	 */
+	@Deprecated
 	public DefaultJWTClaimsVerifier() {
 		this(null, null, null, null);
 	}
@@ -99,8 +137,10 @@ public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWT
 	
 	/**
 	 * Creates a new JWT claims verifier. Allows any audience ("aud")
-	 * unless an exact match is specified. Will check the expiration
-	 * ("exp") and not-before ("nbf") times if present.
+	 * unless an exact match is specified. The expiration ("exp") and
+	 * not-before ("nbf") claims will be checked only if they are present
+	 * and parsed successfully; add them to the required claims if they are
+	 * mandatory.
 	 *
 	 * @param exactMatchClaims The JWT claims that must match exactly,
 	 *                         {@code null} if none.
@@ -115,7 +155,10 @@ public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWT
 	
 	
 	/**
-	 * Creates new default JWT claims verifier.
+	 * Creates new default JWT claims verifier. The expiration ("exp") and
+	 * not-before ("nbf") claims will be checked only if they are present
+	 * and parsed successfully; add them to the required claims if they are
+	 * mandatory.
 	 *
 	 * @param requiredAudience The required JWT audience, {@code null} if
 	 *                         not specified.
@@ -136,7 +179,10 @@ public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWT
 	
 	
 	/**
-	 * Creates new default JWT claims verifier.
+	 * Creates new default JWT claims verifier. The expiration ("exp") and
+	 * not-before ("nbf") claims will be checked only if they are present
+	 * and parsed successfully; add them to the required claims if they are
+	 * mandatory.
 	 *
 	 * @param acceptedAudience The accepted JWT audience values,
 	 *                         {@code null} if not specified. A

@@ -363,6 +363,21 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 	}
 	
 	
+	public void testRequiresEXP_illegalValue() throws BadJWTException {
+		
+		DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier(null, null, Collections.singleton("exp"));
+		
+		verifier.verify(new JWTClaimsSet.Builder().claim("exp", "illegal-value").build(), null);
+		
+		try {
+			verifier.verify(new JWTClaimsSet.Builder().build(), null);
+			fail();
+		} catch (BadJWTException e) {
+			assertEquals("JWT missing required claims: [exp]", e.getMessage());
+		}
+	}
+	
+	
 	public void testRequiresMultiple() throws BadJWTException {
 		
 		DefaultJWTClaimsVerifier<?> verifier = new DefaultJWTClaimsVerifier<>(
@@ -387,5 +402,31 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 		} catch (BadJWTException e) {
 			assertEquals("JWT missing required claims: [iss, iat, jti]", e.getMessage());
 		}
+	}
+	
+	
+	public void testJavaDocExample() throws BadJWTException {
+		
+		DefaultJWTClaimsVerifier<?> verifier = new DefaultJWTClaimsVerifier<>(
+			new JWTClaimsSet.Builder()
+				.issuer("https://issuer.example.com")
+				.audience("https://client.example.com")
+				.build(),
+			new HashSet<>(Arrays.asList("exp", "nbf", "jti")));
+		
+		assertEquals(new HashSet<>(Arrays.asList("iss", "aud", "exp", "nbf", "jti")), verifier.getRequiredClaims());
+		
+		Date now = new Date();
+		Date exp = new Date(now.getTime() + 60_000);
+		
+		verifier.verify(
+			new JWTClaimsSet.Builder()
+				.issuer("https://issuer.example.com")
+				.audience("https://client.example.com")
+				.notBeforeTime(now)
+				.expirationTime(exp)
+				.jwtID("34f8774a-1ede-45be-9b68-595f91a0ab35")
+				.build(),
+			null);
 	}
 }
