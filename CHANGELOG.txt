@@ -1280,3 +1280,5 @@ version 9.8.1 (2021-04-06)
     * Bumps JSON Smart to 1.3.2.
     * Cleans up / refactors code and tests.
 
+version 9.9 (2021-04-26)
+    * Bumps JSON Smart to 1.3.3.
