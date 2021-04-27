@@ -61,12 +61,12 @@ import com.nimbusds.jwt.util.DateUtils;
  * "exp", "nbf" and "jti" claims as required to be present:
  *
  * <pre>
- * DefaultJWTClaimsVerifier<?> verifier = new DefaultJWTClaimsVerifier<>(
+ * DefaultJWTClaimsVerifier&lt;?&gt; verifier = new DefaultJWTClaimsVerifier&lt;&gt;(
  * 	new JWTClaimsSet.Builder()
  * 		.issuer("https://issuer.example.com")
  * 		.audience("https://client.example.com")
  * 		.build(),
- * 	new HashSet<>(Arrays.asList("exp", "nbf", "jti")));
+ * 	new HashSet&lt;&gt;(Arrays.asList("exp", "nbf", "jti")));
  *
  * verifier.verify(jwtClaimsSet, null);
  * </pre>
