@@ -185,7 +185,7 @@ public class JWKTest extends TestCase {
 			JWK.load(keyStore, "1", "".toCharArray());
 			fail();
 		} catch (JOSEException e) {
-			assertEquals("Couldn't retrieve private RSA key (bad pin?): Cannot recover key", e.getMessage());
+			assertTrue(e.getMessage().startsWith("Couldn't retrieve private RSA key (bad pin?)"));
 			assertTrue(e.getCause() instanceof UnrecoverableKeyException);
 		}
 	}
@@ -246,7 +246,7 @@ public class JWKTest extends TestCase {
 			JWK.load(keyStore, "1", "".toCharArray());
 			fail();
 		} catch (JOSEException e) {
-			assertEquals("Couldn't retrieve private EC key (bad pin?): Cannot recover key", e.getMessage());
+			assertTrue(e.getMessage().startsWith("Couldn't retrieve private EC key (bad pin?)"));
 			assertTrue(e.getCause() instanceof UnrecoverableKeyException);
 		}
 	}
