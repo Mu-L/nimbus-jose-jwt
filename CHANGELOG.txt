@@ -1033,7 +1033,7 @@ version 7.9 (2019-10-05)
     * Fixes IllegalArgumentException when parsing JWE header with null "zip"
       (iss #337). Allocated CVE-2019-17195.
     * Catch unexpected exceptions in JSONObjectUtils.parse and rethrow as
-      ParseException. Allocated CVE-2019-17195.
+      ParseException. Allocated CVE-2019-17195. Also addresses CVE-2021-27568.
 
 version 8.0 (2019-10-15)
     * Adds new JOSEObjectTypeVerifier interface for verifying the "typ" (type)
