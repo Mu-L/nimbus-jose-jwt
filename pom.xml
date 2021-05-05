@@ -139,12 +139,17 @@
                 <configuration>
                     <relocations>
                         <relocation>
+                            <pattern>net.minidev.asm</pattern>
+                            <shadedPattern>com.nimbusds.jose.shaded.asm</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>net.minidev.json</pattern>
                             <shadedPattern>com.nimbusds.jose.shaded.json</shadedPattern>
                         </relocation>
                     </relocations>
                     <artifactSet>
                         <includes>
+                            <include>net.minidev:accessors-smart</include>
                             <include>net.minidev:json-smart</include>
                         </includes>
                     </artifactSet>
