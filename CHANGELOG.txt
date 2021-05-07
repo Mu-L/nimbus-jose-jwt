@@ -1290,5 +1290,9 @@ version 9.9.1 (2021-05-04)
     * Bumps JSON Smart to 2.4.7.
 
 version 9.9.2 (2021-05-05)
-    * Shades net.minidev:accessors-smart after the update to JSON Smart 2.4.7.
+    * Shades net.minidev:accessors-smart after the update to JSON Smart 2.4.7
+      (iss #418).
+
+version 9.9.3 (2021-05-07)
+    * Shades org.ow2.asm:asm after the update to JSON Smart 2.4.7 (iss #419).
 

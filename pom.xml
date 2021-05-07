@@ -139,6 +139,10 @@
                 <configuration>
                     <relocations>
                         <relocation>
+                            <pattern>org.objectweb.asm</pattern>
+                            <shadedPattern>com.nimbusds.jose.shaded.ow2asm</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>net.minidev.asm</pattern>
                             <shadedPattern>com.nimbusds.jose.shaded.asm</shadedPattern>
                         </relocation>
@@ -149,6 +153,7 @@
                     </relocations>
                     <artifactSet>
                         <includes>
+                            <include>org.ow2.asm:asm</include>
                             <include>net.minidev:accessors-smart</include>
                             <include>net.minidev:json-smart</include>
                         </includes>
