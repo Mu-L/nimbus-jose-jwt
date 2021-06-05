@@ -30,9 +30,15 @@ import com.nimbusds.jose.util.JSONObjectUtils;
  * Tests the base JOSE header class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-10-04
+ * @version 2021-06-05
  */
 public class HeaderTest extends TestCase {
+	
+	
+	public void testMaxHeaderSizeConstant() {
+		
+		assertEquals(10_000, Header.MAX_HEADER_STRING_LENGTH);
+	}
 
 
 	public void testParsePlainHeaderFromBase64URL()
@@ -98,6 +104,31 @@ public class HeaderTest extends TestCase {
 			fail();
 		} catch (ParseException e) {
 			assertEquals("Missing \"alg\" in header JSON object", e.getMessage());
+		}
+	}
+	
+	
+	public void testHeaderSizeLimitExceeded() {
+		
+		StringBuilder s = new StringBuilder();
+		for (int i = 0; i < Header.MAX_HEADER_STRING_LENGTH; i++) {
+			s.append("a");
+		}
+		
+		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
+			.customParam("data", s.toString())
+			.build();
+		
+		try {
+			Header.parse(header.toBase64URL().toString());
+			fail();
+		} catch (ParseException e) {
+			assertEquals(
+				"The parsed string is longer than the max accepted size of " +
+				Header.MAX_HEADER_STRING_LENGTH +
+				" characters",
+				e.getMessage()
+			);
 		}
 	}
 }

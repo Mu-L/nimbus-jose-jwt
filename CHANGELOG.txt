@@ -1296,3 +1296,12 @@ version 9.9.2 (2021-05-05)
 version 9.9.3 (2021-05-07)
     * Shades org.ow2.asm:asm after the update to JSON Smart 2.4.7 (iss #419).
 
+version 9.10 (2021-06-05)
+    * Enforces a string length limit of 10K chars when parsing JOSE headers
+      (after BASE64URL decoding). The 10K chars should be sufficient to
+      accommodate JOSE headers with an X.509 certificate chain in the "x5c"
+      header parameter (iss #424).
+    * Prevents StackOverflowError when parsing a JOSE header with a very large
+      number of nested JOSE objects (iss #425).
+    * New static JSONObjectUtils.parse(java.lang.String, int) method with an
+      argument to set a limit on the length of the parsed string.

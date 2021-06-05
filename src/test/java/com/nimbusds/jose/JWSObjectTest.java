@@ -18,9 +18,14 @@
 package com.nimbusds.jose;
 
 
+import java.text.ParseException;
+
 import junit.framework.TestCase;
 
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jose.jwk.OctetSequenceKey;
+import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
 
 
@@ -71,5 +76,91 @@ public class JWSObjectTest extends TestCase {
 		String output = jwsObject.serialize();
 
 		assertEquals(output, jwsObject.serialize());
+	}
+	
+	
+	public void testHeaderLengthJustBelowLimit() throws JOSEException, ParseException {
+		
+		StringBuilder s = new StringBuilder();
+		for (int i = 0; i < Header.MAX_HEADER_STRING_LENGTH - 30; i++) {
+			s.append("a");
+		}
+		
+		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
+			.customParam("data", s.toString())
+			.build();
+		
+		assertTrue(header.toBase64URL().decodeToString().length() < Header.MAX_HEADER_STRING_LENGTH);
+		
+		JWSObject jwsObject = new JWSObject(header, new Payload("example"));
+		OctetSequenceKey jwk = new OctetSequenceKeyGenerator(256).generate();
+		jwsObject.sign(new MACSigner(jwk));
+		
+		String jws = jwsObject.serialize();
+		
+		jwsObject = JWSObject.parse(jws);
+		assertTrue(jwsObject.verify(new MACVerifier(jwk)));
+	}
+	
+	
+	public void testHeaderLengthLimitExceeded() throws JOSEException {
+		
+		StringBuilder s = new StringBuilder();
+		for (int i = 0; i < Header.MAX_HEADER_STRING_LENGTH; i++) {
+			s.append("a");
+		}
+		
+		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
+			.customParam("data", s.toString())
+			.build();
+		
+		assertTrue(header.toString().length() > Header.MAX_HEADER_STRING_LENGTH);
+		
+		JWSObject jwsObject = new JWSObject(header, new Payload("example"));
+		jwsObject.sign(new MACSigner(new OctetSequenceKeyGenerator(256).generate()));
+		
+		String jws = jwsObject.serialize();
+		
+		try {
+			JWSObject.parse(jws);
+			fail();
+		} catch (ParseException e) {
+			assertEquals(
+			"Invalid JWS header: The parsed string is longer than the max accepted size of " +
+				Header.MAX_HEADER_STRING_LENGTH +
+				" characters",
+				e.getMessage()
+			);
+		}
+	}
+	
+	
+	public void testParseNestedJSONObjectInHeader() {
+		
+		int recursions = 8000;
+		
+		StringBuilder headerBuilder = new StringBuilder();
+		
+		for (int i = 0; i < recursions; i++) {
+			headerBuilder.append("{\"\":");
+		}
+		
+		String header = Base64URL.encode(headerBuilder.toString()).toString();
+		String payload = Base64URL.encode("123").toString();
+		String invalidSig = Base64URL.encode("123").toString();
+		
+		String token =  header + "." + payload + "." + invalidSig;
+		
+		try {
+			JWSObject.parse(token);
+			fail();
+		} catch (ParseException e) {
+			assertEquals(
+				"Invalid JWS header: The parsed string is longer than the max accepted size of " +
+					Header.MAX_HEADER_STRING_LENGTH +
+					" characters",
+				e.getMessage()
+			);
+		}
 	}
 }

@@ -21,6 +21,7 @@ package com.nimbusds.jose.util;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -31,7 +32,7 @@ import org.junit.Assert;
  * Tests the JSON object utilities.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-03-15
+ * @version 2021-06-04
  */
 public class JSONObjectUtilsTest extends TestCase {
 
@@ -57,6 +58,47 @@ public class JSONObjectUtilsTest extends TestCase {
 			assertEquals("Invalid JSON: Unexpected token 2e+ at position 10.", e.getMessage());
 			assertNull(e.getCause());
 		}
+	}
+	
+	
+	public void testParse_withSizeLimit() {
+		
+		int sizeLimit = 100;
+		
+		StringBuilder s = new StringBuilder();
+		for (int i=0; i < 101; i++) {
+			s.append("a");
+		}
+		assertEquals(101, s.toString().length());
+		
+		try {
+			JSONObjectUtils.parse(s.toString(), sizeLimit);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The parsed string is longer than the max accepted size of 100 characters", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_withNoSizeLimit() throws ParseException {
+		
+		Map<String,Object> map = new HashMap<>();
+		
+		StringBuilder s = new StringBuilder();
+		for (int i=0; i < 101; i++) {
+			s.append("a");
+		}
+		
+		String value = s.toString();
+		
+		assertEquals(101, value.length());
+		map.put("key", value);
+		
+		Map<String,Object> out = JSONObjectUtils.parse(JSONObjectUtils.toJSONString(map), -1);
+		assertEquals(map, out);
+		
+		out = JSONObjectUtils.parse(JSONObjectUtils.toJSONString(map));
+		assertEquals(map, out);
 	}
 	
 	

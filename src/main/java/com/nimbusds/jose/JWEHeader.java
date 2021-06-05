@@ -73,7 +73,7 @@ import com.nimbusds.jose.util.X509CertChainUtils;
  * </pre>
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-03-06
+ * @version 2021-06-05
  */
 @Immutable
 public final class JWEHeader extends CommonSEHeader {
@@ -1279,7 +1279,7 @@ public final class JWEHeader extends CommonSEHeader {
 				      final Base64URL parsedBase64URL)
 		throws ParseException {
 
-		return parse(JSONObjectUtils.parse(jsonString), parsedBase64URL);
+		return parse(JSONObjectUtils.parse(jsonString, MAX_HEADER_STRING_LENGTH), parsedBase64URL);
 	}
 
 
