@@ -1303,5 +1303,8 @@ version 9.10 (2021-06-05)
       header parameter (iss #424).
     * Prevents StackOverflowError when parsing a JOSE header with a very large
       number of nested JOSE objects (iss #425).
+    * Removes the interface JWTClaimsVerifier deprecated in version 4.23
+      (2016-07-25).
     * New static JSONObjectUtils.parse(java.lang.String, int) method with an
       argument to set a limit on the length of the parsed string.
+

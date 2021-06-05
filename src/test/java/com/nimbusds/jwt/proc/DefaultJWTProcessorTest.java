@@ -56,7 +56,7 @@ import com.nimbusds.jwt.*;
 /**
  * Tests the default JWT processor.
  *
- * @version 2019-10-15
+ * @version 2021-06-05
  */
 public class DefaultJWTProcessorTest extends TestCase {
 
@@ -75,7 +75,6 @@ public class DefaultJWTProcessorTest extends TestCase {
 		assertTrue(processor.getJWEDecrypterFactory() instanceof DefaultJWEDecrypterFactory);
 
 		assertTrue(processor.getJWTClaimsSetVerifier() instanceof DefaultJWTClaimsVerifier);
-		assertNull(processor.getJWTClaimsVerifier());
 	}
 
 
@@ -115,7 +114,6 @@ public class DefaultJWTProcessorTest extends TestCase {
 		});
 		
 		assertNotNull(processor.getJWTClaimsSetVerifier());
-		assertNull(processor.getJWTClaimsVerifier());
 
 		assertEquals("alice", processor.process(jwt.serialize(), null).getSubject());
 		assertEquals("https://openid.c2id.com", processor.process(jwt.serialize(), null).getIssuer());
@@ -159,7 +157,6 @@ public class DefaultJWTProcessorTest extends TestCase {
 		});
 
 		assertNotNull(processor.getJWTClaimsSetVerifier());
-		assertNull(processor.getJWTClaimsVerifier());
 
 		assertEquals("alice", processor.process(jwt.serialize(), null).getSubject());
 		assertEquals("https://openid.c2id.com", processor.process(jwt.serialize(), null).getIssuer());
@@ -210,47 +207,6 @@ public class DefaultJWTProcessorTest extends TestCase {
 			assertEquals("Signed JWT rejected: Another algorithm expected, or no matching key(s) found", e.getMessage());
 		}
 	}
-	
-
-	public void testVerifyClaimsAllow_deprecated()
-		throws Exception {
-
-		JWTClaimsSet claims = new JWTClaimsSet.Builder()
-			.issuer("https://openid.c2id.com")
-			.subject("alice")
-			.build();
-
-		SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
-
-		byte[] keyBytes = new byte[32];
-		new SecureRandom().nextBytes(keyBytes);
-		final SecretKey key = new SecretKeySpec(keyBytes, "HMAC");
-
-		jwt.sign(new MACSigner(key));
-
-		ConfigurableJWTProcessor<SimpleSecurityContext> processor = new DefaultJWTProcessor<>();
-
-		processor.setJWSKeySelector(new JWSKeySelector<SimpleSecurityContext>() {
-			@Override
-			public List<? extends Key> selectJWSKeys(JWSHeader header, SimpleSecurityContext context) {
-				return Collections.singletonList(key);
-			}
-		});
-
-		processor.setJWTClaimsVerifier(new JWTClaimsVerifier() {
-			@Override
-			public void verify(JWTClaimsSet claimsSet) throws BadJWTException {
-				if (claimsSet.getIssuer() == null || !claimsSet.getIssuer().equals("https://openid.c2id.com"))
-					throw new BadJWTException("Unexpected/missing issuer");
-			}
-		});
-		
-		assertNull(processor.getJWTClaimsSetVerifier());
-		assertNotNull(processor.getJWTClaimsVerifier());
-
-		assertEquals("alice", processor.process(jwt.serialize(), null).getSubject());
-		assertEquals("https://openid.c2id.com", processor.process(jwt.serialize(), null).getIssuer());
-	}
 
 
 	public void testVerifyClaimsDeny()
@@ -289,53 +245,6 @@ public class DefaultJWTProcessorTest extends TestCase {
 		});
 		
 		assertNotNull(processor.getJWTClaimsSetVerifier());
-		assertNull(processor.getJWTClaimsVerifier());
-
-		try {
-			processor.process(jwt.serialize(), null);
-			fail();
-		} catch (BadJWTException e) {
-
-			assertEquals("Unexpected/missing issuer", e.getMessage());
-		}
-	}
-
-
-	public void testVerifyClaimsDeny_deprecated()
-		throws Exception {
-
-		JWTClaimsSet claims = new JWTClaimsSet.Builder()
-			.issuer("https://test.c2id.com")
-			.subject("alice")
-			.build();
-
-		SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
-
-		byte[] keyBytes = new byte[32];
-		new SecureRandom().nextBytes(keyBytes);
-		final SecretKey key = new SecretKeySpec(keyBytes, "HMAC");
-
-		jwt.sign(new MACSigner(key));
-
-		ConfigurableJWTProcessor<SimpleSecurityContext> processor = new DefaultJWTProcessor<>();
-
-		processor.setJWSKeySelector(new JWSKeySelector<SimpleSecurityContext>() {
-			@Override
-			public List<? extends Key> selectJWSKeys(JWSHeader header, SimpleSecurityContext context) {
-				return Collections.singletonList(key);
-			}
-		});
-
-		processor.setJWTClaimsVerifier(new JWTClaimsVerifier() {
-			@Override
-			public void verify(JWTClaimsSet claimsSet) throws BadJWTException {
-				if (claimsSet.getIssuer() == null || !claimsSet.getIssuer().equals("https://openid.c2id.com"))
-					throw new BadJWTException("Unexpected/missing issuer");
-			}
-		});
-		
-		assertNull(processor.getJWTClaimsSetVerifier());
-		assertNotNull(processor.getJWTClaimsVerifier());
 
 		try {
 			processor.process(jwt.serialize(), null);
@@ -467,7 +376,6 @@ public class DefaultJWTProcessorTest extends TestCase {
 
 		ConfigurableJWTProcessor<SimpleSecurityContext> joseProcessor = new DefaultJWTProcessor<>();
 		joseProcessor.setJWTClaimsSetVerifier(null); // Remove claims verifier, JWT past expiration timestamp
-		joseProcessor.setJWTClaimsVerifier(null); // repeat with deprecated
 
 		joseProcessor.setJWSKeySelector(new JWSKeySelector<SimpleSecurityContext>() {
 			@Override
@@ -996,10 +904,10 @@ public class DefaultJWTProcessorTest extends TestCase {
 		jwtProcessor.setJWTClaimsSetVerifier(new DefaultJWTClaimsVerifier() {
 
 			@Override
-			public void verify(JWTClaimsSet claimsSet)
+			public void verify(JWTClaimsSet claimsSet, SecurityContext context)
 				throws BadJWTException {
 
-				super.verify(claimsSet);
+				super.verify(claimsSet, context);
 
 				String issuer = claimsSet.getIssuer();
 

@@ -86,7 +86,7 @@ import com.nimbusds.jwt.*;
  * {@link com.nimbusds.jose.proc.DefaultJOSEProcessor} class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-04-26
+ * @version 2021-06-05
  */
 public class DefaultJWTProcessor<C extends SecurityContext> implements ConfigurableJWTProcessor<C> {
 
@@ -138,12 +138,6 @@ public class DefaultJWTProcessor<C extends SecurityContext> implements Configura
 	 * The claims verifier.
 	 */
 	private JWTClaimsSetVerifier<C> claimsVerifier = new DefaultJWTClaimsVerifier<>(null, null);
-	
-	
-	/**
-	 * The deprecated claims verifier.
-	 */
-	private JWTClaimsVerifier deprecatedClaimsVerifier = null;
 	
 	
 	@Override
@@ -255,24 +249,6 @@ public class DefaultJWTProcessor<C extends SecurityContext> implements Configura
 	public void setJWTClaimsSetVerifier(final JWTClaimsSetVerifier<C> claimsVerifier) {
 		
 		this.claimsVerifier = claimsVerifier;
-		this.deprecatedClaimsVerifier = null; // clear other verifier
-	}
-	
-	
-	@Override
-	@Deprecated
-	public JWTClaimsVerifier getJWTClaimsVerifier() {
-
-		return deprecatedClaimsVerifier;
-	}
-
-
-	@Override
-	@Deprecated
-	public void setJWTClaimsVerifier(final JWTClaimsVerifier claimsVerifier) {
-
-		this.claimsVerifier = null; // clear official verifier
-		this.deprecatedClaimsVerifier = claimsVerifier;
 	}
 	
 	
@@ -293,9 +269,6 @@ public class DefaultJWTProcessor<C extends SecurityContext> implements Configura
 		
 		if (getJWTClaimsSetVerifier() != null) {
 			getJWTClaimsSetVerifier().verify(claimsSet, context);
-		} else if (getJWTClaimsVerifier() != null) {
-			// Fall back to deprecated claims verifier
-			getJWTClaimsVerifier().verify(claimsSet);
 		}
 		return claimsSet;
 	}

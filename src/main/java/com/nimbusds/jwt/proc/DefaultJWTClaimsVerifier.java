@@ -76,10 +76,10 @@ import com.nimbusds.jwt.util.DateUtils;
  * <p>This class is thread-safe.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-04-26
+ * @version 2021-06-05
  */
 @ThreadSafe
-public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWTClaimsSetVerifier<C>, JWTClaimsVerifier, ClockSkewAware {
+public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWTClaimsSetVerifier<C>, ClockSkewAware {
 
 
 	/**
@@ -272,14 +272,6 @@ public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWT
 	@Override
 	public void setMaxClockSkew(final int maxClockSkewSeconds) {
 		maxClockSkew = maxClockSkewSeconds;
-	}
-	
-	
-	@Override
-	public void verify(final JWTClaimsSet claimsSet)
-		throws BadJWTException {
-
-		verify(claimsSet, null);
 	}
 	
 	

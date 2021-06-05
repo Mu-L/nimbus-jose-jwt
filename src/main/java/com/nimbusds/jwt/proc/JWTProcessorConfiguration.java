@@ -55,7 +55,7 @@ import com.nimbusds.jose.proc.SecurityContext;
  * </ul>
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-06-16
+ * @version 2021-06-05
  */
 public interface JWTProcessorConfiguration<C extends SecurityContext> extends JOSEProcessorConfiguration<C> {
 	
@@ -95,23 +95,4 @@ public interface JWTProcessorConfiguration<C extends SecurityContext> extends JO
 	 *                       not specified.
 	 */
 	void setJWTClaimsSetVerifier(final JWTClaimsSetVerifier<C> claimsVerifier);
-
-
-	/**
-	 * Use {@link #getJWTClaimsSetVerifier()} instead.
-	 *
-	 * @return The JWT claims set verifier, {@code null} if not specified.
-	 */
-	@Deprecated
-	JWTClaimsVerifier getJWTClaimsVerifier();
-
-
-	/**
-	 * Use {@link #setJWTClaimsSetVerifier} instead.
-	 *
-	 * @param claimsVerifier The JWT claims set verifier, {@code null} if
-	 *                       not specified.
-	 */
-	@Deprecated
-	void setJWTClaimsVerifier(final JWTClaimsVerifier claimsVerifier);
 }

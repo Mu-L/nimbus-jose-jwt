@@ -47,8 +47,8 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 		throws BadJOSEException {
 
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().build();
-		JWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier();
-		verifier.verify(claimsSet);
+		JWTClaimsSetVerifier verifier = new DefaultJWTClaimsVerifier();
+		verifier.verify(claimsSet, null);
 	}
 
 
@@ -60,8 +60,8 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
 			.expirationTime(tomorrow)
 			.build();
-		JWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier();
-		verifier.verify(claimsSet);
+		JWTClaimsSetVerifier verifier = new DefaultJWTClaimsVerifier();
+		verifier.verify(claimsSet, null);
 	}
 
 
@@ -72,10 +72,10 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
 			.expirationTime(yesterday)
 			.build();
-		JWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier();
+		JWTClaimsSetVerifier verifier = new DefaultJWTClaimsVerifier();
 
 		try {
-			verifier.verify(claimsSet);
+			verifier.verify(claimsSet, null);
 			fail();
 		} catch (BadJOSEException e) {
 			assertEquals("Expired JWT", e.getMessage());
@@ -91,8 +91,8 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
 			.notBeforeTime(yesterday)
 			.build();
-		JWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier();
-		verifier.verify(claimsSet);
+		JWTClaimsSetVerifier verifier = new DefaultJWTClaimsVerifier();
+		verifier.verify(claimsSet, null);
 	}
 
 
@@ -103,10 +103,10 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
 			.notBeforeTime(tomorrow)
 			.build();
-		JWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier();
+		JWTClaimsSetVerifier verifier = new DefaultJWTClaimsVerifier();
 
 		try {
-			verifier.verify(claimsSet);
+			verifier.verify(claimsSet, null);
 			fail();
 		} catch (BadJOSEException e) {
 			assertEquals("JWT before use time", e.getMessage());
@@ -124,8 +124,8 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 			.expirationTime(tomorrow)
 			.notBeforeTime(yesterday)
 			.build();
-		JWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier();
-		verifier.verify(claimsSet);
+		JWTClaimsSetVerifier verifier = new DefaultJWTClaimsVerifier();
+		verifier.verify(claimsSet, null);
 	}
 
 
@@ -142,7 +142,7 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 
 		final Date thirtySecondsAgo = new Date(now.getTime() - 30*1000L);
 
-		new DefaultJWTClaimsVerifier().verify(new JWTClaimsSet.Builder().expirationTime(thirtySecondsAgo).build());
+		new DefaultJWTClaimsVerifier().verify(new JWTClaimsSet.Builder().expirationTime(thirtySecondsAgo).build(), null);
 	}
 
 
@@ -153,7 +153,7 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 
 		final Date thirtySecondsAhead = new Date(now.getTime() + 30*1000L);
 
-		new DefaultJWTClaimsVerifier().verify(new JWTClaimsSet.Builder().notBeforeTime(thirtySecondsAhead).build());
+		new DefaultJWTClaimsVerifier().verify(new JWTClaimsSet.Builder().notBeforeTime(thirtySecondsAhead).build(), null);
 	}
 
 
