@@ -54,7 +54,7 @@ import com.nimbusds.jose.util.JSONObjectUtils;
  * </pre>
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-10-04
+ * @version 2021-06-05
  */
 @Immutable
 public final class PlainHeader extends Header {
@@ -455,7 +455,7 @@ public final class PlainHeader extends Header {
 					final Base64URL parsedBase64URL)
 		throws ParseException {
 
-		return parse(JSONObjectUtils.parse(jsonString), parsedBase64URL);
+		return parse(JSONObjectUtils.parse(jsonString, MAX_HEADER_STRING_LENGTH), parsedBase64URL);
 	}
 
 

@@ -37,9 +37,18 @@ import com.nimbusds.jose.util.JSONObjectUtils;
  * parameters}; these will be serialised and parsed along the registered ones.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-10-04
+ * @version 2021-06-05
  */
 public abstract class Header implements Serializable {
+	
+	
+	/**
+	 * The max allowed string length when parsing a JOSE header (after the
+	 * BASE64URL decoding). 10K chars should be sufficient to accommodate
+	 * JOSE headers with an X.509 certificate chain in the {@code x5c}
+	 * header parameter.
+	 */
+	public static final int MAX_HEADER_STRING_LENGTH = 10_000;
 
 
 	private static final long serialVersionUID = 1L;
@@ -477,7 +486,7 @@ public abstract class Header implements Serializable {
 				   final Base64URL parsedBase64URL)
 		throws ParseException {
 
-		JSONObject jsonObject = JSONObjectUtils.parse(jsonString);
+		JSONObject jsonObject = JSONObjectUtils.parse(jsonString, MAX_HEADER_STRING_LENGTH);
 
 		return parse(jsonObject, parsedBase64URL);
 	}

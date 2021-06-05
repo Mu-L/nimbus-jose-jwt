@@ -33,7 +33,7 @@ import net.minidev.json.parser.JSONParser;
  * JSON object helper methods for parsing and typed retrieval of member values.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-06-03
+ * @version 2021-06-05
  */
 public class JSONObjectUtils {
 
@@ -65,6 +65,44 @@ public class JSONObjectUtils {
 	public static JSONObject parse(final String s)
 		throws ParseException {
 
+		return parse(s, -1);
+	}
+
+
+	/**
+	 * Parses a JSON object with the option to limit the input string size.
+	 *
+	 * <p>Specific JSON to Java entity mapping (as per JSON Smart):
+	 *
+	 * <ul>
+	 *     <li>JSON true|false map to {@code java.lang.Boolean}.
+	 *     <li>JSON numbers map to {@code java.lang.Number}.
+	 *         <ul>
+	 *             <li>JSON integer numbers map to {@code long}.
+	 *             <li>JSON fraction numbers map to {@code double}.
+	 *         </ul>
+	 *     <li>JSON strings map to {@code java.lang.String}.
+	 *     <li>JSON arrays map to {@code java.util.List<Object>}.
+	 *     <li>JSON objects map to {@code java.util.Map<String,Object>}.
+	 * </ul>
+	 *
+	 * @param s         The JSON object string to parse. Must not be
+	 *                  {@code null}.
+	 * @param sizeLimit The max allowed size of the string to parse. A
+	 *                  negative integer means no limit.
+	 *
+	 * @return The JSON object.
+	 *
+	 * @throws ParseException If the string cannot be parsed to a valid JSON
+	 *                        object.
+	 */
+	public static JSONObject parse(final String s, final int sizeLimit)
+		throws ParseException {
+
+		if (sizeLimit >= 0 && s.length() > sizeLimit) {
+			throw new ParseException("The parsed string is longer than the max accepted size of " + sizeLimit + " characters", 0);
+		}
+		
 		Object o;
 
 		try {

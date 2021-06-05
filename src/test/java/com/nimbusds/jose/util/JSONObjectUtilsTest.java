@@ -31,7 +31,7 @@ import org.junit.Assert;
  * Tests the JSON object utilities.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-06-03
+ * @version 2021-06-05
  */
 public class JSONObjectUtilsTest extends TestCase {
 
@@ -42,6 +42,47 @@ public class JSONObjectUtilsTest extends TestCase {
 		assertEquals(0, JSONObjectUtils.parse("{} ").size());
 		assertEquals(0, JSONObjectUtils.parse("{}\n").size());
 		assertEquals(0, JSONObjectUtils.parse("{}\r\n").size());
+	}
+	
+	
+	public void testParse_withSizeLimit() {
+		
+		int sizeLimit = 100;
+		
+		StringBuilder s = new StringBuilder();
+		for (int i=0; i < 101; i++) {
+			s.append("a");
+		}
+		assertEquals(101, s.toString().length());
+		
+		try {
+			JSONObjectUtils.parse(s.toString(), sizeLimit);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The parsed string is longer than the max accepted size of 100 characters", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_withNoSizeLimit() throws ParseException {
+		
+		JSONObject jsonObject = new JSONObject();
+		
+		StringBuilder s = new StringBuilder();
+		for (int i=0; i < 101; i++) {
+			s.append("a");
+		}
+		
+		String value = s.toString();
+		
+		assertEquals(101, value.length());
+		jsonObject.put("key", value);
+		
+		JSONObject out = JSONObjectUtils.parse(jsonObject.toJSONString(), -1);
+		assertEquals(jsonObject, out);
+		
+		out = JSONObjectUtils.parse(jsonObject.toJSONString());
+		assertEquals(jsonObject, out);
 	}
 	
 	
