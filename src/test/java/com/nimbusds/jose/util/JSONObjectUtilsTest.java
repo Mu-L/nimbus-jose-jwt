@@ -31,7 +31,7 @@ import org.junit.Assert;
  * Tests the JSON object utilities.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-06-05
+ * @version 2021-07-01
  */
 public class JSONObjectUtilsTest extends TestCase {
 
@@ -42,6 +42,37 @@ public class JSONObjectUtilsTest extends TestCase {
 		assertEquals(0, JSONObjectUtils.parse("{} ").size());
 		assertEquals(0, JSONObjectUtils.parse("{}\n").size());
 		assertEquals(0, JSONObjectUtils.parse("{}\r\n").size());
+	}
+	
+	
+	// https://github.com/netplex/json-smart-v1/issues/7
+	// 2021-04-06: JSON Smart 1.3.2 fixes CVE
+	public void testParse_catchNumberFormatException() {
+		
+		String json = "{\"key\":2e+}";
+		try {
+			JSONObjectUtils.parse(json);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("Invalid JSON: Unexpected token 2e+ at position 10.", e.getMessage());
+			assertNull(e.getCause());
+		}
+	}
+	
+	
+	public void testParse_catchStackOverflowError() {
+	
+		StringBuilder sb = new StringBuilder("{\"a\":");
+		for (int i = 0; i < 6000; i++) {
+			sb.append("[");
+		}
+		
+		try {
+			JSONObjectUtils.parse(sb.toString());
+			fail();
+		} catch (ParseException e) {
+			assertEquals("Excessive JSON object and / or array nesting", e.getMessage());
+		}
 	}
 	
 	

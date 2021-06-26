@@ -1210,3 +1210,7 @@ version 8.22 (2021-06-05)
       number of nested JOSE objects (iss #425).
     * New static JSONObjectUtils.parse(java.lang.String, int) method with an
       argument to set a limit on the length of the parsed string.
+
+version 8.22.1 (2021-07-01)
+    * Updates JSONObjectUtils.parse(String, int) to catch StackOverflowErrors
+      and throw them as ParseException (iss #434).

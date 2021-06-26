@@ -33,7 +33,7 @@ import net.minidev.json.parser.JSONParser;
  * JSON object helper methods for parsing and typed retrieval of member values.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-06-05
+ * @version 2021-07-01
  */
 public class JSONObjectUtils {
 
@@ -113,6 +113,8 @@ public class JSONObjectUtils {
 			throw new ParseException("Invalid JSON: " + e.getMessage(), 0);
 		} catch (Exception e) {
 			throw new ParseException("Unexpected exception: " + e.getMessage(), 0);
+		} catch (StackOverflowError e) {
+			throw new ParseException("Excessive JSON object and / or array nesting", 0);
 		}
 
 		if (o instanceof JSONObject) {

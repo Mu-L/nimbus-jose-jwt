@@ -24,13 +24,14 @@ import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.text.ParseException;
 import java.util.Date;
 
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
 import junit.framework.TestCase;
 
 import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.util.Base64URL;
@@ -172,5 +173,24 @@ public class SignedJWTTest extends TestCase {
 		assertNull(claimsSet.getClaim("myclaim"));
 		assertTrue(claimsSet.getClaims().containsKey("myclaim"));
 		assertEquals(2, claimsSet.getClaims().size());
+	}
+	
+	
+	public void testParseWithExcessiveMixedNestingInPayload() throws ParseException {
+		
+		StringBuilder sb = new StringBuilder("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjpb");
+		for (int i = 0; i < 1000; i++) {
+			sb.append("W1tb");
+		}
+		sb.append(".aaaa");
+		
+		SignedJWT jwt = SignedJWT.parse(sb.toString());
+		
+		try {
+			jwt.getJWTClaimsSet();
+			fail();
+		} catch (ParseException e) {
+			assertEquals("Payload of JWS object is not a valid JSON object", e.getMessage());
+		}
 	}
 }
