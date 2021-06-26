@@ -1311,3 +1311,4 @@ version 9.10 (2021-06-05)
 version 9.10.1 (2021-06-26)
     * Updates JSONObjectUtils.parse(String, int) to catch StackOverflowErrors
       and throw them as ParseException (iss #434).
+    * Locks BouncyCastle dependency to version 1.68.
