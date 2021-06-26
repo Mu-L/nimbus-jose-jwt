@@ -24,6 +24,7 @@ import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.text.ParseException;
 import java.util.Date;
 
 import com.nimbusds.jose.crypto.MACSigner;
@@ -174,6 +175,7 @@ public class SignedJWTTest extends TestCase {
 		assertEquals(2, claimsSet.getClaims().size());
 	}
 
+	
 	public void testPayloadUpdated()
 			throws Exception {
 
@@ -186,5 +188,24 @@ public class SignedJWTTest extends TestCase {
 				.subject("after").build().toJSONObject()));
 
 		assertEquals("after", jwt.getJWTClaimsSet().getSubject());
+	}
+	
+	
+	public void testParseWithExcessiveMixedNestingInPayload() throws ParseException {
+		
+		StringBuilder sb = new StringBuilder("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjpb");
+		for (int i = 0; i < 1000; i++) {
+			sb.append("W1tb");
+		}
+		sb.append(".aaaa");
+		
+		SignedJWT jwt = SignedJWT.parse(sb.toString());
+		
+		try {
+			jwt.getJWTClaimsSet();
+			fail();
+		} catch (ParseException e) {
+			assertEquals("Payload of JWS object is not a valid JSON object", e.getMessage());
+		}
 	}
 }

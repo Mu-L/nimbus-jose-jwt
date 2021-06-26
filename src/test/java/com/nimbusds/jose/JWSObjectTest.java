@@ -33,7 +33,7 @@ import com.nimbusds.jose.util.Base64URL;
  * Tests JWS object methods.
  *
  * @author Vladimir Dzhuvinov
- * @version 2015-01-15
+ * @version 2021-06-26
  */
 public class JWSObjectTest extends TestCase {
 
@@ -162,5 +162,40 @@ public class JWSObjectTest extends TestCase {
 				e.getMessage()
 			);
 		}
+	}
+	
+	
+	public void testParseWithExcessiveMixedNestingInHeader() {
+	
+		StringBuilder sb = new StringBuilder("{\"a\":");
+		for (int i = 0; i < 6000; i++) {
+			sb.append("[");
+		}
+		
+		String jws = Base64URL.encode(sb.toString()) + ".aaaa.aaaa";
+		
+		try {
+			JWSObject.parse(jws);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("Invalid JWS header: Excessive JSON object and / or array nesting", e.getMessage());
+		}
+	}
+	
+	
+	public void testParseWithExcessiveMixedNestingInPayload() throws ParseException {
+	
+		
+		StringBuilder sb = new StringBuilder("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjpb");
+		for (int i = 0; i < 1000; i++) {
+			sb.append("W1tb");
+		}
+		sb.append(".aaaa");
+		
+		JWSObject jwsObject = JWSObject.parse(sb.toString());
+		
+		Payload payload = jwsObject.getPayload();
+		assertNotNull(payload.toString());
+		assertNull(payload.toJSONObject());
 	}
 }

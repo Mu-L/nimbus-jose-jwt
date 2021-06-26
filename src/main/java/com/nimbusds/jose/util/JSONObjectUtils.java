@@ -111,6 +111,8 @@ public class JSONObjectUtils {
 			throw new ParseException("Invalid JSON: " + e.getMessage(), 0);
 		} catch (Exception e) {
 			throw new ParseException("Unexpected exception: " + e.getMessage(), 0);
+		} catch (StackOverflowError e) {
+			throw new ParseException("Excessive JSON object and / or array nesting", 0);
 		}
 
 		if (o instanceof JSONObject) {

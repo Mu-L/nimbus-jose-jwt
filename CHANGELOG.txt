@@ -1308,3 +1308,6 @@ version 9.10 (2021-06-05)
     * New static JSONObjectUtils.parse(java.lang.String, int) method with an
       argument to set a limit on the length of the parsed string.
 
+version 9.10.1 (2021-06-26)
+    * Updates JSONObjectUtils.parse(String, int) to catch StackOverflowErrors
+      and throw them as ParseException (iss #434).
