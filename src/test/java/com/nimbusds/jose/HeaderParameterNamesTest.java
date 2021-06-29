@@ -2,15 +2,15 @@ package com.nimbusds.jose;
 
 import junit.framework.TestCase;
 
-import static com.nimbusds.jose.JOSEIdentifiers.*;
+import static com.nimbusds.jose.HeaderParameterNames.*;
 
 /**
- * Tests the correctness of the JOSE Identifier Constants.
+ * Tests the correctness of the Header Parameter Constants.
  *
  * @author Nathaniel Hart
  * @version 2021-06-15
  */
-public class JOSEIdentifiersTest extends TestCase {
+public class HeaderParameterNamesTest extends TestCase {
 
 
   public void testConstantValues() {

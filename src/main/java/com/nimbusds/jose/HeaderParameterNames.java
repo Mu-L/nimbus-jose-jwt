@@ -1,14 +1,14 @@
 package com.nimbusds.jose;
 
 /**
- * The JOSE identifiers to use when creating JWEs, JWKs, etc...
+ * The names of header parameters to use when creating JWEs, JWKs, etc...
  *
  * @see <a href="https://www.iana.org/assignments/jose/jose.xhtml">JSON Object Signing and Encryption (JOSE)</a>
  *
  * @author Nathaniel Hart
  * @version 2021-06-15
  */
-public interface JOSEIdentifiers {
+public interface HeaderParameterNames {
 
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ public interface JOSEIdentifiers {
 
 
   ////////////////////////////////////////////////////////////////////////////////
-  // RFC 7518 (JWA) Header Parameters
+  // RFC 7518 Header Parameters
   ////////////////////////////////////////////////////////////////////////////////
 
 

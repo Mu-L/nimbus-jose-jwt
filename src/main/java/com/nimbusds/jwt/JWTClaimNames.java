@@ -6,7 +6,7 @@ package com.nimbusds.jwt;
  * @author Nathaniel Hart
  * @version 2021-06-15
  */
-public interface JWTIdentifiers {
+public interface JWTClaimNames {
 
 
   /**

@@ -2,15 +2,15 @@ package com.nimbusds.jwt;
 
 import junit.framework.TestCase;
 
-import static com.nimbusds.jwt.JWTIdentifiers.*;
+import static com.nimbusds.jwt.JWTClaimNames.*;
 
 /**
- * Tests the correctness of the JWT Identifier Constants.
+ * Tests the correctness of the JWT Claim Name Constants.
  *
  * @author Nathaniel Hart
  * @version 2021-06-15
  */
-public class JWTIdentifiersTest extends TestCase {
+public class JWTClaimNamesTest extends TestCase {
 
 
   public void testPayloadClaimValues() {

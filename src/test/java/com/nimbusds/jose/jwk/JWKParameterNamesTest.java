@@ -2,23 +2,21 @@ package com.nimbusds.jose.jwk;
 
 import junit.framework.TestCase;
 
-import static com.nimbusds.jose.jwk.JWKIdentifiers.*;
+import static com.nimbusds.jose.jwk.JWKParameterNames.*;
 
 /**
- * Tests the correctness of the JWK Identifier Constants.
+ * Tests the correctness of the JWK Parameter Constants.
  *
  * @author Nathaniel Hart
  * @version 2021-06-15
  */
-public class JWKIdentifiersTest extends TestCase {
+public class JWKParameterNamesTest extends TestCase {
 
 
   public void testConstantValues() {
     assertEquals("kty", KEY_TYPE);
     assertEquals("key_ops", KEY_OPS);
     assertEquals("use", PUBLIC_KEY_USE);
-    assertEquals("enc", ENCRYPTION_ALGORITHM);
-    assertEquals("sig", SIGNATURE);
     assertEquals("key_ops", KEY_OPS);
     assertEquals("alg", ALGORITHM);
     assertEquals("kid", KEY_ID);
@@ -26,8 +24,6 @@ public class JWKIdentifiersTest extends TestCase {
     assertEquals("x5c", X_509_CERT_CHAIN);
     assertEquals("x5t", X_509_CERT_SHA_1_THUMBPRINT);
     assertEquals("x5t#S256", X_509_CERT_SHA_256_THUMBPRINT);
-
-    assertEquals("keys", KEYS);
 
     assertEquals("EC", ELLIPTIC_CURVE_KEY_TYPE);
     assertEquals("RSA", RSA_KEY_TYPE);
