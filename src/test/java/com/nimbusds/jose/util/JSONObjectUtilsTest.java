@@ -63,7 +63,7 @@ public class JSONObjectUtilsTest extends TestCase {
 	public void testParse_catchStackOverflowError() {
 	
 		StringBuilder sb = new StringBuilder("{\"a\":");
-		for (int i = 0; i < 6000; i++) {
+		for (int i = 0; i < 7000; i++) {
 			sb.append("[");
 		}
 		
