@@ -17,13 +17,13 @@
 
     <organization>
         <name>Connect2id Ltd.</name>
-        <url>http://connect2id.com</url>
+        <url>https://connect2id.com</url>
     </organization>
 
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>[1.68,2.0.0)</version>
+            <version>1.68</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>[1.52,)</version>
+            <version>1.68</version>
             <optional>true</optional>
         </dependency>
         <dependency>
