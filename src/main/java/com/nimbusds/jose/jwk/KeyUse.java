@@ -18,6 +18,8 @@
 package com.nimbusds.jose.jwk;
 
 
+import com.nimbusds.jose.HeaderParameterNames;
+
 import java.io.Serializable;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
@@ -45,15 +47,26 @@ public final class KeyUse implements Serializable {
 
 
 	/**
+	 * @see <a href="https://datatracker.ietf.org/doc/html/rfc7517#section-4.2">RFC 7517 "sig" (signature) Parameter Value</a>
+	 */
+	public static final String SIGNATURE_USE = "sig";
+
+	/**
+	 * @see <a href="https://datatracker.ietf.org/doc/html/rfc7517#section-4.2">RFC 7517 "enc" (encryption) Parameter Value</a>
+	 */
+	public static final String ENCRYPTION_USE = HeaderParameterNames.ENCRYPTION_ALGORITHM;
+
+
+	/**
 	 * Signature.
 	 */
-	public static final KeyUse SIGNATURE = new KeyUse("sig");
+	public static final KeyUse SIGNATURE = new KeyUse(SIGNATURE_USE);
 
 
 	/**
 	 * Encryption.
 	 */
-	public static final KeyUse ENCRYPTION = new KeyUse("enc");
+	public static final KeyUse ENCRYPTION = new KeyUse(ENCRYPTION_USE);
 
 
 	/**
