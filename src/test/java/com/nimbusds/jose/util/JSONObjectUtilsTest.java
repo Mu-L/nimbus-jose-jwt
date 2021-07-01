@@ -60,10 +60,11 @@ public class JSONObjectUtilsTest extends TestCase {
 	}
 	
 	
+	// Note, stack depth depends on the JVM config, test may fail because of that
 	public void testParse_catchStackOverflowError() {
 	
 		StringBuilder sb = new StringBuilder("{\"a\":");
-		for (int i = 0; i < 7000; i++) {
+		for (int i = 0; i < 9000; i++) {
 			sb.append("[");
 		}
 		
