@@ -89,7 +89,8 @@ public class PBKDF2 {
 	 * @param password       The password. Must not be {@code null}.
 	 * @param formattedSalt  The formatted cryptographic salt. Must not be
 	 *                       {@code null}.
-	 * @param iterationCount The iteration count. Must be positive.
+	 * @param iterationCount The iteration count. Must be a positive
+	 *                       integer.
 	 * @param prfParams      The Pseudo-Random Function (PRF) parameters.
 	 *                       Must not be {@code null}.
 	 *
@@ -182,14 +183,22 @@ public class PBKDF2 {
 	 *
 	 * @param salt           The cryptographic salt. Must not be
 	 *                       {@code null}.
-	 * @param iterationCount The iteration count.
+	 * @param iterationCount The iteration count. Must be a positive
+	 *                       integer.
 	 * @param blockIndex     The block index.
 	 * @param prf            The pseudo-random function (HMAC). Must not be
 	 *                       {@code null.
 	 *
 	 * @return The block.
+	 *
+	 * @throws JOSEException If the block extraction failed.
 	 */
-	private static byte[] extractBlock(final byte[] salt, final int iterationCount, final int blockIndex, final Mac prf) {
+	private static byte[] extractBlock(final byte[] salt, final int iterationCount, final int blockIndex, final Mac prf)
+		throws JOSEException {
+		
+		if (iterationCount < 1) {
+			throw new JOSEException("The iteration count must be greater than 0");
+		}
 
 		byte[] currentU;
 		byte[] lastU = null;
