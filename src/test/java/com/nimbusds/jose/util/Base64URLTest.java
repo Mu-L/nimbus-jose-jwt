@@ -21,7 +21,6 @@ package com.nimbusds.jose.util;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 
-import com.nimbusds.jose.util.Base64URL;
 import junit.framework.TestCase;
 
 
@@ -29,7 +28,7 @@ import junit.framework.TestCase;
  * Tests the Base64URL class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-06-18
+ * @version 2021-07-02
  */
 public class Base64URLTest extends TestCase {
 
@@ -109,6 +108,30 @@ public class Base64URLTest extends TestCase {
 	public void testFromNull() {
 		
 		assertNull(Base64URL.from(null));
+	}
+	
+	
+	public void testEqualityAndHashCode() {
+		
+		Base64URL a1 = new Base64URL("abc");
+		Base64URL a2 = new Base64URL("abc");
+		
+		Base64 b = new Base64("abc");
+		
+		assertEquals(a1, a2);
+		assertNotSame(a1, b);
+		assertNotSame(a2, b);
+		
+		assertEquals(a1.hashCode(), a2.hashCode());
+		assertEquals(a1.hashCode(), b.hashCode());
+		assertEquals(a2.hashCode(), b.hashCode());
+	}
+	
+	
+	public void testInequalityAndHashCode() {
+		
+		assertNotSame(new Base64URL("abc"), new Base64URL("def"));
+		assertNotSame(new Base64URL("abc").hashCode(), new Base64URL("def").hashCode());
 	}
 }
 
