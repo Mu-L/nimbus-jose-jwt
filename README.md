@@ -70,7 +70,6 @@ The library can handle all standard JOSE algorithms:
 
 The Nimbus JOSE+JWT library requires Java 7+ and has minimal dependencies.
 
-* JCIP for concurrency annotations.
 * (optional) BouncyCastle as an alternative JCA provider. Must not be imported
   together with the BouncyCastle FIPS provider!
 * (optional) BouncyCastle FIPS as a FIPS 140-2, Level 1 compliant JCA provider.
