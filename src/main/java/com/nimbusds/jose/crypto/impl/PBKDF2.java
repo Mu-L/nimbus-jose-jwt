@@ -38,7 +38,8 @@ import com.nimbusds.jose.util.StandardCharset;
  *
  * @author Brian Campbell
  * @author Yavor Vassilev
- * @version 2016-07-26
+ * @author Vladimir Dzhuvinov
+ * @version 2021-07-02
  */
 public class PBKDF2 {
 
@@ -101,6 +102,10 @@ public class PBKDF2 {
 					  final int iterationCount,
 					  final PRFParams prfParams)
 		throws JOSEException {
+		
+		if (iterationCount < 1) {
+			throw new JOSEException("The iteration count must be greater than 0");
+		}
 
 		SecretKey macKey = new SecretKeySpec(password, prfParams.getMACAlgorithm());
 
@@ -184,7 +189,7 @@ public class PBKDF2 {
 	 *
 	 * @return The block.
 	 */
-	private static byte[] extractBlock(byte[] salt, int iterationCount, int blockIndex, Mac prf) {
+	private static byte[] extractBlock(final byte[] salt, final int iterationCount, final int blockIndex, final Mac prf) {
 
 		byte[] currentU;
 		byte[] lastU = null;
