@@ -1315,3 +1315,5 @@ version 9.10.1 (2021-06-26)
 
 version 9.11 (2021-07-02)
     * Adds PBKDF2.deriveKey check to ensure iteration count is greater than 0.
+    * Makes com.github.stephenc.jcip:jcip-annotations:1.0-1 dependency
+      optional.
