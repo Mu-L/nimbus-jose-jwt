@@ -20,10 +20,7 @@ package com.nimbusds.jose.jwk;
 
 import java.io.Serializable;
 import java.security.spec.ECParameterSpec;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import net.jcip.annotations.Immutable;
@@ -57,7 +54,7 @@ import net.jcip.annotations.Immutable;
  *
  * @author Vladimir Dzhuvinov
  * @author Aleksei Doroganov
- * @version 2013-03-28
+ * @version 2021-07-02
  */
 @Immutable
 public final class Curve implements Serializable {
@@ -243,6 +240,12 @@ public final class Curve implements Serializable {
 	}
 	
 	
+	@Override
+	public int hashCode() {
+		return Objects.hash(getName());
+	}
+	
+	
 	/**
 	 * Parses a cryptographic curve from the specified string.
 	 *
@@ -348,7 +351,7 @@ public final class Curve implements Serializable {
 		if (JWSAlgorithm.ES256.equals(alg)) {
 			return Collections.singleton(P_256);
 		} else if (JWSAlgorithm.ES256K.equals(alg)) {
-            return Collections.singleton(SECP256K1);
+			return Collections.singleton(SECP256K1);
 		} else if (JWSAlgorithm.ES384.equals(alg)) {
 			return Collections.singleton(P_384);
 		} else if (JWSAlgorithm.ES512.equals(alg)) {

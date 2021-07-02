@@ -156,4 +156,24 @@ public class CurveTest extends TestCase {
 		// null
 		assertNull(Curve.forJWSAlgorithm(null));
 	}
+	
+	
+	public void testEqualityAndHashCode() {
+		
+		assertEquals(new Curve("P-256"), Curve.P_256);
+		assertEquals(new Curve("P-256").hashCode(), Curve.P_256.hashCode());
+		
+		assertEquals("Crypto name and OID ignored", new Curve("P-256", "x", "y"), new Curve("P-256"));
+		assertEquals("Crypto name and OID ignored", new Curve("P-256", "x", "y").hashCode(), new Curve("P-256").hashCode());
+	}
+	
+	
+	public void testInequalityAndHashCode() {
+		
+		assertNotSame(new Curve("P-256"), Curve.P_384);
+		assertNotSame(new Curve("P-256").hashCode(), Curve.P_384.hashCode());
+		
+		assertNotSame("Crypto name and OID ignored", new Curve("P-256", "x", "y"), new Curve("P-384", "x", "y"));
+		assertNotSame("Crypto name and OID ignored", new Curve("P-256", "x", "y").hashCode(), new Curve("P-384", "x", "y").hashCode());
+	}
 }
