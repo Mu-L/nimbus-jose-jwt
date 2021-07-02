@@ -18,12 +18,14 @@
 package com.nimbusds.jose.crypto;
 
 
-import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+
+import static org.junit.Assert.assertArrayEquals;
+
+import junit.framework.TestCase;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
-import junit.framework.TestCase;
 
 
 /**
@@ -46,8 +48,7 @@ public class PBES2Test extends TestCase {
 	}
 
 
-	public void testClassEncryptionMethodSupport()
-		throws Exception {
+	public void testClassEncryptionMethodSupport() {
 
 		assertEquals(8, PasswordBasedEncrypter.SUPPORTED_ENCRYPTION_METHODS.size());
 		assertTrue(PasswordBasedEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256));
@@ -89,8 +90,7 @@ public class PBES2Test extends TestCase {
 	}
 
 
-	public void testInstanceEncryptionMethodSupport()
-		throws Exception {
+	public void testInstanceEncryptionMethodSupport() {
 
 		JWEEncrypter encrypter = new PasswordBasedEncrypter("secret", 8, 1000);
 
@@ -127,19 +127,19 @@ public class PBES2Test extends TestCase {
 
 	public void testPasswordByteConstructors() {
 
-		byte[] password = "secret".getBytes(Charset.forName("UTF-8"));
+		byte[] password = "secret".getBytes(StandardCharsets.UTF_8);
 
 		PasswordBasedEncrypter encrypter = new PasswordBasedEncrypter(password, 8, 1000);
-
-		assertTrue(Arrays.equals(password, encrypter.getPassword()));
+		
+		assertArrayEquals(password, encrypter.getPassword());
 		assertEquals("secret", encrypter.getPasswordString());
 
 		assertEquals(8, encrypter.getSaltLength());
 		assertEquals(1000, encrypter.getIterationCount());
 
 		PasswordBasedDecrypter decrypter = new PasswordBasedDecrypter(password);
-
-		assertTrue(Arrays.equals(password, decrypter.getPassword()));
+		
+		assertArrayEquals(password, decrypter.getPassword());
 		assertEquals("secret", decrypter.getPasswordString());
 	}
 
