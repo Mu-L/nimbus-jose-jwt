@@ -222,7 +222,7 @@ public interface JWKParameterNames {
 	/**
 	 * Used with {@link KeyType#OCT}
 	 *
-	 * @see <a href="https://datatracker.ietf.org/doc/html/rfc7518#section-n 6.4.1">RFC 7518 "k" (OCT Key Value) Parameter</a>
+	 * @see <a href="https://datatracker.ietf.org/doc/html/rfc7518#section-6.4.1">RFC 7518 "k" (OCT Key Value) Parameter</a>
 	 */
 	String OCT_KEY_VALUE = "k";
 	
