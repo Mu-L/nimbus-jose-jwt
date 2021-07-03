@@ -89,10 +89,24 @@ For Maven add:
 
 where `[ version ]` is the latest stable version.
 
+
+## Issues / suggestions
+
 To post bug reports and suggestions:
 
 <https://bitbucket.org/connect2id/nimbus-jose-jwt/issues>
 
+
+## SonarCloud Status
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=connect2id_nimbus-jose-jwt&metric=alert_status)](https://sonarcloud.io/dashboard?id=connect2id_nimbus-jose-jwt)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=connect2id_nimbus-jose-jwt&metric=security_rating)](https://sonarcloud.io/dashboard?id=connect2id_nimbus-jose-jwt)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=connect2id_nimbus-jose-jwt&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=connect2id_nimbus-jose-jwt)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=connect2id_nimbus-jose-jwt&metric=bugs)](https://sonarcloud.io/dashboard?id=connect2id_nimbus-jose-jwt)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=connect2id_nimbus-jose-jwt&metric=coverage)](https://sonarcloud.io/dashboard?id=connect2id_nimbus-jose-jwt)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=connect2id_nimbus-jose-jwt&metric=ncloc)](https://sonarcloud.io/dashboard?id=connect2id_nimbus-jose-jwt)
+
+## Twitter
 
 Follow updates and new releases on Twitter:
 
