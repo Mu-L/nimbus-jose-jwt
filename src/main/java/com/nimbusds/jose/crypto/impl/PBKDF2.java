@@ -39,17 +39,29 @@ import com.nimbusds.jose.util.StandardCharset;
  * @author Brian Campbell
  * @author Yavor Vassilev
  * @author Vladimir Dzhuvinov
- * @version 2021-07-02
+ * @version 2021-07-03
  */
 public class PBKDF2 {
+	
+	
+	/**
+	 * The minimum salt length (8 bytes).
+	 */
+	public static final int MIN_SALT_LENGTH = 8;
 
 
 	/**
 	 * Zero byte array of length one.
 	 */
-	public static final byte[] ZERO_BYTE = { 0 };
-
-
+	static final byte[] ZERO_BYTE = { 0 };// value of (long) Math.pow(2, 32) - 1;
+	
+	
+	/**
+	 * Value of {@code (long) Math.pow(2, 32) - 1;}
+	 */
+	static final long MAX_DERIVED_KEY_LENGTH = 4294967295L;
+	
+	
 	/**
 	 * Formats the specified cryptographic salt for use in PBKDF2.
 	 *
@@ -58,24 +70,31 @@ public class PBKDF2 {
 	 * </pre>
 	 *
 	 * @param alg  The JWE algorithm. Must not be {@code null}.
-	 * @param salt The cryptographic salt. Must not be empty or null.
+	 * @param salt The cryptographic salt. Must be at least 8 bytes long.
 	 *
 	 * @return The formatted salt for use in PBKDF2.
+	 *
+	 * @throws JOSEException If formatting failed.
 	 */
 	public static byte[] formatSalt(final JWEAlgorithm alg, final byte[] salt)
 		throws JOSEException {
 
 		byte[] algBytes = alg.toString().getBytes(StandardCharset.UTF_8);
+		
+		if (salt == null) {
+			throw new JOSEException("The salt must not be null");
+		}
+		
+		if (salt.length < MIN_SALT_LENGTH) {
+			throw new JOSEException("The salt must be at least " + MIN_SALT_LENGTH + " bytes long");
+		}
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-
 		try {
 			out.write(algBytes);
 			out.write(ZERO_BYTE);
 			out.write(salt);
-
 		} catch (IOException e) {
-
 			throw new JOSEException(e.getMessage(), e);
 		}
 
@@ -104,6 +123,10 @@ public class PBKDF2 {
 					  final PRFParams prfParams)
 		throws JOSEException {
 		
+		if (formattedSalt == null) {
+			throw new JOSEException("The formatted salt must not be null");
+		}
+		
 		if (iterationCount < 1) {
 			throw new JOSEException("The iteration count must be greater than 0");
 		}
@@ -116,9 +139,8 @@ public class PBKDF2 {
 
 		//  1. If dkLen > (2^32 - 1) * hLen, output "derived key too long" and
 		//     stop.
-		long maxDerivedKeyLength = 4294967295L; // value of (long) Math.pow(2, 32) - 1;
-		if (prfParams.getDerivedKeyByteLength() > maxDerivedKeyLength) {
-			throw new JOSEException("derived key too long " + prfParams.getDerivedKeyByteLength());
+		if (prfParams.getDerivedKeyByteLength() > MAX_DERIVED_KEY_LENGTH) {
+			throw new JOSEException("Derived key too long: " + prfParams.getDerivedKeyByteLength());
 		}
 
 		//  2. Let l be the number of hLen-octet blocks in the derived key,
@@ -181,8 +203,7 @@ public class PBKDF2 {
 	/**
 	 * Block extraction iteration.
 	 *
-	 * @param salt           The cryptographic salt. Must not be
-	 *                       {@code null}.
+	 * @param formattedSalt  The formatted salt. Must not be {@code null}.
 	 * @param iterationCount The iteration count. Must be a positive
 	 *                       integer.
 	 * @param blockIndex     The block index.
@@ -193,8 +214,12 @@ public class PBKDF2 {
 	 *
 	 * @throws JOSEException If the block extraction failed.
 	 */
-	private static byte[] extractBlock(final byte[] salt, final int iterationCount, final int blockIndex, final Mac prf)
+	static byte[] extractBlock(final byte[] formattedSalt, final int iterationCount, final int blockIndex, final Mac prf)
 		throws JOSEException {
+		
+		if (formattedSalt == null) {
+			throw new JOSEException("The formatted salt must not be null");
+		}
 		
 		if (iterationCount < 1) {
 			throw new JOSEException("The iteration count must be greater than 0");
@@ -209,7 +234,7 @@ public class PBKDF2 {
 			byte[] inputBytes;
 			if (i == 1)
 			{
-				inputBytes = ByteUtils.concat(salt, IntegerUtils.toBytes(blockIndex));
+				inputBytes = ByteUtils.concat(formattedSalt, IntegerUtils.toBytes(blockIndex));
 				currentU = prf.doFinal(inputBytes);
 				xorU = currentU;
 			}

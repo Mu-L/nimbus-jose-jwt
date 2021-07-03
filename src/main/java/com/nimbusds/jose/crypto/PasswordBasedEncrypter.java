@@ -59,7 +59,7 @@ import net.jcip.annotations.ThreadSafe;
  * </ul>
  *
  * @author Vladimir Dzhuvinov
- * @version 2016-07-26
+ * @version 2021-07-03
  */
 @ThreadSafe
 public class PasswordBasedEncrypter extends PasswordBasedCryptoProvider implements JWEEncrypter {
@@ -68,7 +68,7 @@ public class PasswordBasedEncrypter extends PasswordBasedCryptoProvider implemen
 	/**
 	 * The minimum salt length (8 bytes).
 	 */
-	public static final int MIN_SALT_LENGTH = 8;
+	public static final int MIN_SALT_LENGTH = PBKDF2.MIN_SALT_LENGTH;
 
 
 	/**
