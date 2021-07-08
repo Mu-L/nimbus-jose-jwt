@@ -35,6 +35,7 @@ import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
 
+import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
 
 
@@ -270,9 +271,9 @@ public class JWEHeaderTest extends TestCase {
 		throws Exception {
 
 		Set<String> crit = new HashSet<>();
-		crit.add("iat");
-		crit.add("exp");
-		crit.add("nbf");
+		crit.add(JWTClaimNames.ISSUED_AT);
+		crit.add(JWTClaimNames.EXPIRATION_TIME);
+		crit.add(JWTClaimNames.NOT_BEFORE);
 
 		JWEHeader h = new JWEHeader.Builder(JWEAlgorithm.RSA1_5, EncryptionMethod.A128CBC_HS256).
 			criticalParams(crit).
@@ -287,9 +288,9 @@ public class JWEHeaderTest extends TestCase {
 		
 		crit = h.getCriticalParams();
 
-		assertTrue(crit.contains("iat"));
-		assertTrue(crit.contains("exp"));
-		assertTrue(crit.contains("nbf"));
+		assertTrue(crit.contains(JWTClaimNames.ISSUED_AT));
+		assertTrue(crit.contains(JWTClaimNames.EXPIRATION_TIME));
+		assertTrue(crit.contains(JWTClaimNames.NOT_BEFORE));
 
 		assertEquals(3, crit.size());
 	}
@@ -315,7 +316,7 @@ public class JWEHeaderTest extends TestCase {
 		JWEHeader h = new JWEHeader.Builder(JWEAlgorithm.A128KW, EncryptionMethod.A128GCM).
 			type(JOSEObjectType.JOSE).
 			contentType("application/json").
-			criticalParams(new HashSet<>(Arrays.asList("exp", "nbf"))).
+			criticalParams(new HashSet<>(Arrays.asList(JWTClaimNames.EXPIRATION_TIME, JWTClaimNames.NOT_BEFORE))).
 			jwkURL(new URI("http://example.com/jwk.json")).
 			jwk(new OctetSequenceKey.Builder(new Base64URL("xyz")).build()).
 			x509CertURL(new URI("http://example.com/cert.pem")).
@@ -330,16 +331,16 @@ public class JWEHeaderTest extends TestCase {
 			pbes2Count(1000).
 			iv(new Base64URL("101010")).
 			authTag(new Base64URL("202020")).
-			customParam("exp", 123).
-			customParam("nbf", 456).
+			customParam(JWTClaimNames.EXPIRATION_TIME, 123).
+			customParam(JWTClaimNames.NOT_BEFORE, 456).
 			build();
 
 		assertEquals(JWEAlgorithm.A128KW, h.getAlgorithm());
 		assertEquals(EncryptionMethod.A128GCM, h.getEncryptionMethod());
 		assertEquals(JOSEObjectType.JOSE, h.getType());
 		assertEquals("application/json", h.getContentType());
-		assertTrue(h.getCriticalParams().contains("exp"));
-		assertTrue(h.getCriticalParams().contains("nbf"));
+		assertTrue(h.getCriticalParams().contains(JWTClaimNames.EXPIRATION_TIME));
+		assertTrue(h.getCriticalParams().contains(JWTClaimNames.NOT_BEFORE));
 		assertEquals(2, h.getCriticalParams().size());
 		assertEquals("http://example.com/jwk.json", h.getJWKURL().toString());
 		assertEquals("xyz", ((OctetSequenceKey)h.getJWK()).getKeyValue().toString());
@@ -357,8 +358,8 @@ public class JWEHeaderTest extends TestCase {
 		assertEquals(1000, h.getPBES2Count());
 		assertEquals("101010", h.getIV().toString());
 		assertEquals("202020", h.getAuthTag().toString());
-		assertEquals(123, ((Integer)h.getCustomParam("exp")).intValue());
-		assertEquals(456, ((Integer)h.getCustomParam("nbf")).intValue());
+		assertEquals(123, ((Integer)h.getCustomParam(JWTClaimNames.EXPIRATION_TIME)).intValue());
+		assertEquals(456, ((Integer)h.getCustomParam(JWTClaimNames.NOT_BEFORE)).intValue());
 		assertEquals(2, h.getCustomParams().size());
 		assertNull(h.getParsedBase64URL());
 
@@ -381,8 +382,8 @@ public class JWEHeaderTest extends TestCase {
 		assertTrue(h.getIncludedParams().contains("p2c"));
 		assertTrue(h.getIncludedParams().contains("iv"));
 		assertTrue(h.getIncludedParams().contains("tag"));
-		assertTrue(h.getIncludedParams().contains("exp"));
-		assertTrue(h.getIncludedParams().contains("nbf"));
+		assertTrue(h.getIncludedParams().contains(JWTClaimNames.EXPIRATION_TIME));
+		assertTrue(h.getIncludedParams().contains(JWTClaimNames.NOT_BEFORE));
 		assertEquals(21, h.getIncludedParams().size());
 	}
 

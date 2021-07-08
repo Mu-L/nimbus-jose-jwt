@@ -25,6 +25,7 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
 
 
@@ -121,8 +122,8 @@ public class X25519CryptoTest extends TestCase {
 		OctetKeyPair okp = generateOKP();
 
 		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_ES, EncryptionMethod.A128CBC_HS256).
-			customParam("exp", "2014-04-24").
-			criticalParams(Collections.singleton("exp")).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(Collections.singleton(JWTClaimNames.EXPIRATION_TIME)).
 			build();
 
 		JWEObject jweObject = new JWEObject(header, new Payload("Hello world!"));
@@ -130,7 +131,7 @@ public class X25519CryptoTest extends TestCase {
 
 		jweObject = JWEObject.parse(jweObject.serialize());
 
-		jweObject.decrypt(new X25519Decrypter(okp, Collections.singleton("exp")));
+		jweObject.decrypt(new X25519Decrypter(okp, Collections.singleton(JWTClaimNames.EXPIRATION_TIME)));
 
 		assertEquals("Hello world!", jweObject.getPayload().toString());
 	}
@@ -142,8 +143,8 @@ public class X25519CryptoTest extends TestCase {
 		OctetKeyPair okp = generateOKP();
 
 		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_ES, EncryptionMethod.A128CBC_HS256).
-			customParam("exp", "2014-04-24").
-			criticalParams(Collections.singleton("exp")).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(Collections.singleton(JWTClaimNames.EXPIRATION_TIME)).
 			build();
 
 		JWEObject jweObject = new JWEObject(header, new Payload("Hello world!"));

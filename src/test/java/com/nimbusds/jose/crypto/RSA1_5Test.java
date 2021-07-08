@@ -37,6 +37,7 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
+import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
 
 
@@ -532,8 +533,8 @@ public class RSA1_5Test extends TestCase {
 		throws Exception {
 
 		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.RSA1_5, EncryptionMethod.A128CBC_HS256).
-			customParam("EXP", "2014-04-24").
-			criticalParams(new HashSet<>(Collections.singletonList("EXP"))).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME))).
 			build();
 
 		Payload payload = new Payload("Hello world!");
@@ -548,7 +549,7 @@ public class RSA1_5Test extends TestCase {
 
 		jweObject = JWEObject.parse(jweString);
 
-		JWEDecrypter decrypter = new RSADecrypter(PRIVATE_KEY, new HashSet<>(Collections.singletonList("EXP")));
+		JWEDecrypter decrypter = new RSADecrypter(PRIVATE_KEY, new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME)));
 
 		jweObject.decrypt(decrypter);
 
@@ -564,8 +565,8 @@ public class RSA1_5Test extends TestCase {
 		throws Exception {
 
 		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.RSA1_5, EncryptionMethod.A128CBC_HS256).
-			customParam("EXP", "2014-04-24").
-			criticalParams(new HashSet<>(Collections.singletonList("EXP"))).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME))).
 			build();
 
 		Payload payload = new Payload("Hello world!");

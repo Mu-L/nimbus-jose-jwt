@@ -60,7 +60,7 @@ public class PlainJWTTest extends TestCase {
 	public void testHeaderAndClaimsSetConstructor()
 		throws Exception {
 
-		PlainHeader header = new PlainHeader.Builder().customParam("exp", 1000L).build();
+		PlainHeader header = new PlainHeader.Builder().customParam(JWTClaimNames.EXPIRATION_TIME, 1000L).build();
 
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
 			.subject("alice")

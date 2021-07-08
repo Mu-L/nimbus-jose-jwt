@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
 
 import com.nimbusds.jose.util.Base64URL;
@@ -68,9 +69,9 @@ public class PlainHeaderTest extends TestCase {
 		throws Exception {
 
 		Set<String> crit = new HashSet<>();
-		crit.add("iat");
-		crit.add("exp");
-		crit.add("nbf");
+		crit.add(JWTClaimNames.ISSUED_AT);
+		crit.add(JWTClaimNames.EXPIRATION_TIME);
+		crit.add(JWTClaimNames.NOT_BEFORE);
 
 		Map<String,Object> customParams = new HashMap<>();
 		customParams.put("xCustom", "abc");
@@ -129,9 +130,9 @@ public class PlainHeaderTest extends TestCase {
 		throws Exception {
 
 		Set<String> crit = new HashSet<>();
-		crit.add("iat");
-		crit.add("exp");
-		crit.add("nbf");
+		crit.add(JWTClaimNames.ISSUED_AT);
+		crit.add(JWTClaimNames.EXPIRATION_TIME);
+		crit.add(JWTClaimNames.NOT_BEFORE);
 
 		PlainHeader h = new PlainHeader.Builder().
 			type(new JOSEObjectType("JWT")).

@@ -28,6 +28,7 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.impl.MACProvider;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
 
 
@@ -356,8 +357,8 @@ public class MACTest extends TestCase {
 		new SecureRandom().nextBytes(secret);
 
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS512).
-			customParam("exp", "2014-04-24").
-			criticalParams(new HashSet<>(Collections.singletonList("exp"))).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME))).
 			build();
 
 		JWSObject jwsObject = new JWSObject(header, payload);
@@ -368,7 +369,7 @@ public class MACTest extends TestCase {
 
 		assertEquals("State check", JWSObject.State.SIGNED, jwsObject.getState());
 
-		MACVerifier verifier = new MACVerifier(secret, new HashSet<>(Collections.singletonList("exp")));
+		MACVerifier verifier = new MACVerifier(secret, new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME)));
 
 		boolean verified = jwsObject.verify(verifier);
 
@@ -385,8 +386,8 @@ public class MACTest extends TestCase {
 		new SecureRandom().nextBytes(secret);
 
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS512).
-			customParam("exp", "2014-04-24").
-			criticalParams(new HashSet<>(Collections.singletonList("exp"))).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME))).
 			build();
 
 		JWSObject jwsObject = new JWSObject(header, payload);

@@ -27,6 +27,7 @@ import java.security.spec.*;
 import java.util.Collections;
 import java.util.HashSet;
 
+import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
 
 import com.nimbusds.jose.*;
@@ -324,8 +325,8 @@ public class ECDSARoundTripTest extends TestCase {
 		throws Exception {
 
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.ES512).
-			customParam("exp", "2014-04-24").
-			criticalParams(new HashSet<>(Collections.singletonList("exp"))).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME))).
 			build();
 
 		KeyPair keyPair = createECKeyPair(EC512SPEC);
@@ -340,7 +341,7 @@ public class ECDSARoundTripTest extends TestCase {
 
 		assertEquals(JWSObject.State.SIGNED, jwsObject.getState());
 
-		JWSVerifier verifier = new ECDSAVerifier(publicKey, new HashSet<>(Collections.singletonList("exp")));
+		JWSVerifier verifier = new ECDSAVerifier(publicKey, new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME)));
 
 		boolean verified = jwsObject.verify(verifier);
 
@@ -354,8 +355,8 @@ public class ECDSARoundTripTest extends TestCase {
 		throws Exception {
 
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.ES512).
-			customParam("exp", "2014-04-24").
-			criticalParams(new HashSet<>(Collections.singletonList("exp"))).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME))).
 			build();
 
 		KeyPair keyPair = createECKeyPair(EC512SPEC);
