@@ -84,18 +84,18 @@ public final class JWSHeader extends CommonSEHeader {
 	static {
 		Set<String> p = new HashSet<>();
 
-		p.add("alg");
-		p.add("jku");
-		p.add("jwk");
-		p.add("x5u");
-		p.add("x5t");
-		p.add("x5t#S256");
-		p.add("x5c");
-		p.add("kid");
-		p.add("typ");
-		p.add("cty");
-		p.add("crit");
-		p.add("b64");
+		p.add(HeaderParameterNames.ALGORITHM);
+		p.add(HeaderParameterNames.JWK_SET_URL);
+		p.add(HeaderParameterNames.JWK);
+		p.add(HeaderParameterNames.X_509_CERT_URL);
+		p.add(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT);
+		p.add(HeaderParameterNames.X_509_CERT_SHA_256_THUMBPRINT);
+		p.add(HeaderParameterNames.X_509_CERT_CHAIN);
+		p.add(HeaderParameterNames.KEY_ID);
+		p.add(HeaderParameterNames.TYPE);
+		p.add(HeaderParameterNames.CONTENT_TYPE);
+		p.add(HeaderParameterNames.CRITICAL);
+		p.add(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD);
 
 		REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(p);
 	}
@@ -702,7 +702,7 @@ public final class JWSHeader extends CommonSEHeader {
 	public Set<String> getIncludedParams() {
 		Set<String> includedParams = super.getIncludedParams();
 		if (! isBase64URLEncodePayload()) {
-			includedParams.add("b64");
+			includedParams.add(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD);
 		}
 		return includedParams;
 	}
@@ -712,7 +712,7 @@ public final class JWSHeader extends CommonSEHeader {
 	public Map<String, Object> toJSONObject() {
 		Map<String, Object> o = super.toJSONObject();
 		if (! isBase64URLEncodePayload()) {
-			o.put("b64", false);
+			o.put(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD, false);
 		}
 		return o;
 	}
@@ -765,38 +765,38 @@ public final class JWSHeader extends CommonSEHeader {
 		// Parse optional + custom parameters
 		for (final String name: jsonObject.keySet()) {
 			
-			if("alg".equals(name)) {
+			if(HeaderParameterNames.ALGORITHM.equals(name)) {
 				// skip
-			} else if("typ".equals(name)) {
+			} else if(HeaderParameterNames.TYPE.equals(name)) {
 				String typValue = JSONObjectUtils.getString(jsonObject, name);
 				if (typValue != null) {
 					header = header.type(new JOSEObjectType(typValue));
 				}
-			} else if("cty".equals(name)) {
+			} else if(HeaderParameterNames.CONTENT_TYPE.equals(name)) {
 				header = header.contentType(JSONObjectUtils.getString(jsonObject, name));
-			} else if("crit".equals(name)) {
+			} else if(HeaderParameterNames.CRITICAL.equals(name)) {
 				List<String> critValues = JSONObjectUtils.getStringList(jsonObject, name);
 				if (critValues != null) {
 					header = header.criticalParams(new HashSet<>(critValues));
 				}
-			} else if("jku".equals(name)) {
+			} else if(HeaderParameterNames.JWK_SET_URL.equals(name)) {
 				header = header.jwkURL(JSONObjectUtils.getURI(jsonObject, name));
-			} else if("jwk".equals(name)) {
+			} else if(HeaderParameterNames.JWK.equals(name)) {
 				Map<String, Object> jwkObject = JSONObjectUtils.getJSONObject(jsonObject, name);
 				if (jwkObject != null) {
 					header = header.jwk(JWK.parse(jwkObject));
 				}
-			} else if("x5u".equals(name)) {
+			} else if(HeaderParameterNames.X_509_CERT_URL.equals(name)) {
 				header = header.x509CertURL(JSONObjectUtils.getURI(jsonObject, name));
-			} else if("x5t".equals(name)) {
+			} else if(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT.equals(name)) {
 				header = header.x509CertThumbprint(Base64URL.from(JSONObjectUtils.getString(jsonObject, name)));
-			} else if("x5t#S256".equals(name)) {
+			} else if(HeaderParameterNames.X_509_CERT_SHA_256_THUMBPRINT.equals(name)) {
 				header = header.x509CertSHA256Thumbprint(Base64URL.from(JSONObjectUtils.getString(jsonObject, name)));
-			} else if("x5c".equals(name)) {
+			} else if(HeaderParameterNames.X_509_CERT_CHAIN.equals(name)) {
 				header = header.x509CertChain(X509CertChainUtils.toBase64List(JSONObjectUtils.getJSONArray(jsonObject, name)));
-			} else if("kid".equals(name)) {
+			} else if(HeaderParameterNames.KEY_ID.equals(name)) {
 				header = header.keyID(JSONObjectUtils.getString(jsonObject, name));
-			} else if("b64".equals(name)) {
+			} else if(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD.equals(name)) {
 				header = header.base64URLEncodePayload(JSONObjectUtils.getBoolean(jsonObject, name));
 			} else {
 				header = header.customParam(name, jsonObject.get(name));

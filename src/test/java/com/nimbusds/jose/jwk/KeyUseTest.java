@@ -29,6 +29,7 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
 
+import com.nimbusds.jose.HeaderParameterNames;
 import com.nimbusds.jose.util.IOUtils;
 import com.nimbusds.jose.util.X509CertUtils;
 import junit.framework.TestCase;
@@ -53,9 +54,9 @@ public class KeyUseTest extends TestCase {
 		assertEquals("sig", KeyUse.SIGNATURE.getValue());
 		assertEquals("sig", KeyUse.SIGNATURE.toString());
 
-		assertEquals("enc", KeyUse.ENCRYPTION.identifier());
-		assertEquals("enc", KeyUse.ENCRYPTION.getValue());
-		assertEquals("enc", KeyUse.ENCRYPTION.toString());
+		assertEquals(HeaderParameterNames.ENCRYPTION_ALGORITHM, KeyUse.ENCRYPTION.identifier());
+		assertEquals(HeaderParameterNames.ENCRYPTION_ALGORITHM, KeyUse.ENCRYPTION.getValue());
+		assertEquals(HeaderParameterNames.ENCRYPTION_ALGORITHM, KeyUse.ENCRYPTION.toString());
 	}
 	
 	
@@ -76,7 +77,7 @@ public class KeyUseTest extends TestCase {
 		throws ParseException {
 
 		assertEquals(KeyUse.SIGNATURE, KeyUse.parse("sig"));
-		assertEquals(KeyUse.ENCRYPTION, KeyUse.parse("enc"));
+		assertEquals(KeyUse.ENCRYPTION, KeyUse.parse(HeaderParameterNames.ENCRYPTION_ALGORITHM));
 	}
 
 

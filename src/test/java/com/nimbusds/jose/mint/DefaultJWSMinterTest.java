@@ -5,11 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.nimbusds.jose.JOSEObjectType;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.KeySourceException;
+import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.factories.DefaultJWSSignerFactory;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSelector;
@@ -74,7 +70,7 @@ public class DefaultJWSMinterTest extends TestCase {
 			throws Exception {
 
 		final JWK key = new OctetSequenceKeyGenerator(256)
-				.keyID("kid").generate();
+				.keyID(HeaderParameterNames.KEY_ID).generate();
 
 		final ConfigurableJWSMinter<JWKSecurityContext> minter = new DefaultJWSMinter<>();
 

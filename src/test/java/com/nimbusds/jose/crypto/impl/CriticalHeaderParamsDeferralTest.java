@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.nimbusds.jose.HeaderParameterNames;
 import com.nimbusds.jose.crypto.impl.CriticalHeaderParamsDeferral;
 import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
@@ -44,7 +45,7 @@ public class CriticalHeaderParamsDeferralTest extends TestCase {
 
 		CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
 
-		assertEquals(Collections.singleton("b64"), checker.getProcessedCriticalHeaderParams());
+		assertEquals(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), checker.getProcessedCriticalHeaderParams());
 		assertTrue(checker.getDeferredCriticalHeaderParams().isEmpty());
 	}
 
@@ -57,7 +58,7 @@ public class CriticalHeaderParamsDeferralTest extends TestCase {
 
 		checker.setDeferredCriticalHeaderParams(deferred);
 		
-		assertEquals(Collections.singleton("b64"), checker.getProcessedCriticalHeaderParams());
+		assertEquals(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), checker.getProcessedCriticalHeaderParams());
 		assertEquals(deferred, checker.getDeferredCriticalHeaderParams());
 	}
 	
@@ -68,7 +69,7 @@ public class CriticalHeaderParamsDeferralTest extends TestCase {
 		
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
 			.base64URLEncodePayload(true)
-			.criticalParams(Collections.singleton("b64"))
+			.criticalParams(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD))
 			.build();
 		
 		assertTrue(checker.headerPasses(header));

@@ -21,10 +21,7 @@ package com.nimbusds.jose.crypto.impl;
 import java.util.Collections;
 import java.util.Set;
 
-import com.nimbusds.jose.CriticalHeaderParamsAware;
-import com.nimbusds.jose.Header;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWEHeader;
+import com.nimbusds.jose.*;
 
 
 /**
@@ -52,7 +49,7 @@ public class CriticalHeaderParamsDeferral {
 	 */
 	public Set<String> getProcessedCriticalHeaderParams() {
 
-		return Collections.singleton("b64");
+		return Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD);
 	}
 
 

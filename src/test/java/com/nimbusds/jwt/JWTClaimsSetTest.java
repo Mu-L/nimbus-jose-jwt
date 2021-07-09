@@ -22,6 +22,7 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.*;
 
+import com.nimbusds.jose.HeaderParameterNames;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
 
@@ -748,7 +749,7 @@ public class JWTClaimsSetTest extends TestCase {
 
 		JWTClaimsSet claimsSet = JWTClaimsSet.parse(json);
 
-		assertEquals("HS256", claimsSet.getStringClaim("alg"));
+		assertEquals("HS256", claimsSet.getStringClaim(HeaderParameterNames.ALGORITHM));
 
 		List<String> audList = claimsSet.getStringListClaim(JWTClaimNames.AUDIENCE);
 		assertEquals("a", audList.get(0));

@@ -23,7 +23,6 @@ public class HeaderParameterNamesTest extends TestCase {
 		assertEquals("jku", JWK_SET_URL);
 		assertEquals("jwk", JWK);
 		assertEquals("kid", KEY_ID);
-		assertEquals("typ", TYPE);
 		assertEquals("x5u", X_509_CERT_URL);
 		assertEquals("x5c", X_509_CERT_CHAIN);
 		assertEquals("x5t", X_509_CERT_SHA_1_THUMBPRINT);

@@ -94,8 +94,8 @@ public class JWEHeaderTest extends TestCase {
 		assertNull(h.getType());
 		assertNull(h.getContentType());
 
-		assertTrue(h.getIncludedParams().contains("alg"));
-		assertTrue(h.getIncludedParams().contains("enc"));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ENCRYPTION_ALGORITHM));
 		assertEquals(2, h.getIncludedParams().size());
 	}
 
@@ -119,8 +119,8 @@ public class JWEHeaderTest extends TestCase {
 		assertNull(h.getType());
 		assertNull(h.getContentType());
 
-		assertTrue(h.getIncludedParams().contains("alg"));
-		assertTrue(h.getIncludedParams().contains("enc"));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ENCRYPTION_ALGORITHM));
 		assertEquals(2, h.getIncludedParams().size());
 	}
 
@@ -204,22 +204,22 @@ public class JWEHeaderTest extends TestCase {
 
 		assertEquals(base64URL, h.getParsedBase64URL());
 
-		assertTrue(h.getIncludedParams().contains("alg"));
-		assertTrue(h.getIncludedParams().contains("typ"));
-		assertTrue(h.getIncludedParams().contains("enc"));
-		assertTrue(h.getIncludedParams().contains("zip"));
-		assertTrue(h.getIncludedParams().contains("jku"));
-		assertTrue(h.getIncludedParams().contains("jwk"));
-		assertTrue(h.getIncludedParams().contains("kid"));
-		assertTrue(h.getIncludedParams().contains("x5u"));
-		assertTrue(h.getIncludedParams().contains("x5t"));
-		assertTrue(h.getIncludedParams().contains("x5c"));
-		assertTrue(h.getIncludedParams().contains("apu"));
-		assertTrue(h.getIncludedParams().contains("apv"));
-		assertTrue(h.getIncludedParams().contains("p2s"));
-		assertTrue(h.getIncludedParams().contains("p2c"));
-		assertTrue(h.getIncludedParams().contains("iv"));
-		assertTrue(h.getIncludedParams().contains("tag"));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.TYPE));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ENCRYPTION_ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.COMPRESSION_ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.JWK_SET_URL));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.JWK));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.KEY_ID));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_URL));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_CHAIN));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.AGREEMENT_PARTY_U_INFO));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.AGREEMENT_PARTY_V_INFO));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.PBES2_SALT_INPUT));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.PBES2_COUNT));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.INITIALIZATION_VECTOR));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.AUTHENTICATION_TAG));
 		assertTrue(h.getIncludedParams().contains("xCustom"));
 		assertEquals(18, h.getIncludedParams().size());
 
@@ -363,25 +363,25 @@ public class JWEHeaderTest extends TestCase {
 		assertEquals(2, h.getCustomParams().size());
 		assertNull(h.getParsedBase64URL());
 
-		assertTrue(h.getIncludedParams().contains("alg"));
-		assertTrue(h.getIncludedParams().contains("enc"));
-		assertTrue(h.getIncludedParams().contains("typ"));
-		assertTrue(h.getIncludedParams().contains("cty"));
-		assertTrue(h.getIncludedParams().contains("crit"));
-		assertTrue(h.getIncludedParams().contains("jku"));
-		assertTrue(h.getIncludedParams().contains("jwk"));
-		assertTrue(h.getIncludedParams().contains("x5u"));
-		assertTrue(h.getIncludedParams().contains("x5t"));
-		assertTrue(h.getIncludedParams().contains("x5t#S256"));
-		assertTrue(h.getIncludedParams().contains("x5c"));
-		assertTrue(h.getIncludedParams().contains("kid"));
-		assertTrue(h.getIncludedParams().contains("zip"));
-		assertTrue(h.getIncludedParams().contains("apu"));
-		assertTrue(h.getIncludedParams().contains("apv"));
-		assertTrue(h.getIncludedParams().contains("p2s"));
-		assertTrue(h.getIncludedParams().contains("p2c"));
-		assertTrue(h.getIncludedParams().contains("iv"));
-		assertTrue(h.getIncludedParams().contains("tag"));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ENCRYPTION_ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.TYPE));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.CONTENT_TYPE));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.CRITICAL));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.JWK_SET_URL));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.JWK));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_URL));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_SHA_256_THUMBPRINT));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_CHAIN));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.KEY_ID));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.COMPRESSION_ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.AGREEMENT_PARTY_U_INFO));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.AGREEMENT_PARTY_V_INFO));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.PBES2_SALT_INPUT));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.PBES2_COUNT));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.INITIALIZATION_VECTOR));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.AUTHENTICATION_TAG));
 		assertTrue(h.getIncludedParams().contains(JWTClaimNames.EXPIRATION_TIME));
 		assertTrue(h.getIncludedParams().contains(JWTClaimNames.NOT_BEFORE));
 		assertEquals(21, h.getIncludedParams().size());
@@ -409,9 +409,9 @@ public class JWEHeaderTest extends TestCase {
 		throws ParseException {
 
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("alg", JWEAlgorithm.DIR.getName());
-		jsonObject.put("enc", EncryptionMethod.A128GCM.getName());
-		jsonObject.put("typ", null);
+		jsonObject.put(HeaderParameterNames.ALGORITHM, JWEAlgorithm.DIR.getName());
+		jsonObject.put(HeaderParameterNames.ENCRYPTION_ALGORITHM, EncryptionMethod.A128GCM.getName());
+		jsonObject.put(HeaderParameterNames.TYPE, null);
 		assertEquals(3, jsonObject.size());
 
 		JWEHeader header = JWEHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
@@ -424,9 +424,9 @@ public class JWEHeaderTest extends TestCase {
 		throws ParseException {
 
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("alg", JWEAlgorithm.DIR.getName());
-		jsonObject.put("enc", EncryptionMethod.A128GCM.getName());
-		jsonObject.put("crit", null);
+		jsonObject.put(HeaderParameterNames.ALGORITHM, JWEAlgorithm.DIR.getName());
+		jsonObject.put(HeaderParameterNames.ENCRYPTION_ALGORITHM, EncryptionMethod.A128GCM.getName());
+		jsonObject.put(HeaderParameterNames.CRITICAL, null);
 		assertEquals(3, jsonObject.size());
 
 		JWEHeader header = JWEHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
@@ -438,9 +438,9 @@ public class JWEHeaderTest extends TestCase {
 		throws ParseException {
 
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("alg", JWEAlgorithm.DIR.getName());
-		jsonObject.put("enc", EncryptionMethod.A128GCM.getName());
-		jsonObject.put("jwk", null);
+		jsonObject.put(HeaderParameterNames.ALGORITHM, JWEAlgorithm.DIR.getName());
+		jsonObject.put(HeaderParameterNames.ENCRYPTION_ALGORITHM, EncryptionMethod.A128GCM.getName());
+		jsonObject.put(HeaderParameterNames.JWK, null);
 		assertEquals(3, jsonObject.size());
 		
 		JWEHeader header = JWEHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
@@ -452,9 +452,9 @@ public class JWEHeaderTest extends TestCase {
 		throws ParseException {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("alg", JWEAlgorithm.DIR.getName());
-		jsonObject.put("enc", EncryptionMethod.A128GCM.getName());
-		jsonObject.put("zip", null);
+		jsonObject.put(HeaderParameterNames.ALGORITHM, JWEAlgorithm.DIR.getName());
+		jsonObject.put(HeaderParameterNames.ENCRYPTION_ALGORITHM, EncryptionMethod.A128GCM.getName());
+		jsonObject.put(HeaderParameterNames.COMPRESSION_ALGORITHM, null);
 		assertEquals(3, jsonObject.size());
 		
 		JWEHeader header = JWEHeader.parse(JSONObjectUtils.toJSONString(jsonObject));

@@ -45,18 +45,18 @@ public class JWSHeaderTest extends TestCase {
 	public void testRegisteredParamNames() {
 		
 		Set<String> paramNames = JWSHeader.getRegisteredParameterNames();
-		assertTrue(paramNames.contains("alg"));
-		assertTrue(paramNames.contains("jku"));
-		assertTrue(paramNames.contains("jwk"));
-		assertTrue(paramNames.contains("x5u"));
-		assertTrue(paramNames.contains("x5t"));
-		assertTrue(paramNames.contains("x5t#S256"));
-		assertTrue(paramNames.contains("x5c"));
-		assertTrue(paramNames.contains("kid"));
-		assertTrue(paramNames.contains("typ"));
-		assertTrue(paramNames.contains("cty"));
-		assertTrue(paramNames.contains("crit"));
-		assertTrue(paramNames.contains("b64"));
+		assertTrue(paramNames.contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(paramNames.contains(HeaderParameterNames.JWK_SET_URL));
+		assertTrue(paramNames.contains(HeaderParameterNames.JWK));
+		assertTrue(paramNames.contains(HeaderParameterNames.X_509_CERT_URL));
+		assertTrue(paramNames.contains(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT));
+		assertTrue(paramNames.contains(HeaderParameterNames.X_509_CERT_SHA_256_THUMBPRINT));
+		assertTrue(paramNames.contains(HeaderParameterNames.X_509_CERT_CHAIN));
+		assertTrue(paramNames.contains(HeaderParameterNames.KEY_ID));
+		assertTrue(paramNames.contains(HeaderParameterNames.TYPE));
+		assertTrue(paramNames.contains(HeaderParameterNames.CONTENT_TYPE));
+		assertTrue(paramNames.contains(HeaderParameterNames.CRITICAL));
+		assertTrue(paramNames.contains(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD));
 		assertEquals(12, paramNames.size());
 	}
 
@@ -79,7 +79,7 @@ public class JWSHeaderTest extends TestCase {
 		assertTrue(h.getCustomParams().isEmpty());
 		
 		Map<String, Object> o = h.toJSONObject();
-		assertEquals(h.getAlgorithm().getName(), o.get("alg"));
+		assertEquals(h.getAlgorithm().getName(), o.get(HeaderParameterNames.ALGORITHM));
 		assertEquals(1, o.size());
 	}
 
@@ -158,16 +158,16 @@ public class JWSHeaderTest extends TestCase {
 
 		assertEquals(base64URL, h.getParsedBase64URL());
 
-		assertTrue(h.getIncludedParams().contains("alg"));
-		assertTrue(h.getIncludedParams().contains("typ"));
-		assertTrue(h.getIncludedParams().contains("cty"));
-		assertTrue(h.getIncludedParams().contains("crit"));
-		assertTrue(h.getIncludedParams().contains("jku"));
-		assertTrue(h.getIncludedParams().contains("jwk"));
-		assertTrue(h.getIncludedParams().contains("kid"));
-		assertTrue(h.getIncludedParams().contains("x5u"));
-		assertTrue(h.getIncludedParams().contains("x5t"));
-		assertTrue(h.getIncludedParams().contains("x5c"));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.TYPE));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.CONTENT_TYPE));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.CRITICAL));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.JWK_SET_URL));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.JWK));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.KEY_ID));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_URL));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_CHAIN));
 		assertTrue(h.getIncludedParams().contains("xCustom"));
 		assertEquals(12, h.getIncludedParams().size());
 
@@ -225,8 +225,8 @@ public class JWSHeaderTest extends TestCase {
 		assertEquals(JWSAlgorithm.HS256, h.getAlgorithm());
 		assertNull(h.getContentType());
 
-		assertTrue(h.getIncludedParams().contains("alg"));
-		assertTrue(h.getIncludedParams().contains("typ"));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.TYPE));
 		assertEquals(2, h.getIncludedParams().size());
 	}
 
@@ -329,16 +329,16 @@ public class JWSHeaderTest extends TestCase {
 		assertEquals(2, h.getCustomParams().size());
 		assertNull(h.getParsedBase64URL());
 
-		assertTrue(h.getIncludedParams().contains("alg"));
-		assertTrue(h.getIncludedParams().contains("typ"));
-		assertTrue(h.getIncludedParams().contains("cty"));
-		assertTrue(h.getIncludedParams().contains("crit"));
-		assertTrue(h.getIncludedParams().contains("jku"));
-		assertTrue(h.getIncludedParams().contains("jwk"));
-		assertTrue(h.getIncludedParams().contains("x5u"));
-		assertTrue(h.getIncludedParams().contains("x5t"));
-		assertTrue(h.getIncludedParams().contains("x5c"));
-		assertTrue(h.getIncludedParams().contains("kid"));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.TYPE));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.CONTENT_TYPE));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.CRITICAL));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.JWK_SET_URL));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.JWK));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_URL));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.X_509_CERT_CHAIN));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.KEY_ID));
 		assertTrue(h.getIncludedParams().contains(JWTClaimNames.EXPIRATION_TIME));
 		assertTrue(h.getIncludedParams().contains(JWTClaimNames.NOT_BEFORE));
 		assertEquals(13, h.getIncludedParams().size());
@@ -401,16 +401,16 @@ public class JWSHeaderTest extends TestCase {
 		// Builder
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
 			.base64URLEncodePayload(false)
-			.criticalParams(Collections.singleton("b64"))
+			.criticalParams(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD))
 			.build();
 		
 		assertEquals(JWSAlgorithm.RS256, header.getAlgorithm());
 		assertFalse(header.isBase64URLEncodePayload());
-		assertEquals(Collections.singleton("b64"), header.getCriticalParams());
+		assertEquals(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), header.getCriticalParams());
 		
-		assertTrue(header.getIncludedParams().contains("alg"));
-		assertTrue(header.getIncludedParams().contains("b64"));
-		assertTrue(header.getIncludedParams().contains("crit"));
+		assertTrue(header.getIncludedParams().contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(header.getIncludedParams().contains(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD));
+		assertTrue(header.getIncludedParams().contains(HeaderParameterNames.CRITICAL));
 		assertEquals(3, header.getIncludedParams().size());
 		
 		// Builder copy constructor
@@ -419,18 +419,18 @@ public class JWSHeaderTest extends TestCase {
 		
 		assertEquals(JWSAlgorithm.RS256, header.getAlgorithm());
 		assertFalse(header.isBase64URLEncodePayload());
-		assertEquals(Collections.singleton("b64"), header.getCriticalParams());
+		assertEquals(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), header.getCriticalParams());
 		
-		assertTrue(header.getIncludedParams().contains("alg"));
-		assertTrue(header.getIncludedParams().contains("b64"));
-		assertTrue(header.getIncludedParams().contains("crit"));
+		assertTrue(header.getIncludedParams().contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(header.getIncludedParams().contains(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD));
+		assertTrue(header.getIncludedParams().contains(HeaderParameterNames.CRITICAL));
 		assertEquals(3, header.getIncludedParams().size());
 		
 		// Serialisation
 		Map<String, Object> o = header.toJSONObject();
-		assertEquals(JWSAlgorithm.RS256.getName(), o.get("alg"));
-		assertFalse(JSONObjectUtils.getBoolean(o, "b64"));
-		assertEquals(Collections.singletonList("b64"), JSONObjectUtils.getStringList(o, "crit"));
+		assertEquals(JWSAlgorithm.RS256.getName(), o.get(HeaderParameterNames.ALGORITHM));
+		assertFalse(JSONObjectUtils.getBoolean(o, HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD));
+		assertEquals(Collections.singletonList(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), JSONObjectUtils.getStringList(o, HeaderParameterNames.CRITICAL));
 		assertEquals(3, o.size());
 		
 		Base64URL base64URL = header.toBase64URL();
@@ -440,7 +440,7 @@ public class JWSHeaderTest extends TestCase {
 		
 		assertEquals(JWSAlgorithm.RS256, header.getAlgorithm());
 		assertFalse(header.isBase64URLEncodePayload());
-		assertEquals(Collections.singleton("b64"), header.getCriticalParams());
+		assertEquals(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), header.getCriticalParams());
 		
 		assertEquals(base64URL, header.getParsedBase64URL());
 	}
@@ -452,11 +452,11 @@ public class JWSHeaderTest extends TestCase {
 		JWSHeader header = JWSHeader.parse(new Base64URL(s));
 		assertEquals(JWSAlgorithm.HS256, header.getAlgorithm());
 		assertFalse(header.isBase64URLEncodePayload());
-		assertEquals(Collections.singleton("b64"), header.getCriticalParams());
+		assertEquals(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), header.getCriticalParams());
 		
-		assertTrue(header.getIncludedParams().contains("alg"));
-		assertTrue(header.getIncludedParams().contains("b64"));
-		assertTrue(header.getIncludedParams().contains("crit"));
+		assertTrue(header.getIncludedParams().contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(header.getIncludedParams().contains(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD));
+		assertTrue(header.getIncludedParams().contains(HeaderParameterNames.CRITICAL));
 		assertEquals(3, header.getIncludedParams().size());
 	}
 
@@ -514,7 +514,7 @@ public class JWSHeaderTest extends TestCase {
 		assertEquals(1, jsonObject.size());
 		
 		Map<String, Object> headerJSONObject = header.toJSONObject();
-		assertEquals("HS256", headerJSONObject.get("alg"));
+		assertEquals("HS256", headerJSONObject.get(HeaderParameterNames.ALGORITHM));
 		jsonObject = (Map) headerJSONObject.get("prm");
 		assertEquals("value", jsonObject.get("key"));
 		assertEquals(1, jsonObject.size());
@@ -529,7 +529,7 @@ public class JWSHeaderTest extends TestCase {
 		assertEquals(1, jsonObject.size());
 		
 		headerJSONObject = header.toJSONObject();
-		assertEquals("HS256", headerJSONObject.get("alg"));
+		assertEquals("HS256", headerJSONObject.get(HeaderParameterNames.ALGORITHM));
 		jsonObject = (Map<String, Object> ) headerJSONObject.get("prm");
 		assertEquals("value", jsonObject.get("key"));
 		assertEquals(1, jsonObject.size());
@@ -545,9 +545,9 @@ public class JWSHeaderTest extends TestCase {
 		
 		Map<String, Object>  jsonObject = JSONObjectUtils.parse(new Base64URL(header).decodeToString());
 		
-		assertEquals("HS256", jsonObject.get("alg"));
-		assertEquals("JWT", jsonObject.get("typ"));
-		assertNull(jsonObject.get("cty"));
+		assertEquals("HS256", jsonObject.get(HeaderParameterNames.ALGORITHM));
+		assertEquals("JWT", jsonObject.get(HeaderParameterNames.TYPE));
+		assertNull(jsonObject.get(HeaderParameterNames.CONTENT_TYPE));
 		assertEquals(3, jsonObject.size());
 		
 		JWSHeader jwsHeader = JWSHeader.parse(new Base64URL(header));
@@ -563,8 +563,8 @@ public class JWSHeaderTest extends TestCase {
 		throws ParseException {
 		
 		Map<String, Object>  jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("alg", "HS256");
-		jsonObject.put("typ", null);
+		jsonObject.put(HeaderParameterNames.ALGORITHM, "HS256");
+		jsonObject.put(HeaderParameterNames.TYPE, null);
 		assertEquals(2, jsonObject.size());
 		
 		Header header = JWSHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
@@ -576,8 +576,8 @@ public class JWSHeaderTest extends TestCase {
 		throws ParseException {
 		
 		Map<String, Object>  jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("alg", "HS256");
-		jsonObject.put("crit", null);
+		jsonObject.put(HeaderParameterNames.ALGORITHM, "HS256");
+		jsonObject.put(HeaderParameterNames.CRITICAL, null);
 		assertEquals(2, jsonObject.size());
 		
 		Header header = JWSHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
@@ -589,8 +589,8 @@ public class JWSHeaderTest extends TestCase {
 		throws ParseException {
 		
 		Map<String, Object>  jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("alg", "HS256");
-		jsonObject.put("jwk", null);
+		jsonObject.put(HeaderParameterNames.ALGORITHM, "HS256");
+		jsonObject.put(HeaderParameterNames.JWK, null);
 		assertEquals(2, jsonObject.size());
 		
 		JWSHeader header = JWSHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
@@ -601,7 +601,7 @@ public class JWSHeaderTest extends TestCase {
 	public void testParsePlainHeader() {
 		
 		Map<String, Object>  jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("alg", "none");
+		jsonObject.put(HeaderParameterNames.ALGORITHM, "none");
 		
 		try {
 			JWSHeader.parse(JSONObjectUtils.toJSONString(jsonObject));

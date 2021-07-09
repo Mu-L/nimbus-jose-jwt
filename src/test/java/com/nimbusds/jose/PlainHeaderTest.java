@@ -83,10 +83,10 @@ public class PlainHeaderTest extends TestCase {
 			customParams,
 			null);
 
-		assertTrue(h.getIncludedParams().contains("alg"));
-		assertTrue(h.getIncludedParams().contains("typ"));
-		assertTrue(h.getIncludedParams().contains("cty"));
-		assertTrue(h.getIncludedParams().contains("crit"));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.TYPE));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.CONTENT_TYPE));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.CRITICAL));
 		assertTrue(h.getIncludedParams().contains("xCustom"));
 		assertEquals(5, h.getIncludedParams().size());
 
@@ -141,10 +141,10 @@ public class PlainHeaderTest extends TestCase {
 			customParam("xCustom", "abc").
 			build();
 
-		assertTrue(h.getIncludedParams().contains("alg"));
-		assertTrue(h.getIncludedParams().contains("typ"));
-		assertTrue(h.getIncludedParams().contains("cty"));
-		assertTrue(h.getIncludedParams().contains("crit"));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.ALGORITHM));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.TYPE));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.CONTENT_TYPE));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.CRITICAL));
 		assertTrue(h.getIncludedParams().contains("xCustom"));
 		assertEquals(5, h.getIncludedParams().size());
 
@@ -199,8 +199,8 @@ public class PlainHeaderTest extends TestCase {
 		throws ParseException {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("alg", Algorithm.NONE.getName());
-		jsonObject.put("typ", null);
+		jsonObject.put(HeaderParameterNames.ALGORITHM, Algorithm.NONE.getName());
+		jsonObject.put(HeaderParameterNames.TYPE, null);
 		assertEquals(2, jsonObject.size());
 		
 		Header header = PlainHeader.parse(JSONObjectUtils.toJSONString(jsonObject));
@@ -213,8 +213,8 @@ public class PlainHeaderTest extends TestCase {
 		throws ParseException {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("alg", Algorithm.NONE.getName());
-		jsonObject.put("crit", null);
+		jsonObject.put(HeaderParameterNames.ALGORITHM, Algorithm.NONE.getName());
+		jsonObject.put(HeaderParameterNames.CRITICAL, null);
 		assertEquals(2, jsonObject.size());
 		
 		Header header = PlainHeader.parse(JSONObjectUtils.toJSONString(jsonObject));

@@ -768,7 +768,7 @@ public class RSASSATest {
 		RSASSAVerifier verifier = new RSASSAVerifier(PUBLIC_KEY, deferredCrit);
 
 		assertTrue(deferredCrit.containsAll(verifier.getDeferredCriticalHeaderParams()));
-		assertEquals(Collections.singleton("b64"), verifier.getProcessedCriticalHeaderParams());
+		assertEquals(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), verifier.getProcessedCriticalHeaderParams());
 
 		boolean verified = jwsObject.verify(verifier);
 
