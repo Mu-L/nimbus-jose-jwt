@@ -210,7 +210,7 @@ public class OctetSequenceKeyTest extends TestCase {
 				.build();
 			fail();
 		} catch (IllegalStateException e) {
-			assertEquals("The key use \"use\" and key options \"key_opts\" parameters are not consistent, see RFC 7517, section 4.3", e.getMessage());
+			assertEquals("The key use \"use\" and key options \"key_ops\" parameters are not consistent, see RFC 7517, section 4.3", e.getMessage());
 		}
 	}
 
@@ -613,7 +613,7 @@ public class OctetSequenceKeyTest extends TestCase {
 	public void testParse_missingKty() {
 		
 		Map<String, Object> jsonObject =JSONObjectUtils.newJSONObject();
-		jsonObject.put("k", "werewrwerewr");
+		jsonObject.put(JWKParameterNames.OCT_KEY_VALUE, "werewrwerewr");
 		
 		try {
 			OctetSequenceKey.parse(jsonObject);
@@ -627,7 +627,7 @@ public class OctetSequenceKeyTest extends TestCase {
 	public void testParse_missingK() {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("kty", "oct");
+		jsonObject.put(JWKParameterNames.KEY_TYPE, "oct");
 		
 		try {
 			OctetSequenceKey.parse(jsonObject);
@@ -641,8 +641,8 @@ public class OctetSequenceKeyTest extends TestCase {
 	public void testParse_nullK() {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("kty", "oct");
-		jsonObject.put("k", null);
+		jsonObject.put(JWKParameterNames.KEY_TYPE, "oct");
+		jsonObject.put(JWKParameterNames.OCT_KEY_VALUE, null);
 		
 		try {
 			OctetSequenceKey.parse(jsonObject);

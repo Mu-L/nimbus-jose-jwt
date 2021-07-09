@@ -897,7 +897,7 @@ public class RSAKeyTest extends TestCase {
 				.keyOperations(ops)
 				.build();
 		} catch (IllegalStateException e) {
-			assertEquals("The key use \"use\" and key options \"key_opts\" parameters are not consistent, see RFC 7517, section 4.3", e.getMessage());
+			assertEquals("The key use \"use\" and key options \"key_ops\" parameters are not consistent, see RFC 7517, section 4.3", e.getMessage());
 		}
 	}
 	
@@ -1286,10 +1286,10 @@ public class RSAKeyTest extends TestCase {
 		assertEquals(privateKey, kpOut.getPrivate());
 		
 		Map<String, Object> json = rsaJWK.toJSONObject();
-		assertEquals("RSA", json.get("kty"));
-		assertEquals("1", json.get("kid"));
-		assertEquals(Base64URL.encode(publicKey.getPublicExponent()).toString(), json.get("e"));
-		assertEquals(Base64URL.encode(publicKey.getModulus()).toString(), json.get("n"));
+		assertEquals("RSA", json.get(JWKParameterNames.KEY_TYPE));
+		assertEquals("1", json.get(JWKParameterNames.KEY_ID));
+		assertEquals(Base64URL.encode(publicKey.getPublicExponent()).toString(), json.get(JWKParameterNames.RSA_EXPONENT));
+		assertEquals(Base64URL.encode(publicKey.getModulus()).toString(), json.get(JWKParameterNames.RSA_MODULUS));
 		assertEquals(4, json.size());
 	}
 	
@@ -1652,7 +1652,7 @@ public class RSAKeyTest extends TestCase {
 			"{\"kty\":\"RSA\",\"x5t#S256\":\"QOjjUwPhfMBMIT2zn5nrUxc4GocujsSHziKh-FlvmiU\",\"e\":\"AQAB\",\"kid\":\"18031265869169735523\",\"x5c\":[\"MIIDljCCAn4CCQD6O+zGNny3YzANBgkqhkiG9w0BAQsFADCBpTELMAkGA1UEBhMCQkUxEDAOBgNVBAgTB0JlbGdpdW0xETAPBgNVBAcTCEJydXNzZWxzMRwwGgYDVQQKExNFdXJvcGVhbiBDb21taXNzaW9uMRAwDgYDVQQLEwdTRkMyMDE0MR8wHQYDVQQDExZTRkMyMDE0IENBIERFVkVMT1BNRU5UMSAwHgYJKoZIhvcNAQkBFhF2YW53b2JlQHlhaG9vLkNvbTAeFw0xNjEwMTgxNTE4NTdaFw0yNjEwMTYxNTE4NTdaMHQxCzAJBgNVBAYTAkJFMRAwDgYDVQQIEwdCRUxHSVVNMREwDwYDVQQHEwhCcnVzc2VsczEcMBoGA1UEChMTRXVyb3BlYW4gQ29tbWlzc2lvbjEQMA4GA1UECxMHU0ZDMjAxNDEQMA4GA1UEAxMHdmFud29iZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMC7n95a0Yp\\/anE2ya3VhUjJ8KhoC8mAiblGJYMPsB2QfLKJEoZ2eSCD\\/GwkxufEb8UPauQDFogMshUZwwZ08k0OXywh3a9xO9zI+CCz23TNvueACQzWbtwWrx6lU5ljOOhBdt+c\\/CRXXgG2kH+hhs8MaV5KgN6iPf0HilH3QP2pwLNVLrupm\\/0r9CwuEc\\/wWLbi1nLno366vn\\/+jdsuxSrWnr\\/S8SCY3+L6CzZfhWMzF1SrsiCn+v6MirAwcG2IckNomGiL+X7PjObOSIWDVa7G9\\/Ouh4EaZN0w\\/zUvMSZ8mXkTo\\/Qk48kQlzm\\/KoQpEcoa9Dng4EdGyXzsipxsCNsCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAlBtx8Lh3PL1PBoiki5VkPUqfNlYNE6C+3faPzjEKu0D8+g\\/y1AbFp7442J3QqX0yfS\\/qG3BIc2dU8ICDhmstn7d2yr+FDFF4raQ8OfMocQy66Rf6wgAQy0YETWF+gBx8bKhd3D+V12paZg8ocDE7+V0UOCmxRMSz8hRvycCYGlf5pD2v2DIfPatNgwyASZK+qu+w++OrilC3wXKG2XD8AWaoTWMWz1ycov6pSnRGEr0DNxF4DBWrJWe\\/b+HH1K1hiKG0lnD520Ldoy3VRF86uRBnAjKX0yy7LHZy1QaB6M5DHtzOQFg7GldjhuZVFA01smyadepiOI0jc6jTwghT2Q==\"],\"n\":\"wLuf3lrRin9qcTbJrdWFSMnwqGgLyYCJuUYlgw-wHZB8sokShnZ5IIP8bCTG58RvxQ9q5AMWiAyyFRnDBnTyTQ5fLCHdr3E73Mj4ILPbdM2-54AJDNZu3BavHqVTmWM46EF235z8JFdeAbaQf6GGzwxpXkqA3qI9_QeKUfdA_anAs1Uuu6mb_Sv0LC4Rz_BYtuLWcuejfrq-f_6N2y7FKtaev9LxIJjf4voLNl-FYzMXVKuyIKf6_oyKsDBwbYhyQ2iYaIv5fs-M5s5IhYNVrsb3866HgRpk3TD_NS8xJnyZeROj9CTjyRCXOb8qhCkRyhr0OeDgR0bJfOyKnGwI2w\"}");
 		
 		Map<String, Object> jsonObject = rsaKey.toJSONObject();
-		List<Object> x5cArray = (List<Object>) jsonObject.get("x5c");
+		List<Object> x5cArray = (List<Object>) jsonObject.get(JWKParameterNames.X_509_CERT_CHAIN);
 		assertEquals(rsaKey.getX509CertChain().get(0).toString(), x5cArray.get(0));
 		assertEquals(1, x5cArray.size());
 		
@@ -1677,8 +1677,8 @@ public class RSAKeyTest extends TestCase {
 	public void testParse_missingKty() {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("n", n);
-		jsonObject.put("e", e);
+		jsonObject.put(JWKParameterNames.RSA_MODULUS, n);
+		jsonObject.put(JWKParameterNames.RSA_EXPONENT, e);
 		try {
 			RSAKey.parse(jsonObject);
 			fail();
@@ -1691,8 +1691,8 @@ public class RSAKeyTest extends TestCase {
 	public void testParse_missingN() {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("kty", "RSA");
-		jsonObject.put("e", e);
+		jsonObject.put(JWKParameterNames.KEY_TYPE, "RSA");
+		jsonObject.put(JWKParameterNames.RSA_EXPONENT, e);
 		try {
 			RSAKey.parse(jsonObject);
 			fail();
@@ -1705,8 +1705,8 @@ public class RSAKeyTest extends TestCase {
 	public void testParse_missingE() {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("kty", "RSA");
-		jsonObject.put("n", n);
+		jsonObject.put(JWKParameterNames.KEY_TYPE, "RSA");
+		jsonObject.put(JWKParameterNames.RSA_MODULUS, n);
 		try {
 			RSAKey.parse(jsonObject);
 			fail();

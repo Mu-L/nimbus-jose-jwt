@@ -188,9 +188,9 @@ public class OctetKeyPairTest extends TestCase {
 		assertTrue(key.isPrivate());
 		
 		Map<String, Object> jsonObject = key.toJSONObject();
-		assertEquals(Curve.Ed25519.getName(), jsonObject.get("crv"));
-		assertEquals(EXAMPLE_OKP_ED25519.X.toString(), jsonObject.get("x"));
-		assertEquals(EXAMPLE_OKP_ED25519.D.toString(), jsonObject.get("d"));
+		assertEquals(Curve.Ed25519.getName(), jsonObject.get(JWKParameterNames.OKP_SUBTYPE));
+		assertEquals(EXAMPLE_OKP_ED25519.X.toString(), jsonObject.get(JWKParameterNames.OKP_PUBLIC_KEY));
+		assertEquals(EXAMPLE_OKP_ED25519.D.toString(), jsonObject.get(JWKParameterNames.OKP_PRIVATE_KEY));
 		
 		String jwkString = JSONObjectUtils.toJSONString(jsonObject);
 		
@@ -273,9 +273,9 @@ public class OctetKeyPairTest extends TestCase {
 		assertFalse(key.isPrivate());
 		
 		Map<String, Object> jsonObject = key.toJSONObject();
-		assertEquals(Curve.Ed25519.getName(), jsonObject.get("crv"));
-		assertEquals(EXAMPLE_OKP_ED25519.X.toString(), jsonObject.get("x"));
-		assertFalse(jsonObject.containsKey("d"));
+		assertEquals(Curve.Ed25519.getName(), jsonObject.get(JWKParameterNames.OKP_SUBTYPE));
+		assertEquals(EXAMPLE_OKP_ED25519.X.toString(), jsonObject.get(JWKParameterNames.OKP_PUBLIC_KEY));
+		assertFalse(jsonObject.containsKey(JWKParameterNames.OKP_PRIVATE_KEY));
 		
 		String jwkString = JSONObjectUtils.toJSONString(jsonObject);
 		
@@ -540,8 +540,8 @@ public class OctetKeyPairTest extends TestCase {
 	public void testParse_missingKty() {
 
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("crv", "Ed25519");
-		jsonObject.put("x", "ewrewrewr");
+		jsonObject.put(JWKParameterNames.ELLIPTIC_CURVE, "Ed25519");
+		jsonObject.put(JWKParameterNames.OKP_PUBLIC_KEY, "ewrewrewr");
 		
 		try {
 			OctetKeyPair.parse(jsonObject);
@@ -555,8 +555,8 @@ public class OctetKeyPairTest extends TestCase {
 	public void testParse_missingCrv() {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("kty", "OKP");
-		jsonObject.put("x", "ewrewrewr");
+		jsonObject.put(JWKParameterNames.KEY_TYPE, "OKP");
+		jsonObject.put(JWKParameterNames.OKP_PUBLIC_KEY, "ewrewrewr");
 		
 		try {
 			OctetKeyPair.parse(jsonObject);
@@ -570,8 +570,8 @@ public class OctetKeyPairTest extends TestCase {
 	public void testParse_missingX() {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("kty", "OKP");
-		jsonObject.put("crv", "Ed25519");
+		jsonObject.put(JWKParameterNames.KEY_TYPE, "OKP");
+		jsonObject.put(JWKParameterNames.ELLIPTIC_CURVE, "Ed25519");
 		
 		try {
 			OctetKeyPair.parse(jsonObject);

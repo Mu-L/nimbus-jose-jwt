@@ -593,7 +593,7 @@ public class ECKeyTest extends TestCase {
 				.keyOperations(ops)
 				.build();
 		} catch (IllegalStateException e) {
-			assertEquals("The key use \"use\" and key options \"key_opts\" parameters are not consistent, see RFC 7517, section 4.3", e.getMessage());
+			assertEquals("The key use \"use\" and key options \"key_ops\" parameters are not consistent, see RFC 7517, section 4.3", e.getMessage());
 		}
 	}
 
@@ -797,11 +797,11 @@ public class ECKeyTest extends TestCase {
 		assertEquals(privateKey, kpOut.getPrivate());
 		
 		Map<String, Object> json = ecJWK.toJSONObject();
-		assertEquals("EC", json.get("kty"));
-		assertEquals("1", json.get("kid"));
-		assertEquals("P-256", json.get("crv"));
-		assertNotNull(json.get("x"));
-		assertNotNull(json.get("y"));
+		assertEquals("EC", json.get(JWKParameterNames.KEY_TYPE));
+		assertEquals("1", json.get(JWKParameterNames.KEY_ID));
+		assertEquals("P-256", json.get(JWKParameterNames.ELLIPTIC_CURVE));
+		assertNotNull(json.get(JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE));
+		assertNotNull(json.get(JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE));
 		assertEquals(5, json.size());
 	}
 	
@@ -1177,9 +1177,9 @@ public class ECKeyTest extends TestCase {
 	public void testParse_missingCurve() {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("kty", "EC");
-		jsonObject.put("x", "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
-		jsonObject.put("y", "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
+		jsonObject.put(JWKParameterNames.KEY_TYPE, "EC");
+		jsonObject.put(JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE, "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
+		jsonObject.put(JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE, "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
 		try {
 			ECKey.parse(jsonObject);
 			fail();
@@ -1192,9 +1192,9 @@ public class ECKeyTest extends TestCase {
 	public void testParse_missingX() {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("kty", "EC");
-		jsonObject.put("crv", "P-256");
-		jsonObject.put("y", "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
+		jsonObject.put(JWKParameterNames.KEY_TYPE, "EC");
+		jsonObject.put(JWKParameterNames.ELLIPTIC_CURVE, "P-256");
+		jsonObject.put(JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE, "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM");
 		try {
 			ECKey.parse(jsonObject);
 			fail();
@@ -1207,9 +1207,9 @@ public class ECKeyTest extends TestCase {
 	public void testParse_missingY() {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("kty", "EC");
-		jsonObject.put("crv", "P-256");
-		jsonObject.put("x", "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
+		jsonObject.put(JWKParameterNames.KEY_TYPE, "EC");
+		jsonObject.put(JWKParameterNames.ELLIPTIC_CURVE, "P-256");
+		jsonObject.put(JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE, "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4");
 		try {
 			ECKey.parse(jsonObject);
 			fail();

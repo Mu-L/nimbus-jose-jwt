@@ -58,15 +58,15 @@ public class JWKMetadataTest extends TestCase {
 
 		Map<String, Object> o = JSONObjectUtils.newJSONObject();
 		
-		o.put("kty", null);
-		o.put("use", null);
-		o.put("key_ops", null);
-		o.put("alg", null);
-		o.put("kid", null);
-		o.put("x5u", null);
-		o.put("x5t", null);
-		o.put("x5t#S256", null);
-		o.put("x5c", null);
+		o.put(JWKParameterNames.KEY_TYPE, null);
+		o.put(JWKParameterNames.PUBLIC_KEY_USE, null);
+		o.put(JWKParameterNames.KEY_OPS, null);
+		o.put(JWKParameterNames.ALGORITHM, null);
+		o.put(JWKParameterNames.KEY_ID, null);
+		o.put(JWKParameterNames.X_509_CERT_URL, null);
+		o.put(JWKParameterNames.X_509_CERT_SHA_1_THUMBPRINT, null);
+		o.put(JWKParameterNames.X_509_CERT_SHA_256_THUMBPRINT, null);
+		o.put(JWKParameterNames.X_509_CERT_CHAIN, null);
 		
 		try {
 			JWKMetadata.parseKeyType(o);
@@ -90,7 +90,7 @@ public class JWKMetadataTest extends TestCase {
 		throws ParseException {
 
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("x5c", JSONArrayUtils.newJSONArray()); // empty
+		jsonObject.put(JWKParameterNames.X_509_CERT_CHAIN, JSONArrayUtils.newJSONArray()); // empty
 		
 		assertNull(JWKMetadata.parseX509CertChain(jsonObject));
 	}
