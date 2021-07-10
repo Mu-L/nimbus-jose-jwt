@@ -23,7 +23,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.nimbusds.jose.HeaderParameterNames;
 import com.nimbusds.jose.crypto.impl.CriticalHeaderParamsDeferral;
+import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
 
 import com.nimbusds.jose.JWSAlgorithm;
@@ -43,20 +45,20 @@ public class CriticalHeaderParamsDeferralTest extends TestCase {
 
 		CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
 
-		assertEquals(Collections.singleton("b64"), checker.getProcessedCriticalHeaderParams());
+		assertEquals(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), checker.getProcessedCriticalHeaderParams());
 		assertTrue(checker.getDeferredCriticalHeaderParams().isEmpty());
 	}
 
 
 	public void testSetter() {
 		
-		Set<String> deferred = new HashSet<>(Arrays.asList("exp", "hs"));
+		Set<String> deferred = new HashSet<>(Arrays.asList(JWTClaimNames.EXPIRATION_TIME, "hs"));
 		
 		CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
 
 		checker.setDeferredCriticalHeaderParams(deferred);
 		
-		assertEquals(Collections.singleton("b64"), checker.getProcessedCriticalHeaderParams());
+		assertEquals(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), checker.getProcessedCriticalHeaderParams());
 		assertEquals(deferred, checker.getDeferredCriticalHeaderParams());
 	}
 	
@@ -67,7 +69,7 @@ public class CriticalHeaderParamsDeferralTest extends TestCase {
 		
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
 			.base64URLEncodePayload(true)
-			.criticalParams(Collections.singleton("b64"))
+			.criticalParams(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD))
 			.build();
 		
 		assertTrue(checker.headerPasses(header));
@@ -87,12 +89,12 @@ public class CriticalHeaderParamsDeferralTest extends TestCase {
 	public void testPassIgnoredCritParams() {
 
 		CriticalHeaderParamsDeferral checker = new CriticalHeaderParamsDeferral();
-		checker.setDeferredCriticalHeaderParams(new HashSet<>(Collections.singletonList("exp")));
+		checker.setDeferredCriticalHeaderParams(new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME)));
 
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).
 			keyID("1").
-			customParam("exp", "2014-04-24").
-			criticalParams(new HashSet<>(Collections.singletonList("exp"))).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME))).
 			build();
 
 		assertTrue(checker.headerPasses(header));
@@ -105,8 +107,8 @@ public class CriticalHeaderParamsDeferralTest extends TestCase {
 
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).
 			keyID("1").
-			customParam("exp", "2014-04-24").
-			criticalParams(new HashSet<>(Collections.singletonList("exp"))).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME))).
 			build();
 
 		assertFalse(checker.headerPasses(header));

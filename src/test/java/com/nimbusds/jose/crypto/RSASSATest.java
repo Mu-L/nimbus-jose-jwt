@@ -31,6 +31,7 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
+import com.nimbusds.jwt.JWTClaimNames;
 import org.junit.Test;
 
 import com.nimbusds.jose.*;
@@ -767,7 +768,7 @@ public class RSASSATest {
 		RSASSAVerifier verifier = new RSASSAVerifier(PUBLIC_KEY, deferredCrit);
 
 		assertTrue(deferredCrit.containsAll(verifier.getDeferredCriticalHeaderParams()));
-		assertEquals(Collections.singleton("b64"), verifier.getProcessedCriticalHeaderParams());
+		assertEquals(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), verifier.getProcessedCriticalHeaderParams());
 
 		boolean verified = jwsObject.verify(verifier);
 
@@ -899,8 +900,8 @@ public class RSASSATest {
 		JWSSigner signer = new RSASSASigner(rsaJWK);
 		
 		Map<String, Object> criticalParameters = new HashMap<>();
-		criticalParameters.put("iss", "https://issuer.example.com");
-		criticalParameters.put("iat", DateUtils.toSecondsSinceEpoch(new Date()));
+		criticalParameters.put(JWTClaimNames.ISSUER, "https://issuer.example.com");
+		criticalParameters.put(JWTClaimNames.ISSUED_AT, DateUtils.toSecondsSinceEpoch(new Date()));
 		
 		Payload payload = new Payload("Hello, world!");
 		

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.nimbusds.jose.HeaderParameterNames;
 import junit.framework.TestCase;
 import org.junit.Assert;
 
@@ -451,8 +452,8 @@ public class JSONObjectUtilsTest extends TestCase {
 	public void testGetBase64URL() throws ParseException {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("x5t", "abc");
-		Base64URL base64URL = JSONObjectUtils.getBase64URL(jsonObject, "x5t");
+		jsonObject.put(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT, "abc");
+		Base64URL base64URL = JSONObjectUtils.getBase64URL(jsonObject, HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT);
 		assertEquals("abc", base64URL.toString());
 	}
 	
@@ -460,14 +461,14 @@ public class JSONObjectUtilsTest extends TestCase {
 	public void testGetBase64URL_null() throws ParseException {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		jsonObject.put("x5t", null);
-		assertNull(JSONObjectUtils.getBase64URL(jsonObject, "x5t"));
+		jsonObject.put(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT, null);
+		assertNull(JSONObjectUtils.getBase64URL(jsonObject, HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT));
 	}
 	
 	
 	public void testGetBase64URL_missing() throws ParseException {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		assertNull(JSONObjectUtils.getBase64URL(jsonObject, "x5t"));
+		assertNull(JSONObjectUtils.getBase64URL(jsonObject, HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT));
 	}
 }

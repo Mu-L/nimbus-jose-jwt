@@ -20,6 +20,7 @@ package com.nimbusds.jwt.proc;
 
 import java.util.*;
 
+import com.nimbusds.jwt.JWTClaimNames;
 import net.jcip.annotations.ThreadSafe;
 
 import com.nimbusds.jose.proc.SecurityContext;
@@ -207,7 +208,7 @@ public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWT
 		Set<String> requiredClaimsCopy = new HashSet<>(this.exactMatchClaims.getClaims().keySet());
 		if (acceptedAudienceValues != null && ! acceptedAudienceValues.contains(null)) {
 			// check if an explicit aud is required
-			requiredClaimsCopy.add("aud");
+			requiredClaimsCopy.add(JWTClaimNames.AUDIENCE);
 		}
 		if (requiredClaims != null) {
 			requiredClaimsCopy.addAll(requiredClaims);

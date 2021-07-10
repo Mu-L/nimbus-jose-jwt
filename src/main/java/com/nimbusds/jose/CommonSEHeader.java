@@ -257,31 +257,31 @@ abstract class CommonSEHeader extends Header {
 		Set<String> includedParameters = super.getIncludedParams();
 
 		if (jku != null) {
-			includedParameters.add("jku");
+			includedParameters.add(HeaderParameterNames.JWK_SET_URL);
 		}
 
 		if (jwk != null) {
-			includedParameters.add("jwk");
+			includedParameters.add(HeaderParameterNames.JWK);
 		}
 
 		if (x5u != null) {
-			includedParameters.add("x5u");
+			includedParameters.add(HeaderParameterNames.X_509_CERT_URL);
 		}
 
 		if (x5t != null) {
-			includedParameters.add("x5t");
+			includedParameters.add(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT);
 		}
 
 		if (x5t256 != null) {
-			includedParameters.add("x5t#S256");
+			includedParameters.add(HeaderParameterNames.X_509_CERT_SHA_256_THUMBPRINT);
 		}
 
 		if (x5c != null && ! x5c.isEmpty()) {
-			includedParameters.add("x5c");
+			includedParameters.add(HeaderParameterNames.X_509_CERT_CHAIN);
 		}
 
 		if (kid != null) {
-			includedParameters.add("kid");
+			includedParameters.add(HeaderParameterNames.KEY_ID);
 		}
 
 		return includedParameters;
@@ -294,23 +294,23 @@ abstract class CommonSEHeader extends Header {
 		Map<String, Object> o = super.toJSONObject();
 
 		if (jku != null) {
-			o.put("jku", jku.toString());
+			o.put(HeaderParameterNames.JWK_SET_URL, jku.toString());
 		}
 
 		if (jwk != null) {
-			o.put("jwk", jwk.toJSONObject());
+			o.put(HeaderParameterNames.JWK, jwk.toJSONObject());
 		}
 
 		if (x5u != null) {
-			o.put("x5u", x5u.toString());
+			o.put(HeaderParameterNames.X_509_CERT_URL, x5u.toString());
 		}
 
 		if (x5t != null) {
-			o.put("x5t", x5t.toString());
+			o.put(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT, x5t.toString());
 		}
 
 		if (x5t256 != null) {
-			o.put("x5t#S256", x5t256.toString());
+			o.put(HeaderParameterNames.X_509_CERT_SHA_256_THUMBPRINT, x5t256.toString());
 		}
 
 		if (x5c != null && ! x5c.isEmpty()) {
@@ -318,11 +318,11 @@ abstract class CommonSEHeader extends Header {
 			for (Base64 item : x5c) {
 			    x5cJson.add(item.toString());
 			}
-			o.put("x5c", x5cJson);
+			o.put(HeaderParameterNames.X_509_CERT_CHAIN, x5cJson);
 		}
 
 		if (kid != null) {
-			o.put("kid", kid);
+			o.put(HeaderParameterNames.KEY_ID, kid);
 		}
 
 		return o;

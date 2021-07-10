@@ -30,6 +30,7 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
 
 import com.nimbusds.jose.*;
@@ -446,8 +447,8 @@ public class DefaultJOSEProcessorTest extends TestCase {
 
 		Map<String, Object> jsonObject = joseProcessor.process(jwt, new SimpleSecurityContext()).toJSONObject();
 
-		assertEquals("joe", jsonObject.get("iss"));
-		assertEquals(1300819380, ((Number)jsonObject.get("exp")).intValue());
+		assertEquals("joe", jsonObject.get(JWTClaimNames.ISSUER));
+		assertEquals(1300819380, ((Number)jsonObject.get(JWTClaimNames.EXPIRATION_TIME)).intValue());
 		assertTrue((Boolean) jsonObject.get("http://example.com/is_root"));
 		assertEquals(3, jsonObject.size());
 	}
@@ -587,8 +588,8 @@ public class DefaultJOSEProcessorTest extends TestCase {
 
 		Map<String, Object> jsonObject = processor.process(jws, null).toJSONObject();
 
-		assertEquals("joe", jsonObject.get("iss"));
-		assertEquals(1300819380, ((Number)jsonObject.get("exp")).intValue());
+		assertEquals("joe", jsonObject.get(JWTClaimNames.ISSUER));
+		assertEquals(1300819380, ((Number)jsonObject.get(JWTClaimNames.EXPIRATION_TIME)).intValue());
 		assertTrue((Boolean) jsonObject.get("http://example.com/is_root"));
 		assertEquals(3, jsonObject.size());
 	}

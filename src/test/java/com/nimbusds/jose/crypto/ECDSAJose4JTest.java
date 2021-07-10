@@ -18,15 +18,12 @@
 package com.nimbusds.jose.crypto;
 
 
+import com.nimbusds.jose.*;
 import junit.framework.TestCase;
 
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jws.JsonWebSignature;
 
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.jwk.ECKey;
 
 
@@ -78,7 +75,7 @@ public class ECDSAJose4JTest extends TestCase {
 		// Create JWS
 		JsonWebKey jwk = JsonWebKey.Factory.newJwk(EC_P521_JWK_JSON);
 		JsonWebSignature jws = new JsonWebSignature();
-		jws.setHeader("alg", "ES512");
+		jws.setHeader(HeaderParameterNames.ALGORITHM, "ES512");
 		jws.setPayload("Hello world!");
 		// jws.setKey(jwk.getKey()); // fails, check with jose4j todo - post ticket to jose4j
 		jws.setKey(ECKey.parse(EC_P521_JWK_JSON).toECPrivateKey());

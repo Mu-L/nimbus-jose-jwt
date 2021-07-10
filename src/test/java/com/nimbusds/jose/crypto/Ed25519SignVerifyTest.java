@@ -27,6 +27,7 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
 import org.junit.Assert;
 
@@ -499,8 +500,8 @@ public class Ed25519SignVerifyTest extends TestCase {
 		OctetKeyPair okp = generateOKP();
 
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.EdDSA).
-			customParam("exp", "2014-04-24").
-			criticalParams(Collections.singleton("exp")).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(Collections.singleton(JWTClaimNames.EXPIRATION_TIME)).
 			build();
 
 		JWSObject jwsObject = new JWSObject(header, new Payload("Hello world!"));
@@ -508,7 +509,7 @@ public class Ed25519SignVerifyTest extends TestCase {
 
 		jwsObject = JWSObject.parse(jwsObject.serialize());
 
-		assertTrue(jwsObject.verify(new Ed25519Verifier(okp.toPublicJWK(), Collections.singleton("exp"))));
+		assertTrue(jwsObject.verify(new Ed25519Verifier(okp.toPublicJWK(), Collections.singleton(JWTClaimNames.EXPIRATION_TIME))));
 
 		assertEquals("Hello world!", jwsObject.getPayload().toString());
 	}
@@ -520,8 +521,8 @@ public class Ed25519SignVerifyTest extends TestCase {
 		OctetKeyPair okp = generateOKP();
 
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.EdDSA).
-			customParam("exp", "2014-04-24").
-			criticalParams(Collections.singleton("exp")).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(Collections.singleton(JWTClaimNames.EXPIRATION_TIME)).
 			build();
 
 		JWSObject jwsObject = new JWSObject(header, new Payload("Hello world!"));

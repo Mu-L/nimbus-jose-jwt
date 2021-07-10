@@ -256,7 +256,7 @@ public class PBES2Test extends TestCase {
 		// Modify header
 		JSONObject modifiedHeaderJSONObject = new JSONObject();
 		modifiedHeaderJSONObject.putAll(jweObject.getHeader().toJSONObject());
-		modifiedHeaderJSONObject.put("p2c", 0);
+		modifiedHeaderJSONObject.put(HeaderParameterNames.PBES2_COUNT, 0);
 		Base64URL modifiedHeader = Base64URL.encode(modifiedHeaderJSONObject.toJSONString());
 		
 		jwe = jwe.substring(jwe.indexOf('.'));

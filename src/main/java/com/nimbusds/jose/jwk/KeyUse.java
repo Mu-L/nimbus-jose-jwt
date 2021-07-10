@@ -18,6 +18,8 @@
 package com.nimbusds.jose.jwk;
 
 
+import com.nimbusds.jose.HeaderParameterNames;
+
 import java.io.Serializable;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
@@ -53,7 +55,7 @@ public final class KeyUse implements Serializable {
 	/**
 	 * Encryption.
 	 */
-	public static final KeyUse ENCRYPTION = new KeyUse("enc");
+	public static final KeyUse ENCRYPTION = new KeyUse(HeaderParameterNames.ENCRYPTION_ALGORITHM);
 
 
 	/**

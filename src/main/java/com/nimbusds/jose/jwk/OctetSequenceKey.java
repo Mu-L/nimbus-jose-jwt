@@ -304,8 +304,8 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
 
 			// Put mandatory params in sorted order
 			LinkedHashMap<String,String> requiredParams = new LinkedHashMap<>();
-			requiredParams.put("k", k.toString());
-			requiredParams.put("kty", KeyType.OCT.getValue());
+			requiredParams.put(JWKParameterNames.OCT_KEY_VALUE, k.toString());
+			requiredParams.put(JWKParameterNames.KEY_TYPE, KeyType.OCT.getValue());
 			this.kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
 			return this;
 		}
@@ -503,8 +503,8 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
 
 		// Put mandatory params in sorted order
 		LinkedHashMap<String,String> requiredParams = new LinkedHashMap<>();
-		requiredParams.put("k", k.toString());
-		requiredParams.put("kty", getKeyType().toString());
+		requiredParams.put(JWKParameterNames.OCT_KEY_VALUE, k.toString());
+		requiredParams.put(JWKParameterNames.KEY_TYPE, getKeyType().toString());
 		return requiredParams;
 	}
 
@@ -552,7 +552,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
 		Map<String, Object> o = super.toJSONObject();
 
 		// Append key value
-		o.put("k", k.toString());
+		o.put(JWKParameterNames.OCT_KEY_VALUE, k.toString());
 		
 		return o;
 	}
@@ -593,11 +593,11 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
 		
 		// Check the key type
 		if (! KeyType.OCT.equals(JWKMetadata.parseKeyType(jsonObject))) {
-			throw new ParseException("The key type \"kty\" must be oct", 0);
+			throw new ParseException("The key type \"" + JWKParameterNames.KEY_TYPE + "\" must be " + KeyType.OCT.getValue(), 0);
 		}
 
 		// Parse the mandatory parameter
-		Base64URL k = JSONObjectUtils.getBase64URL(jsonObject, "k");
+		Base64URL k = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.OCT_KEY_VALUE);
 
 		try {
 			return new OctetSequenceKey(k,

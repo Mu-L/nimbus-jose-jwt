@@ -94,26 +94,27 @@ public final class JWEHeader extends CommonSEHeader {
 	static {
 		Set<String> p = new HashSet<>();
 
-		p.add("alg");
-		p.add("enc");
-		p.add("epk");
-		p.add("zip");
-		p.add("jku");
-		p.add("jwk");
-		p.add("x5u");
-		p.add("x5t");
-		p.add("x5t#S256");
-		p.add("x5c");
-		p.add("kid");
-		p.add("typ");
-		p.add("cty");
-		p.add("crit");
-		p.add("apu");
-		p.add("apv");
-		p.add("p2s");
-		p.add("p2c");
-		p.add("iv");
-		p.add("authTag");
+		p.add(HeaderParameterNames.ALGORITHM);
+		p.add(HeaderParameterNames.ENCRYPTION_ALGORITHM);
+		p.add(HeaderParameterNames.EPHEMERAL_PUBLIC_KEY);
+		p.add(HeaderParameterNames.COMPRESSION_ALGORITHM);
+		p.add(HeaderParameterNames.JWK_SET_URL);
+		p.add(HeaderParameterNames.JWK);
+		p.add(HeaderParameterNames.X_509_CERT_URL);
+		p.add(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT);
+		p.add(HeaderParameterNames.X_509_CERT_SHA_256_THUMBPRINT);
+		p.add(HeaderParameterNames.X_509_CERT_CHAIN);
+		p.add(HeaderParameterNames.KEY_ID);
+		p.add(HeaderParameterNames.TYPE);
+		p.add(HeaderParameterNames.CONTENT_TYPE);
+		p.add(HeaderParameterNames.CRITICAL);
+		p.add(HeaderParameterNames.AGREEMENT_PARTY_U_INFO);
+		p.add(HeaderParameterNames.AGREEMENT_PARTY_V_INFO);
+		p.add(HeaderParameterNames.PBES2_SALT_INPUT);
+		p.add(HeaderParameterNames.PBES2_COUNT);
+		p.add(HeaderParameterNames.INITIALIZATION_VECTOR);
+		p.add(HeaderParameterNames.AUTHENTICATION_TAG);
+		p.add("authTag"); // this is a non-standard header, but we should leave it for backwards compatibility
 
 		REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(p);
 	}
@@ -1032,39 +1033,39 @@ public final class JWEHeader extends CommonSEHeader {
 		Set<String> includedParameters = super.getIncludedParams();
 
 		if (enc != null) {
-			includedParameters.add("enc");
+			includedParameters.add(HeaderParameterNames.ENCRYPTION_ALGORITHM);
 		}
 
 		if (epk != null) {
-			includedParameters.add("epk");
+			includedParameters.add(HeaderParameterNames.EPHEMERAL_PUBLIC_KEY);
 		}
 
 		if (zip != null) {
-			includedParameters.add("zip");
+			includedParameters.add(HeaderParameterNames.COMPRESSION_ALGORITHM);
 		}
 
 		if (apu != null) {
-			includedParameters.add("apu");
+			includedParameters.add(HeaderParameterNames.AGREEMENT_PARTY_U_INFO);
 		}
 		
 		if (apv != null) {
-			includedParameters.add("apv");
+			includedParameters.add(HeaderParameterNames.AGREEMENT_PARTY_V_INFO);
 		}
 
 		if (p2s != null) {
-			includedParameters.add("p2s");
+			includedParameters.add(HeaderParameterNames.PBES2_SALT_INPUT);
 		}
 
 		if (p2c > 0) {
-			includedParameters.add("p2c");
+			includedParameters.add(HeaderParameterNames.PBES2_COUNT);
 		}
 
 		if (iv != null) {
-			includedParameters.add("iv");
+			includedParameters.add(HeaderParameterNames.INITIALIZATION_VECTOR);
 		}
 
 		if (tag != null) {
-			includedParameters.add("tag");
+			includedParameters.add(HeaderParameterNames.AUTHENTICATION_TAG);
 		}
 
 		return includedParameters;
@@ -1077,39 +1078,39 @@ public final class JWEHeader extends CommonSEHeader {
 		Map<String, Object> o = super.toJSONObject();
 
 		if (enc != null) {
-			o.put("enc", enc.toString());
+			o.put(HeaderParameterNames.ENCRYPTION_ALGORITHM, enc.toString());
 		}
 
 		if (epk != null) {
-			o.put("epk", epk.toJSONObject());
+			o.put(HeaderParameterNames.EPHEMERAL_PUBLIC_KEY, epk.toJSONObject());
 		}
 
 		if (zip != null) {
-			o.put("zip", zip.toString());
+			o.put(HeaderParameterNames.COMPRESSION_ALGORITHM, zip.toString());
 		}
 
 		if (apu != null) {
-			o.put("apu", apu.toString());
+			o.put(HeaderParameterNames.AGREEMENT_PARTY_U_INFO, apu.toString());
 		}
 		
 		if (apv != null) {
-			o.put("apv", apv.toString());
+			o.put(HeaderParameterNames.AGREEMENT_PARTY_V_INFO, apv.toString());
 		}
 
 		if (p2s != null) {
-			o.put("p2s", p2s.toString());
+			o.put(HeaderParameterNames.PBES2_SALT_INPUT, p2s.toString());
 		}
 
 		if (p2c > 0) {
-			o.put("p2c", p2c);
+			o.put(HeaderParameterNames.PBES2_COUNT, p2c);
 		}
 
 		if (iv != null) {
-			o.put("iv", iv.toString());
+			o.put(HeaderParameterNames.INITIALIZATION_VECTOR, iv.toString());
 		}
 
 		if (tag != null) {
-			o.put("tag", tag.toString());
+			o.put(HeaderParameterNames.AUTHENTICATION_TAG, tag.toString());
 		}
 
 		return o;
@@ -1130,7 +1131,7 @@ public final class JWEHeader extends CommonSEHeader {
 	private static EncryptionMethod parseEncryptionMethod(final Map<String, Object> json)
 		throws ParseException {
 
-		return EncryptionMethod.parse(JSONObjectUtils.getString(json, "enc"));
+		return EncryptionMethod.parse(JSONObjectUtils.getString(json, HeaderParameterNames.ENCRYPTION_ALGORITHM));
 	}
 
 
@@ -1184,57 +1185,57 @@ public final class JWEHeader extends CommonSEHeader {
 		// Parse optional + custom parameters
 		for(final String name: jsonObject.keySet()) {
 
-			if("alg".equals(name)) {
+			if(HeaderParameterNames.ALGORITHM.equals(name)) {
 				// skip
-			} else if("enc".equals(name)) {
+			} else if(HeaderParameterNames.ENCRYPTION_ALGORITHM.equals(name)) {
 				// skip
-			} else if("typ".equals(name)) {
+			} else if(HeaderParameterNames.TYPE.equals(name)) {
 				String typValue = JSONObjectUtils.getString(jsonObject, name);
 				if (typValue != null) {
 					header = header.type(new JOSEObjectType(typValue));
 				}
-			} else if("cty".equals(name)) {
+			} else if(HeaderParameterNames.CONTENT_TYPE.equals(name)) {
 				header = header.contentType(JSONObjectUtils.getString(jsonObject, name));
-			} else if("crit".equals(name)) {
+			} else if(HeaderParameterNames.CRITICAL.equals(name)) {
 				List<String> critValues = JSONObjectUtils.getStringList(jsonObject, name);
 				if (critValues != null) {
 					header = header.criticalParams(new HashSet<>(critValues));
 				}
-			} else if("jku".equals(name)) {
+			} else if(HeaderParameterNames.JWK_SET_URL.equals(name)) {
 				header = header.jwkURL(JSONObjectUtils.getURI(jsonObject, name));
-			} else if("jwk".equals(name)) {
+			} else if(HeaderParameterNames.JWK.equals(name)) {
 				Map<String, Object> jwkObject = JSONObjectUtils.getJSONObject(jsonObject, name);
 				if (jwkObject != null) {
 					header = header.jwk(JWK.parse(jwkObject));
 				}
-			} else if("x5u".equals(name)) {
+			} else if(HeaderParameterNames.X_509_CERT_URL.equals(name)) {
 				header = header.x509CertURL(JSONObjectUtils.getURI(jsonObject, name));
-			} else if("x5t".equals(name)) {
+			} else if(HeaderParameterNames.X_509_CERT_SHA_1_THUMBPRINT.equals(name)) {
 				header = header.x509CertThumbprint(Base64URL.from(JSONObjectUtils.getString(jsonObject, name)));
-			} else if("x5t#S256".equals(name)) {
+			} else if(HeaderParameterNames.X_509_CERT_SHA_256_THUMBPRINT.equals(name)) {
 				header = header.x509CertSHA256Thumbprint(Base64URL.from(JSONObjectUtils.getString(jsonObject, name)));
-			} else if("x5c".equals(name)) {
+			} else if(HeaderParameterNames.X_509_CERT_CHAIN.equals(name)) {
 				header = header.x509CertChain(X509CertChainUtils.toBase64List(JSONObjectUtils.getJSONArray(jsonObject, name)));
-			} else if("kid".equals(name)) {
+			} else if(HeaderParameterNames.KEY_ID.equals(name)) {
 				header = header.keyID(JSONObjectUtils.getString(jsonObject, name));
-			} else if("epk".equals(name)) {
+			} else if(HeaderParameterNames.EPHEMERAL_PUBLIC_KEY.equals(name)) {
 				header = header.ephemeralPublicKey(JWK.parse(JSONObjectUtils.getJSONObject(jsonObject, name)));
-			} else if("zip".equals(name)) {
+			} else if(HeaderParameterNames.COMPRESSION_ALGORITHM.equals(name)) {
 				String zipValue = JSONObjectUtils.getString(jsonObject, name);
 				if (zipValue != null) {
 					header = header.compressionAlgorithm(new CompressionAlgorithm(zipValue));
 				}
-			} else if("apu".equals(name)) {
+			} else if(HeaderParameterNames.AGREEMENT_PARTY_U_INFO.equals(name)) {
 				header = header.agreementPartyUInfo(Base64URL.from(JSONObjectUtils.getString(jsonObject, name)));
-			} else if("apv".equals(name)) {
+			} else if(HeaderParameterNames.AGREEMENT_PARTY_V_INFO.equals(name)) {
 				header = header.agreementPartyVInfo(Base64URL.from(JSONObjectUtils.getString(jsonObject, name)));
-			} else if("p2s".equals(name)) {
+			} else if(HeaderParameterNames.PBES2_SALT_INPUT.equals(name)) {
 				header = header.pbes2Salt(Base64URL.from(JSONObjectUtils.getString(jsonObject, name)));
-			} else if("p2c".equals(name)) {
+			} else if(HeaderParameterNames.PBES2_COUNT.equals(name)) {
 				header = header.pbes2Count(JSONObjectUtils.getInt(jsonObject, name));
-			} else if("iv".equals(name)) {
+			} else if(HeaderParameterNames.INITIALIZATION_VECTOR.equals(name)) {
 				header = header.iv(Base64URL.from(JSONObjectUtils.getString(jsonObject, name)));
-			} else if("tag".equals(name)) {
+			} else if(HeaderParameterNames.AUTHENTICATION_TAG.equals(name)) {
 				header = header.authTag(Base64URL.from(JSONObjectUtils.getString(jsonObject, name)));
 			} else {
 				header = header.customParam(name, jsonObject.get(name));

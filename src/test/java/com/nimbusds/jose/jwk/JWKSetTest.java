@@ -1151,7 +1151,7 @@ public class JWKSetTest extends TestCase {
 		keys.add(new RSAKeyGenerator(2048).generate().toJSONObject());
 		
 		Map<String, Object> unknownKey = new HashMap<>();
-		unknownKey.put("kty", "UNKNOWN");
+		unknownKey.put(JWKParameterNames.KEY_TYPE, "UNKNOWN");
 		keys.add(unknownKey);
 		
 		Map<String, Object> input = new HashMap<>();

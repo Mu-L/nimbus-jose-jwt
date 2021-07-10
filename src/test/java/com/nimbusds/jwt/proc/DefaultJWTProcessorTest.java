@@ -868,7 +868,7 @@ public class DefaultJWTProcessorTest extends TestCase {
 		// Set the required JWT claims for access tokens
 		jwtProcessor.setJWTClaimsSetVerifier(new DefaultJWTClaimsVerifier(
 			new JWTClaimsSet.Builder().issuer("https://demo.c2id.com/c2id").build(),
-			new HashSet<>(Arrays.asList("sub", "iat", "exp", "scp", "cid", "jti"))));
+			new HashSet<>(Arrays.asList(JWTClaimNames.SUBJECT, JWTClaimNames.ISSUED_AT, JWTClaimNames.EXPIRATION_TIME, "scp", "cid", JWTClaimNames.JWT_ID))));
 
 		// Process the token
 		SecurityContext ctx = null; // optional context parameter, not required here

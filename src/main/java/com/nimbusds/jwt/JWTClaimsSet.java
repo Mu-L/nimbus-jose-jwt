@@ -82,15 +82,6 @@ public final class JWTClaimsSet implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 
-	private static final String ISSUER_CLAIM = "iss";
-	private static final String SUBJECT_CLAIM = "sub";
-	private static final String AUDIENCE_CLAIM = "aud";
-	private static final String EXPIRATION_TIME_CLAIM = "exp";
-	private static final String NOT_BEFORE_CLAIM = "nbf";
-	private static final String ISSUED_AT_CLAIM = "iat";
-	private static final String JWT_ID_CLAIM = "jti";
-
-
 	/**
 	 * The registered claim names.
 	 */
@@ -103,13 +94,13 @@ public final class JWTClaimsSet implements Serializable {
 	static {
 		Set<String> n = new HashSet<>();
 
-		n.add(ISSUER_CLAIM);
-		n.add(SUBJECT_CLAIM);
-		n.add(AUDIENCE_CLAIM);
-		n.add(EXPIRATION_TIME_CLAIM);
-		n.add(NOT_BEFORE_CLAIM);
-		n.add(ISSUED_AT_CLAIM);
-		n.add(JWT_ID_CLAIM);
+		n.add(JWTClaimNames.ISSUER);
+		n.add(JWTClaimNames.SUBJECT);
+		n.add(JWTClaimNames.AUDIENCE);
+		n.add(JWTClaimNames.EXPIRATION_TIME);
+		n.add(JWTClaimNames.NOT_BEFORE);
+		n.add(JWTClaimNames.ISSUED_AT);
+		n.add(JWTClaimNames.JWT_ID);
 
 		REGISTERED_CLAIM_NAMES = Collections.unmodifiableSet(n);
 	}
@@ -168,7 +159,7 @@ public final class JWTClaimsSet implements Serializable {
 		 */
 		public Builder issuer(final String iss) {
 
-			claims.put(ISSUER_CLAIM, iss);
+			claims.put(JWTClaimNames.ISSUER, iss);
 			return this;
 		}
 
@@ -182,7 +173,7 @@ public final class JWTClaimsSet implements Serializable {
 		 */
 		public Builder subject(final String sub) {
 
-			claims.put(SUBJECT_CLAIM, sub);
+			claims.put(JWTClaimNames.SUBJECT, sub);
 			return this;
 		}
 
@@ -197,7 +188,7 @@ public final class JWTClaimsSet implements Serializable {
 		 */
 		public Builder audience(final List<String> aud) {
 
-			claims.put(AUDIENCE_CLAIM, aud);
+			claims.put(JWTClaimNames.AUDIENCE, aud);
 			return this;
 		}
 
@@ -213,9 +204,9 @@ public final class JWTClaimsSet implements Serializable {
 		public Builder audience(final String aud) {
 
 			if (aud == null) {
-				claims.put(AUDIENCE_CLAIM, null);
+				claims.put(JWTClaimNames.AUDIENCE, null);
 			} else {
-				claims.put(AUDIENCE_CLAIM, Collections.singletonList(aud));
+				claims.put(JWTClaimNames.AUDIENCE, Collections.singletonList(aud));
 			}
 			return this;
 		}
@@ -231,7 +222,7 @@ public final class JWTClaimsSet implements Serializable {
 		 */
 		public Builder expirationTime(final Date exp) {
 
-			claims.put(EXPIRATION_TIME_CLAIM, exp);
+			claims.put(JWTClaimNames.EXPIRATION_TIME, exp);
 			return this;
 		}
 
@@ -246,7 +237,7 @@ public final class JWTClaimsSet implements Serializable {
 		 */
 		public Builder notBeforeTime(final Date nbf) {
 
-			claims.put(NOT_BEFORE_CLAIM, nbf);
+			claims.put(JWTClaimNames.NOT_BEFORE, nbf);
 			return this;
 		}
 
@@ -261,7 +252,7 @@ public final class JWTClaimsSet implements Serializable {
 		 */
 		public Builder issueTime(final Date iat) {
 
-			claims.put(ISSUED_AT_CLAIM, iat);
+			claims.put(JWTClaimNames.ISSUED_AT, iat);
 			return this;
 		}
 
@@ -275,7 +266,7 @@ public final class JWTClaimsSet implements Serializable {
 		 */
 		public Builder jwtID(final String jti) {
 
-			claims.put(JWT_ID_CLAIM, jti);
+			claims.put(JWTClaimNames.JWT_ID, jti);
 			return this;
 		}
 
@@ -362,7 +353,7 @@ public final class JWTClaimsSet implements Serializable {
 	public String getIssuer() {
 
 		try {
-			return getStringClaim(ISSUER_CLAIM);
+			return getStringClaim(JWTClaimNames.ISSUER);
 		} catch (ParseException e) {
 			return null;
 		}
@@ -377,7 +368,7 @@ public final class JWTClaimsSet implements Serializable {
 	public String getSubject() {
 
 		try {
-			return getStringClaim(SUBJECT_CLAIM);
+			return getStringClaim(JWTClaimNames.SUBJECT);
 		} catch (ParseException e) {
 			return null;
 		}
@@ -391,7 +382,7 @@ public final class JWTClaimsSet implements Serializable {
 	 */
 	public List<String> getAudience() {
 
-		Object audValue = getClaim(AUDIENCE_CLAIM);
+		Object audValue = getClaim(JWTClaimNames.AUDIENCE);
 		
 		if (audValue instanceof String) {
 			// Special case
@@ -400,7 +391,7 @@ public final class JWTClaimsSet implements Serializable {
 		
 		List<String> aud;
 		try {
-			aud = getStringListClaim(AUDIENCE_CLAIM);
+			aud = getStringListClaim(JWTClaimNames.AUDIENCE);
 		} catch (ParseException e) {
 			return Collections.emptyList();
 		}
@@ -416,7 +407,7 @@ public final class JWTClaimsSet implements Serializable {
 	public Date getExpirationTime() {
 
 		try {
-			return getDateClaim(EXPIRATION_TIME_CLAIM);
+			return getDateClaim(JWTClaimNames.EXPIRATION_TIME);
 		} catch (ParseException e) {
 			return null;
 		}
@@ -431,7 +422,7 @@ public final class JWTClaimsSet implements Serializable {
 	public Date getNotBeforeTime() {
 
 		try {
-			return getDateClaim(NOT_BEFORE_CLAIM);
+			return getDateClaim(JWTClaimNames.NOT_BEFORE);
 		} catch (ParseException e) {
 			return null;
 		}
@@ -446,7 +437,7 @@ public final class JWTClaimsSet implements Serializable {
 	public Date getIssueTime() {
 
 		try {
-			return getDateClaim(ISSUED_AT_CLAIM);
+			return getDateClaim(JWTClaimNames.ISSUED_AT);
 		} catch (ParseException e) {
 			return null;
 		}
@@ -461,7 +452,7 @@ public final class JWTClaimsSet implements Serializable {
 	public String getJWTID() {
 
 		try {
-			return getStringClaim(JWT_ID_CLAIM);
+			return getStringClaim(JWTClaimNames.JWT_ID);
 		} catch (ParseException e) {
 			return null;
 		}
@@ -850,21 +841,21 @@ public final class JWTClaimsSet implements Serializable {
 				Date dateValue = (Date) claim.getValue();
 				o.put(claim.getKey(), DateUtils.toSecondsSinceEpoch(dateValue));
 				
-			} else if (AUDIENCE_CLAIM.equals(claim.getKey())) {
+			} else if (JWTClaimNames.AUDIENCE.equals(claim.getKey())) {
 				
 				// Serialise single audience list and string
 				List<String> audList = getAudience();
 				
 				if (audList != null && ! audList.isEmpty()) {
 					if (audList.size() == 1) {
-						o.put(AUDIENCE_CLAIM, audList.get(0));
+						o.put(JWTClaimNames.AUDIENCE, audList.get(0));
 					} else {
 						List<Object> audArray = JSONArrayUtils.newJSONArray();
 						audArray.addAll(audList);
-						o.put(AUDIENCE_CLAIM, audArray);
+						o.put(JWTClaimNames.AUDIENCE, audArray);
 					}
 				} else if (includeClaimsWithNullValues) {
-					o.put(AUDIENCE_CLAIM, null);
+					o.put(JWTClaimNames.AUDIENCE, null);
 				}
 				
 			} else if (claim.getValue() != null) {
@@ -943,35 +934,35 @@ public final class JWTClaimsSet implements Serializable {
 		for (final String name: json.keySet()) {
 			
 			switch (name) {
-				case ISSUER_CLAIM:
-					builder.issuer(JSONObjectUtils.getString(json, ISSUER_CLAIM));
+				case JWTClaimNames.ISSUER:
+					builder.issuer(JSONObjectUtils.getString(json, JWTClaimNames.ISSUER));
 					break;
-				case SUBJECT_CLAIM:
-					builder.subject(JSONObjectUtils.getString(json, SUBJECT_CLAIM));
+				case JWTClaimNames.SUBJECT:
+					builder.subject(JSONObjectUtils.getString(json, JWTClaimNames.SUBJECT));
 					break;
-				case AUDIENCE_CLAIM:
-					Object audValue = json.get(AUDIENCE_CLAIM);
+				case JWTClaimNames.AUDIENCE:
+					Object audValue = json.get(JWTClaimNames.AUDIENCE);
 					if (audValue instanceof String) {
 						List<String> singleAud = new ArrayList<>();
-						singleAud.add(JSONObjectUtils.getString(json, AUDIENCE_CLAIM));
+						singleAud.add(JSONObjectUtils.getString(json, JWTClaimNames.AUDIENCE));
 						builder.audience(singleAud);
 					} else if (audValue instanceof List) {
-						builder.audience(JSONObjectUtils.getStringList(json, AUDIENCE_CLAIM));
+						builder.audience(JSONObjectUtils.getStringList(json, JWTClaimNames.AUDIENCE));
 					} else if (audValue == null) {
 						builder.audience((String) null);
 					}
 					break;
-				case EXPIRATION_TIME_CLAIM:
-					builder.expirationTime(new Date(JSONObjectUtils.getLong(json, EXPIRATION_TIME_CLAIM) * 1000));
+				case JWTClaimNames.EXPIRATION_TIME:
+					builder.expirationTime(new Date(JSONObjectUtils.getLong(json, JWTClaimNames.EXPIRATION_TIME) * 1000));
 					break;
-				case NOT_BEFORE_CLAIM:
-					builder.notBeforeTime(new Date(JSONObjectUtils.getLong(json, NOT_BEFORE_CLAIM) * 1000));
+				case JWTClaimNames.NOT_BEFORE:
+					builder.notBeforeTime(new Date(JSONObjectUtils.getLong(json, JWTClaimNames.NOT_BEFORE) * 1000));
 					break;
-				case ISSUED_AT_CLAIM:
-					builder.issueTime(new Date(JSONObjectUtils.getLong(json, ISSUED_AT_CLAIM) * 1000));
+				case JWTClaimNames.ISSUED_AT:
+					builder.issueTime(new Date(JSONObjectUtils.getLong(json, JWTClaimNames.ISSUED_AT) * 1000));
 					break;
-				case JWT_ID_CLAIM:
-					builder.jwtID(JSONObjectUtils.getString(json, JWT_ID_CLAIM));
+				case JWTClaimNames.JWT_ID:
+					builder.jwtID(JSONObjectUtils.getString(json, JWTClaimNames.JWT_ID));
 					break;
 				default:
 					builder.claim(name, json.get(name));

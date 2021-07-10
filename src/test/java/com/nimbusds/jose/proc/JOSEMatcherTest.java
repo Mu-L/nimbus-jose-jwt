@@ -266,7 +266,7 @@ public class JOSEMatcherTest extends TestCase {
 			new Payload("Hello world!"))));
 
 		assertFalse(matcher.matches(new PlainObject(
-			new PlainHeader.Builder().customParam("jku", "https://c2id.com/jwk.json").build(),
+			new PlainHeader.Builder().customParam(HeaderParameterNames.JWK_SET_URL, "https://c2id.com/jwk.json").build(),
 			new Payload("Hello world!"))));
 	}
 
@@ -289,7 +289,7 @@ public class JOSEMatcherTest extends TestCase {
 			new Payload("Hello world!"))));
 
 		assertTrue(matcher.matches(new PlainObject(
-			new PlainHeader.Builder().customParam("jku", "https://c2id.com/jwk.json").build(),
+			new PlainHeader.Builder().customParam(HeaderParameterNames.JWK_SET_URL, "https://c2id.com/jwk.json").build(),
 			new Payload("Hello world!"))));
 	}
 
@@ -309,7 +309,7 @@ public class JOSEMatcherTest extends TestCase {
 		)));
 
 		assertFalse(matcher.matches(new PlainObject(
-			new PlainHeader.Builder().customParam("kid", "1").build(),
+			new PlainHeader.Builder().customParam(HeaderParameterNames.KEY_ID, "1").build(),
 			new Payload("Hello world!")
 		)));
 
@@ -340,7 +340,7 @@ public class JOSEMatcherTest extends TestCase {
 		)));
 
 		assertTrue(matcher.matches(new PlainObject(
-			new PlainHeader.Builder().customParam("kid", "1").build(),
+			new PlainHeader.Builder().customParam(HeaderParameterNames.KEY_ID, "1").build(),
 			new Payload("Hello world!")
 		)));
 

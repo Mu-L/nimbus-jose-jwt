@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 
+import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
 
 import com.nimbusds.jose.proc.BadJOSEException;
@@ -175,8 +176,8 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 			null);
 		
 		assertNull(verifier.getAcceptedAudienceValues());
-		assertEquals(Collections.singleton("iss"), verifier.getRequiredClaims());
-		assertEquals(Collections.singleton("iss"), verifier.getExactMatchClaims().getClaims().keySet());
+		assertEquals(Collections.singleton(JWTClaimNames.ISSUER), verifier.getRequiredClaims());
+		assertEquals(Collections.singleton(JWTClaimNames.ISSUER), verifier.getExactMatchClaims().getClaims().keySet());
 		assertTrue(verifier.getProhibitedClaims().isEmpty());
 		
 		verifier.verify(new JWTClaimsSet.Builder().issuer(iss).build(), null);
@@ -192,8 +193,8 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 			null);
 		
 		assertNull(verifier.getAcceptedAudienceValues());
-		assertEquals(Collections.singleton("iss"), verifier.getRequiredClaims());
-		assertEquals(Collections.singleton("iss"), verifier.getExactMatchClaims().getClaims().keySet());
+		assertEquals(Collections.singleton(JWTClaimNames.ISSUER), verifier.getRequiredClaims());
+		assertEquals(Collections.singleton(JWTClaimNames.ISSUER), verifier.getExactMatchClaims().getClaims().keySet());
 		assertTrue(verifier.getProhibitedClaims().isEmpty());
 		
 		try {
@@ -214,8 +215,8 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 			null);
 		
 		assertNull(verifier.getAcceptedAudienceValues());
-		assertEquals(Collections.singleton("iss"), verifier.getRequiredClaims());
-		assertEquals(Collections.singleton("iss"), verifier.getExactMatchClaims().getClaims().keySet());
+		assertEquals(Collections.singleton(JWTClaimNames.ISSUER), verifier.getRequiredClaims());
+		assertEquals(Collections.singleton(JWTClaimNames.ISSUER), verifier.getExactMatchClaims().getClaims().keySet());
 		assertTrue(verifier.getProhibitedClaims().isEmpty());
 		
 		try {
@@ -335,7 +336,7 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 	
 	public void testRequiresIAT() throws BadJWTException {
 		
-		DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier(null, null, Collections.singleton("iat"));
+		DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier(null, null, Collections.singleton(JWTClaimNames.ISSUED_AT));
 		
 		verifier.verify(new JWTClaimsSet.Builder().issueTime(new Date()).build(), null);
 		
@@ -350,7 +351,7 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 	
 	public void testRequiresEXP() throws BadJWTException {
 		
-		DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier(null, null, Collections.singleton("exp"));
+		DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier(null, null, Collections.singleton(JWTClaimNames.EXPIRATION_TIME));
 		
 		verifier.verify(new JWTClaimsSet.Builder().expirationTime(new Date()).build(), null);
 		
@@ -365,9 +366,9 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 	
 	public void testRequiresEXP_illegalValue() throws BadJWTException {
 		
-		DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier(null, null, Collections.singleton("exp"));
+		DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier(null, null, Collections.singleton(JWTClaimNames.EXPIRATION_TIME));
 		
-		verifier.verify(new JWTClaimsSet.Builder().claim("exp", "illegal-value").build(), null);
+		verifier.verify(new JWTClaimsSet.Builder().claim(JWTClaimNames.EXPIRATION_TIME, "illegal-value").build(), null);
 		
 		try {
 			verifier.verify(new JWTClaimsSet.Builder().build(), null);
@@ -384,9 +385,9 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 			new JWTClaimsSet.Builder()
 				.issuer("https://example.com")
 				.build(),
-			new HashSet<>(Arrays.asList("iss", "iat", "jti")));
+			new HashSet<>(Arrays.asList(JWTClaimNames.ISSUER, JWTClaimNames.ISSUED_AT, JWTClaimNames.JWT_ID)));
 		
-		assertEquals(new HashSet<>(Arrays.asList("iss", "iat", "jti")), verifier.getRequiredClaims());
+		assertEquals(new HashSet<>(Arrays.asList(JWTClaimNames.ISSUER, JWTClaimNames.ISSUED_AT, JWTClaimNames.JWT_ID)), verifier.getRequiredClaims());
 		
 		verifier.verify(
 			new JWTClaimsSet.Builder()
@@ -412,9 +413,9 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 				.issuer("https://issuer.example.com")
 				.audience("https://client.example.com")
 				.build(),
-			new HashSet<>(Arrays.asList("exp", "nbf", "jti")));
+			new HashSet<>(Arrays.asList(JWTClaimNames.EXPIRATION_TIME, JWTClaimNames.NOT_BEFORE, JWTClaimNames.JWT_ID)));
 		
-		assertEquals(new HashSet<>(Arrays.asList("iss", "aud", "exp", "nbf", "jti")), verifier.getRequiredClaims());
+		assertEquals(new HashSet<>(Arrays.asList(JWTClaimNames.ISSUER, JWTClaimNames.AUDIENCE, JWTClaimNames.EXPIRATION_TIME, JWTClaimNames.NOT_BEFORE, JWTClaimNames.JWT_ID)), verifier.getRequiredClaims());
 		
 		Date now = new Date();
 		Date exp = new Date(now.getTime() + 60_000);

@@ -53,7 +53,7 @@ final class JWKMetadata {
 		throws ParseException {
 
 		try {
-			return KeyType.parse(JSONObjectUtils.getString(o, "kty"));
+			return KeyType.parse(JSONObjectUtils.getString(o, JWKParameterNames.KEY_TYPE));
 		} catch (IllegalArgumentException e) {
 			throw new ParseException(e.getMessage(), 0);
 		}
@@ -73,7 +73,7 @@ final class JWKMetadata {
 	static KeyUse parseKeyUse(final Map<String, Object> o)
 		throws ParseException {
 
-		return KeyUse.parse(JSONObjectUtils.getString(o, "use"));
+		return KeyUse.parse(JSONObjectUtils.getString(o, JWKParameterNames.PUBLIC_KEY_USE));
 	}
 
 
@@ -89,7 +89,7 @@ final class JWKMetadata {
 	static Set<KeyOperation> parseKeyOperations(final Map<String, Object> o)
 		throws ParseException {
 		
-		return KeyOperation.parse(JSONObjectUtils.getStringList(o, "key_ops"));
+		return KeyOperation.parse(JSONObjectUtils.getStringList(o, JWKParameterNames.KEY_OPS));
 	}
 
 
@@ -105,7 +105,7 @@ final class JWKMetadata {
 	static Algorithm parseAlgorithm(final Map<String, Object> o)
 		throws ParseException {
 
-		return Algorithm.parse(JSONObjectUtils.getString(o, "alg"));
+		return Algorithm.parse(JSONObjectUtils.getString(o, JWKParameterNames.ALGORITHM));
 	}
 
 
@@ -121,7 +121,7 @@ final class JWKMetadata {
 	static String parseKeyID(final Map<String, Object> o)
 		throws ParseException {
 
-		return JSONObjectUtils.getString(o, "kid");
+		return JSONObjectUtils.getString(o, JWKParameterNames.KEY_ID);
 	}
 
 
@@ -137,7 +137,7 @@ final class JWKMetadata {
 	static URI parseX509CertURL(final Map<String, Object> o)
 		throws ParseException {
 
-		return JSONObjectUtils.getURI(o, "x5u");
+		return JSONObjectUtils.getURI(o, JWKParameterNames.X_509_CERT_URL);
 	}
 
 
@@ -154,7 +154,7 @@ final class JWKMetadata {
 	static Base64URL parseX509CertThumbprint(final Map<String, Object> o)
 		throws ParseException {
 
-		return JSONObjectUtils.getBase64URL(o, "x5t");
+		return JSONObjectUtils.getBase64URL(o, JWKParameterNames.X_509_CERT_SHA_1_THUMBPRINT);
 	}
 
 
@@ -171,7 +171,7 @@ final class JWKMetadata {
 	static Base64URL parseX509CertSHA256Thumbprint(final Map<String, Object> o)
 		throws ParseException {
 
-		return JSONObjectUtils.getBase64URL(o, "x5t#S256");
+		return JSONObjectUtils.getBase64URL(o, JWKParameterNames.X_509_CERT_SHA_256_THUMBPRINT);
 	}
 
 
@@ -190,7 +190,7 @@ final class JWKMetadata {
 		throws ParseException {
 		
 		// https://tools.ietf.org/html/rfc7517#section-4.7
-		List<Base64> chain = X509CertChainUtils.toBase64List(JSONObjectUtils.getJSONArray(o, "x5c"));
+		List<Base64> chain = X509CertChainUtils.toBase64List(JSONObjectUtils.getJSONArray(o, JWKParameterNames.X_509_CERT_CHAIN));
 		
 		if (chain == null || ! chain.isEmpty()) {
 			return chain;

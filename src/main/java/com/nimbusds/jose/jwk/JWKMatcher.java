@@ -1317,11 +1317,11 @@ public class JWKMatcher {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		
-		append(sb, "kty", types);
-		append(sb, "use", uses);
-		append(sb, "key_ops", ops);
-		append(sb, "alg", algs);
-		append(sb, "kid", ids);
+		append(sb, JWKParameterNames.KEY_TYPE, types);
+		append(sb, JWKParameterNames.PUBLIC_KEY_USE, uses);
+		append(sb, JWKParameterNames.KEY_OPS, ops);
+		append(sb, JWKParameterNames.ALGORITHM, algs);
+		append(sb, JWKParameterNames.KEY_ID, ids);
 		
 		if (hasUse) {
 			sb.append("has_use=true ");
@@ -1348,8 +1348,8 @@ public class JWKMatcher {
 		}
 		
 		append(sb, "size", sizesBits);
-		append(sb, "crv", curves);
-		append(sb, "x5t#S256", x5tS256s);
+		append(sb, JWKParameterNames.ELLIPTIC_CURVE, curves);
+		append(sb, JWKParameterNames.X_509_CERT_SHA_256_THUMBPRINT, x5tS256s);
 			
 		return sb.toString().trim();
 	}

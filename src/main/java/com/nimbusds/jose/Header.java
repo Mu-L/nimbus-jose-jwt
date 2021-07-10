@@ -256,18 +256,18 @@ public abstract class Header implements Serializable {
 		Set<String> includedParameters =
 			new HashSet<>(getCustomParams().keySet());
 
-		includedParameters.add("alg");
+		includedParameters.add(HeaderParameterNames.ALGORITHM);
 
 		if (getType() != null) {
-			includedParameters.add("typ");
+			includedParameters.add(HeaderParameterNames.TYPE);
 		}
 
 		if (getContentType() != null) {
-			includedParameters.add("cty");
+			includedParameters.add(HeaderParameterNames.CONTENT_TYPE);
 		}
 
 		if (getCriticalParams() != null && ! getCriticalParams().isEmpty()) {
-			includedParameters.add("crit");
+			includedParameters.add(HeaderParameterNames.CRITICAL);
 		}
 
 		return includedParameters;
@@ -289,18 +289,18 @@ public abstract class Header implements Serializable {
 		o.putAll(customParams);
 
 		// Alg is always defined
-		o.put("alg", alg.toString());
+		o.put(HeaderParameterNames.ALGORITHM, alg.toString());
 
 		if (typ != null) {
-			o.put("typ", typ.toString());
+			o.put(HeaderParameterNames.TYPE, typ.toString());
 		}
 
 		if (cty != null) {
-			o.put("cty", cty);
+			o.put(HeaderParameterNames.CONTENT_TYPE, cty);
 		}
 
 		if (crit != null && ! crit.isEmpty()) {
-			o.put("crit", new ArrayList<>(crit));
+			o.put(HeaderParameterNames.CRITICAL, new ArrayList<>(crit));
 		}
 
 		return o;
@@ -365,7 +365,7 @@ public abstract class Header implements Serializable {
 	public static Algorithm parseAlgorithm(final Map<String, Object> json)
 		throws ParseException {
 
-		String algName = JSONObjectUtils.getString(json, "alg");
+		String algName = JSONObjectUtils.getString(json, HeaderParameterNames.ALGORITHM);
 		
 		if (algName == null) {
 			throw new ParseException("Missing \"alg\" in header JSON object", 0);
@@ -375,7 +375,7 @@ public abstract class Header implements Serializable {
 		if (algName.equals(Algorithm.NONE.getName())) {
 			// Plain
 			return Algorithm.NONE;
-		} else if (json.containsKey("enc")) {
+		} else if (json.containsKey(HeaderParameterNames.ENCRYPTION_ALGORITHM)) {
 			// JWE
 			return JWEAlgorithm.parse(algName);
 		} else {

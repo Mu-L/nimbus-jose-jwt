@@ -18,6 +18,14 @@
 package com.nimbusds.jose.jwk;
 
 
+import com.nimbusds.jose.Algorithm;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.util.Base64;
+import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.ByteUtils;
+import com.nimbusds.jose.util.JSONObjectUtils;
+import net.jcip.annotations.Immutable;
+
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -26,15 +34,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.*;
-
-import net.jcip.annotations.Immutable;
-
-import com.nimbusds.jose.Algorithm;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.util.Base64;
-import com.nimbusds.jose.util.Base64URL;
-import com.nimbusds.jose.util.ByteUtils;
-import com.nimbusds.jose.util.JSONObjectUtils;
 
 
 /**
@@ -356,9 +355,9 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 			
 			// Put mandatory params in sorted order
 			LinkedHashMap<String,String> requiredParams = new LinkedHashMap<>();
-			requiredParams.put("crv", crv.toString());
-			requiredParams.put("kty", KeyType.OKP.getValue());
-			requiredParams.put("x", x.toString());
+			requiredParams.put(JWKParameterNames.OKP_SUBTYPE, crv.toString());
+			requiredParams.put(JWKParameterNames.KEY_TYPE, KeyType.OKP.getValue());
+			requiredParams.put(JWKParameterNames.OKP_PUBLIC_KEY, x.toString());
 			this.kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
 			return this;
 		}
@@ -543,7 +542,7 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 		this.crv = crv;
 		
 		if (x == null) {
-			throw new IllegalArgumentException("The 'x' parameter must not be null");
+			throw new IllegalArgumentException("The '" + JWKParameterNames.OKP_PUBLIC_KEY + "' parameter must not be null");
 		}
 		
 		this.x = x;
@@ -596,14 +595,14 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 		this.crv = crv;
 		
 		if (x == null) {
-			throw new IllegalArgumentException("The 'x' parameter must not be null");
+			throw new IllegalArgumentException("The '" + JWKParameterNames.OKP_PUBLIC_KEY + "' parameter must not be null");
 		}
 		
 		this.x = x;
 		decodedX = x.decode();
 		
 		if (d == null) {
-			throw new IllegalArgumentException("The 'd' parameter must not be null");
+			throw new IllegalArgumentException("The '" + JWKParameterNames.OKP_PRIVATE_KEY + "' parameter must not be null");
 		}
 		
 		this.d = d;
@@ -700,9 +699,9 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 		
 		// Put mandatory params in sorted order
 		LinkedHashMap<String,String> requiredParams = new LinkedHashMap<>();
-		requiredParams.put("crv", crv.toString());
-		requiredParams.put("kty", getKeyType().getValue());
-		requiredParams.put("x", x.toString());
+		requiredParams.put(JWKParameterNames.OKP_SUBTYPE, crv.toString());
+		requiredParams.put(JWKParameterNames.KEY_TYPE, getKeyType().getValue());
+		requiredParams.put(JWKParameterNames.OKP_PUBLIC_KEY, x.toString());
 		return requiredParams;
 	}
 	
@@ -737,11 +736,11 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 		Map<String, Object> o = super.toJSONObject();
 		
 		// Append OKP specific attributes
-		o.put("crv", crv.toString());
-		o.put("x", x.toString());
+		o.put(JWKParameterNames.OKP_SUBTYPE, crv.toString());
+		o.put(JWKParameterNames.OKP_PUBLIC_KEY, x.toString());
 		
 		if (d != null) {
-			o.put("d", d.toString());
+			o.put(JWKParameterNames.OKP_PRIVATE_KEY, d.toString());
 		}
 		
 		return o;
@@ -790,21 +789,21 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 		
 		// Check the key type
 		if (! KeyType.OKP.equals(JWKMetadata.parseKeyType(jsonObject))) {
-			throw new ParseException("The key type \"kty\" must be OKP", 0);
+			throw new ParseException("The key type \"" + JWKParameterNames.KEY_TYPE + "\" must be " + KeyType.OKP.getValue(), 0);
 		}
 		
 		// Parse the mandatory parameters
 		Curve crv;
 		try {
-			crv = Curve.parse(JSONObjectUtils.getString(jsonObject, "crv"));
+			crv = Curve.parse(JSONObjectUtils.getString(jsonObject, JWKParameterNames.OKP_SUBTYPE));
 		} catch (IllegalArgumentException e) {
 			throw new ParseException(e.getMessage(), 0);
 		}
 		
-		Base64URL x = JSONObjectUtils.getBase64URL(jsonObject, "x");
+		Base64URL x = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.OKP_PUBLIC_KEY);
 		
 		// Get the optional private key
-		Base64URL d = JSONObjectUtils.getBase64URL(jsonObject, "d");
+		Base64URL d = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.OKP_PRIVATE_KEY);
 		
 		try {
 			if (d == null) {

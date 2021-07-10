@@ -163,8 +163,8 @@ public class CurveTest extends TestCase {
 		assertEquals(new Curve("P-256"), Curve.P_256);
 		assertEquals(new Curve("P-256").hashCode(), Curve.P_256.hashCode());
 		
-		assertEquals("Crypto name and OID ignored", new Curve("P-256", "x", "y"), new Curve("P-256"));
-		assertEquals("Crypto name and OID ignored", new Curve("P-256", "x", "y").hashCode(), new Curve("P-256").hashCode());
+		assertEquals("Crypto name and OID ignored", new Curve("P-256", JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE, JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE), new Curve("P-256"));
+		assertEquals("Crypto name and OID ignored", new Curve("P-256", JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE, JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE).hashCode(), new Curve("P-256").hashCode());
 	}
 	
 	
@@ -173,7 +173,7 @@ public class CurveTest extends TestCase {
 		assertNotSame(new Curve("P-256"), Curve.P_384);
 		assertNotSame(new Curve("P-256").hashCode(), Curve.P_384.hashCode());
 		
-		assertNotSame("Crypto name and OID ignored", new Curve("P-256", "x", "y"), new Curve("P-384", "x", "y"));
-		assertNotSame("Crypto name and OID ignored", new Curve("P-256", "x", "y").hashCode(), new Curve("P-384", "x", "y").hashCode());
+		assertNotSame("Crypto name and OID ignored", new Curve("P-256", JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE, JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE), new Curve("P-384", JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE, JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE));
+		assertNotSame("Crypto name and OID ignored", new Curve("P-256", JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE, JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE).hashCode(), new Curve("P-384", JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE, JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE).hashCode());
 	}
 }

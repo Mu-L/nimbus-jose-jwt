@@ -18,6 +18,11 @@
 package com.nimbusds.jose.jwk;
 
 
+import com.nimbusds.jose.Algorithm;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.util.Base64;
+import com.nimbusds.jose.util.*;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.security.*;
@@ -29,11 +34,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.text.ParseException;
 import java.util.*;
-
-import com.nimbusds.jose.Algorithm;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.util.Base64;
-import com.nimbusds.jose.util.*;
 
 
 /**
@@ -185,13 +185,13 @@ public abstract class JWK implements Serializable {
 		      final KeyStore ks) {
 
 		if (kty == null) {
-			throw new IllegalArgumentException("The key type \"kty\" parameter must not be null");
+			throw new IllegalArgumentException("The key type \"" + JWKParameterNames.KEY_TYPE + "\" parameter must not be null");
 		}
 
 		this.kty = kty;
 
 		if (! KeyUseAndOpsConsistency.areConsistent(use, ops)) {
-			throw new IllegalArgumentException("The key use \"use\" and key options \"key_opts\" parameters are not consistent, " +
+			throw new IllegalArgumentException("The key use \"" + JWKParameterNames.PUBLIC_KEY_USE + "\" and key options \"" + JWKParameterNames.KEY_OPS + "\" parameters are not consistent, " +
 				"see RFC 7517, section 4.3");
 		}
 
@@ -206,14 +206,14 @@ public abstract class JWK implements Serializable {
 		this.x5t256 = x5t256;
 		
 		if (x5c != null && x5c.isEmpty()) {
-			throw new IllegalArgumentException("The X.509 certificate chain \"x5c\" must not be empty");
+			throw new IllegalArgumentException("The X.509 certificate chain \"" + JWKParameterNames.X_509_CERT_CHAIN + "\" must not be empty");
 		}
 		this.x5c = x5c;
 		
 		try {
 			parsedX5c = X509CertChainUtils.parse(x5c);
 		} catch (ParseException e) {
-			throw new IllegalArgumentException("Invalid X.509 certificate chain \"x5c\": " + e.getMessage(), e);
+			throw new IllegalArgumentException("Invalid X.509 certificate chain \"" + JWKParameterNames.X_509_CERT_CHAIN + "\": " + e.getMessage(), e);
 		}
 		
 		this.keyStore = ks;
@@ -491,10 +491,10 @@ public abstract class JWK implements Serializable {
 
 		Map<String, Object> o = JSONObjectUtils.newJSONObject();
 
-		o.put("kty", kty.getValue());
+		o.put(JWKParameterNames.KEY_TYPE, kty.getValue());
 
 		if (use != null) {
-			o.put("use", use.identifier());
+			o.put(JWKParameterNames.PUBLIC_KEY_USE, use.identifier());
 		}
 
 		if (ops != null) {
@@ -502,27 +502,27 @@ public abstract class JWK implements Serializable {
 			for (KeyOperation op: ops) {
 				stringValues.add(op.identifier());
 			}
-			o.put("key_ops", stringValues);
+			o.put(JWKParameterNames.KEY_OPS, stringValues);
 		}
 
 		if (alg != null) {
-			o.put("alg", alg.getName());
+			o.put(JWKParameterNames.ALGORITHM, alg.getName());
 		}
 
 		if (kid != null) {
-			o.put("kid", kid);
+			o.put(JWKParameterNames.KEY_ID, kid);
 		}
 
 		if (x5u != null) {
-			o.put("x5u", x5u.toString());
+			o.put(JWKParameterNames.X_509_CERT_URL, x5u.toString());
 		}
 
 		if (x5t != null) {
-			o.put("x5t", x5t.toString());
+			o.put(JWKParameterNames.X_509_CERT_SHA_1_THUMBPRINT, x5t.toString());
 		}
 		
 		if (x5t256 != null) {
-			o.put("x5t#S256", x5t256.toString());
+			o.put(JWKParameterNames.X_509_CERT_SHA_256_THUMBPRINT, x5t256.toString());
 		}
 
 		if (x5c != null) {
@@ -530,7 +530,7 @@ public abstract class JWK implements Serializable {
 			for (Base64 base64: x5c) {
 				stringValues.add(base64.toString());
 			}
-			o.put("x5c", stringValues);
+			o.put(JWKParameterNames.X_509_CERT_CHAIN, stringValues);
 		}
 
 		return o;
@@ -592,7 +592,7 @@ public abstract class JWK implements Serializable {
 	public static JWK parse(final Map<String, Object> jsonObject)
 		throws ParseException {
 		
-		String ktyString = JSONObjectUtils.getString(jsonObject, "kty");
+		String ktyString = JSONObjectUtils.getString(jsonObject, JWKParameterNames.KEY_TYPE);
 		
 		if (ktyString == null) {
 			throw new ParseException("Missing key type \"kty\" parameter", 0);
@@ -618,7 +618,7 @@ public abstract class JWK implements Serializable {
 
 		} else {
 
-			throw new ParseException("Unsupported key type \"kty\" parameter: " + kty, 0);
+			throw new ParseException("Unsupported key type \"" + JWKParameterNames.KEY_TYPE + "\" parameter: " + kty, 0);
 		}
 	}
 	
@@ -784,7 +784,7 @@ public abstract class JWK implements Serializable {
 				validateEcCurves(ecPubKey, (ECPrivateKey) privateKey);
 			}
 			if (privateKey != null && !(privateKey instanceof ECPrivateKey)) {
-				throw new JOSEException("Unsupported EC private key type: " + privateKey);
+				throw new JOSEException("Unsupported " + KeyType.EC.getValue() + " private key type: " + privateKey);
 			}
 
 			final Curve curve = Curve.forECParameterSpec(pubParams);
@@ -801,7 +801,7 @@ public abstract class JWK implements Serializable {
 			if (privateKey instanceof RSAPrivateKey) {
 				builder.privateKey((RSAPrivateKey) privateKey);
 			} else if (privateKey != null) {
-				throw new JOSEException("Unsupported RSA private key type: " + privateKey);
+				throw new JOSEException("Unsupported " + KeyType.RSA.getValue() + " private key type: " + privateKey);
 			}
 			return builder.build();
 		}
@@ -814,16 +814,16 @@ public abstract class JWK implements Serializable {
 		final ECParameterSpec pubParams = publicKey.getParams();
 		final ECParameterSpec privParams = privateKey.getParams();
 		if (!pubParams.getCurve().equals(privParams.getCurve())) {
-			throw new JOSEException("Public/private EC key curve mismatch: " + publicKey);
+			throw new JOSEException("Public/private " + KeyType.EC.getValue() + " key curve mismatch: " + publicKey);
 		}
 		if (pubParams.getCofactor() != privParams.getCofactor()) {
-			throw new JOSEException("Public/private EC key cofactor mismatch: " + publicKey);
+			throw new JOSEException("Public/private " + KeyType.EC.getValue() + " key cofactor mismatch: " + publicKey);
 		}
 		if (!pubParams.getGenerator().equals(privParams.getGenerator())) {
-			throw new JOSEException("Public/private EC key generator mismatch: " + publicKey);
+			throw new JOSEException("Public/private " + KeyType.EC.getValue() + " key generator mismatch: " + publicKey);
 		}
 		if (!pubParams.getOrder().equals(privParams.getOrder())) {
-			throw new JOSEException("Public/private EC key order mismatch: " + publicKey);
+			throw new JOSEException("Public/private " + KeyType.EC.getValue() + " key order mismatch: " + publicKey);
 		}
 	}
 

@@ -467,10 +467,10 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
 			// Put mandatory params in sorted order
 			LinkedHashMap<String,String> requiredParams = new LinkedHashMap<>();
-			requiredParams.put("crv", crv.toString());
-			requiredParams.put("kty", KeyType.EC.getValue());
-			requiredParams.put("x", x.toString());
-			requiredParams.put("y", y.toString());
+			requiredParams.put(JWKParameterNames.ELLIPTIC_CURVE, crv.toString());
+			requiredParams.put(JWKParameterNames.KEY_TYPE, KeyType.EC.getValue());
+			requiredParams.put(JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE, x.toString());
+			requiredParams.put(JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE, y.toString());
 			this.kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
 			return this;
 		}
@@ -1282,10 +1282,10 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 
 		// Put mandatory params in sorted order
 		LinkedHashMap<String,String> requiredParams = new LinkedHashMap<>();
-		requiredParams.put("crv", crv.toString());
-		requiredParams.put("kty", getKeyType().getValue());
-		requiredParams.put("x", x.toString());
-		requiredParams.put("y", y.toString());
+		requiredParams.put(JWKParameterNames.ELLIPTIC_CURVE, crv.toString());
+		requiredParams.put(JWKParameterNames.KEY_TYPE, getKeyType().getValue());
+		requiredParams.put(JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE, x.toString());
+		requiredParams.put(JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE, y.toString());
 		return requiredParams;
 	}
 
@@ -1333,12 +1333,12 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 		Map<String, Object> o = super.toJSONObject();
 
 		// Append EC specific attributes
-		o.put("crv", crv.toString());
-		o.put("x", x.toString());
-		o.put("y", y.toString());
+		o.put(JWKParameterNames.ELLIPTIC_CURVE, crv.toString());
+		o.put(JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE, x.toString());
+		o.put(JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE, y.toString());
 
 		if (d != null) {
-			o.put("d", d.toString());
+			o.put(JWKParameterNames.ELLIPTIC_CURVE_PRIVATE_KEY, d.toString());
 		}
 		
 		return o;
@@ -1386,16 +1386,16 @@ public final class ECKey extends JWK implements AsymmetricJWK, CurveBasedJWK {
 		// Parse the mandatory public key parameters
 		Curve crv;
 		try {
-			crv = Curve.parse(JSONObjectUtils.getString(jsonObject, "crv"));
+			crv = Curve.parse(JSONObjectUtils.getString(jsonObject, JWKParameterNames.ELLIPTIC_CURVE));
 		} catch (IllegalArgumentException e) {
 			throw new ParseException(e.getMessage(), 0);
 		}
 		
-		Base64URL x = JSONObjectUtils.getBase64URL(jsonObject, "x");
-		Base64URL y = JSONObjectUtils.getBase64URL(jsonObject, "y");
+		Base64URL x = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.ELLIPTIC_CURVE_X_COORDINATE);
+		Base64URL y = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.ELLIPTIC_CURVE_Y_COORDINATE);
 
 		// Get optional private key
-		Base64URL d = JSONObjectUtils.getBase64URL(jsonObject, "d");
+		Base64URL d = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.ELLIPTIC_CURVE_PRIVATE_KEY);
 		
 		try {
 			if (d == null) {

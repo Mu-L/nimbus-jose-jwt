@@ -839,9 +839,9 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 
 			// Put mandatory params in sorted order
 			LinkedHashMap<String,Object> requiredParams = new LinkedHashMap<>();
-			requiredParams.put("e", e.toString());
-			requiredParams.put("kty", KeyType.RSA.getValue());
-			requiredParams.put("n", n.toString());
+			requiredParams.put(JWKParameterNames.RSA_EXPONENT, e.toString());
+			requiredParams.put(JWKParameterNames.KEY_TYPE, KeyType.RSA.getValue());
+			requiredParams.put(JWKParameterNames.RSA_MODULUS, n.toString());
 			this.kid = ThumbprintUtils.compute(hashAlg, requiredParams).toString();
 			return this;
 		}
@@ -1933,9 +1933,9 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 
 		// Put mandatory params in sorted order
 		LinkedHashMap<String,String> requiredParams = new LinkedHashMap<>();
-		requiredParams.put("e", e.toString());
-		requiredParams.put("kty", getKeyType().getValue());
-		requiredParams.put("n", n.toString());
+		requiredParams.put(JWKParameterNames.RSA_EXPONENT, e.toString());
+		requiredParams.put(JWKParameterNames.KEY_TYPE, getKeyType().getValue());
+		requiredParams.put(JWKParameterNames.RSA_MODULUS, n.toString());
 		return requiredParams;
 	}
 
@@ -1981,25 +1981,25 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 		Map<String, Object> o = super.toJSONObject();
 
 		// Append public RSA key specific attributes
-		o.put("n", n.toString());
-		o.put("e", e.toString());
+		o.put(JWKParameterNames.RSA_MODULUS, n.toString());
+		o.put(JWKParameterNames.RSA_EXPONENT, e.toString());
 		if (d != null) {
-			o.put("d", d.toString());
+			o.put(JWKParameterNames.RSA_PRIVATE_EXPONENT, d.toString());
 		}
 		if (p != null) {
-			o.put("p", p.toString());
+			o.put(JWKParameterNames.RSA_FIRST_PRIME_FACTOR, p.toString());
 		}
 		if (q != null) {
-			o.put("q", q.toString());
+			o.put(JWKParameterNames.RSA_SECOND_PRIME_FACTOR, q.toString());
 		}
 		if (dp != null) {
-			o.put("dp", dp.toString());
+			o.put(JWKParameterNames.RSA_FIRST_FACTOR_CRT_EXPONENT, dp.toString());
 		}
 		if (dq != null) {
-			o.put("dq", dq.toString());
+			o.put(JWKParameterNames.RSA_SECOND_FACTOR_CRT_EXPONENT, dq.toString());
 		}
 		if (qi != null) {
-			o.put("qi", qi.toString());
+			o.put(JWKParameterNames.RSA_FIRST_CRT_COEFFICIENT, qi.toString());
 		}
 		if (oth != null && !oth.isEmpty()) {
 
@@ -2008,14 +2008,14 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 			for (OtherPrimesInfo other : oth) {
 
 				 Map<String, Object> oo = JSONObjectUtils.newJSONObject();
-				oo.put("r", other.r.toString());
-				oo.put("d", other.d.toString());
-				oo.put("t", other.t.toString());
+				oo.put(JWKParameterNames.RSA_OTHER_PRIMES__PRIME_FACTOR, other.r.toString());
+				oo.put(JWKParameterNames.RSA_OTHER_PRIMES__FACTOR_CRT_EXPONENT, other.d.toString());
+				oo.put(JWKParameterNames.RSA_OTHER_PRIMES__FACTOR_CRT_COEFFICIENT, other.t.toString());
 
 				a.add(oo);
 			}
 
-			o.put("oth", a);
+			o.put(JWKParameterNames.RSA_OTHER_PRIMES, a);
 		}
 
 		return o;
@@ -2061,25 +2061,25 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 		}
 		
 		// Parse the mandatory public key parameters
-		Base64URL n = JSONObjectUtils.getBase64URL(jsonObject, "n");
-		Base64URL e = JSONObjectUtils.getBase64URL(jsonObject, "e");
+		Base64URL n = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.RSA_MODULUS);
+		Base64URL e = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.RSA_EXPONENT);
 		
 		// Parse the optional private key parameters
 
 		// 1st private representation
-		Base64URL d = JSONObjectUtils.getBase64URL(jsonObject, "d");
+		Base64URL d = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.RSA_PRIVATE_EXPONENT);
 
 		// 2nd private (CRT) representation
-		Base64URL p = JSONObjectUtils.getBase64URL(jsonObject, "p");
-		Base64URL q = JSONObjectUtils.getBase64URL(jsonObject, "q");
-		Base64URL dp = JSONObjectUtils.getBase64URL(jsonObject, "dp");
-		Base64URL dq = JSONObjectUtils.getBase64URL(jsonObject, "dq");
-		Base64URL qi = JSONObjectUtils.getBase64URL(jsonObject, "qi");
+		Base64URL p = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.RSA_FIRST_PRIME_FACTOR);
+		Base64URL q = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.RSA_SECOND_PRIME_FACTOR);
+		Base64URL dp = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.RSA_FIRST_FACTOR_CRT_EXPONENT);
+		Base64URL dq = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.RSA_SECOND_FACTOR_CRT_EXPONENT);
+		Base64URL qi = JSONObjectUtils.getBase64URL(jsonObject, JWKParameterNames.RSA_FIRST_CRT_COEFFICIENT);
 		
 		List<OtherPrimesInfo> oth = null;
-		if (jsonObject.containsKey("oth")) {
+		if (jsonObject.containsKey(JWKParameterNames.RSA_OTHER_PRIMES)) {
 
-			List<Object> arr = JSONObjectUtils.getJSONArray(jsonObject, "oth");
+			List<Object> arr = JSONObjectUtils.getJSONArray(jsonObject, JWKParameterNames.RSA_OTHER_PRIMES);
 			if(arr != null) {
 				oth = new ArrayList<>(arr.size());
 				
@@ -2088,9 +2088,9 @@ public final class RSAKey extends JWK implements AsymmetricJWK {
 					if (o instanceof Map) {
 						 Map<String, Object> otherJson = ( Map<String, Object>)o;
 	    
-						Base64URL r = JSONObjectUtils.getBase64URL(otherJson, "r");
-						Base64URL odq = JSONObjectUtils.getBase64URL(otherJson, "dq");
-						Base64URL t = JSONObjectUtils.getBase64URL(otherJson, "t");
+						Base64URL r = JSONObjectUtils.getBase64URL(otherJson, JWKParameterNames.RSA_OTHER_PRIMES__PRIME_FACTOR);
+						Base64URL odq = JSONObjectUtils.getBase64URL(otherJson, JWKParameterNames.RSA_SECOND_FACTOR_CRT_EXPONENT);
+						Base64URL t = JSONObjectUtils.getBase64URL(otherJson, JWKParameterNames.RSA_OTHER_PRIMES__FACTOR_CRT_COEFFICIENT);
 						try {
 							oth.add(new OtherPrimesInfo(r, odq, t));
 						} catch (IllegalArgumentException iae) {

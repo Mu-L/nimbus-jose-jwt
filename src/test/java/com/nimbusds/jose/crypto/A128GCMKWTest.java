@@ -24,6 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
+import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
 import org.junit.Assert;
 
@@ -382,8 +383,8 @@ public class A128GCMKWTest extends TestCase {
 		throws Exception {
 
 		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.A128GCMKW, EncryptionMethod.A128CBC_HS256).
-			customParam("exp", "2014-04-24").
-			criticalParams(new HashSet<>(Collections.singletonList("exp"))).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME))).
 			build();
 
 		Payload payload = new Payload("Hello world!");
@@ -399,7 +400,7 @@ public class A128GCMKWTest extends TestCase {
 
 		jweObject = JWEObject.parse(jweString);
 
-		AESDecrypter decrypter = new AESDecrypter(new SecretKeySpec(key128, "AES"), new HashSet<>(Collections.singletonList("exp")));
+		AESDecrypter decrypter = new AESDecrypter(new SecretKeySpec(key128, "AES"), new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME)));
 		decrypter.getJCAContext().setKeyEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
 
 		jweObject.decrypt(decrypter);
@@ -416,8 +417,8 @@ public class A128GCMKWTest extends TestCase {
 		throws Exception {
 
 		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.A128GCMKW, EncryptionMethod.A128CBC_HS256).
-			customParam("exp", "2014-04-24").
-			criticalParams(new HashSet<>(Collections.singletonList("exp"))).
+			customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+			criticalParams(new HashSet<>(Collections.singletonList(JWTClaimNames.EXPIRATION_TIME))).
 			build();
 
 		Payload payload = new Payload("Hello world!");

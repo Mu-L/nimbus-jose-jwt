@@ -80,7 +80,7 @@ public class JWSUnencodedObjectTest extends TestCase {
 		// Create JWS
 		JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
 			.base64URLEncodePayload(false)
-			.criticalParams(Collections.singleton("b64"))
+			.criticalParams(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD))
 			.build();
 		
 		JWSObject jwsObject = new JWSObject(header, detachedPayload);
@@ -101,7 +101,7 @@ public class JWSUnencodedObjectTest extends TestCase {
 		JWSHeader parsedHeader = JWSHeader.parse(parts[0]);
 		assertEquals(JWSAlgorithm.HS256, parsedHeader.getAlgorithm());
 		assertFalse(parsedHeader.isBase64URLEncodePayload());
-		assertEquals(Collections.singleton("b64"), parsedHeader.getCriticalParams());
+		assertEquals(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), parsedHeader.getCriticalParams());
 		
 		assertEquals("Payload part empty", "", parts[1].toString());
 		
@@ -120,7 +120,7 @@ public class JWSUnencodedObjectTest extends TestCase {
 		
 		assertEquals(JWSAlgorithm.HS256, parsedJWSObject.getHeader().getAlgorithm());
 		assertFalse(parsedJWSObject.getHeader().isBase64URLEncodePayload());
-		assertEquals(Collections.singleton("b64"), parsedJWSObject.getHeader().getCriticalParams());
+		assertEquals(Collections.singleton(HeaderParameterNames.BASE64_URL_ENCODE_PAYLOAD), parsedJWSObject.getHeader().getCriticalParams());
 		
 		assertTrue(parsedJWSObject.verify(new MACVerifier(HMAC_JWK)));
 		
