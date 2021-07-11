@@ -1313,7 +1313,13 @@ version 9.10.1 (2021-06-26)
       and throw them as ParseException (iss #434).
     * Locks BouncyCastle dependency to version 1.68.
 
-version 9.11 (2021-07-03)
+version 9.11 (2021-07-11)
+    * Adds HeaderParameterNames class with String constants for the standard
+      JWS and JWE header parameter names used in this library.
+    * Adds JWKParameterNames class with String constants for the standard JSON
+      Web Key (JWK) parameter names.
+    * Adds JWTClaimNames class with String constants for the standard JSON Web
+      Token (JWT) claim names.
     * Provides Curve.hashCode based on the JOSE curve name.
     * Adds PBKDF2.deriveKey check to ensure iteration count is greater than 0.
     * Makes com.github.stephenc.jcip:jcip-annotations:1.0-1 dependency
