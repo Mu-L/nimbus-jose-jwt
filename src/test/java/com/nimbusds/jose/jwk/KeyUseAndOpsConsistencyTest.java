@@ -43,12 +43,16 @@ public class KeyUseAndOpsConsistencyTest extends TestCase {
 		assertTrue(KeyUseAndOpsConsistency.areConsistent(null, Collections.singleton(KeyOperation.SIGN)));
 	}
 	
+	public void testUseUnknown() {
+	
+		assertTrue(KeyUseAndOpsConsistency.areConsistent(new KeyUse("unkown"), null));
+		assertTrue(KeyUseAndOpsConsistency.areConsistent(new KeyUse("unkown"), Collections.singleton(KeyOperation.SIGN)));
+	}
 	
 	public void testOpsNull() {
 		
 		assertTrue(KeyUseAndOpsConsistency.areConsistent(KeyUse.SIGNATURE, null));
 	}
-	
 	
 	public void testConsistentSignatureUse() {
 		

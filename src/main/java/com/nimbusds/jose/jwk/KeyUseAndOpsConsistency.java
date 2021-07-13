@@ -71,6 +71,6 @@ class KeyUseAndOpsConsistency {
 			return true;
 		}
 		
-		return MAP.get(use).containsAll(ops);
+		return !MAP.containsKey(use) || MAP.get(use).containsAll(ops);
 	}
 }
