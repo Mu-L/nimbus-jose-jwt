@@ -1325,3 +1325,8 @@ version 9.11 (2021-07-11)
     * Makes com.github.stephenc.jcip:jcip-annotations:1.0-1 dependency
       optional.
     * Refactors PBKDF2 code with additional checks.
+
+version 9.11.1 (2021-07-13)
+    * Fixes an NPE in KeyUseAndOpsConsistency.areConsistent when the KeyUse
+      is a non-standard value other than "sig" and "enc" (iss #436).
+

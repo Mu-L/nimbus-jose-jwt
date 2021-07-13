@@ -27,7 +27,7 @@ import java.util.*;
  * <p>See https://tools.ietf.org/html/rfc7517#section-4.3
  *
  * @author Vladimir Dzhuvinov
- * @version 2017-06-20
+ * @version 2021-07-13
  */
 class KeyUseAndOpsConsistency {
 	
@@ -59,6 +59,10 @@ class KeyUseAndOpsConsistency {
 	
 	/**
 	 * Checks if the specified key use and key operations are consistent.
+	 * Note, a key use with a non-standard value other than
+	 * {@link KeyUse#SIGNATURE "sig"} and {@link KeyUse#ENCRYPTION "enc"}
+	 * is always assumed to be consistent with a specified key operations
+	 * set.
 	 *
 	 * @param use The key use. May be {@code null}.
 	 * @param ops The key operations. May be {@code null}.
