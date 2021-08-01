@@ -53,68 +53,77 @@ public class RSASSA {
 						     final Provider provider)
 		throws JOSEException {
 
-		final String jcaAlg;
-		
-		// Alternative JCA name to try
-		String jcaAlgAlt = null;
-		
-		PSSParameterSpec pssSpec = null;
+		Signature signature = null;
 
-		if (alg.equals(JWSAlgorithm.RS256)) {
-			
-			jcaAlg = "SHA256withRSA";
-			
-		} else if (alg.equals(JWSAlgorithm.RS384)) {
-			
-			jcaAlg = "SHA384withRSA";
-			
-		} else if (alg.equals(JWSAlgorithm.RS512)) {
-			
-			jcaAlg = "SHA512withRSA";
-			
-		} else if (alg.equals(JWSAlgorithm.PS256)) {
-			
-			jcaAlg = "RSASSA-PSS"; // JWA mandates salt length equals hash
-			pssSpec = new PSSParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, 32, 1);
-			
-			jcaAlgAlt = "SHA256withRSAandMGF1";
-			
-		} else if (alg.equals(JWSAlgorithm.PS384)) {
-			
-			jcaAlg = "RSASSA-PSS"; // JWA mandates salt length equals hash
-			pssSpec = new PSSParameterSpec("SHA-384", "MGF1", MGF1ParameterSpec.SHA384, 48, 1);
-			
-			jcaAlgAlt = "SHA384withRSAandMGF1";
-			
-		} else if (alg.equals(JWSAlgorithm.PS512)) {
-			
-			jcaAlg = "RSASSA-PSS"; // JWA mandates salt length equals hash
-			pssSpec = new PSSParameterSpec("SHA-512", "MGF1", MGF1ParameterSpec.SHA512, 64, 1);
-			
-			jcaAlgAlt = "SHA512withRSAandMGF1";
-			
-		} else {
-			throw new JOSEException(AlgorithmSupportMessage.unsupportedJWSAlgorithm(alg, RSASSAProvider.SUPPORTED_ALGORITHMS));
+		if (alg.equals(JWSAlgorithm.RS256)
+				&& (signature = getSignerAndVerifier("SHA256withRSA", provider)) != null) {
+
+			return signature;
+
+		} else if (alg.equals(JWSAlgorithm.RS384)
+				&& (signature = getSignerAndVerifier("SHA384withRSA", provider)) != null) {
+
+			return signature;
+
+		} else if (alg.equals(JWSAlgorithm.RS512)
+				&& (signature = getSignerAndVerifier("SHA512withRSA", provider)) != null) {
+
+			return signature;
+
+		} else if (alg.equals(JWSAlgorithm.PS256) // JWA mandates salt length equals hash
+				&& (signature = getSignerAndVerifier("RSASSA-PSS", provider, new PSSParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, 32, 1))) != null) {
+
+			return signature;
+
+		} else if (alg.equals(JWSAlgorithm.PS256)
+				&& (signature = getSignerAndVerifier("SHA256withRSAandMGF1", provider)) != null) {
+
+			return signature;
+
+		} else if (alg.equals(JWSAlgorithm.PS384) // JWA mandates salt length equals hash
+				&& (signature = getSignerAndVerifier("RSASSA-PSS", provider, new PSSParameterSpec("SHA-384", "MGF1", MGF1ParameterSpec.SHA384, 48, 1))) != null) {
+
+			return signature;
+
+		} else if (alg.equals(JWSAlgorithm.PS384)
+				&& (signature = getSignerAndVerifier("SHA384withRSAandMGF1", provider)) != null) {
+
+			return signature;
+
+		} else if (alg.equals(JWSAlgorithm.PS512) // JWA mandates salt length equals hash
+				&& (signature = getSignerAndVerifier("RSASSA-PSS", provider, new PSSParameterSpec("SHA-512", "MGF1", MGF1ParameterSpec.SHA512, 64, 1))) != null) {
+
+			return signature;
+
+		} else if (alg.equals(JWSAlgorithm.PS512)
+				&& (signature = getSignerAndVerifier("SHA512withRSAandMGF1", provider)) != null) {
+
+			return signature;
+
 		}
+
+		throw new JOSEException(AlgorithmSupportMessage.unsupportedJWSAlgorithm(alg, RSASSAProvider.SUPPORTED_ALGORITHMS));
+	}
+
+	private static Signature getSignerAndVerifier(final String jcaAlg, final Provider provider)
+			throws JOSEException {
+		return getSignerAndVerifier(jcaAlg, provider, null);
+	}
+
+	private static Signature getSignerAndVerifier(final String jcaAlg, final Provider provider, final PSSParameterSpec pssSpec)
+			throws JOSEException {
 
 		Signature signature;
 		try {
-			signature = getSignerAndVerifier(jcaAlg, provider);
-			
-		} catch (NoSuchAlgorithmException e) {
-			
-			if (jcaAlgAlt == null) {
-				throw new JOSEException("Unsupported RSASSA algorithm: " + e.getMessage(), e);
+			if (provider != null) {
+				signature = Signature.getInstance(jcaAlg, provider);
+			} else {
+				signature = Signature.getInstance(jcaAlg);
 			}
-			
-			// Retry with alternative JCA name
-			try {
-				signature = getSignerAndVerifier(jcaAlgAlt, provider);
-			} catch (NoSuchAlgorithmException e2) {
-				throw new JOSEException("Unsupported RSASSA algorithm (after retry with alternative): " + e2.getMessage(), e2);
-			}
+		} catch (NoSuchAlgorithmException ignore) {
+			return null;
 		}
-		
+
 		if (pssSpec != null) {
 			try {
 				signature.setParameter(pssSpec);
@@ -125,18 +134,6 @@ public class RSASSA {
 
 		return signature;
 	}
-	
-	
-	private static Signature getSignerAndVerifier(final String jcaAlg, final Provider provider)
-		throws NoSuchAlgorithmException {
-		
-		if (provider != null) {
-			return Signature.getInstance(jcaAlg, provider);
-		} else {
-			return Signature.getInstance(jcaAlg);
-		}
-	}
-
 
 	/**
 	 * Prevents public instantiation.
