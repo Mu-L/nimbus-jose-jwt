@@ -33,7 +33,7 @@ import com.nimbusds.jose.JWSAlgorithm;
  * RSA-SSA functions and utilities.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-02-20
+ * @version 2021-08-01
  */
 public class RSASSA {
 
@@ -53,7 +53,7 @@ public class RSASSA {
 						     final Provider provider)
 		throws JOSEException {
 
-		Signature signature = null;
+		Signature signature;
 
 		if (alg.equals(JWSAlgorithm.RS256)
 				&& (signature = getSignerAndVerifier("SHA256withRSA", provider)) != null) {

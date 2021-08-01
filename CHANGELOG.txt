@@ -1333,3 +1333,9 @@ version 9.11.1 (2021-07-13)
 version 9.11.2 (2021-07-27)
     * Restores com.github.stephenc.jcip:jcip-annotations:1.0-1 dependency as
       non-optional (iss #438).
+
+version 9.11.3 (2021-08-01)
+    * Refactors RSASSA.getSignerAndVerifier to obtain a Signature for PSxxx
+      without a PSSParameterSpec when the JCA algorithm name contains the
+      necessary PSS parameters. Intended to prevent an
+      UnsupportedOperationException with the nCipher JCA provider.
