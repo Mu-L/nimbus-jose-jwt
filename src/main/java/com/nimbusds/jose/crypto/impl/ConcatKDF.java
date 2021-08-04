@@ -176,6 +176,36 @@ public class ConcatKDF implements JCAAware<JCAContext> {
 		return deriveKey(sharedSecret, keyLength, otherInfo);
 	}
 
+	/**
+	 * Derives a key from the specified inputs.
+	 *
+	 * @param sharedSecret The shared secret. Must not be {@code null}.
+	 * @param keyLength    The length of the key to derive, in bits.
+	 * @param algID        The algorithm identifier, {@code null} if not
+	 *                     specified.
+	 * @param partyUInfo   The partyUInfo, {@code null} if not specified.
+	 * @param partyVInfo   The partyVInfo {@code null} if not specified.
+	 * @param suppPubInfo  The suppPubInfo, {@code null} if not specified.
+	 * @param suppPrivInfo The suppPrivInfo, {@code null} if not specified.
+	 *
+	 * @return The derived key, with algorithm set to "AES".
+	 *
+	 * @throws JOSEException If the key derivation failed.
+	 */
+	public SecretKey deriveKey(final SecretKey sharedSecret,
+				   final int keyLength,
+			       final byte[] algID,
+			       final byte[] partyUInfo,
+				   final byte[] partyVInfo,
+			       final byte[] suppPubInfo,
+				   final byte[] suppPrivInfo,
+				   final byte[] tag)
+			throws JOSEException {
+
+		final byte[] otherInfo = composeOtherInfo(algID, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo, tag);
+
+		return deriveKey(sharedSecret, keyLength, otherInfo);
+	}
 
 	/**
 	 * Composes the other info as {@code algID || partyUInfo || partyVInfo
@@ -197,6 +227,30 @@ public class ConcatKDF implements JCAAware<JCAContext> {
 					      final byte[] suppPrivInfo) {
 
 		return ByteUtils.concat(algID, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo);
+	}
+
+	/**
+	 * Composes the other info as {@code algID || tag || partyUInfo || partyVInfo
+	 * || suppPubInfo || suppPrivInfo}.
+	 *
+	 * @param algID        The algorithm identifier, {@code null} if not
+	 *                     specified.
+	 * @param partyUInfo   The partyUInfo, {@code null} if not specified.
+	 * @param partyVInfo   The partyVInfo {@code null} if not specified.
+	 * @param suppPubInfo  The suppPubInfo, {@code null} if not specified.
+	 * @param suppPrivInfo The suppPrivInfo, {@code null} if not specified.
+	 * @param tag          The cctag, {@code null} if not specified.
+	 *
+	 * @return The resulting other info.
+	 */
+	public static byte[] composeOtherInfo(final byte[] algID,
+						  final byte[] partyUInfo,
+						  final byte[] partyVInfo,
+						  final byte[] suppPubInfo,
+						  final byte[] suppPrivInfo,
+						  final byte[] tag) {
+
+		return ByteUtils.concat(algID, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo, tag);
 	}
 
 
