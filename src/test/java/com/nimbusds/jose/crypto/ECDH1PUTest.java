@@ -1,7 +1,7 @@
 /*
  * nimbus-jose-jwt
  *
- * Copyright 2012-2021, Connect2id Ltd.
+ * Copyright 2012-2021, Connect2id Ltd and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
  * this file except in compliance with the License. You may obtain a copy of the
@@ -18,15 +18,12 @@
 package com.nimbusds.jose.crypto;
 
 
-import com.google.crypto.tink.subtle.X25519;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWEHeader;
-import com.nimbusds.jose.crypto.impl.AESKW;
 import com.nimbusds.jose.crypto.impl.ConcatKDF;
 import com.nimbusds.jose.crypto.impl.ECDH1PU;
-import com.nimbusds.jose.jca.JWEJCAContext;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.OctetKeyPair;
@@ -79,7 +76,7 @@ public class ECDH1PUTest extends TestCase{
 		public byte[] Zs;
 		public byte[] expectedZ;
 		public byte[] expectedSharedKey;
-		public Base64URL tag = null;
+		public Base64URL tag;
 		public String apu;
 		public String apv;
 

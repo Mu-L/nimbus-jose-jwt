@@ -1,7 +1,7 @@
 /*
  * nimbus-jose-jwt
  *
- * Copyright 2012-2021, Connect2id Ltd.
+ * Copyright 2012-2021, Connect2id Ltd and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
  * this file except in compliance with the License. You may obtain a copy of the
@@ -23,7 +23,6 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEDecrypter;
 import com.nimbusds.jose.JWEHeader;
 import com.nimbusds.jose.crypto.impl.*;
-import com.nimbusds.jose.crypto.utils.ECChecks;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64URL;
@@ -81,7 +80,7 @@ import java.util.Set;
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Direct Key wrapping mode:
+ * <p>Supports the following content encryption algorithms for Key wrapping mode:
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
@@ -256,18 +255,8 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
 		}
 
 		ECPublicKey ephemeralPublicKey = ephemeralKey.toECPublicKey();
-		
-		// Curve check
-		if (getPrivateKey() instanceof ECPrivateKey) {
-			ECPrivateKey ecPrivateKey = (ECPrivateKey)getPrivateKey();
-			if (!ECChecks.isPointOnCurve(ephemeralPublicKey, ecPrivateKey)) {
-				throw new JOSEException("Invalid ephemeral public EC key: Point(s) not on the expected curve");
-			}
-		} else {
-			if (!ECChecks.isPointOnCurve(ephemeralPublicKey, getCurve().toECParameterSpec())) {
-				throw new JOSEException("Invalid ephemeral public EC key: Point(s) not on the expected curve");
-			}
-		}
+
+		ECDH1PU.validateSameCurve(privateKey, ephemeralPublicKey);
 
 		SecretKey Ze = ECDH.deriveSharedSecret(
 			ephemeralPublicKey,

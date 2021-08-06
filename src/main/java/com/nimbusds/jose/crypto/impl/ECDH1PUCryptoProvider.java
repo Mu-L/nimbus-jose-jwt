@@ -63,7 +63,7 @@ import java.util.Set;
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Direct Key wrapping mode:
+ * <p>Supports the following content encryption algorithms for Key wrapping mode:
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}

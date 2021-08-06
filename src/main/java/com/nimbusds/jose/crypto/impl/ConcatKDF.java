@@ -230,8 +230,8 @@ public class ConcatKDF implements JCAAware<JCAContext> {
 	}
 
 	/**
-	 * Composes the other info as {@code algID || tag || partyUInfo || partyVInfo
-	 * || suppPubInfo || suppPrivInfo}.
+	 * Composes the other info as {@code algID || partyUInfo || partyVInfo
+	 * || suppPubInfo || suppPrivInfo || tag}.
 	 *
 	 * @param algID        The algorithm identifier, {@code null} if not
 	 *                     specified.

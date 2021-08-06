@@ -1,7 +1,7 @@
 /*
  * nimbus-jose-jwt
  *
- * Copyright 2012-2021, Connect2id Ltd.
+ * Copyright 2012-2021, Connect2id Ltd and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
  * this file except in compliance with the License. You may obtain a copy of the
@@ -61,9 +61,7 @@ import java.util.Set;
  * <p>Supports the following elliptic curves:
  *
  * <ul>
- *     <li>{@link Curve#P_256}
- *     <li>{@link Curve#P_384}
- *     <li>{@link Curve#P_521}
+ *     <li>{@link Curve#X25519}
  * </ul>
  *
  * <p>Supports the following content encryption algorithms for Direct key agreement mode:
@@ -79,7 +77,7 @@ import java.util.Set;
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Direct Key wrapping mode:
+ * <p>Supports the following content encryption algorithms for Key wrapping mode:
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
