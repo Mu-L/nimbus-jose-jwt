@@ -1,7 +1,7 @@
 /*
  * nimbus-jose-jwt
  *
- * Copyright 2012-2016, Connect2id Ltd.
+ * Copyright 2012-2021, Connect2id Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
  * this file except in compliance with the License. You may obtain a copy of the
@@ -23,18 +23,13 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEDecrypter;
 import com.nimbusds.jose.JWEHeader;
 import com.nimbusds.jose.crypto.impl.*;
-import com.nimbusds.jose.crypto.utils.ECChecks;
 import com.nimbusds.jose.jwk.Curve;
-import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
+import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
-import java.security.PrivateKey;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 
@@ -95,6 +90,7 @@ import java.util.Set;
  * @author Alexander Martynov
  * @version 2021-08-03
  */
+@ThreadSafe
 public class ECDH1PUX25519Decrypter extends ECDH1PUCryptoProvider implements JWEDecrypter, CriticalHeaderParamsAware {
 
 
@@ -146,18 +142,6 @@ public class ECDH1PUX25519Decrypter extends ECDH1PUCryptoProvider implements JWE
 			throws JOSEException {
 
 		super(privateKey.getCurve());
-
-		if (! Curve.X25519.equals(privateKey.getCurve())) {
-			throw new JOSEException("X25519Decrypter only supports OctetKeyPairs with crv=X25519");
-		}
-
-		if (! Curve.X25519.equals(publicKey.getCurve())) {
-			throw new JOSEException("X25519Decrypter only supports OctetKeyPairs with crv=X25519");
-		}
-
-		if (! privateKey.isPrivate()) {
-			throw new JOSEException("The OctetKeyPair doesn't contain a private part");
-		}
 
 		this.privateKey = privateKey;
 		this.publicKey = publicKey;
@@ -215,6 +199,8 @@ public class ECDH1PUX25519Decrypter extends ECDH1PUCryptoProvider implements JWE
 						  final Base64URL authTag)
 			throws JOSEException {
 
+		ECDH1PU.validateSameCurve(privateKey, publicKey);
+
 		// Check for unrecognizable "crit" properties
 		critPolicy.ensureHeaderPasses(header);
 
@@ -225,17 +211,12 @@ public class ECDH1PUX25519Decrypter extends ECDH1PUCryptoProvider implements JWE
 			throw new JOSEException("Missing ephemeral public key \"epk\" JWE header parameter");
 		}
 
-		if (! privateKey.getCurve().equals(ephemeralPublicKey.getCurve())) {
-			throw new JOSEException("Curve of ephemeral public key does not match curve of private key");
-		}
+		ECDH1PU.validateSameCurve(privateKey, ephemeralPublicKey);
 
-		// Derive 'Z'
-		// Derive 'Ze'
 		SecretKey Ze = ECDH.deriveSharedSecret(
 				ephemeralPublicKey,
 				privateKey);
 
-		// Derive 'Zs'
 		SecretKey Zs = ECDH.deriveSharedSecret(
 				publicKey,
 				privateKey);

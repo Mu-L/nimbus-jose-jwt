@@ -1,7 +1,7 @@
 /*
  * nimbus-jose-jwt
  *
- * Copyright 2012-2019, Connect2id Ltd.
+ * Copyright 2012-2021, Connect2id Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
  * this file except in compliance with the License. You may obtain a copy of the
@@ -20,15 +20,16 @@ package com.nimbusds.jose.crypto;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
+import com.nimbusds.jose.crypto.impl.ContentCryptoProvider;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64URL;
 import junit.framework.TestCase;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.SecureRandom;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
@@ -44,9 +45,8 @@ import java.util.HashSet;
  */
 public class ECDH1PUCryptoTest extends TestCase {
 
-
 	private static ECKey generateECJWK(final Curve curve)
-		throws Exception {
+			throws Exception {
 
 		ECParameterSpec ecParameterSpec = curve.toECParameterSpec();
 
@@ -55,272 +55,220 @@ public class ECDH1PUCryptoTest extends TestCase {
 		KeyPair keyPair = generator.generateKeyPair();
 
 		return new ECKey.Builder(curve, (ECPublicKey)keyPair.getPublic()).
-			privateKey((ECPrivateKey) keyPair.getPrivate()).
-			build();
-	}
-
-
-	public void testCycle_ECDH_1PU_Curve_P256()
-		throws Exception {
-
-		ECKey aliceKey = generateECJWK(Curve.P_256);
-		ECKey bobKey = generateECJWK(Curve.P_256);
-
-		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU, EncryptionMethod.A128GCM).
-			agreementPartyUInfo(Base64URL.encode("Alice")).
-			agreementPartyVInfo(Base64URL.encode("Bob")).
-			build();
-
-		JWEObject jweObject = new JWEObject(header, new Payload("Hello world!"));
-
-		ECDH1PUEncrypter encrypter = new ECDH1PUEncrypter(aliceKey.toECPrivateKey(), bobKey.toECPublicKey());
-		encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.encrypt(encrypter);
-
-		ECKey epk = (ECKey) jweObject.getHeader().getEphemeralPublicKey();
-		assertEquals(Curve.P_256, epk.getCurve());
-		assertNotNull(epk.getX());
-		assertNotNull(epk.getY());
-		assertNull(epk.getD());
-
-		assertNull(jweObject.getEncryptedKey());
-
-		String jwe = jweObject.serialize();
-
-		jweObject = JWEObject.parse(jwe);
-
-		ECDH1PUDecrypter decrypter = new ECDH1PUDecrypter(bobKey.toECPrivateKey(), aliceKey.toECPublicKey());
-		decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.decrypt(decrypter);
-
-		assertEquals("Hello world!", jweObject.getPayload().toString());
-	}
-
-
-	public void testCycle_ECDH_1PU_Curve_P256_A128KW()
-		throws Exception {
-
-		ECKey aliceKey = generateECJWK(Curve.P_256);
-		ECKey bobKey = generateECJWK(Curve.P_256);
-
-		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU_A128KW, EncryptionMethod.A256CBC_HS512).
-			agreementPartyUInfo(Base64URL.encode("Alice")).
-			agreementPartyVInfo(Base64URL.encode("Bob")).
-			build();
-
-		JWEObject jweObject = new JWEObject(header, new Payload("Hello world!"));
-
-		ECDH1PUEncrypter encrypter = new ECDH1PUEncrypter(aliceKey.toECPrivateKey(), bobKey.toECPublicKey());
-		encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.encrypt(encrypter);
-
-		ECKey epk = (ECKey) jweObject.getHeader().getEphemeralPublicKey();
-		assertEquals(Curve.P_256, epk.getCurve());
-		assertNotNull(epk.getX());
-		assertNotNull(epk.getY());
-		assertNull(epk.getD());
-
-		assertNotNull(jweObject.getEncryptedKey());
-
-		String jwe = jweObject.serialize();
-
-		jweObject = JWEObject.parse(jwe);
-
-		ECDH1PUDecrypter decrypter = new ECDH1PUDecrypter(bobKey.toECPrivateKey(), aliceKey.toECPublicKey());
-		decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.decrypt(decrypter);
-
-		assertEquals("Hello world!", jweObject.getPayload().toString());
-	}
-	
-	/**
-	 * Test ECDH Encrypter with provided CEK encryption and decryption cycle.
-	 * 
-	 * @throws Exception
-	 */
-	public void testCycle_ECDH_1PU_Curve_P256_A128KW_WithCekSpecified() throws Exception {
-		ECKey aliceKey = generateECJWK(Curve.P_256);
-		ECKey bobKey = generateECJWK(Curve.P_256);
-
-		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU_A128KW, EncryptionMethod.A128GCM).
-				agreementPartyUInfo(Base64URL.encode("Alice")).
-				agreementPartyVInfo(Base64URL.encode("Bob")).
+				privateKey((ECPrivateKey) keyPair.getPrivate()).
 				build();
-
-		JWEObject jweObject = new JWEObject(header, new Payload("Hello world!"));
-
-		KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-		keyGenerator.init(EncryptionMethod.A128GCM.cekBitLength());
-		SecretKey cek = keyGenerator.generateKey();
-
-		ECDH1PUEncrypter encrypter = new ECDH1PUEncrypter(aliceKey.toECPrivateKey(), bobKey.toECPublicKey(), cek);
-		encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.encrypt(encrypter);
-
-		ECKey epk = (ECKey) jweObject.getHeader().getEphemeralPublicKey();
-		assertEquals(Curve.P_256, epk.getCurve());
-		assertNotNull(epk.getX());
-		assertNotNull(epk.getY());
-		assertNull(epk.getD());
-
-		assertNotNull(jweObject.getEncryptedKey());
-
-		String jwe = jweObject.serialize();
-
-		jweObject = JWEObject.parse(jwe);
-
-		ECDH1PUDecrypter decrypter = new ECDH1PUDecrypter(bobKey.toECPrivateKey(), aliceKey.toECPublicKey());
-		decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.decrypt(decrypter);
-
-		assertEquals("Hello world!", jweObject.getPayload().toString());
 	}
 
-	public void testCycle_ECDH_1PU_Curve_P384()
-		throws Exception {
+	private static class CycleTest {
+		public Curve curve;
+		public JWEAlgorithm algorithm;
+		public EncryptionMethod encryptionMethod;
 
-		ECKey aliceKey = generateECJWK(Curve.P_384);
-		ECKey bobKey = generateECJWK(Curve.P_384);
-
-		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU, EncryptionMethod.A128GCM).
-			agreementPartyUInfo(Base64URL.encode("Alice")).
-			agreementPartyVInfo(Base64URL.encode("Bob")).
-			build();
-
-		JWEObject jweObject = new JWEObject(header, new Payload("Hello world!"));
-
-		ECDH1PUEncrypter encrypter = new ECDH1PUEncrypter(aliceKey.toECPrivateKey(), bobKey.toECPublicKey());
-		encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.encrypt(encrypter);
-
-		ECKey epk = (ECKey) jweObject.getHeader().getEphemeralPublicKey();
-		assertEquals(Curve.P_384, epk.getCurve());
-		assertNotNull(epk.getX());
-		assertNotNull(epk.getY());
-		assertNull(epk.getD());
-
-		assertNull(jweObject.getEncryptedKey());
-
-		String jwe = jweObject.serialize();
-
-		jweObject = JWEObject.parse(jwe);
-
-		ECDH1PUDecrypter decrypter = new ECDH1PUDecrypter(bobKey.toECPrivateKey(), aliceKey.toECPublicKey());
-		decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.decrypt(decrypter);
-
-		assertEquals("Hello world!", jweObject.getPayload().toString());
+		public CycleTest(JWEAlgorithm algorithm, Curve curve, EncryptionMethod encryptionMethod) {
+			this.curve = curve;
+			this.algorithm = algorithm;
+			this.encryptionMethod = encryptionMethod;
+		}
 	}
 
+	private static final CycleTest[] allowedCycles = new CycleTest[] {
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_256, EncryptionMethod.A128CBC_HS256),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_256, EncryptionMethod.A192CBC_HS384),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_256, EncryptionMethod.A256CBC_HS512),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_256, EncryptionMethod.A128GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_256, EncryptionMethod.A192GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_256, EncryptionMethod.A256GCM),
 
-	public void testCycle_ECDH_1PU_Curve_P384_A128KW()
-		throws Exception {
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_384, EncryptionMethod.A128CBC_HS256),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_384, EncryptionMethod.A192CBC_HS384),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_384, EncryptionMethod.A256CBC_HS512),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_384, EncryptionMethod.A128GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_384, EncryptionMethod.A192GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_384, EncryptionMethod.A256GCM),
 
-		ECKey aliceKey = generateECJWK(Curve.P_384);
-		ECKey bobKey = generateECJWK(Curve.P_384);
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_521, EncryptionMethod.A128CBC_HS256),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_521, EncryptionMethod.A192CBC_HS384),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_521, EncryptionMethod.A256CBC_HS512),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_521, EncryptionMethod.A128GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_521, EncryptionMethod.A192GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.P_521, EncryptionMethod.A256GCM),
 
-		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU_A128KW, EncryptionMethod.A256CBC_HS512).
-			agreementPartyUInfo(Base64URL.encode("Alice")).
-			agreementPartyVInfo(Base64URL.encode("Bob")).
-			build();
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_256, EncryptionMethod.A128CBC_HS256),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_256, EncryptionMethod.A192CBC_HS384),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_256, EncryptionMethod.A256CBC_HS512),
 
-		JWEObject jweObject = new JWEObject(header, new Payload("Hello world!"));
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_384, EncryptionMethod.A128CBC_HS256),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_384, EncryptionMethod.A192CBC_HS384),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_384, EncryptionMethod.A256CBC_HS512),
 
-		ECDH1PUEncrypter encrypter = new ECDH1PUEncrypter(aliceKey.toECPrivateKey(), bobKey.toECPublicKey());
-		encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.encrypt(encrypter);
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_521, EncryptionMethod.A128CBC_HS256),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_521, EncryptionMethod.A192CBC_HS384),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_521, EncryptionMethod.A256CBC_HS512),
 
-		ECKey epk = (ECKey) jweObject.getHeader().getEphemeralPublicKey();
-		assertEquals(Curve.P_384, epk.getCurve());
-		assertNotNull(epk.getX());
-		assertNotNull(epk.getY());
-		assertNull(epk.getD());
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_256, EncryptionMethod.A128CBC_HS256),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_256, EncryptionMethod.A192CBC_HS384),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_256, EncryptionMethod.A256CBC_HS512),
 
-		assertNotNull(jweObject.getEncryptedKey());
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_384, EncryptionMethod.A128CBC_HS256),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_384, EncryptionMethod.A192CBC_HS384),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_384, EncryptionMethod.A256CBC_HS512),
 
-		String jwe = jweObject.serialize();
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_521, EncryptionMethod.A128CBC_HS256),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_521, EncryptionMethod.A192CBC_HS384),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_521, EncryptionMethod.A256CBC_HS512),
 
-		jweObject = JWEObject.parse(jwe);
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_256, EncryptionMethod.A128CBC_HS256),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_256, EncryptionMethod.A192CBC_HS384),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_256, EncryptionMethod.A256CBC_HS512),
 
-		ECDH1PUDecrypter decrypter = new ECDH1PUDecrypter(bobKey.toECPrivateKey(), aliceKey.toECPublicKey());
-		decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.decrypt(decrypter);
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_384, EncryptionMethod.A128CBC_HS256),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_384, EncryptionMethod.A192CBC_HS384),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_384, EncryptionMethod.A256CBC_HS512),
 
-		assertEquals("Hello world!", jweObject.getPayload().toString());
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_521, EncryptionMethod.A128CBC_HS256),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_521, EncryptionMethod.A192CBC_HS384),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_521, EncryptionMethod.A256CBC_HS512),
+	};
+
+	private static final CycleTest[] forbiddenCycles = new CycleTest[] {
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_256, EncryptionMethod.A128GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_256, EncryptionMethod.A192GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_256, EncryptionMethod.A256GCM),
+
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_384, EncryptionMethod.A128GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_384, EncryptionMethod.A192GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_384, EncryptionMethod.A256GCM),
+
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_521, EncryptionMethod.A128GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_521, EncryptionMethod.A192GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.P_521, EncryptionMethod.A256GCM),
+
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_256, EncryptionMethod.A128GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_256, EncryptionMethod.A192GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_256, EncryptionMethod.A256GCM),
+
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_384, EncryptionMethod.A128GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_384, EncryptionMethod.A192GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_384, EncryptionMethod.A256GCM),
+
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_521, EncryptionMethod.A128GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_521, EncryptionMethod.A192GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.P_521, EncryptionMethod.A256GCM),
+
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_256, EncryptionMethod.A128GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_256, EncryptionMethod.A192GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_256, EncryptionMethod.A256GCM),
+
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_384, EncryptionMethod.A128GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_384, EncryptionMethod.A192GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_384, EncryptionMethod.A256GCM),
+
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_521, EncryptionMethod.A128GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_521, EncryptionMethod.A192GCM),
+			new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.P_521, EncryptionMethod.A256GCM),
+	};
+
+	public void testCycle() throws Exception {
+		Payload payload = new Payload("Hello world!");
+
+		for (CycleTest cycle : allowedCycles) {
+			ECKey aliceKey = generateECJWK(cycle.curve);
+			ECKey bobKey = generateECJWK(cycle.curve);
+
+			JWEHeader header = new JWEHeader.Builder(cycle.algorithm, cycle.encryptionMethod).
+					agreementPartyUInfo(Base64URL.encode("Alice")).
+					agreementPartyVInfo(Base64URL.encode("Bob")).
+					build();
+
+			JWEObject jweObject = new JWEObject(header, payload);
+
+			ECDH1PUEncrypter encrypter = new ECDH1PUEncrypter(aliceKey.toECPrivateKey(), bobKey.toECPublicKey());
+			encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
+			jweObject.encrypt(encrypter);
+
+			ECKey epk = (ECKey) jweObject.getHeader().getEphemeralPublicKey();
+			assertEquals(cycle.curve, epk.getCurve());
+			assertNotNull(epk.getX());
+			assertNotNull(epk.getY());
+			assertNull(epk.getD());
+
+			String jwe = jweObject.serialize();
+			jweObject = JWEObject.parse(jwe);
+
+			ECDH1PUDecrypter decrypter = new ECDH1PUDecrypter(bobKey.toECPrivateKey(), aliceKey.toECPublicKey());
+			decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
+			jweObject.decrypt(decrypter);
+
+			assertEquals(payload.toString(), jweObject.getPayload().toString());
+		}
 	}
 
+	public void testCycle_isForbidden() throws Exception {
+		Payload payload = new Payload("Hello world!");
 
-	public void testCycle_ECDH_1PU_Curve_P521()
-		throws Exception {
+		for (CycleTest cycle : forbiddenCycles) {
+			ECKey aliceKey = generateECJWK(cycle.curve);
+			ECKey bobKey = generateECJWK(cycle.curve);
 
-		ECKey aliceKey = generateECJWK(Curve.P_521);
-		ECKey bobKey = generateECJWK(Curve.P_521);
+			JWEHeader header = new JWEHeader.Builder(cycle.algorithm, cycle.encryptionMethod).
+					agreementPartyUInfo(Base64URL.encode("Alice")).
+					agreementPartyVInfo(Base64URL.encode("Bob")).
+					build();
 
-		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU, EncryptionMethod.A128GCM).
-			agreementPartyUInfo(Base64URL.encode("Alice")).
-			agreementPartyVInfo(Base64URL.encode("Bob")).
-			build();
+			JWEObject jweObject = new JWEObject(header, payload);
 
-		JWEObject jweObject = new JWEObject(header, new Payload("Hello world!"));
-
-		ECDH1PUEncrypter encrypter = new ECDH1PUEncrypter(aliceKey.toECPrivateKey(), bobKey.toECPublicKey());
-		encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.encrypt(encrypter);
-
-		ECKey epk = (ECKey) jweObject.getHeader().getEphemeralPublicKey();
-		assertEquals(Curve.P_521, epk.getCurve());
-		assertNotNull(epk.getX());
-		assertNotNull(epk.getY());
-		assertNull(epk.getD());
-
-		assertNull(jweObject.getEncryptedKey());
-
-		String jwe = jweObject.serialize();
-
-		jweObject = JWEObject.parse(jwe);
-
-		ECDH1PUDecrypter decrypter = new ECDH1PUDecrypter(bobKey.toECPrivateKey(), aliceKey.toECPublicKey());
-		decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.decrypt(decrypter);
-
-		assertEquals("Hello world!", jweObject.getPayload().toString());
+			try {
+				ECDH1PUEncrypter encrypter = new ECDH1PUEncrypter(aliceKey.toECPrivateKey(), bobKey.toECPublicKey());
+				encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
+				jweObject.encrypt(encrypter);
+				fail();
+			} catch (JOSEException e) {
+				String expectedMessage = String.format("Unsupported JWE encryption method %s, " +
+								"must be A128CBC-HS256, A192CBC-HS384 or A256CBC-HS512",
+						cycle.encryptionMethod.getName());
+				assertEquals(expectedMessage, e.getMessage());
+			}
+		}
 	}
 
+	public void testCycle_WithCekSpecified() throws Exception {
+		Payload payload = new Payload("Hello world!");
 
-	public void testCycle_ECDH_1PU_Curve_P521_A128KW()
-		throws Exception {
+		for (CycleTest cycle : allowedCycles) {
+			if (cycle.encryptionMethod.cekBitLength() == 0)
+				continue;
 
-		ECKey aliceKey = generateECJWK(Curve.P_521);
-		ECKey bobKey = generateECJWK(Curve.P_521);
+			SecretKey cek = ContentCryptoProvider.generateCEK(cycle.encryptionMethod, new SecureRandom());
 
-		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU_A128KW, EncryptionMethod.A256CBC_HS512).
-			agreementPartyUInfo(Base64URL.encode("Alice")).
-			agreementPartyVInfo(Base64URL.encode("Bob")).
-			build();
+			ECKey aliceKey = generateECJWK(cycle.curve);
+			ECKey bobKey = generateECJWK(cycle.curve);
 
-		JWEObject jweObject = new JWEObject(header, new Payload("Hello world!"));
+			JWEHeader header = new JWEHeader.Builder(cycle.algorithm, cycle.encryptionMethod).
+					agreementPartyUInfo(Base64URL.encode("Alice")).
+					agreementPartyVInfo(Base64URL.encode("Bob")).
+					build();
 
-		ECDH1PUEncrypter encrypter = new ECDH1PUEncrypter(aliceKey.toECPrivateKey(), bobKey.toECPublicKey());
-		encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.encrypt(encrypter);
+			JWEObject jweObject = new JWEObject(header, payload);
 
-		ECKey epk = (ECKey) jweObject.getHeader().getEphemeralPublicKey();
-		assertEquals(Curve.P_521, epk.getCurve());
-		assertNotNull(epk.getX());
-		assertNotNull(epk.getY());
-		assertNull(epk.getD());
+			ECDH1PUEncrypter encrypter = new ECDH1PUEncrypter(aliceKey.toECPrivateKey(), bobKey.toECPublicKey(), cek);
+			encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
+			jweObject.encrypt(encrypter);
 
-		assertNotNull(jweObject.getEncryptedKey());
+			ECKey epk = (ECKey) jweObject.getHeader().getEphemeralPublicKey();
+			assertEquals(cycle.curve, epk.getCurve());
+			assertNotNull(epk.getX());
+			assertNotNull(epk.getY());
+			assertNull(epk.getD());
 
-		String jwe = jweObject.serialize();
+			String jwe = jweObject.serialize();
+			jweObject = JWEObject.parse(jwe);
 
-		jweObject = JWEObject.parse(jwe);
+			ECDH1PUDecrypter decrypter = new ECDH1PUDecrypter(bobKey.toECPrivateKey(), aliceKey.toECPublicKey());
+			decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
+			jweObject.decrypt(decrypter);
 
-		ECDH1PUDecrypter decrypter = new ECDH1PUDecrypter(bobKey.toECPrivateKey(), aliceKey.toECPublicKey());
-		decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
-		jweObject.decrypt(decrypter);
-
-		assertEquals("Hello world!", jweObject.getPayload().toString());
+			assertEquals(payload.toString(), jweObject.getPayload().toString());
+		}
 	}
 
 	public void testCritParamDeferral()
@@ -370,6 +318,44 @@ public class ECDH1PUCryptoTest extends TestCase {
 		} catch (JOSEException e) {
 			// ok
 			assertEquals("Unsupported critical header parameter(s)", e.getMessage());
+		}
+	}
+
+	public void testCurveNotMatch() throws Exception {
+		ECKey aliceKey = generateECJWK(Curve.P_256);
+		ECKey bobKey = generateECJWK(Curve.P_521);
+		ECKey correctBobKey = generateECJWK(Curve.P_256);
+
+		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU_A128KW, EncryptionMethod.A256CBC_HS512).
+				agreementPartyUInfo(Base64URL.encode("Alice")).
+				agreementPartyVInfo(Base64URL.encode("Bob")).
+				build();
+
+		JWEObject jweObject = new JWEObject(header, new Payload("Hello, world"));
+
+		try {
+
+			ECDH1PUEncrypter encrypter = new ECDH1PUEncrypter(aliceKey.toECPrivateKey(), bobKey.toECPublicKey());
+			encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
+			jweObject.encrypt(encrypter);
+
+			fail();
+		} catch (JOSEException e) {
+			assertEquals("Curve of public key does not match curve of private key", e.getMessage());
+		}
+
+		try {
+			ECDH1PUEncrypter encrypter = new ECDH1PUEncrypter(aliceKey.toECPrivateKey(), correctBobKey.toECPublicKey());
+			encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
+			jweObject.encrypt(encrypter);
+
+			ECDH1PUDecrypter decrypter = new ECDH1PUDecrypter(bobKey.toECPrivateKey(), aliceKey.toECPublicKey());
+			decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
+			jweObject.decrypt(decrypter);
+
+			fail();
+		} catch (JOSEException e) {
+			assertEquals("Curve of public key does not match curve of private key", e.getMessage());
 		}
 	}
 }

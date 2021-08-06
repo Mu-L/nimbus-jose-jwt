@@ -1,7 +1,7 @@
 /*
  * nimbus-jose-jwt
  *
- * Copyright 2012-2016, Connect2id Ltd and contributors.
+ * Copyright 2012-2021, Connect2id Ltd and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
  * this file except in compliance with the License. You may obtain a copy of the
@@ -19,12 +19,17 @@ package com.nimbusds.jose.crypto.impl;
 
 
 import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.utils.ECChecks;
+import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.ByteUtils;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 
 
 /**
@@ -112,6 +117,9 @@ public class ECDH1PU {
 	/**
 	 * Derives a shared key (via concat KDF).
 	 *
+	 * It should only be called in {@link ECDH.AlgorithmMode#DIRECT}
+	 * mode because shared key is cek and the tag is unknown.
+	 *
 	 * @param header    The JWE header. Its algorithm and encryption method
 	 *                  must be supported. Must not be {@code null}.
 	 * @param Z         The derived shared secret ('Z'). Must not be
@@ -158,6 +166,9 @@ public class ECDH1PU {
 
 	/**
 	 * Derives a shared key (via concat KDF).
+	 *
+	 * It should only be called in {@link ECDH.AlgorithmMode#KW}
+	 * mode the tag is known.
 	 *
 	 * @param header    The JWE header. Its algorithm and encryption method
 	 *                  must be supported. Must not be {@code null}.
@@ -228,6 +239,52 @@ public class ECDH1PU {
 	public static SecretKey deriveZ(final SecretKey Ze, final SecretKey Zs) {
 		byte[] encodedKey = ByteUtils.concat(Ze.getEncoded(), Zs.getEncoded());
 		return new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
+	}
+
+
+	/**
+	 * Check private key and public key are from the same curve
+	 *
+	 * @param privateKey EC private key
+	 * @param publicKey EC public key
+	 *
+	 * @throws JOSEException curves don't match
+	 *
+	 */
+	public static void validateSameCurve(ECPrivateKey privateKey, ECPublicKey publicKey) throws JOSEException{
+		if (!privateKey.getParams().getCurve().equals(publicKey.getParams().getCurve())) {
+			throw new JOSEException("Curve of public key does not match curve of private key");
+		}
+
+		if (!ECChecks.isPointOnCurve(publicKey, privateKey)) {
+			throw new JOSEException("Invalid public EC key: Point(s) not on the expected curve");
+		}
+	}
+
+	/**
+	 * Check private key and public key are from the same curve
+	 *
+	 * @param privateKey OKP private key
+	 * @param publicKey OKP public key
+	 *
+	 * @throws JOSEException curves don't match
+	 */
+	public static void validateSameCurve(OctetKeyPair privateKey, OctetKeyPair publicKey) throws JOSEException {
+		if (!privateKey.isPrivate()) {
+			throw new JOSEException("OKP private key should be a private key");
+		}
+
+		if (publicKey.isPrivate()) {
+			throw new JOSEException("OKP public key should not be a private key");
+		}
+
+		if (!publicKey.getCurve().equals(Curve.X25519)) {
+			throw new JOSEException("Only supports OctetKeyPairs with crv=X25519");
+		}
+
+		if (!privateKey.getCurve().equals(publicKey.getCurve())) {
+			throw new JOSEException("Curve of public key does not match curve of private key");
+		}
 	}
 
 	/**

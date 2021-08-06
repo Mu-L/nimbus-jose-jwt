@@ -40,7 +40,7 @@ import net.jcip.annotations.Immutable;
  *     <li>{@link #ECDH_ES_A128KW ESDH-ES+A128KW}
  *     <li>{@link #ECDH_ES_A128KW ESDH-ES+A192KW}
  *     <li>{@link #ECDH_ES_A256KW ESDH-ES+A256KW}
- *     <li>{@link #ECDH_1PU ECDH-ES}
+ *     <li>{@link #ECDH_1PU ECDH-1PU}
  *     <li>{@link #ECDH_1PU_A128KW ESDH-1PU+A128KW}
  *     <li>{@link #ECDH_1PU_A128KW ESDH-1PU+A192KW}
  *     <li>{@link #ECDH_1PU_A256KW ESDH-1PU+A256KW}

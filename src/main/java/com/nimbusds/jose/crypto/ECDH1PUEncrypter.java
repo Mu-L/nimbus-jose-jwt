@@ -1,7 +1,7 @@
 /*
  * nimbus-jose-jwt
  *
- * Copyright 2012-2019, Connect2id Ltd.
+ * Copyright 2012-2021, Connect2id Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
  * this file except in compliance with the License. You may obtain a copy of the
@@ -161,23 +161,20 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
 	 *                             for each JWE.
 	 * @throws JOSEException       If the elliptic curve is not supported.
 	 */
-	public ECDH1PUEncrypter(final ECPrivateKey privateKey, final ECPublicKey publicKey, final SecretKey contentEncryptionKey)
-		throws JOSEException {
+	public ECDH1PUEncrypter(final ECPrivateKey privateKey,
+							final ECPublicKey publicKey,
+							final SecretKey contentEncryptionKey)
+			throws JOSEException {
 
 		super(Curve.forECParameterSpec(publicKey.getParams()));
 
 		this.privateKey = privateKey;
 		this.publicKey = publicKey;
 
-		if (contentEncryptionKey != null) {
-			if (contentEncryptionKey.getAlgorithm() == null || !contentEncryptionKey.getAlgorithm().equals("AES")) {
-				throw new IllegalArgumentException("The algorithm of the content encryption key (CEK) must be AES");
-			} else {
-				this.contentEncryptionKey = contentEncryptionKey;
-			}
-		} else {
-			this.contentEncryptionKey = null;
-		}
+		if (contentEncryptionKey != null && (contentEncryptionKey.getAlgorithm() == null || !contentEncryptionKey.getAlgorithm().equals("AES")))
+			throw new IllegalArgumentException("The algorithm of the content encryption key (CEK) must be AES");
+
+		this.contentEncryptionKey = contentEncryptionKey;
 	}
 
 
@@ -214,6 +211,8 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
 	public JWECryptoParts encrypt(final JWEHeader header, final byte[] clearText)
 		throws JOSEException {
 
+		ECDH1PU.validateSameCurve(privateKey, publicKey);
+
 		// Generate ephemeral EC key pair on the same curve as the consumer's public key
 		KeyPair ephemeralKeyPair = generateEphemeralKeyPair(publicKey.getParams());
 		ECPublicKey ephemeralPublicKey = (ECPublicKey)ephemeralKeyPair.getPublic();
@@ -224,19 +223,16 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
 			ephemeralPublicKey(new ECKey.Builder(getCurve(), ephemeralPublicKey).build()).
 			build();
 
-		// Derive 'Ze'
 		SecretKey Ze = ECDH.deriveSharedSecret(
 			publicKey,
 			ephemeralPrivateKey,
 			getJCAContext().getKeyEncryptionProvider());
 
-		// Derive 'Zs'
 		SecretKey Zs = ECDH.deriveSharedSecret(
 				publicKey,
 				privateKey,
 				getJCAContext().getKeyEncryptionProvider());
 
-		// Derive 'Z'
 		SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
 
 		return encryptWithZ(updatedHeader, Z, clearText, contentEncryptionKey);

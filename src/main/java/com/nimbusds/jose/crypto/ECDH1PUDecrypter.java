@@ -1,7 +1,7 @@
 /*
  * nimbus-jose-jwt
  *
- * Copyright 2012-2016, Connect2id Ltd.
+ * Copyright 2012-2021, Connect2id Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
  * this file except in compliance with the License. You may obtain a copy of the
@@ -27,6 +27,7 @@ import com.nimbusds.jose.crypto.utils.ECChecks;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64URL;
+import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
 import java.security.PrivateKey;
@@ -91,6 +92,7 @@ import java.util.Set;
  * @author Alexander Martynov
  * @version 2021-08-03
  */
+@ThreadSafe
 public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecrypter, CriticalHeaderParamsAware {
 
 
@@ -112,7 +114,7 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
 	/**
 	 * The private EC key.
 	 */
-	private final PrivateKey privateKey;
+	private final ECPrivateKey privateKey;
 
 	/**
 	 * The public EC key.
@@ -137,7 +139,7 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
 							final ECPublicKey publicKey)
 		throws JOSEException {
 
-		this(privateKey, publicKey, (Set<String>) null);
+		this(privateKey, publicKey, null);
 	}
 
 	/**
@@ -242,6 +244,8 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
 			      final Base64URL authTag)
 		throws JOSEException {
 
+		ECDH1PU.validateSameCurve(privateKey, publicKey);
+
 		critPolicy.ensureHeaderPasses(header);
 
 		// Get ephemeral EC key
@@ -265,19 +269,16 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
 			}
 		}
 
-		// Derive 'Ze'
 		SecretKey Ze = ECDH.deriveSharedSecret(
 			ephemeralPublicKey,
 			privateKey,
 			getJCAContext().getKeyEncryptionProvider());
 
-		// Derive Zs
 		SecretKey Zs = ECDH.deriveSharedSecret(
 				publicKey,
 				privateKey,
 				getJCAContext().getKeyEncryptionProvider());
 
-		// Derive 'Z'
 		SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
 
 		return decryptWithZ(header, Z, encryptedKey, iv, cipherText, authTag);

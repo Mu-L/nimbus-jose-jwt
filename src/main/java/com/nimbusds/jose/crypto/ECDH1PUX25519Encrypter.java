@@ -1,7 +1,7 @@
 /*
  * nimbus-jose-jwt
  *
- * Copyright 2012-2019, Connect2id Ltd.
+ * Copyright 2012-2021, Connect2id Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
  * this file except in compliance with the License. You may obtain a copy of the
@@ -27,18 +27,13 @@ import com.nimbusds.jose.crypto.impl.ECDH;
 import com.nimbusds.jose.crypto.impl.ECDH1PU;
 import com.nimbusds.jose.crypto.impl.ECDH1PUCryptoProvider;
 import com.nimbusds.jose.jwk.Curve;
-import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
 import java.security.*;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.spec.ECParameterSpec;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 
@@ -113,6 +108,11 @@ public class ECDH1PUX25519Encrypter extends ECDH1PUCryptoProvider implements JWE
 	 */
 	private final OctetKeyPair privateKey;
 
+	/**
+	 * The externally supplied AES content encryption key (CEK) to use,
+	 * {@code null} to generate a CEK for each JWE.
+	 */
+	private final SecretKey contentEncryptionKey;
 
 	/**
 	 * Creates a new Curve25519 Elliptic Curve Diffie-Hellman encrypter.
@@ -125,24 +125,39 @@ public class ECDH1PUX25519Encrypter extends ECDH1PUCryptoProvider implements JWE
 	public ECDH1PUX25519Encrypter(final OctetKeyPair privateKey, final OctetKeyPair publicKey)
 			throws JOSEException {
 
+		this(privateKey, publicKey, null);
+	}
+
+	/**
+	 * Creates a new Curve25519 Elliptic Curve Diffie-Hellman encrypter.
+	 *
+	 * @param privateKey The private key. Must not be {@code null}.
+	 * @param publicKey The public key. Must not be {@code null}.
+	 * @param contentEncryptionKey The content encryption key (CEK) to use.
+	 *                             If specified its algorithm must be "AES"
+	 *                             and its length must match the expected
+	 *                             for the JWE encryption method ("enc").
+	 *                             If {@code null} a CEK will be generated
+	 *                             for each JWE.
+	 *
+	 * @throws JOSEException If the key subtype is not supported.
+	 */
+	public ECDH1PUX25519Encrypter(final OctetKeyPair privateKey,
+								  final OctetKeyPair publicKey,
+								  final SecretKey contentEncryptionKey
+								  )
+			throws JOSEException {
+
 		super(publicKey.getCurve());
-
-		if (! Curve.X25519.equals(privateKey.getCurve())) {
-			throw new JOSEException("X25519Encrypter only supports OctetKeyPairs with crv=X25519");
-		}
-
-		if (! Curve.X25519.equals(publicKey.getCurve())) {
-			throw new JOSEException("X25519Encrypter only supports OctetKeyPairs with crv=X25519");
-		}
-
-		if (publicKey.isPrivate()) {
-			throw new JOSEException("X25519Encrypter requires a public key, use OctetKeyPair.toPublicJWK()");
-		}
 
 		this.publicKey = publicKey;
 		this.privateKey = privateKey;
-	}
 
+		if (contentEncryptionKey != null && (contentEncryptionKey.getAlgorithm() == null || !contentEncryptionKey.getAlgorithm().equals("AES")))
+			throw new IllegalArgumentException("The algorithm of the content encryption key (CEK) must be AES");
+
+		this.contentEncryptionKey = contentEncryptionKey;
+	}
 
 	@Override
 	public Set<Curve> supportedEllipticCurves() {
@@ -175,6 +190,8 @@ public class ECDH1PUX25519Encrypter extends ECDH1PUCryptoProvider implements JWE
 	public JWECryptoParts encrypt(final JWEHeader header, final byte[] clearText)
 			throws JOSEException {
 
+		ECDH1PU.validateSameCurve(privateKey, publicKey);
+
 		// Generate ephemeral X25519 key pair
 		final byte[] ephemeralPrivateKeyBytes = X25519.generatePrivateKey();
 		final byte[] ephemeralPublicKeyBytes;
@@ -197,20 +214,16 @@ public class ECDH1PUX25519Encrypter extends ECDH1PUCryptoProvider implements JWE
 				ephemeralPublicKey(ephemeralPublicKey).
 				build();
 
-		// Derive 'Z'
-		// Derive 'Ze'
 		SecretKey Ze = ECDH.deriveSharedSecret(
 				publicKey,
 				ephemeralPrivateKey);
 
-		// Derive 'Zs'
 		SecretKey Zs = ECDH.deriveSharedSecret(
 				publicKey,
 				privateKey);
 
-		// Derive 'Z'
 		SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
 
-		return encryptWithZ(updatedHeader, Z, clearText);
+		return encryptWithZ(updatedHeader, Z, clearText, contentEncryptionKey);
 	}
 }

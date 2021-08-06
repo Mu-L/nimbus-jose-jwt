@@ -1,7 +1,7 @@
 /*
  * nimbus-jose-jwt
  *
- * Copyright 2012-2019, Connect2id Ltd and contributors.
+ * Copyright 2012-2021, Connect2id Ltd and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
  * this file except in compliance with the License. You may obtain a copy of the
@@ -50,12 +50,25 @@ import java.util.Set;
  *     <li>{@link Curve#X25519}
  * </ul>
  *
- * <p>Supports the following content encryption algorithms:
+ * <p>Supports the following content encryption algorithms for Direct key agreement mode:
  *
  * <ul>
- *     <li>{@link EncryptionMethod#A128CBC_HS256}
- *     <li>{@link EncryptionMethod#A192CBC_HS384}
- *     <li>{@link EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128GCM}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A192GCM}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256GCM}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ * </ul>
+ *
+ * <p>Supports the following content encryption algorithms for Direct Key wrapping mode:
+ *
+ * <ul>
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512}
  * </ul>
  *
  * @author Alexander Martynov
@@ -157,16 +170,6 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
 
 	/**
 	 * Encrypts the specified plaintext using the specified shared secret
-	 * ("Z").
-	 */
-	protected JWECryptoParts encryptWithZ(final JWEHeader header, final SecretKey Z, final byte[] clearText)
-		throws JOSEException {
-		
-		return this.encryptWithZ(header, Z, clearText, null);
-	}
-
-	/**
-	 * Encrypts the specified plaintext using the specified shared secret
 	 * ("Z") and, if provided, the content encryption key (CEK).
 	 */
 	protected JWECryptoParts encryptWithZ(final JWEHeader header,
@@ -193,7 +196,15 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
 
 		if (algMode.equals(ECDH.AlgorithmMode.KW)) {
 
-			if(contentEncryptionKey != null) { // Use externally supplied CEK
+			// Key wrapping mode supports only AES_CBC_HMAC_SHA2
+			// See https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04#section-2.1
+			if (!EncryptionMethod.Family.AES_CBC_HMAC_SHA.contains(enc)) {
+				throw new JOSEException(AlgorithmSupportMessage.unsupportedEncryptionMethod(
+						header.getEncryptionMethod(),
+						EncryptionMethod.Family.AES_CBC_HMAC_SHA));
+			}
+
+			if (contentEncryptionKey != null) { // Use externally supplied CEK
 				cek = contentEncryptionKey;
 			} else { // Generate the CEK according to the enc method
 				cek = ContentCryptoProvider.generateCEK(enc, getJCAContext().getSecureRandom());
@@ -255,6 +266,5 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
 
 		return ContentCryptoProvider.decrypt(header, encryptedKey, iv, cipherText, authTag, cek, getJCAContext());
 	}
-
 
 }
