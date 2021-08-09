@@ -97,175 +97,175 @@ import java.util.Set;
 public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncrypter {
 
 
-	/**
-	 * The supported EC JWK curves by the ECDH crypto provider class.
-	 */
-	public static final Set<Curve> SUPPORTED_ELLIPTIC_CURVES;
+    /**
+     * The supported EC JWK curves by the ECDH crypto provider class.
+     */
+    public static final Set<Curve> SUPPORTED_ELLIPTIC_CURVES;
 
 
-	static {
-		Set<Curve> curves = new LinkedHashSet<>();
-		curves.add(Curve.P_256);
-		curves.add(Curve.P_384);
-		curves.add(Curve.P_521);
-		SUPPORTED_ELLIPTIC_CURVES = Collections.unmodifiableSet(curves);
-	}
+    static {
+        Set<Curve> curves = new LinkedHashSet<>();
+        curves.add(Curve.P_256);
+        curves.add(Curve.P_384);
+        curves.add(Curve.P_521);
+        SUPPORTED_ELLIPTIC_CURVES = Collections.unmodifiableSet(curves);
+    }
 
 
-	/**
-	 * The public JWK key.
-	 */
-	private final ECPublicKey publicKey;
+    /**
+     * The public JWK key.
+     */
+    private final ECPublicKey publicKey;
 
-	/**
-	 * The private JWK key;
-	 */
-	private final ECPrivateKey privateKey;
+    /**
+     * The private JWK key;
+     */
+    private final ECPrivateKey privateKey;
 
-	/**
-	 * The externally supplied AES content encryption key (CEK) to use,
-	 * {@code null} to generate a CEK for each JWE.
-	 */
-	private final SecretKey contentEncryptionKey;
+    /**
+     * The externally supplied AES content encryption key (CEK) to use,
+     * {@code null} to generate a CEK for each JWE.
+     */
+    private final SecretKey contentEncryptionKey;
 
-	/**
-	 * Creates a new Elliptic Curve Diffie-Hellman encrypter.
-	 *
-	 * @param privateKey The private EC key. Must not be {@code null}.
-	 *
-	 * @param publicKey The public EC key. Must not be {@code null}.
-	 *
-	 * @throws JOSEException If the elliptic curve is not supported.
-	 */
-	public ECDH1PUEncrypter(final ECPrivateKey privateKey, final ECPublicKey publicKey)
-		throws JOSEException {
+    /**
+     * Creates a new Elliptic Curve Diffie-Hellman encrypter.
+     *
+     * @param privateKey The private EC key. Must not be {@code null}.
+     *
+     * @param publicKey The public EC key. Must not be {@code null}.
+     *
+     * @throws JOSEException If the elliptic curve is not supported.
+     */
+    public ECDH1PUEncrypter(final ECPrivateKey privateKey, final ECPublicKey publicKey)
+        throws JOSEException {
 
-		this(privateKey, publicKey, null);
-	}
-
-
-	/**
-	 * Creates a new Elliptic Curve Diffie-Hellman encrypter with an
-	 * optionally specified content encryption key (CEK).
-	 *
-	 * @param privateKey            The private EC key. Must not be
-	 *               			   {@code null}.
-	 *
-	 * @param publicKey            The public EC key. Must not be
-	 *                             {@code null}.
-	 * @param contentEncryptionKey The content encryption key (CEK) to use.
-	 *                             If specified its algorithm must be "AES"
-	 *                             and its length must match the expected
-	 *                             for the JWE encryption method ("enc").
-	 *                             If {@code null} a CEK will be generated
-	 *                             for each JWE.
-	 * @throws JOSEException       If the elliptic curve is not supported.
-	 */
-	public ECDH1PUEncrypter(final ECPrivateKey privateKey,
-							final ECPublicKey publicKey,
-							final SecretKey contentEncryptionKey)
-			throws JOSEException {
-
-		super(Curve.forECParameterSpec(publicKey.getParams()));
-
-		this.privateKey = privateKey;
-		this.publicKey = publicKey;
-
-		if (contentEncryptionKey != null && (contentEncryptionKey.getAlgorithm() == null || !contentEncryptionKey.getAlgorithm().equals("AES")))
-			throw new IllegalArgumentException("The algorithm of the content encryption key (CEK) must be AES");
-
-		this.contentEncryptionKey = contentEncryptionKey;
-	}
+        this(privateKey, publicKey, null);
+    }
 
 
-	/**
-	 * Returns the public EC key.
-	 *
-	 * @return The public EC key.
-	 */
-	public ECPublicKey getPublicKey() {
+    /**
+     * Creates a new Elliptic Curve Diffie-Hellman encrypter with an
+     * optionally specified content encryption key (CEK).
+     *
+     * @param privateKey            The private EC key. Must not be
+     *               			   {@code null}.
+     *
+     * @param publicKey            The public EC key. Must not be
+     *                             {@code null}.
+     * @param contentEncryptionKey The content encryption key (CEK) to use.
+     *                             If specified its algorithm must be "AES"
+     *                             and its length must match the expected
+     *                             for the JWE encryption method ("enc").
+     *                             If {@code null} a CEK will be generated
+     *                             for each JWE.
+     * @throws JOSEException       If the elliptic curve is not supported.
+     */
+    public ECDH1PUEncrypter(final ECPrivateKey privateKey,
+                            final ECPublicKey publicKey,
+                            final SecretKey contentEncryptionKey)
+            throws JOSEException {
 
-		return publicKey;
-	}
+        super(Curve.forECParameterSpec(publicKey.getParams()));
 
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
 
-	/**
-	 * Returns the private EC key.
-	 *
-	 * @return The private EC key.
-	 */
-	public ECPrivateKey getPrivateKey() {
+        if (contentEncryptionKey != null && (contentEncryptionKey.getAlgorithm() == null || !contentEncryptionKey.getAlgorithm().equals("AES")))
+            throw new IllegalArgumentException("The algorithm of the content encryption key (CEK) must be AES");
 
-		return privateKey;
-	}
-
-
-	@Override
-	public Set<Curve> supportedEllipticCurves() {
-
-		return SUPPORTED_ELLIPTIC_CURVES;
-	}
-
-
-	@Override
-	public JWECryptoParts encrypt(final JWEHeader header, final byte[] clearText)
-		throws JOSEException {
-
-		ECDH1PU.validateSameCurve(privateKey, publicKey);
-
-		// Generate ephemeral EC key pair on the same curve as the consumer's public key
-		KeyPair ephemeralKeyPair = generateEphemeralKeyPair(publicKey.getParams());
-		ECPublicKey ephemeralPublicKey = (ECPublicKey)ephemeralKeyPair.getPublic();
-		ECPrivateKey ephemeralPrivateKey = (ECPrivateKey)ephemeralKeyPair.getPrivate();
-
-		// Add the ephemeral public EC key to the header
-		JWEHeader updatedHeader = new JWEHeader.Builder(header).
-			ephemeralPublicKey(new ECKey.Builder(getCurve(), ephemeralPublicKey).build()).
-			build();
-
-		SecretKey Ze = ECDH.deriveSharedSecret(
-			publicKey,
-			ephemeralPrivateKey,
-			getJCAContext().getKeyEncryptionProvider());
-
-		SecretKey Zs = ECDH.deriveSharedSecret(
-				publicKey,
-				privateKey,
-				getJCAContext().getKeyEncryptionProvider());
-
-		SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
-
-		return encryptWithZ(updatedHeader, Z, clearText, contentEncryptionKey);
-	}
+        this.contentEncryptionKey = contentEncryptionKey;
+    }
 
 
-	/**
-	 * Generates a new ephemeral EC key pair with the specified curve.
-	 *
-	 * @param ecParameterSpec The EC key spec. Must not be {@code null}.
-	 *
-	 * @return The EC key pair.
-	 *
-	 * @throws JOSEException If the EC key pair couldn't be generated.
-	 */
-	private KeyPair generateEphemeralKeyPair(final ECParameterSpec ecParameterSpec)
-		throws JOSEException {
+    /**
+     * Returns the public EC key.
+     *
+     * @return The public EC key.
+     */
+    public ECPublicKey getPublicKey() {
 
-		Provider keProvider = getJCAContext().getKeyEncryptionProvider();
+        return publicKey;
+    }
 
-		try {
-			KeyPairGenerator generator;
 
-			if (keProvider != null) {
-				generator = KeyPairGenerator.getInstance("EC", keProvider);
-			} else {
-				generator = KeyPairGenerator.getInstance("EC");
-			}
+    /**
+     * Returns the private EC key.
+     *
+     * @return The private EC key.
+     */
+    public ECPrivateKey getPrivateKey() {
 
-			generator.initialize(ecParameterSpec);
-			return generator.generateKeyPair();
-		} catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-			throw new JOSEException("Couldn't generate ephemeral EC key pair: " + e.getMessage(), e);
-		}
-	}
+        return privateKey;
+    }
+
+
+    @Override
+    public Set<Curve> supportedEllipticCurves() {
+
+        return SUPPORTED_ELLIPTIC_CURVES;
+    }
+
+
+    @Override
+    public JWECryptoParts encrypt(final JWEHeader header, final byte[] clearText)
+        throws JOSEException {
+
+        ECDH1PU.validateSameCurve(privateKey, publicKey);
+
+        // Generate ephemeral EC key pair on the same curve as the consumer's public key
+        KeyPair ephemeralKeyPair = generateEphemeralKeyPair(publicKey.getParams());
+        ECPublicKey ephemeralPublicKey = (ECPublicKey)ephemeralKeyPair.getPublic();
+        ECPrivateKey ephemeralPrivateKey = (ECPrivateKey)ephemeralKeyPair.getPrivate();
+
+        // Add the ephemeral public EC key to the header
+        JWEHeader updatedHeader = new JWEHeader.Builder(header).
+            ephemeralPublicKey(new ECKey.Builder(getCurve(), ephemeralPublicKey).build()).
+            build();
+
+        SecretKey Ze = ECDH.deriveSharedSecret(
+            publicKey,
+            ephemeralPrivateKey,
+            getJCAContext().getKeyEncryptionProvider());
+
+        SecretKey Zs = ECDH.deriveSharedSecret(
+                publicKey,
+                privateKey,
+                getJCAContext().getKeyEncryptionProvider());
+
+        SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
+
+        return encryptWithZ(updatedHeader, Z, clearText, contentEncryptionKey);
+    }
+
+
+    /**
+     * Generates a new ephemeral EC key pair with the specified curve.
+     *
+     * @param ecParameterSpec The EC key spec. Must not be {@code null}.
+     *
+     * @return The EC key pair.
+     *
+     * @throws JOSEException If the EC key pair couldn't be generated.
+     */
+    private KeyPair generateEphemeralKeyPair(final ECParameterSpec ecParameterSpec)
+        throws JOSEException {
+
+        Provider keProvider = getJCAContext().getKeyEncryptionProvider();
+
+        try {
+            KeyPairGenerator generator;
+
+            if (keProvider != null) {
+                generator = KeyPairGenerator.getInstance("EC", keProvider);
+            } else {
+                generator = KeyPairGenerator.getInstance("EC");
+            }
+
+            generator.initialize(ecParameterSpec);
+            return generator.generateKeyPair();
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
+            throw new JOSEException("Couldn't generate ephemeral EC key pair: " + e.getMessage(), e);
+        }
+    }
 }

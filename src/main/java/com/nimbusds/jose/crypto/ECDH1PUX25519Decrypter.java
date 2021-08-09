@@ -92,140 +92,140 @@ import java.util.Set;
 public class ECDH1PUX25519Decrypter extends ECDH1PUCryptoProvider implements JWEDecrypter, CriticalHeaderParamsAware {
 
 
-	/**
-	 * The private key.
-	 */
-	private final OctetKeyPair privateKey;
+    /**
+     * The private key.
+     */
+    private final OctetKeyPair privateKey;
 
-	/**
-	 * The public key.
-	 */
-	private final OctetKeyPair publicKey;
+    /**
+     * The public key.
+     */
+    private final OctetKeyPair publicKey;
 
-	/**
-	 * The critical header policy.
-	 */
-	private final CriticalHeaderParamsDeferral critPolicy = new CriticalHeaderParamsDeferral();
-
-
-	/**
-	 * Creates a new Curve25519 Elliptic Curve Diffie-Hellman decrypter.
-	 *
-	 * @param privateKey The private key. Must not be {@code null}.
-	 * @param publicKey The private key. Must not be {@code null}.
-	 *
-	 * @throws JOSEException If the key subtype is not supported.
-	 */
-	public ECDH1PUX25519Decrypter(final OctetKeyPair privateKey, final OctetKeyPair publicKey)
-			throws JOSEException {
-
-		this(privateKey, publicKey, null);
-	}
+    /**
+     * The critical header policy.
+     */
+    private final CriticalHeaderParamsDeferral critPolicy = new CriticalHeaderParamsDeferral();
 
 
-	/**
-	 * Creates a new Curve25519 Elliptic Curve Diffie-Hellman decrypter.
-	 *
-	 * @param privateKey     The private key. Must not be {@code null}.
-	 * @param publicKey The private key. Must not be {@code null}.
-	 * @param defCritHeaders The names of the critical header parameters
-	 *                       that are deferred to the application for
-	 *                       processing, empty set or {@code null} if none.
-	 *
-	 * @throws JOSEException If the key subtype is not supported.
-	 */
-	public ECDH1PUX25519Decrypter(final OctetKeyPair privateKey,
-								  final OctetKeyPair publicKey,
-								  final Set<String> defCritHeaders)
-			throws JOSEException {
+    /**
+     * Creates a new Curve25519 Elliptic Curve Diffie-Hellman decrypter.
+     *
+     * @param privateKey The private key. Must not be {@code null}.
+     * @param publicKey The private key. Must not be {@code null}.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public ECDH1PUX25519Decrypter(final OctetKeyPair privateKey, final OctetKeyPair publicKey)
+            throws JOSEException {
 
-		super(privateKey.getCurve());
-
-		this.privateKey = privateKey;
-		this.publicKey = publicKey;
-
-		critPolicy.setDeferredCriticalHeaderParams(defCritHeaders);
-	}
+        this(privateKey, publicKey, null);
+    }
 
 
-	@Override
-	public Set<Curve> supportedEllipticCurves() {
+    /**
+     * Creates a new Curve25519 Elliptic Curve Diffie-Hellman decrypter.
+     *
+     * @param privateKey     The private key. Must not be {@code null}.
+     * @param publicKey The private key. Must not be {@code null}.
+     * @param defCritHeaders The names of the critical header parameters
+     *                       that are deferred to the application for
+     *                       processing, empty set or {@code null} if none.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public ECDH1PUX25519Decrypter(final OctetKeyPair privateKey,
+                                  final OctetKeyPair publicKey,
+                                  final Set<String> defCritHeaders)
+            throws JOSEException {
 
-		return Collections.singleton(Curve.X25519);
-	}
+        super(privateKey.getCurve());
 
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
 
-	/**
-	 * Returns the private key.
-	 *
-	 * @return The private key.
-	 */
-	public OctetKeyPair getPrivateKey() {
-
-		return privateKey;
-	}
-
-	/**
-	 * Returns the public key.
-	 *
-	 * @return The public key.
-	 */
-	public OctetKeyPair getPublicKey() {
-
-		return publicKey;
-	}
-
-	@Override
-	public Set<String> getProcessedCriticalHeaderParams() {
-
-		return critPolicy.getProcessedCriticalHeaderParams();
-	}
+        critPolicy.setDeferredCriticalHeaderParams(defCritHeaders);
+    }
 
 
-	@Override
-	public Set<String> getDeferredCriticalHeaderParams() {
+    @Override
+    public Set<Curve> supportedEllipticCurves() {
 
-		return critPolicy.getProcessedCriticalHeaderParams();
-	}
+        return Collections.singleton(Curve.X25519);
+    }
 
 
-	@Override
-	public byte[] decrypt(final JWEHeader header,
-						  final Base64URL encryptedKey,
-						  final Base64URL iv,
-						  final Base64URL cipherText,
-						  final Base64URL authTag)
-			throws JOSEException {
+    /**
+     * Returns the private key.
+     *
+     * @return The private key.
+     */
+    public OctetKeyPair getPrivateKey() {
 
-		ECDH1PU.validateSameCurve(privateKey, publicKey);
+        return privateKey;
+    }
 
-		// Check for unrecognizable "crit" properties
-		critPolicy.ensureHeaderPasses(header);
+    /**
+     * Returns the public key.
+     *
+     * @return The public key.
+     */
+    public OctetKeyPair getPublicKey() {
 
-		// Get ephemeral key from header
-		OctetKeyPair ephemeralPublicKey = (OctetKeyPair) header.getEphemeralPublicKey();
+        return publicKey;
+    }
 
-		if (ephemeralPublicKey == null) {
-			throw new JOSEException("Missing ephemeral public key \"epk\" JWE header parameter");
-		}
+    @Override
+    public Set<String> getProcessedCriticalHeaderParams() {
 
-		ECDH1PU.validateSameCurve(privateKey, ephemeralPublicKey);
+        return critPolicy.getProcessedCriticalHeaderParams();
+    }
 
-		SecretKey Ze = ECDH.deriveSharedSecret(
-				ephemeralPublicKey,
-				privateKey);
 
-		SecretKey Zs = ECDH.deriveSharedSecret(
-				publicKey,
-				privateKey);
+    @Override
+    public Set<String> getDeferredCriticalHeaderParams() {
 
-		// Derive 'Z'
-		// Note: X25519 does not require public key validation
-		// See https://cr.yp.to/ecdh.html#validate
-		SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
+        return critPolicy.getProcessedCriticalHeaderParams();
+    }
 
-		return decryptWithZ(header, Z, encryptedKey, iv, cipherText, authTag);
-	}
+
+    @Override
+    public byte[] decrypt(final JWEHeader header,
+                          final Base64URL encryptedKey,
+                          final Base64URL iv,
+                          final Base64URL cipherText,
+                          final Base64URL authTag)
+            throws JOSEException {
+
+        ECDH1PU.validateSameCurve(privateKey, publicKey);
+
+        // Check for unrecognizable "crit" properties
+        critPolicy.ensureHeaderPasses(header);
+
+        // Get ephemeral key from header
+        OctetKeyPair ephemeralPublicKey = (OctetKeyPair) header.getEphemeralPublicKey();
+
+        if (ephemeralPublicKey == null) {
+            throw new JOSEException("Missing ephemeral public key \"epk\" JWE header parameter");
+        }
+
+        ECDH1PU.validateSameCurve(privateKey, ephemeralPublicKey);
+
+        SecretKey Ze = ECDH.deriveSharedSecret(
+                ephemeralPublicKey,
+                privateKey);
+
+        SecretKey Zs = ECDH.deriveSharedSecret(
+                publicKey,
+                privateKey);
+
+        // Derive 'Z'
+        // Note: X25519 does not require public key validation
+        // See https://cr.yp.to/ecdh.html#validate
+        SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
+
+        return decryptWithZ(header, Z, encryptedKey, iv, cipherText, authTag);
+    }
 
 
 }

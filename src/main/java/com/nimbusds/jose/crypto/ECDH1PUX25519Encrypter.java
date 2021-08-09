@@ -96,132 +96,132 @@ import java.util.Set;
 public class ECDH1PUX25519Encrypter extends ECDH1PUCryptoProvider implements JWEEncrypter {
 
 
-	/**
-	 * The public key.
-	 */
-	private final OctetKeyPair publicKey;
+    /**
+     * The public key.
+     */
+    private final OctetKeyPair publicKey;
 
-	/**
-	 * The private key.
-	 */
-	private final OctetKeyPair privateKey;
+    /**
+     * The private key.
+     */
+    private final OctetKeyPair privateKey;
 
-	/**
-	 * The externally supplied AES content encryption key (CEK) to use,
-	 * {@code null} to generate a CEK for each JWE.
-	 */
-	private final SecretKey contentEncryptionKey;
+    /**
+     * The externally supplied AES content encryption key (CEK) to use,
+     * {@code null} to generate a CEK for each JWE.
+     */
+    private final SecretKey contentEncryptionKey;
 
-	/**
-	 * Creates a new Curve25519 Elliptic Curve Diffie-Hellman encrypter.
-	 *
-	 * @param privateKey The private key. Must not be {@code null}.
-	 * @param publicKey The public key. Must not be {@code null}.
-	 *
-	 * @throws JOSEException If the key subtype is not supported.
-	 */
-	public ECDH1PUX25519Encrypter(final OctetKeyPair privateKey, final OctetKeyPair publicKey)
-			throws JOSEException {
+    /**
+     * Creates a new Curve25519 Elliptic Curve Diffie-Hellman encrypter.
+     *
+     * @param privateKey The private key. Must not be {@code null}.
+     * @param publicKey The public key. Must not be {@code null}.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public ECDH1PUX25519Encrypter(final OctetKeyPair privateKey, final OctetKeyPair publicKey)
+            throws JOSEException {
 
-		this(privateKey, publicKey, null);
-	}
+        this(privateKey, publicKey, null);
+    }
 
-	/**
-	 * Creates a new Curve25519 Elliptic Curve Diffie-Hellman encrypter.
-	 *
-	 * @param privateKey The private key. Must not be {@code null}.
-	 * @param publicKey The public key. Must not be {@code null}.
-	 * @param contentEncryptionKey The content encryption key (CEK) to use.
-	 *                             If specified its algorithm must be "AES"
-	 *                             and its length must match the expected
-	 *                             for the JWE encryption method ("enc").
-	 *                             If {@code null} a CEK will be generated
-	 *                             for each JWE.
-	 *
-	 * @throws JOSEException If the key subtype is not supported.
-	 */
-	public ECDH1PUX25519Encrypter(final OctetKeyPair privateKey,
-								  final OctetKeyPair publicKey,
-								  final SecretKey contentEncryptionKey
-								  )
-			throws JOSEException {
+    /**
+     * Creates a new Curve25519 Elliptic Curve Diffie-Hellman encrypter.
+     *
+     * @param privateKey The private key. Must not be {@code null}.
+     * @param publicKey The public key. Must not be {@code null}.
+     * @param contentEncryptionKey The content encryption key (CEK) to use.
+     *                             If specified its algorithm must be "AES"
+     *                             and its length must match the expected
+     *                             for the JWE encryption method ("enc").
+     *                             If {@code null} a CEK will be generated
+     *                             for each JWE.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public ECDH1PUX25519Encrypter(final OctetKeyPair privateKey,
+                                  final OctetKeyPair publicKey,
+                                  final SecretKey contentEncryptionKey
+                                  )
+            throws JOSEException {
 
-		super(publicKey.getCurve());
+        super(publicKey.getCurve());
 
-		this.publicKey = publicKey;
-		this.privateKey = privateKey;
+        this.publicKey = publicKey;
+        this.privateKey = privateKey;
 
-		if (contentEncryptionKey != null && (contentEncryptionKey.getAlgorithm() == null || !contentEncryptionKey.getAlgorithm().equals("AES")))
-			throw new IllegalArgumentException("The algorithm of the content encryption key (CEK) must be AES");
+        if (contentEncryptionKey != null && (contentEncryptionKey.getAlgorithm() == null || !contentEncryptionKey.getAlgorithm().equals("AES")))
+            throw new IllegalArgumentException("The algorithm of the content encryption key (CEK) must be AES");
 
-		this.contentEncryptionKey = contentEncryptionKey;
-	}
+        this.contentEncryptionKey = contentEncryptionKey;
+    }
 
-	@Override
-	public Set<Curve> supportedEllipticCurves() {
+    @Override
+    public Set<Curve> supportedEllipticCurves() {
 
-		return Collections.singleton(Curve.X25519);
-	}
+        return Collections.singleton(Curve.X25519);
+    }
 
 
-	/**
-	 * Returns the public key.
-	 *
-	 * @return The public key.
-	 */
-	public OctetKeyPair getPublicKey() {
+    /**
+     * Returns the public key.
+     *
+     * @return The public key.
+     */
+    public OctetKeyPair getPublicKey() {
 
-		return publicKey;
-	}
+        return publicKey;
+    }
 
-	/**
-	 * Returns the private key.
-	 *
-	 * @return The private key.
-	 */
-	public OctetKeyPair getPrivateKey() {
+    /**
+     * Returns the private key.
+     *
+     * @return The private key.
+     */
+    public OctetKeyPair getPrivateKey() {
 
-		return privateKey;
-	}
+        return privateKey;
+    }
 
-	@Override
-	public JWECryptoParts encrypt(final JWEHeader header, final byte[] clearText)
-			throws JOSEException {
+    @Override
+    public JWECryptoParts encrypt(final JWEHeader header, final byte[] clearText)
+            throws JOSEException {
 
-		ECDH1PU.validateSameCurve(privateKey, publicKey);
+        ECDH1PU.validateSameCurve(privateKey, publicKey);
 
-		// Generate ephemeral X25519 key pair
-		final byte[] ephemeralPrivateKeyBytes = X25519.generatePrivateKey();
-		final byte[] ephemeralPublicKeyBytes;
-		try {
-			ephemeralPublicKeyBytes = X25519.publicFromPrivate(ephemeralPrivateKeyBytes);
+        // Generate ephemeral X25519 key pair
+        final byte[] ephemeralPrivateKeyBytes = X25519.generatePrivateKey();
+        final byte[] ephemeralPublicKeyBytes;
+        try {
+            ephemeralPublicKeyBytes = X25519.publicFromPrivate(ephemeralPrivateKeyBytes);
 
-		} catch (InvalidKeyException e) {
-			// Should never happen since we just generated this private key
-			throw new JOSEException(e.getMessage(), e);
-		}
+        } catch (InvalidKeyException e) {
+            // Should never happen since we just generated this private key
+            throw new JOSEException(e.getMessage(), e);
+        }
 
-		final OctetKeyPair ephemeralPrivateKey =
-				new OctetKeyPair.Builder(getCurve(), Base64URL.encode(ephemeralPublicKeyBytes)).
-						d(Base64URL.encode(ephemeralPrivateKeyBytes)).
-						build();
-		final OctetKeyPair ephemeralPublicKey = ephemeralPrivateKey.toPublicJWK();
+        final OctetKeyPair ephemeralPrivateKey =
+                new OctetKeyPair.Builder(getCurve(), Base64URL.encode(ephemeralPublicKeyBytes)).
+                        d(Base64URL.encode(ephemeralPrivateKeyBytes)).
+                        build();
+        final OctetKeyPair ephemeralPublicKey = ephemeralPrivateKey.toPublicJWK();
 
-		// Add the ephemeral public EC key to the header
-		JWEHeader updatedHeader = new JWEHeader.Builder(header).
-				ephemeralPublicKey(ephemeralPublicKey).
-				build();
+        // Add the ephemeral public EC key to the header
+        JWEHeader updatedHeader = new JWEHeader.Builder(header).
+                ephemeralPublicKey(ephemeralPublicKey).
+                build();
 
-		SecretKey Ze = ECDH.deriveSharedSecret(
-				publicKey,
-				ephemeralPrivateKey);
+        SecretKey Ze = ECDH.deriveSharedSecret(
+                publicKey,
+                ephemeralPrivateKey);
 
-		SecretKey Zs = ECDH.deriveSharedSecret(
-				publicKey,
-				privateKey);
+        SecretKey Zs = ECDH.deriveSharedSecret(
+                publicKey,
+                privateKey);
 
-		SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
+        SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
 
-		return encryptWithZ(updatedHeader, Z, clearText, contentEncryptionKey);
-	}
+        return encryptWithZ(updatedHeader, Z, clearText, contentEncryptionKey);
+    }
 }
