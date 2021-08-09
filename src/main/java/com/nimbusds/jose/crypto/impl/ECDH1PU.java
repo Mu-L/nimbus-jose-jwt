@@ -117,8 +117,13 @@ public class ECDH1PU {
     /**
      * Derives a shared key (via concat KDF).
      *
-     * It should only be called in {@link ECDH.AlgorithmMode#DIRECT}
-     * mode because shared key is cek and the tag is unknown.
+     * The method should only be called in the {@link ECDH.AlgorithmMode#DIRECT} mode.
+     *
+     * The method derives the Content Encryption Key (CEK) for the "enc" algorithm,
+     * in the {@link ECDH.AlgorithmMode#DIRECT} mode.
+     *
+     * The method does not take the auth tag because the auth tag
+     * will be generated using a CEK derived as an output of this method.
      *
      * @param header    The JWE header. Its algorithm and encryption method
      *                  must be supported. Must not be {@code null}.
@@ -167,17 +172,22 @@ public class ECDH1PU {
     /**
      * Derives a shared key (via concat KDF).
      *
-     * It should only be called in {@link ECDH.AlgorithmMode#KW}
-     * mode the tag is known.
+     * The method should only be called in {@link ECDH.AlgorithmMode#KW}.
+     *
+     * In Key Agreement with {@link ECDH.AlgorithmMode#KW} mode,
+     * the JWE Authentication Tag is included in the input to the KDF.
+     * This ensures that the content of the JWE was produced by the original sender
+     * and not by another recipient.
+     *
      *
      * @param header    The JWE header. Its algorithm and encryption method
      *                  must be supported. Must not be {@code null}.
      * @param Z         The derived shared secret ('Z'). Must not be
      *                  {@code null}.
      * @param tag       In Direct Key Agreement mode this is set to an empty octet
-     *       			string. In Key Agreement with Key Wrapping mode, this is set to a
-     *       			value of the form Data, where Data is the raw octets of
-     *       			the JWE Authentication Tag.
+     *                  string. In Key Agreement with Key Wrapping mode, this is set to a
+     *                  value of the form Data, where Data is the raw octets of
+     *                  the JWE Authentication Tag.
      * @param concatKDF The concat KDF. Must be initialised and not
      *                  {@code null}.
      *
