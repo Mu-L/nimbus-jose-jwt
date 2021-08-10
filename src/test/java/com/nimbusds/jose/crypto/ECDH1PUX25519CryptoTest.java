@@ -30,7 +30,6 @@ import junit.framework.TestCase;
 
 import javax.crypto.SecretKey;
 import java.security.SecureRandom;
-import java.text.ParseException;
 import java.util.Collections;
 
 
