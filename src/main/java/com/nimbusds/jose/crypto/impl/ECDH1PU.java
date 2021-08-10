@@ -30,6 +30,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.util.Objects;
 
 
 /**
@@ -55,6 +56,8 @@ public class ECDH1PU {
      */
     public static ECDH.AlgorithmMode resolveAlgorithmMode(final JWEAlgorithm alg)
         throws JOSEException {
+
+        Objects.requireNonNull(alg, "The parameter \"alg\" must not be null");
 
         if (alg.equals(JWEAlgorithm.ECDH_1PU)) {
 
@@ -92,6 +95,9 @@ public class ECDH1PU {
     public static int sharedKeyLength(final JWEAlgorithm alg, final EncryptionMethod enc)
         throws JOSEException {
 
+        Objects.requireNonNull(alg, "The parameter \"alg\" must not be null");
+        Objects.requireNonNull(enc, "The parameter \"enc\" must not be null");
+
         if (alg.equals(JWEAlgorithm.ECDH_1PU)) {
 
             int length = enc.cekBitLength();
@@ -101,17 +107,22 @@ public class ECDH1PU {
             }
 
             return length;
-
-        } else if (alg.equals(JWEAlgorithm.ECDH_1PU_A128KW)) {
-            return 128;
-        } else if (alg.equals(JWEAlgorithm.ECDH_1PU_A192KW)) {
-            return  192;
-        } else if (alg.equals(JWEAlgorithm.ECDH_1PU_A256KW)) {
-            return  256;
-        } else {
-            throw new JOSEException(AlgorithmSupportMessage.unsupportedJWEAlgorithm(
-                alg, ECDHCryptoProvider.SUPPORTED_ALGORITHMS));
         }
+
+        if (alg.equals(JWEAlgorithm.ECDH_1PU_A128KW)) {
+            return 128;
+        }
+
+        if (alg.equals(JWEAlgorithm.ECDH_1PU_A192KW)) {
+            return  192;
+        }
+
+        if (alg.equals(JWEAlgorithm.ECDH_1PU_A256KW)) {
+            return  256;
+        }
+
+        throw new JOSEException(AlgorithmSupportMessage.unsupportedJWEAlgorithm(
+                alg, ECDHCryptoProvider.SUPPORTED_ALGORITHMS));
     }
 
     /**
@@ -140,6 +151,10 @@ public class ECDH1PU {
                                             final SecretKey Z,
                                             final ConcatKDF concatKDF)
             throws JOSEException {
+
+        Objects.requireNonNull(header, "The parameter \"header\" must not be null");
+        Objects.requireNonNull(Z, "The parameter \"Z\" must not be null");
+        Objects.requireNonNull(concatKDF, "The parameter \"concatKDF\" must not be null");
 
         final int sharedKeyLength = sharedKeyLength(header.getAlgorithm(), header.getEncryptionMethod());
 
@@ -201,6 +216,11 @@ public class ECDH1PU {
                         final ConcatKDF concatKDF)
         throws JOSEException {
 
+        Objects.requireNonNull(header, "The parameter \"header\" must not be null");
+        Objects.requireNonNull(Z, "The parameter \"Z\" must not be null");
+        Objects.requireNonNull(tag, "The parameter \"tag\" must not be null");
+        Objects.requireNonNull(concatKDF, "The parameter \"concatKDF\" must not be null");
+
         final int sharedKeyLength = sharedKeyLength(header.getAlgorithm(), header.getEncryptionMethod());
 
         // Set the alg ID for the concat KDF
@@ -247,6 +267,9 @@ public class ECDH1PU {
      * @return		The derived shared key.
      */
     public static SecretKey deriveZ(final SecretKey Ze, final SecretKey Zs) {
+        Objects.requireNonNull(Ze, "The parameter \"Ze\" must not be null");
+        Objects.requireNonNull(Zs, "The parameter \"Zs\" must not be null");
+
         byte[] encodedKey = ByteUtils.concat(Ze.getEncoded(), Zs.getEncoded());
         return new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
     }
@@ -255,13 +278,16 @@ public class ECDH1PU {
     /**
      * Check private key and public key are from the same curve
      *
-     * @param privateKey EC private key
-     * @param publicKey EC public key
+     * @param privateKey EC private key. Must not be {@code null}.
+     * @param publicKey EC public key. Must not be {@code null}.
      *
      * @throws JOSEException curves don't match
      *
      */
     public static void validateSameCurve(ECPrivateKey privateKey, ECPublicKey publicKey) throws JOSEException{
+        Objects.requireNonNull(privateKey, "The parameter \"privateKey\" must not be null");
+        Objects.requireNonNull(publicKey, "The parameter \"publicKey\" must not be null");
+
         if (!privateKey.getParams().getCurve().equals(publicKey.getParams().getCurve())) {
             throw new JOSEException("Curve of public key does not match curve of private key");
         }
@@ -274,12 +300,15 @@ public class ECDH1PU {
     /**
      * Check private key and public key are from the same curve
      *
-     * @param privateKey OKP private key
-     * @param publicKey OKP public key
+     * @param privateKey OKP private key. Must not be {@code null}.
+     * @param publicKey OKP public key. Must not be {@code null}.
      *
      * @throws JOSEException curves don't match
      */
     public static void validateSameCurve(OctetKeyPair privateKey, OctetKeyPair publicKey) throws JOSEException {
+        Objects.requireNonNull(privateKey, "The parameter \"privateKey\" must not be null");
+        Objects.requireNonNull(publicKey, "The parameter \"publicKey\" must not be null");
+
         if (!privateKey.isPrivate()) {
             throw new JOSEException("OKP private key should be a private key");
         }

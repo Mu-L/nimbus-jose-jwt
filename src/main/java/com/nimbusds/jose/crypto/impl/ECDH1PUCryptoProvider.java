@@ -170,7 +170,10 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
 
     /**
      * Encrypts the specified plaintext using the specified shared secret
-     * ("Z") and, if provided, the content encryption key (CEK).
+     * ("Z").
+     *
+     * Encrypts the specified plaintext using if provided,
+     * the content encryption key (CEK) for {@link ECDH.AlgorithmMode#KW}.
      */
     protected JWECryptoParts encryptWithZ(final JWEHeader header,
                                           final SecretKey Z,
