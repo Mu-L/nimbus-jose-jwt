@@ -342,6 +342,12 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
                         " \"x\": \"BT7aR0ItXfeDAldeeOlXL_wXqp-j5FltT0vRSG16kRw\",\n" +
                         " \"d\": \"1gDirl_r_Y3-qUa3WXHgEXrrEHngWThU3c9zj9A2uBg\"}");
 
+        OctetKeyPair charlieKey = OctetKeyPair.parse(
+                "{\"kty\": \"OKP\",\n" +
+                        " \"crv\": \"X25519\",\n" +
+                        " \"x\": \"BT7aR0ItXfeDAldeeOlXL_wXqp-j5FltT0vRSG16kRw\",\n" +
+                        " \"d\": \"1gDirl_r_Y3-qUa3WXHgEXrrEHngWThU3c9zj9A2uBg\"}");
+
         JWEObject jweObject = new JWEObject(
                 Base64URL.from("eyJhbGciOiJFQ0RILTFQVStBMTI4S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiYXB1Ijoi" +
                         "UVd4cFkyVSIsImFwdiI6IlFtOWlJR0Z1WkNCRGFHRnliR2xsIiwiZXBrIjp7Imt0eSI6Ik9L" +
@@ -353,9 +359,26 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
                 Base64URL.from("HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ")
         );
 
-        ECDH1PUX25519Decrypter decrypter = new ECDH1PUX25519Decrypter(bobKey, aliceKey.toPublicJWK());
-        jweObject.decrypt(decrypter);
+        String jwe = jweObject.serialize();
 
-        assertEquals(exceptedPlaintext, jweObject.getPayload().toString());
+        // Bob can decrypt message
+        JWEObject bobMessage = JWEObject.parse(jwe);
+        ECDH1PUX25519Decrypter bobDecrypter = new ECDH1PUX25519Decrypter(
+                bobKey,
+                aliceKey.toPublicJWK()
+        );
+
+        bobMessage.decrypt(bobDecrypter);
+        assertEquals(exceptedPlaintext, bobMessage.getPayload().toString());
+
+        // Charlie can decrypt message
+        JWEObject charlieMessage = JWEObject.parse(jwe);
+        ECDH1PUX25519Decrypter charlieDecrypter = new ECDH1PUX25519Decrypter(
+                charlieKey,
+                aliceKey.toPublicJWK()
+        );
+
+        charlieMessage.decrypt(charlieDecrypter);
+        assertEquals(exceptedPlaintext, charlieMessage.getPayload().toString());
     }
 }
