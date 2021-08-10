@@ -134,8 +134,7 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
      *
      * @throws JOSEException If the elliptic curve is not supported.
      */
-    public ECDH1PUDecrypter(final ECPrivateKey privateKey,
-                            final ECPublicKey publicKey)
+    public ECDH1PUDecrypter(final ECPrivateKey privateKey, final ECPublicKey publicKey)
         throws JOSEException {
 
         this(privateKey, publicKey, null);
@@ -237,10 +236,10 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
 
     @Override
     public byte[] decrypt(final JWEHeader header,
-                  final Base64URL encryptedKey,
-                  final Base64URL iv,
-                  final Base64URL cipherText,
-                  final Base64URL authTag)
+                          final Base64URL encryptedKey,
+                          final Base64URL iv,
+                          final Base64URL cipherText,
+                          final Base64URL authTag)
         throws JOSEException {
 
         ECDH1PU.validateSameCurve(privateKey, publicKey);

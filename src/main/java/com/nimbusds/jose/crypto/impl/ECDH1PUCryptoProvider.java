@@ -127,7 +127,7 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
 
         Curve definedCurve = curve != null ? curve : new Curve("unknown");
 
-        if (! supportedEllipticCurves().contains(curve)) {
+        if (!supportedEllipticCurves().contains(curve)) {
             throw new JOSEException(AlgorithmSupportMessage.unsupportedEllipticCurve(
                 definedCurve, supportedEllipticCurves()));
         }
@@ -173,9 +173,9 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
      * ("Z") and, if provided, the content encryption key (CEK).
      */
     protected JWECryptoParts encryptWithZ(final JWEHeader header,
-                          final SecretKey Z,
-                          final byte[] clearText,
-                          final SecretKey contentEncryptionKey)
+                                          final SecretKey Z,
+                                          final byte[] clearText,
+                                          final SecretKey contentEncryptionKey)
         throws JOSEException {
 
         final JWEAlgorithm alg = header.getAlgorithm();
@@ -231,11 +231,11 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
      * Decrypts the encrypted JWE parts using the specified shared secret ("Z").
      */
     protected byte[] decryptWithZ(final JWEHeader header,
-                      final SecretKey Z,
-                      final Base64URL encryptedKey,
-                      final Base64URL iv,
-                      final Base64URL cipherText,
-                      final Base64URL authTag)
+                                  final SecretKey Z,
+                                  final Base64URL encryptedKey,
+                                  final Base64URL iv,
+                                  final Base64URL cipherText,
+                                  final Base64URL authTag)
         throws JOSEException {
 
         final JWEAlgorithm alg = header.getAlgorithm();
@@ -264,7 +264,7 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
             throw new JOSEException("Unexpected JWE ECDH algorithm mode: " + algMode);
         }
 
-        return ContentCryptoProvider.decrypt(header, encryptedKey, iv, cipherText, authTag, cek, getJCAContext());
+        return ContentCryptoProvider.decrypt(header, null, iv, cipherText, authTag, cek, getJCAContext());
     }
 
 }

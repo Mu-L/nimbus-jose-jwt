@@ -28,6 +28,7 @@ import com.nimbusds.jose.crypto.impl.ECDH1PU;
 import com.nimbusds.jose.crypto.impl.ECDH1PUCryptoProvider;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.OctetKeyPair;
+import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
 import com.nimbusds.jose.util.Base64URL;
 import net.jcip.annotations.ThreadSafe;
 
@@ -190,21 +191,7 @@ public class ECDH1PUX25519Encrypter extends ECDH1PUCryptoProvider implements JWE
 
         ECDH1PU.validateSameCurve(privateKey, publicKey);
 
-        // Generate ephemeral X25519 key pair
-        final byte[] ephemeralPrivateKeyBytes = X25519.generatePrivateKey();
-        final byte[] ephemeralPublicKeyBytes;
-        try {
-            ephemeralPublicKeyBytes = X25519.publicFromPrivate(ephemeralPrivateKeyBytes);
-
-        } catch (InvalidKeyException e) {
-            // Should never happen since we just generated this private key
-            throw new JOSEException(e.getMessage(), e);
-        }
-
-        final OctetKeyPair ephemeralPrivateKey =
-                new OctetKeyPair.Builder(getCurve(), Base64URL.encode(ephemeralPublicKeyBytes)).
-                        d(Base64URL.encode(ephemeralPrivateKeyBytes)).
-                        build();
+        final OctetKeyPair ephemeralPrivateKey = new OctetKeyPairGenerator(getCurve()).generate();
         final OctetKeyPair ephemeralPublicKey = ephemeralPrivateKey.toPublicJWK();
 
         // Add the ephemeral public EC key to the header

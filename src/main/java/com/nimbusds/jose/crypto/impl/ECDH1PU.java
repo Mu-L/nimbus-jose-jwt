@@ -59,19 +59,19 @@ public class ECDH1PU {
         if (alg.equals(JWEAlgorithm.ECDH_1PU)) {
 
             return ECDH.AlgorithmMode.DIRECT;
+        }
 
-        } else if (alg.equals(JWEAlgorithm.ECDH_1PU_A128KW) ||
+        if (alg.equals(JWEAlgorithm.ECDH_1PU_A128KW) ||
                 alg.equals(JWEAlgorithm.ECDH_1PU_A192KW) ||
                 alg.equals(JWEAlgorithm.ECDH_1PU_A256KW)
         ) {
 
             return ECDH.AlgorithmMode.KW;
-        } else {
+        }
 
-            throw new JOSEException(AlgorithmSupportMessage.unsupportedJWEAlgorithm(
+        throw new JOSEException(AlgorithmSupportMessage.unsupportedJWEAlgorithm(
                 alg,
                 ECDHCryptoProvider.SUPPORTED_ALGORITHMS));
-        }
     }
 
 
@@ -81,7 +81,7 @@ public class ECDH1PU {
      *
      * @param alg The JWE ECDH algorithm. Must be supported and not
      *            {@code null}.
-     * @param enc The encryption method. Must be supported} and not
+     * @param enc The encryption method. Must be supported and not
      *            {@code null}.
      *
      * @return The bit length of the shared key.

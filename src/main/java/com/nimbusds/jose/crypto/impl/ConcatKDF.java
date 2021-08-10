@@ -193,13 +193,13 @@ public class ConcatKDF implements JCAAware<JCAContext> {
 	 * @throws JOSEException If the key derivation failed.
 	 */
 	public SecretKey deriveKey(final SecretKey sharedSecret,
-				   final int keyLength,
-			       final byte[] algID,
-			       final byte[] partyUInfo,
-				   final byte[] partyVInfo,
-			       final byte[] suppPubInfo,
-				   final byte[] suppPrivInfo,
-				   final byte[] tag)
+                   final int keyLength,
+                   final byte[] algID,
+                   final byte[] partyUInfo,
+                   final byte[] partyVInfo,
+                   final byte[] suppPubInfo,
+                   final byte[] suppPrivInfo,
+                   final byte[] tag)
 			throws JOSEException {
 
 		final byte[] otherInfo = composeOtherInfo(algID, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo, tag);
