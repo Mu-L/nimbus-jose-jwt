@@ -328,7 +328,7 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
     }
 
     // see https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04#appendix-B
-    public void test_ECDH_1PU_encryption_decryption() throws Exception {
+    public void test_ECDH_1PU_decryption() throws Exception {
         String exceptedPlaintext = "Three is a magic number.";
         OctetKeyPair aliceKey = OctetKeyPair.parse(
                 "{\"kty\": \"OKP\",\n" +
