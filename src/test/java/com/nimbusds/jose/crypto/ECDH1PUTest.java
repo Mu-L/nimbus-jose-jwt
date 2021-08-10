@@ -23,7 +23,9 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWEHeader;
 import com.nimbusds.jose.crypto.impl.ConcatKDF;
+import com.nimbusds.jose.crypto.impl.ECDH;
 import com.nimbusds.jose.crypto.impl.ECDH1PU;
+import com.nimbusds.jose.jca.JWEJCAContext;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.OctetKeyPair;
@@ -103,20 +105,6 @@ public class ECDH1PUTest extends TestCase{
     }
 
     private static final TestVector[] testVectors = new TestVector[] {
-            // https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04#appendix-A
-            new TestVector(
-                    JWEAlgorithm.ECDH_1PU,
-                    EncryptionMethod.A256GCM,
-                    fromHex("9e56d91d817135d372834283bf84269cfb316ea3da806a48f6daa7798cfe90c4"),
-                    fromHex("e3ca3474384c9f62b30bfd4c688b3e7d4110a1b4badc3cc54ef7b81241efd50d"),
-                    fromHex("9e56d91d817135d372834283bf84269cfb316ea3da806a48f6daa7798cfe90c4" +
-                                    "e3ca3474384c9f62b30bfd4c688b3e7d4110a1b4badc3cc54ef7b81241efd50d"),
-                    fromHex("6caf13723d14850ad4b42cd6dde935bffd2fff00a9ba70de05c203a5e1722ca7"),
-                    null,
-                    "Alice",
-                    "Bob"
-            ),
-
             // https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04#appendix-B.9
             new TestVector(
                     JWEAlgorithm.ECDH_1PU_A128KW,
@@ -124,7 +112,7 @@ public class ECDH1PUTest extends TestCase{
                     fromHex("32810896e0fe4d570ed1acfcedf67117dc194ed5daac21d8ff7af3244694897f"),
                     fromHex("2157612c9048edfae77cb2e4237140605967c05c7f77a48eeaf2cf29a5737c4a"),
                     fromHex("32810896e0fe4d570ed1acfcedf67117dc194ed5daac21d8ff7af3244694897f" +
-                                    "2157612c9048edfae77cb2e4237140605967c05c7f77a48eeaf2cf29a5737c4a"),
+                            "2157612c9048edfae77cb2e4237140605967c05c7f77a48eeaf2cf29a5737c4a"),
                     fromHex("df4c37a0668306a11e3d6b0074b5d8df"),
                     Base64URL.from("HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ"),
                     "Alice",
@@ -219,7 +207,71 @@ public class ECDH1PUTest extends TestCase{
         }
     }
 
+    /**
+     * see https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04#appendix-A
+     */
+    public void test_ECDH_1PU_DirectMode() throws Exception {
+        ECKey aliceKey = ECKey.parse(
+                "{\"kty\":\"EC\",\n" +
+                        " \"crv\":\"P-256\",\n" +
+                        " \"x\":\"WKn-ZIGevcwGIyyrzFoZNBdaq9_TsqzGl96oc0CWuis\",\n" +
+                        " \"y\":\"y77t-RvAHRKTsSGdIYUfweuOvwrvDD-Q3Hv5J0fSKbE\",\n" +
+                        " \"d\":\"Hndv7ZZjs_ke8o9zXYo3iq-Yr8SewI5vrqd0pAvEPqg\"}");
+
+        ECKey bobKey = ECKey.parse(
+                "{\"kty\":\"EC\",\n" +
+                        " \"crv\":\"P-256\",\n" +
+                        " \"x\":\"weNJy2HscCSM6AEDTDg04biOvhFhyyWvOHQfeF_PxMQ\",\n" +
+                        " \"y\":\"e8lnCO-AlStT-NJVX-crhB7QRYhiix03illJOVAOyck\",\n" +
+                        " \"d\":\"VEmDZpDXXK8p8N0Cndsxs924q6nS1RXFASRl6BfUqdw\"}");
+
+        ECKey epk = ECKey.parse(
+                "{\"kty\":\"EC\",\n" +
+                        " \"crv\":\"P-256\",\n" +
+                        " \"x\":\"gI0GAILBdu7T53akrFmMyGcsF3n5dO7MmwNBHKW5SV0\",\n" +
+                        " \"y\":\"SLW_xSffzlPWrHEVI30DHM_4egVwt3NQqeUD7nMFpps\",\n" +
+                        " \"d\":\"0_NxaRPUMQoAJt50Gz8YiTr8gRTwyEaCumd-MToTmIo\"}");
+
+        JWEJCAContext jcaContext = new JWEJCAContext();
+
+        byte[] expectedZs = fromHex("e3ca3474384c9f62b30bfd4c688b3e7d4110a1b4badc3cc54ef7b81241efd50d");
+        byte[] expectedZe = fromHex("9e56d91d817135d372834283bf84269cfb316ea3da806a48f6daa7798cfe90c4");
+        byte[] expectedZ = fromHex("9e56d91d817135d372834283bf84269c" +
+                "fb316ea3da806a48f6daa7798cfe90c4" +
+                "e3ca3474384c9f62b30bfd4c688b3e7d" +
+                "4110a1b4badc3cc54ef7b81241efd50d");
+        byte[] expectedSharedKey = fromHex("6caf13723d14850ad4b42cd6dde935bffd2fff00a9ba70de05c203a5e1722ca7");
+
+        SecretKey Ze = ECDH.deriveSharedSecret(
+                bobKey.toECPublicKey(),
+                epk.toECPrivateKey(),
+                jcaContext.getKeyEncryptionProvider()
+        );
+
+        assertArrayEquals(expectedZe, Ze.getEncoded());
+
+        SecretKey Zs = ECDH.deriveSharedSecret(
+                bobKey.toECPublicKey(),
+                aliceKey.toECPrivateKey(),
+                jcaContext.getKeyEncryptionProvider()
+        );
+
+        assertArrayEquals(expectedZs, Zs.getEncoded());
+
+        SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
+        assertArrayEquals(expectedZ, Z.getEncoded());
+
+        JWEHeader jwe = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU, EncryptionMethod.A256GCM)
+                .agreementPartyUInfo(Base64URL.encode("Alice"))
+                .agreementPartyVInfo(Base64URL.encode("Bob"))
+                .build();
+
+        SecretKey sharedKey = ECDH1PU.deriveSharedKey(jwe, Z, new ConcatKDF("SHA-256"));
+        assertArrayEquals(expectedSharedKey, sharedKey.getEncoded());
+    }
+
     public void test_TestVectors() throws Exception {
+
         for (TestVector vector : testVectors) {
             SecretKey Ze = new SecretKeySpec(vector.Ze, "AES");
             SecretKey Zs = new SecretKeySpec(vector.Zs, "AES");
@@ -232,15 +284,8 @@ public class ECDH1PUTest extends TestCase{
                     .agreementPartyVInfo(Base64URL.encode(vector.apv))
                     .build();
 
-            if (vector.tag == null) {
-                SecretKey sharedKey = ECDH1PU.deriveSharedKey(jwe, Z, new ConcatKDF("SHA-256"));
-                assertArrayEquals(vector.expectedSharedKey, sharedKey.getEncoded());
-            }
-
-            if (vector.tag != null) {
-                SecretKey sharedKey = ECDH1PU.deriveSharedKey(jwe, Z, vector.tag, new ConcatKDF("SHA-256"));
-                assertArrayEquals(vector.expectedSharedKey, sharedKey.getEncoded());
-            }
+            SecretKey sharedKey = ECDH1PU.deriveSharedKey(jwe, Z, vector.tag, new ConcatKDF("SHA-256"));
+            assertArrayEquals(vector.expectedSharedKey, sharedKey.getEncoded());
         }
     }
 }

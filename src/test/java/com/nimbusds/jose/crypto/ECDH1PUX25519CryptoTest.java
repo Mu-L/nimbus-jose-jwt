@@ -30,6 +30,7 @@ import junit.framework.TestCase;
 
 import javax.crypto.SecretKey;
 import java.security.SecureRandom;
+import java.text.ParseException;
 import java.util.Collections;
 
 
@@ -83,7 +84,7 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
         }
     }
 
-    private static final CurveTest[] notMatchedCurves = new CurveTest[] {
+    private static final CurveTest[] notMatchedCurves = new CurveTest[]{
             new CurveTest(
                     generateOKP(Curve.X25519),
                     generateOKP(Curve.X25519).toPublicJWK(),
@@ -101,7 +102,7 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
             )
     };
 
-    private static final CycleTest[] allowedCycles = new CycleTest[] {
+    private static final CycleTest[] allowedCycles = new CycleTest[]{
             new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.X25519, EncryptionMethod.A128CBC_HS256),
             new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.X25519, EncryptionMethod.A192CBC_HS384),
             new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.X25519, EncryptionMethod.A256CBC_HS512),
@@ -122,7 +123,7 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
             new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.X25519, EncryptionMethod.A256CBC_HS512)
     };
 
-    private static final CycleTest[] forbiddenCycles = new CycleTest[] {
+    private static final CycleTest[] forbiddenCycles = new CycleTest[]{
             new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.X25519, EncryptionMethod.A128GCM),
             new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.X25519, EncryptionMethod.A192GCM),
             new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.X25519, EncryptionMethod.A256GCM),
@@ -238,15 +239,15 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
     }
 
     public void testCritParamDeferral()
-        throws Exception {
+            throws Exception {
 
         OctetKeyPair aliceKey = generateOKP(Curve.X25519);
         OctetKeyPair bobKey = generateOKP(Curve.X25519);
 
         JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU, EncryptionMethod.A128CBC_HS256).
-            customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
-            criticalParams(Collections.singleton(JWTClaimNames.EXPIRATION_TIME)).
-            build();
+                customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+                criticalParams(Collections.singleton(JWTClaimNames.EXPIRATION_TIME)).
+                build();
 
         JWEObject jweObject = new JWEObject(header, new Payload("Hello world!"));
         ECDH1PUX25519Encrypter encrypter = new ECDH1PUX25519Encrypter(aliceKey, bobKey.toPublicJWK());
@@ -261,15 +262,15 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
 
 
     public void testCritParamReject()
-        throws Exception {
+            throws Exception {
 
         OctetKeyPair aliceKey = generateOKP(Curve.X25519);
         OctetKeyPair bobKey = generateOKP(Curve.X25519);
 
         JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU, EncryptionMethod.A128CBC_HS256).
-            customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
-            criticalParams(Collections.singleton(JWTClaimNames.EXPIRATION_TIME)).
-            build();
+                customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
+                criticalParams(Collections.singleton(JWTClaimNames.EXPIRATION_TIME)).
+                build();
 
         JWEObject jweObject = new JWEObject(header, new Payload("Hello world!"));
         ECDH1PUX25519Encrypter encrypter = new ECDH1PUX25519Encrypter(aliceKey, bobKey.toPublicJWK());
@@ -325,5 +326,37 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
                 assertEquals(curveTest.expectedMessage, e.getMessage());
             }
         }
+    }
+
+    // see https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04#appendix-B
+    public void test_ECDH_1PU_encryption_decryption() throws Exception {
+        String exceptedPlaintext = "Three is a magic number.";
+        OctetKeyPair aliceKey = OctetKeyPair.parse(
+                "{\"kty\": \"OKP\",\n" +
+                        " \"crv\": \"X25519\",\n" +
+                        " \"x\": \"Knbm_BcdQr7WIoz-uqit9M0wbcfEr6y-9UfIZ8QnBD4\",\n" +
+                        " \"d\": \"i9KuFhSzEBsiv3PKVL5115OCdsqQai5nj_Flzfkw5jU\"}");
+
+        OctetKeyPair bobKey = OctetKeyPair.parse(
+                "{\"kty\": \"OKP\",\n" +
+                        " \"crv\": \"X25519\",\n" +
+                        " \"x\": \"BT7aR0ItXfeDAldeeOlXL_wXqp-j5FltT0vRSG16kRw\",\n" +
+                        " \"d\": \"1gDirl_r_Y3-qUa3WXHgEXrrEHngWThU3c9zj9A2uBg\"}");
+
+        JWEObject jweObject = new JWEObject(
+                Base64URL.from("eyJhbGciOiJFQ0RILTFQVStBMTI4S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiYXB1Ijoi" +
+                        "UVd4cFkyVSIsImFwdiI6IlFtOWlJR0Z1WkNCRGFHRnliR2xsIiwiZXBrIjp7Imt0eSI6Ik9L" +
+                        "UCIsImNydiI6IlgyNTUxOSIsIngiOiJrOW9mX2NwQWFqeTBwb1c1Z2FpeFhHczluSGt3ZzFB" +
+                        "RnFVQUZhMzlkeUJjIn19"),
+                Base64URL.from("pOMVA9_PtoRe7xXW1139NzzN1UhiFoio8lGto9cf0t8PyU-sjNXH8-LIRLycq8CHJQbDwvQeU1cSl55cQ0hGezJu2N9IY0QN"),
+                Base64URL.from("AAECAwQFBgcICQoLDA0ODw"),
+                Base64URL.from("Az2IWsISEMDJvyc5XRL-3-d-RgNBOGolCsxFFoUXFYw"),
+                Base64URL.from("HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ")
+        );
+
+        ECDH1PUX25519Decrypter decrypter = new ECDH1PUX25519Decrypter(bobKey, aliceKey.toPublicJWK());
+        jweObject.decrypt(decrypter);
+
+        assertEquals(exceptedPlaintext, jweObject.getPayload().toString());
     }
 }
