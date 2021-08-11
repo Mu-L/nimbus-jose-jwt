@@ -1339,3 +1339,7 @@ version 9.11.3 (2021-08-01)
       without a PSSParameterSpec when the JCA algorithm name contains the
       necessary PSS parameters. Intended to prevent an
       UnsupportedOperationException with the nCipher JCA provider.
+
+version 9.12 (2021-08-11)
+    * Increases MAX_HEADER_STRING_LENGTH from 10K to 20K to accommodate larger
+      JOSE x5c header parameters (iss #440).
