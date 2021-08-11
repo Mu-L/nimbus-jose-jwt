@@ -64,7 +64,7 @@ The library can handle all standard JOSE algorithms:
   Object Signing and Encryption (JOSE)
 * draft-ietf-cose-webauthn-algorithms-03 - COSE and JOSE Registrations for 
   WebAuthn Algorithms
-
+* draft-madden-jose-ecdh-1pu-04 - Public Key Authenticated Encryption for JOSE: ECDH-1PU
 
 ## System requirements and dependencies
 
