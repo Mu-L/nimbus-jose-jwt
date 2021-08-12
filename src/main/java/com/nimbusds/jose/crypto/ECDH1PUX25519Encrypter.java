@@ -18,7 +18,6 @@
 package com.nimbusds.jose.crypto;
 
 
-import com.google.crypto.tink.subtle.X25519;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWECryptoParts;
 import com.nimbusds.jose.JWEEncrypter;
@@ -29,11 +28,9 @@ import com.nimbusds.jose.crypto.impl.ECDH1PUCryptoProvider;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
-import com.nimbusds.jose.util.Base64URL;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
-import java.security.*;
 import java.util.Collections;
 import java.util.Set;
 
@@ -80,6 +77,7 @@ import java.util.Set;
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256GCM}
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#XC20P}
  * </ul>
  *
  * <p>Supports the following content encryption algorithms for Key wrapping mode:

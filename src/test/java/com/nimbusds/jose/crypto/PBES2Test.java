@@ -52,7 +52,7 @@ public class PBES2Test extends TestCase {
 
 	public void testClassEncryptionMethodSupport() {
 
-		assertEquals(8, PasswordBasedEncrypter.SUPPORTED_ENCRYPTION_METHODS.size());
+		assertEquals(9, PasswordBasedEncrypter.SUPPORTED_ENCRYPTION_METHODS.size());
 		assertTrue(PasswordBasedEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(PasswordBasedEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A192CBC_HS384));
 		assertTrue(PasswordBasedEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256CBC_HS512));
@@ -61,8 +61,9 @@ public class PBES2Test extends TestCase {
 		assertTrue(PasswordBasedEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256GCM));
 		assertTrue(PasswordBasedEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256_DEPRECATED));
 		assertTrue(PasswordBasedEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256CBC_HS512_DEPRECATED));
+		assertTrue(PasswordBasedEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.XC20P));
 
-		assertEquals(8, PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS.size());
+		assertEquals(9, PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS.size());
 		assertTrue(PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A192CBC_HS384));
 		assertTrue(PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256CBC_HS512));
@@ -71,6 +72,7 @@ public class PBES2Test extends TestCase {
 		assertTrue(PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128GCM));
 		assertTrue(PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A192GCM));
 		assertTrue(PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256GCM));
+		assertTrue(PasswordBasedDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.XC20P));
 	}
 
 
@@ -96,7 +98,7 @@ public class PBES2Test extends TestCase {
 
 		JWEEncrypter encrypter = new PasswordBasedEncrypter("secret", 8, 1000);
 
-		assertEquals(8, encrypter.supportedEncryptionMethods().size());
+		assertEquals(9, encrypter.supportedEncryptionMethods().size());
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A192CBC_HS384));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256CBC_HS512));
@@ -105,10 +107,11 @@ public class PBES2Test extends TestCase {
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256GCM));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256_DEPRECATED));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256CBC_HS512_DEPRECATED));
+		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.XC20P));
 
 		JWEDecrypter decrypter = new PasswordBasedDecrypter("secret");
 
-		assertEquals(8, decrypter.supportedEncryptionMethods().size());
+		assertEquals(9, decrypter.supportedEncryptionMethods().size());
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A192CBC_HS384));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256CBC_HS512));
@@ -117,6 +120,7 @@ public class PBES2Test extends TestCase {
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128GCM));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A192GCM));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256GCM));
+		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.XC20P));
 	}
 
 

@@ -62,6 +62,7 @@ public class ContentCryptoProvider {
 		methods.add(EncryptionMethod.A256GCM);
 		methods.add(EncryptionMethod.A128CBC_HS256_DEPRECATED);
 		methods.add(EncryptionMethod.A256CBC_HS512_DEPRECATED);
+		methods.add(EncryptionMethod.XC20P);
 		SUPPORTED_ENCRYPTION_METHODS = Collections.unmodifiableSet(methods);
 
 		Map<Integer,Set<EncryptionMethod>> encsMap = new HashMap<>();
@@ -75,6 +76,7 @@ public class ContentCryptoProvider {
 		bit256Encs.add(EncryptionMethod.A256GCM);
 		bit256Encs.add(EncryptionMethod.A128CBC_HS256);
 		bit256Encs.add(EncryptionMethod.A128CBC_HS256_DEPRECATED);
+		bit256Encs.add(EncryptionMethod.XC20P);
 		bit384Encs.add(EncryptionMethod.A192CBC_HS384);
 		bit512Encs.add(EncryptionMethod.A256CBC_HS512);
 		bit512Encs.add(EncryptionMethod.A256CBC_HS512_DEPRECATED);
@@ -205,6 +207,14 @@ public class ContentCryptoProvider {
 				jcaProvider.getContentEncryptionProvider(),
 				jcaProvider.getMACProvider());
 
+		} else if (header.getEncryptionMethod().equals(EncryptionMethod.XC20P)) {
+
+			Container<byte[]> ivContainer = new Container<>(null);
+
+			authCipherText = XC20P.encryptAuthenticated(cek, ivContainer, plainText, aad);
+
+			iv = ivContainer.get();
+
 		} else {
 
 			throw new JOSEException(AlgorithmSupportMessage.unsupportedEncryptionMethod(
@@ -296,6 +306,16 @@ public class ContentCryptoProvider {
 				authTag,
 				jcaProvider.getContentEncryptionProvider(),
 				jcaProvider.getMACProvider());
+
+		} else if (header.getEncryptionMethod().equals(EncryptionMethod.XC20P)) {
+
+			plainText = XC20P.decryptAuthenticated(
+					cek,
+					iv.decode(),
+					cipherText.decode(),
+					aad,
+					authTag.decode()
+			);
 
 		} else {
 			throw new JOSEException(AlgorithmSupportMessage.unsupportedEncryptionMethod(

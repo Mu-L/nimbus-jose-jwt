@@ -121,6 +121,14 @@ public final class EncryptionMethod extends Algorithm {
 
 
 	/**
+	 * XChaCha: eXtended-nonce ChaCha and AEAD_XChaCha20_Poly1305
+	 * (optional)
+	 */
+	public static final EncryptionMethod XC20P =
+		new EncryptionMethod("XC20P", Requirement.OPTIONAL, 256);
+
+
+	/**
 	 * Encryption method family.
 	 */
 	public static final class Family extends AlgorithmFamily<EncryptionMethod> {
@@ -251,6 +259,9 @@ public final class EncryptionMethod extends Algorithm {
 
 			return A256CBC_HS512_DEPRECATED;
 
+		} else if (s.equals(XC20P.getName())){
+
+			return XC20P;
 		} else {
 
 			return new EncryptionMethod(s);
