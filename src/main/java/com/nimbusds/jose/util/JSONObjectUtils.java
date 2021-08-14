@@ -284,7 +284,7 @@ public class JSONObjectUtils {
 		Number value = getGeneric(o, key, Number.class);
 		
 		if (value == null) {
-			throw new ParseException("JSON object member with key \"" + key + "\" is missing or null", 0);
+			throw new ParseException("JSON object member with key " + key + " is missing or null", 0);
 		}
 		
 		return value.doubleValue();
