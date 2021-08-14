@@ -292,7 +292,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			fail();
 			
 		} catch (ParseException e) {
-			assertEquals("JSON object member with key \"key\" is missing or null", e.getMessage());
+			assertEquals("JSON object member with key key is missing or null", e.getMessage());
 		}
 	}
 	
