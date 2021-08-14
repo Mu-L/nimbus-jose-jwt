@@ -132,13 +132,13 @@ public class PasswordBasedDecrypter extends PasswordBasedCryptoProvider implemen
 		}
 
 		if (header.getPBES2Salt() == null) {
-			throw new JOSEException("Missing JWE \"p2s\" header parameter");
+			throw new JOSEException("Missing JWE p2s header parameter");
 		}
 
 		final byte[] salt = header.getPBES2Salt().decode();
 
 		if (header.getPBES2Count() < 1) {
-			throw new JOSEException("Missing JWE \"p2c\" header parameter");
+			throw new JOSEException("Missing JWE p2c header parameter");
 		}
 
 		final int iterationCount = header.getPBES2Count();

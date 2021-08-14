@@ -322,7 +322,7 @@ public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWT
 			Object actualClaim = claimsSet.getClaim(exactMatch);
 			Object expectedClaim = exactMatchClaims.getClaim(exactMatch);
 			if (! actualClaim.equals(expectedClaim)) {
-				throw new BadJWTException("JWT \"" + exactMatch + "\" claim has value " + actualClaim + ", must be " + expectedClaim);
+				throw new BadJWTException("JWT " + exactMatch + " claim has value " + actualClaim + ", must be " + expectedClaim);
 			}
 		}
 		

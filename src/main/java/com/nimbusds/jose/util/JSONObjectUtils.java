@@ -164,7 +164,7 @@ public class JSONObjectUtils {
 		Object value = o.get(key);
 
 		if (! clazz.isAssignableFrom(value.getClass())) {
-			throw new ParseException("Unexpected type of JSON object member with key \"" + key + "\"", 0);
+			throw new ParseException("Unexpected type of JSON object member with key " + key + "", 0);
 		}
 
 		return (T)value;
@@ -188,7 +188,7 @@ public class JSONObjectUtils {
 		Boolean value = getGeneric(o, key, Boolean.class);
 		
 		if (value == null) {
-			throw new ParseException("JSON object member with key \"" + key + "\" is missing or null", 0);
+			throw new ParseException("JSON object member with key " + key + " is missing or null", 0);
 		}
 		
 		return value;
@@ -212,7 +212,7 @@ public class JSONObjectUtils {
 		Number value = getGeneric(o, key, Number.class);
 		
 		if (value == null) {
-			throw new ParseException("JSON object member with key \"" + key + "\" is missing or null", 0);
+			throw new ParseException("JSON object member with key " + key + " is missing or null", 0);
 		}
 		
 		return value.intValue();
@@ -236,7 +236,7 @@ public class JSONObjectUtils {
 		Number value = getGeneric(o, key, Number.class);
 		
 		if (value == null) {
-			throw new ParseException("JSON object member with key \"" + key + "\" is missing or null", 0);
+			throw new ParseException("JSON object member with key " + key + " is missing or null", 0);
 		}
 		
 		return value.longValue();
@@ -260,7 +260,7 @@ public class JSONObjectUtils {
 		Number value = getGeneric(o, key, Number.class);
 		
 		if (value == null) {
-			throw new ParseException("JSON object member with key \"" + key + "\" is missing or null", 0);
+			throw new ParseException("JSON object member with key " + key + " is missing or null", 0);
 		}
 		
 		return value.floatValue();

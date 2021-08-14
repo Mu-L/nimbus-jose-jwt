@@ -1343,3 +1343,10 @@ version 9.11.3 (2021-08-01)
 version 9.12 (2021-08-11)
     * Increases MAX_HEADER_STRING_LENGTH from 10K to 20K to accommodate larger
       JOSE x5c header parameters (iss #440).
+
+version 9.12.1 (2021-08-14)
+    * Removes double quote (") characters from ParseException, JOSEException,
+      BadJOSEException and other exception messages to make the strings
+      compliant when used in OAuth 2.0 error_description strings. See RFC 6749,
+      section 5.2.
+
