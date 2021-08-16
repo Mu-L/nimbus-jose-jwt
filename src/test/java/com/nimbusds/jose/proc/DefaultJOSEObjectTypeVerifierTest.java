@@ -51,7 +51,7 @@ public class DefaultJOSEObjectTypeVerifierTest extends TestCase {
 			verifier.verify(new JOSEObjectType("at+jwt"), null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("JOSE header \"typ\" (type) \"at+jwt\" not allowed", e.getMessage());
+			assertEquals("JOSE header typ (type) at+jwt not allowed", e.getMessage());
 		}
 	}
 	
@@ -72,7 +72,7 @@ public class DefaultJOSEObjectTypeVerifierTest extends TestCase {
 			verifier.verify(new JOSEObjectType("at+jwt"), null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("JOSE header \"typ\" (type) \"at+jwt\" not allowed", e.getMessage());
+			assertEquals("JOSE header typ (type) at+jwt not allowed", e.getMessage());
 		}
 	}
 	
@@ -90,7 +90,7 @@ public class DefaultJOSEObjectTypeVerifierTest extends TestCase {
 			verifier.verify(new JOSEObjectType("at+jwt"), null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("JOSE header \"typ\" (type) \"at+jwt\" not allowed", e.getMessage());
+			assertEquals("JOSE header typ (type) at+jwt not allowed", e.getMessage());
 		}
 	}
 	
@@ -114,7 +114,7 @@ public class DefaultJOSEObjectTypeVerifierTest extends TestCase {
 			verifier.verify(new JOSEObjectType("at+jwt"), null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("JOSE header \"typ\" (type) \"at+jwt\" not allowed", e.getMessage());
+			assertEquals("JOSE header typ (type) at+jwt not allowed", e.getMessage());
 		}
 	}
 	
@@ -134,7 +134,7 @@ public class DefaultJOSEObjectTypeVerifierTest extends TestCase {
 			verifier.verify(new JOSEObjectType("at+jwt"), null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("JOSE header \"typ\" (type) \"at+jwt\" not allowed", e.getMessage());
+			assertEquals("JOSE header typ (type) at+jwt not allowed", e.getMessage());
 		}
 	}
 	
@@ -154,7 +154,7 @@ public class DefaultJOSEObjectTypeVerifierTest extends TestCase {
 			verifier.verify(null, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("Required JOSE header \"typ\" (type) parameter is missing", e.getMessage());
+			assertEquals("Required JOSE header typ (type) parameter is missing", e.getMessage());
 		}
 	}
 	

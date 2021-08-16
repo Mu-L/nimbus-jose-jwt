@@ -614,7 +614,7 @@ public class DirectCryptoTest extends TestCase {
 			fail();
 		} catch (JOSEException e) {
 			
-			assertEquals("The \"A128CBC-HS256\" encryption method or key size is not supported by the JWE encrypter: Supported methods: [A128GCM]", e.getMessage());
+			assertEquals("The A128CBC-HS256 encryption method or key size is not supported by the JWE encrypter: Supported methods: [A128GCM]", e.getMessage());
 		}
 	}
 	

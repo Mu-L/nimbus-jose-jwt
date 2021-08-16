@@ -223,7 +223,7 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 			verifier.verify(new JWTClaimsSet.Builder().issuer("https://example.com").build(), null);
 			fail();
 		} catch (BadJWTException e) {
-			assertEquals("JWT \"iss\" claim has value https://example.com, must be https://c2id.com", e.getMessage());
+			assertEquals("JWT iss claim has value https://example.com, must be https://c2id.com", e.getMessage());
 		}
 	}
 	
@@ -268,7 +268,7 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 			verifier.verify(new JWTClaimsSet.Builder().audience("456").build(), null);
 			fail();
 		} catch (BadJWTException e) {
-			assertEquals("JWT \"aud\" claim has value [456], must be [123]", e.getMessage());
+			assertEquals("JWT aud claim has value [456], must be [123]", e.getMessage());
 		}
 	}
 	

@@ -147,7 +147,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			fail();
 			
 		} catch (ParseException e) {
-			assertEquals("JSON object member with key \"key\" is missing or null", e.getMessage());
+			assertEquals("JSON object member with key key is missing or null", e.getMessage());
 		}
 	}
 	
@@ -161,7 +161,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			fail();
 			
 		} catch (ParseException e) {
-			assertEquals("JSON object member with key \"key\" is missing or null", e.getMessage());
+			assertEquals("JSON object member with key key is missing or null", e.getMessage());
 		}
 	}
 	
@@ -176,7 +176,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			fail();
 			
 		} catch (ParseException e) {
-			assertEquals("JSON object member with key \"key\" is missing or null", e.getMessage());
+			assertEquals("JSON object member with key key is missing or null", e.getMessage());
 		}
 	}
 	
@@ -190,7 +190,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			fail();
 			
 		} catch (ParseException e) {
-			assertEquals("JSON object member with key \"key\" is missing or null", e.getMessage());
+			assertEquals("JSON object member with key key is missing or null", e.getMessage());
 		}
 	}
 	
@@ -205,7 +205,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			fail();
 			
 		} catch (ParseException e) {
-			assertEquals("Unexpected type of JSON object member with key \"key\"", e.getMessage());
+			assertEquals("Unexpected type of JSON object member with key key", e.getMessage());
 		}
 	}
 	
@@ -220,7 +220,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			fail();
 			
 		} catch (ParseException e) {
-			assertEquals("JSON object member with key \"key\" is missing or null", e.getMessage());
+			assertEquals("JSON object member with key key is missing or null", e.getMessage());
 		}
 	}
 	
@@ -234,7 +234,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			fail();
 			
 		} catch (ParseException e) {
-			assertEquals("JSON object member with key \"key\" is missing or null", e.getMessage());
+			assertEquals("JSON object member with key key is missing or null", e.getMessage());
 		}
 	}
 	
@@ -249,7 +249,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			fail();
 			
 		} catch (ParseException e) {
-			assertEquals("JSON object member with key \"key\" is missing or null", e.getMessage());
+			assertEquals("JSON object member with key key is missing or null", e.getMessage());
 		}
 	}
 	
@@ -263,7 +263,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			fail();
 			
 		} catch (ParseException e) {
-			assertEquals("JSON object member with key \"key\" is missing or null", e.getMessage());
+			assertEquals("JSON object member with key key is missing or null", e.getMessage());
 		}
 	}
 	
@@ -278,7 +278,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			fail();
 			
 		} catch (ParseException e) {
-			assertEquals("JSON object member with key \"key\" is missing or null", e.getMessage());
+			assertEquals("JSON object member with key key is missing or null", e.getMessage());
 		}
 	}
 	
@@ -292,7 +292,7 @@ public class JSONObjectUtilsTest extends TestCase {
 			fail();
 			
 		} catch (ParseException e) {
-			assertEquals("JSON object member with key \"key\" is missing or null", e.getMessage());
+			assertEquals("JSON object member with key key is missing or null", e.getMessage());
 		}
 	}
 	
