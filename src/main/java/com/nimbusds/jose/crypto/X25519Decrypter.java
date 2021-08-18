@@ -179,7 +179,7 @@ public class X25519Decrypter extends ECDHCryptoProvider implements JWEDecrypter,
 		OctetKeyPair ephemeralPublicKey = (OctetKeyPair) header.getEphemeralPublicKey();
 
 		if (ephemeralPublicKey == null) {
-			throw new JOSEException("Missing ephemeral public key \"epk\" JWE header parameter");
+			throw new JOSEException("Missing ephemeral public key epk JWE header parameter");
 		}
 
 		if (! privateKey.getCurve().equals(ephemeralPublicKey.getCurve())) {

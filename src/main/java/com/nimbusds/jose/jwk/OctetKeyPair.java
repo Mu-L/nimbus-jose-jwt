@@ -789,7 +789,7 @@ public class OctetKeyPair extends JWK implements AsymmetricJWK, CurveBasedJWK {
 		
 		// Check the key type
 		if (! KeyType.OKP.equals(JWKMetadata.parseKeyType(jsonObject))) {
-			throw new ParseException("The key type \"" + JWKParameterNames.KEY_TYPE + "\" must be " + KeyType.OKP.getValue(), 0);
+			throw new ParseException("The key type " + JWKParameterNames.KEY_TYPE + " must be " + KeyType.OKP.getValue(), 0);
 		}
 		
 		// Parse the mandatory parameters

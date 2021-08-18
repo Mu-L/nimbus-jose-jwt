@@ -593,7 +593,7 @@ public final class OctetSequenceKey extends JWK implements SecretJWK {
 		
 		// Check the key type
 		if (! KeyType.OCT.equals(JWKMetadata.parseKeyType(jsonObject))) {
-			throw new ParseException("The key type \"" + JWKParameterNames.KEY_TYPE + "\" must be " + KeyType.OCT.getValue(), 0);
+			throw new ParseException("The key type " + JWKParameterNames.KEY_TYPE + " must be " + KeyType.OCT.getValue(), 0);
 		}
 
 		// Parse the mandatory parameter

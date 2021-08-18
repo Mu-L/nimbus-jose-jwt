@@ -30,14 +30,14 @@ import com.nimbusds.jose.util.JSONObjectUtils;
  * Tests the base JOSE header class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-06-05
+ * @version 2021-08-11
  */
 public class HeaderTest extends TestCase {
 	
 	
 	public void testMaxHeaderSizeConstant() {
 		
-		assertEquals(10_000, Header.MAX_HEADER_STRING_LENGTH);
+		assertEquals(20_000, Header.MAX_HEADER_STRING_LENGTH);
 	}
 
 
