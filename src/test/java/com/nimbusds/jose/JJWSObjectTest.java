@@ -41,7 +41,7 @@ public class JJWSObjectTest extends TestCase {
 
         jwsObject.sign(new MACSigner("12345678901234567890123456789012"));
 
-        Map<String, Object> json = jwsObject.toJSONObject();
+        Map<String, Object> json = jwsObject.toJSONObject(false);
         assertEquals(jwsObject.getHeader().toBase64URL(), json.get("protected"));
         assertEquals(jwsObject.getPayload().toBase64URL(), json.get("payload"));
         assertEquals(jwsObject.getSignature(), json.get("signature"));
@@ -54,7 +54,7 @@ public class JJWSObjectTest extends TestCase {
         OctetSequenceKey jwk = new OctetSequenceKeyGenerator(256).generate();
         jwsObject.sign(new MACSigner(jwk));
 
-        String json = jwsObject.toJSONString();
+        String json = jwsObject.toString();
         assertNotNull(json);
 
         JJWSObject parsed = JJWSObject.parse(json);

@@ -71,7 +71,7 @@ public class JJWSObject extends JWSObject implements JSONSerializable {
     }
 
     @Override
-    public Map<String, Object> toJSONObject() {
+    public Map<String, Object> toJSONObject(boolean flattened) {
         ensureSignedOrVerifiedState();
 
         Map<String, Object> json = new HashMap<>();
@@ -83,8 +83,8 @@ public class JJWSObject extends JWSObject implements JSONSerializable {
     }
 
     @Override
-    public String toJSONString() {
-        return JSONObjectUtils.toJSONString(toJSONObject());
+    public String toString() {
+        return JSONObjectUtils.toJSONString(toJSONObject(true));
     }
 
     /**

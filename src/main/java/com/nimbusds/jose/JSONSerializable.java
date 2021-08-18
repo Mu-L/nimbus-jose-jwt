@@ -34,14 +34,5 @@ public interface JSONSerializable {
      *                               that permits serialisation.
      * @return The JSON object.
      */
-    Map<String, Object> toJSONObject();
-
-    /**
-     * Returns a JSON string representation of the JOSE Object.
-     *
-     * @throws IllegalStateException If the JOSE object is not in a state
-     *                               that permits serialisation.
-     * @return The JSON string.
-     */
-    String toJSONString();
+    Map<String, Object> toJSONObject(boolean flattened);
 }
