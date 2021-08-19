@@ -18,12 +18,19 @@
 package com.nimbusds.jose;
 
 
+import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
+import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
+import com.nimbusds.jose.util.JSONObjectUtils;
 import junit.framework.TestCase;
 
+import java.security.interfaces.ECPrivateKey;
+import java.util.List;
 import java.util.Map;
 
 
@@ -34,17 +41,37 @@ import java.util.Map;
  * @version 2021-08-17
  */
 public class JWSObjectJSONTest extends TestCase {
-    
-    public void testJSONObjectSerialization() throws Exception {
+
+    public void testJSONObjectSerializationGeneral() throws Exception {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.ES256K);
+        JWSObjectJSON jwsObject = new JWSObjectJSON(header, new Payload("Hello world!"));
+
+        ECPrivateKey privateKey = new ECKeyGenerator(Curve.SECP256K1).generate().toECPrivateKey();
+        jwsObject.sign(new ECDSASigner(privateKey));
+
+        Map<String, Object> json = jwsObject.toJSONObject(false);
+        Map<String, Object>[] signatures = JSONObjectUtils.getJSONObjectArray(json, "signatures");
+        assertNotNull(signatures);
+
+        // support single signature
+        assertEquals(1, signatures.length);
+
+        Map<String, Object> signature = signatures[0];
+        assertEquals(jwsObject.getHeader().toBase64URL().toString(), signature.get("protected").toString());
+        assertEquals(jwsObject.getPayload().toBase64URL().toString(), json.get("payload").toString());
+        assertEquals(jwsObject.getSignature().toString(), signature.get("signature").toString());
+    }
+
+    public void testJSONObjectSerializationFlattened() throws Exception {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
         JWSObjectJSON jwsObject = new JWSObjectJSON(header, new Payload("Hello world!"));
 
         jwsObject.sign(new MACSigner("12345678901234567890123456789012"));
 
-        Map<String, Object> json = jwsObject.toJSONObject(false);
-        assertEquals(jwsObject.getHeader().toBase64URL(), json.get("protected"));
-        assertEquals(jwsObject.getPayload().toBase64URL(), json.get("payload"));
-        assertEquals(jwsObject.getSignature(), json.get("signature"));
+        Map<String, Object> json = jwsObject.toJSONObject(true);
+        assertEquals(jwsObject.getHeader().toBase64URL().toString(), json.get("protected").toString());
+        assertEquals(jwsObject.getPayload().toBase64URL().toString(), json.get("payload").toString());
+        assertEquals(jwsObject.getSignature().toString(), json.get("signature").toString());
     }
 
     public void testJSONSerializationAndParse() throws Exception {

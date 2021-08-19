@@ -27,68 +27,56 @@ import com.nimbusds.jose.util.Base64URL;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 
 /**
- * Elliptic Curve Diffie-Hellman encrypter of
- * {@link JWEObject JWE objects} for curves using EC JWK keys.
+ * Elliptic Curve Diffie-Hellman Multi encrypter of
+ * {@link JWEObjectJSON JWE objects} for curves using EC JWK keys.
  * Expects a public EC key (with a P-256, P-384, or P-521 curve).
  *
  * <p>Public Key Authenticated Encryption for JOSE
  * <a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04">ECDH-1PU</a>
  * for more information.
  *
- * <p>For Curve25519/X25519, see {@link ECDH1PUX25519Encrypter} instead.
- *
  * <p>This class is thread-safe.
  *
  * <p>Supports the following key management algorithms:
  *
  * <ul>
- *     <li>{@link JWEAlgorithm#ECDH_1PU}
- *     <li>{@link JWEAlgorithm#ECDH_1PU_A128KW}
- *     <li>{@link JWEAlgorithm#ECDH_1PU_A192KW}
- *     <li>{@link JWEAlgorithm#ECDH_1PU_A256KW}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_ES}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_ES_A128KW}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_ES_A192KW}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_ES_A256KW}
  * </ul>
  *
  * <p>Supports the following elliptic curves:
  *
  * <ul>
- *     <li>{@link Curve#P_256}
- *     <li>{@link Curve#P_384}
- *     <li>{@link Curve#P_521}
+ *     <li>{@link com.nimbusds.jose.jwk.Curve#P_256}
+ *     <li>{@link com.nimbusds.jose.jwk.Curve#P_384}
+ *     <li>{@link com.nimbusds.jose.jwk.Curve#P_521}
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Direct key agreement mode:
+ * <p>Supports the following content encryption algorithms:
  *
  * <ul>
- *     <li>{@link EncryptionMethod#A128CBC_HS256}
- *     <li>{@link EncryptionMethod#A192CBC_HS384}
- *     <li>{@link EncryptionMethod#A256CBC_HS512}
- *     <li>{@link EncryptionMethod#A128GCM}
- *     <li>{@link EncryptionMethod#A192GCM}
- *     <li>{@link EncryptionMethod#A256GCM}
- *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
- *     <li>{@link EncryptionMethod#XC20P}
- * </ul>
- *
- * <p>Supports the following content encryption algorithms for Key wrapping mode:
- *
- * <ul>
- *     <li>{@link EncryptionMethod#A128CBC_HS256}
- *     <li>{@link EncryptionMethod#A192CBC_HS384}
- *     <li>{@link EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128GCM}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A192GCM}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256GCM}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#XC20P}
  * </ul>
  *
  * @author Alexander Martynov
- * @version 2021-08-03
+ * @version 2021-08-18
  */
 @ThreadSafe
-public class ECDHEncrypterMulti extends ECDHCryptoProvider implements JWEEncryptorMulti<ECKey> {
+public class ECDHEncrypterMulti extends ECDHCryptoProvider implements JWEEncryptorMulti {
 
     /**
      * The supported EC JWK curves by the ECDH crypto provider class.
@@ -129,33 +117,61 @@ public class ECDHEncrypterMulti extends ECDHCryptoProvider implements JWEEncrypt
                 ephemeralPublicKey(new ECKey.Builder(getCurve(), this.ephemeralKeyPair.toECPublicKey()).build()).
                 build();
 
-       return MultiCryptoProvider.encrypt(updatedHeader, recipients, clearText, this);
+       return encryptMulti(updatedHeader, clearText);
     }
 
-    @Override
-    public JWECryptoParts encrypt(JWEHeader header, ECKey key, SecretKey cek, byte[] clearText) throws JOSEException {
-        SecretKey Z = ECDH.deriveSharedSecret(
-                key.toECPublicKey(),
-                ephemeralKeyPair.toECPrivateKey(),
-                getJCAContext().getKeyEncryptionProvider()
+    private JWECryptoMultiParts encryptMulti(JWEHeader header, byte[] clearText) throws JOSEException {
+        SecretKey cek = ContentCryptoProvider.generateCEK(header.getEncryptionMethod(), getJCAContext().getSecureRandom());
+        List<Recipient> recipients = new ArrayList<>();
+        boolean encrypted = false;
+        JWECryptoParts parts = null;
+
+        for (ECKey key : this.recipients) {
+            Base64URL encryptedKey;
+            SecretKey Z = ECDH.deriveSharedSecret(
+                    key.toECPublicKey(),
+                    ephemeralKeyPair.toECPrivateKey(),
+                    getJCAContext().getKeyEncryptionProvider()
+            );
+
+            if (!encrypted) {
+                parts = encryptWithZ(header, Z, clearText, cek);
+                encryptedKey = parts.getEncryptedKey();
+                encrypted = true;
+            } else {
+                encryptedKey = deriveEncryptedKey(header, Z, cek);
+            }
+
+            if (encryptedKey != null) {
+                Recipient recipient = new Recipient
+                        .Builder()
+                        .encryptedKey(encryptedKey)
+                        .kid(key.getKeyID())
+                        .build();
+
+                recipients.add(recipient);
+            }
+        }
+
+        if (parts == null) {
+            throw new JOSEException("Content MUST be encrypted");
+        }
+
+        return new JWECryptoMultiParts(
+                parts.getHeader(),
+                Collections.unmodifiableList(recipients),
+                parts.getInitializationVector(),
+                parts.getCipherText(),
+                parts.getAuthenticationTag()
         );
-
-        return encryptWithZ(header, Z, clearText, cek);
     }
 
-    @Override
-    public Base64URL deriveEncryptedKey(JWEHeader header, JWECryptoParts parts, ECKey key, SecretKey cek) throws JOSEException {
+    private Base64URL deriveEncryptedKey(JWEHeader header, SecretKey sharedSecret, SecretKey cek) throws JOSEException {
         final JWEAlgorithm alg = header.getAlgorithm();
         final ECDH.AlgorithmMode algMode = ECDH.resolveAlgorithmMode(alg);
 
-        final SecretKey Z = ECDH.deriveSharedSecret(
-                key.toECPublicKey(),
-                ephemeralKeyPair.toECPrivateKey(),
-                getJCAContext().getKeyEncryptionProvider()
-        );
-
         if (algMode.equals(ECDH.AlgorithmMode.KW)) {
-            SecretKey sharedKey = ECDH.deriveSharedKey(header, Z, getConcatKDF());
+            SecretKey sharedKey = ECDH.deriveSharedKey(header, sharedSecret, getConcatKDF());
             return Base64URL.encode(AESKW.wrapCEK(cek, sharedKey, getJCAContext().getKeyEncryptionProvider()));
         }
 

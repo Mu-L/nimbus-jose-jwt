@@ -33,14 +33,12 @@ import java.util.Set;
 
 
 /**
- * Elliptic Curve Diffie-Hellman decrypter of
- * {@link com.nimbusds.jose.JWEObject JWE objects} for curves using EC JWK
+ * Elliptic Curve Diffie-Hellman Multi decrypter of
+ * {@link com.nimbusds.jose.JWEObjectJSON JWE objects} for curves using EC JWK
  * Expects a private {@link OctetKeyPair} key with {@code "crv"} X25519.
  *
  * <p>See <a href="https://tools.ietf.org/html/rfc8037">RFC 8037</a>
  * for more information.
- *
- * <p>See also {@link ECDH1PUDecrypter} for ECDH on other curves.
  *
  * <p>Public Key Authenticated Encryption for JOSE
  * <a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04">ECDH-1PU</a>
@@ -86,10 +84,10 @@ import java.util.Set;
  * </ul>
  *
  * @author Alexander Martynov
- * @version 2021-08-03
+ * @version 2021-08-18
  */
 @ThreadSafe
-public class ECDH1PUX25519DecrypterMulti extends ECDH1PUCryptoProvider implements JWEDecrypterMulti<OctetKeyPair>, CriticalHeaderParamsAware {
+public class ECDH1PUX25519DecrypterMulti extends ECDH1PUCryptoProvider implements JWEDecrypterMulti, CriticalHeaderParamsAware {
 
 
     /**
@@ -160,17 +158,51 @@ public class ECDH1PUX25519DecrypterMulti extends ECDH1PUCryptoProvider implement
 
         critPolicy.ensureHeaderPasses(header);
 
-        return MultiCryptoProvider.decrypt(header, this.recipients, recipients, iv, cipherText, authTag, this);
+        return decryptMulti(header, recipients, iv, cipherText, authTag);
     }
 
-    @Override
-    public byte[] decrypt(JWEHeader header, OctetKeyPair key, Recipient recipient, Base64URL iv, Base64URL cipherText, Base64URL authTag) throws JOSEException {
+    private byte[] decryptMulti(
+            final JWEHeader header,
+            final List<Recipient> recipients,
+            final Base64URL iv,
+            final Base64URL cipherText,
+            final Base64URL authTag
+    ) throws JOSEException {
+        byte[] result = null;
+
+        for (OctetKeyPair recipientKey : this.recipients) {
+            Recipient recipient = null;
+
+            String kid = recipientKey.getKeyID();
+            if (kid == null)
+                throw new JOSEException("\"kid\" header should be specified");
+
+            for (Recipient rec : recipients) {
+                if (kid.equals(rec.getHeader().get("kid"))) {
+                    recipient = rec;
+                }
+            }
+
+            if (recipient == null)
+                throw new JOSEException("Recipient not found");
+
+            result = decrypt(header, recipientKey, recipient, iv, cipherText, authTag);
+        }
+
+        return result;
+    }
+
+    private byte[] decrypt(JWEHeader header, OctetKeyPair key, Recipient recipient, Base64URL iv, Base64URL cipherText, Base64URL authTag) throws JOSEException {
         // Get ephemeral EC key
         OctetKeyPair ephemeralKey = (OctetKeyPair) header.getEphemeralPublicKey();
 
+        ECDH1PU.validateSameCurve(key, key.toPublicJWK());
+
         if (ephemeralKey == null) {
-            throw new JOSEException("Missing ephemeral public EC key \"epk\" JWE header parameter");
+            throw new JOSEException("Missing ephemeral public key epk JWE header parameter");
         }
+
+        ECDH1PU.validateSameCurve(key, ephemeralKey.toPublicJWK());
 
         SecretKey Ze = ECDH.deriveSharedSecret(
                 ephemeralKey.toPublicJWK(),

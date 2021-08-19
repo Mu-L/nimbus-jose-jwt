@@ -33,62 +33,50 @@ import java.util.Set;
 
 
 /**
- * Elliptic Curve Diffie-Hellman decrypter of
- * {@link JWEObject JWE objects} for curves using EC JWK
+ * Elliptic Curve Diffie-Hellman Multi decrypter of
+ * {@link JWEObjectJSON JWE objects} for curves using EC JWK
  * keys. Expects a private EC key (with a P-256, P-384 or P-521 curve).
  *
  * <p>Public Key Authenticated Encryption for JOSE
  * <a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04">ECDH-1PU</a>
  * for more information.
  *
- * <p>For Curve25519/X25519, see {@link ECDH1PUX25519Decrypter} instead.
- *
  * <p>This class is thread-safe.
  *
  * <p>Supports the following key management algorithms:
  *
  * <ul>
- *     <li>{@link JWEAlgorithm#ECDH_1PU}
- *     <li>{@link JWEAlgorithm#ECDH_1PU_A128KW}
- *     <li>{@link JWEAlgorithm#ECDH_1PU_A192KW}
- *     <li>{@link JWEAlgorithm#ECDH_1PU_A256KW}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_ES}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_ES_A128KW}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_ES_A192KW}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_ES_A256KW}
  * </ul>
  *
- * <p>Supports the following elliptic curves:
+ * <p>Supports the following elliptic curve:
  *
  * <ul>
- *     <li>{@link Curve#P_256}
- *     <li>{@link Curve#P_384}
- *     <li>{@link Curve#P_521}
+ *     <li>{@link com.nimbusds.jose.jwk.Curve#X25519} (Curve25519)
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Direct key agreement mode:
+ * <p>Supports the following content encryption algorithms:
  *
  * <ul>
- *     <li>{@link EncryptionMethod#A128CBC_HS256}
- *     <li>{@link EncryptionMethod#A192CBC_HS384}
- *     <li>{@link EncryptionMethod#A256CBC_HS512}
- *     <li>{@link EncryptionMethod#A128GCM}
- *     <li>{@link EncryptionMethod#A192GCM}
- *     <li>{@link EncryptionMethod#A256GCM}
- *     <li>{@link EncryptionMethod#A128CBC_HS256_DEPRECATED}
- *     <li>{@link EncryptionMethod#A256CBC_HS512_DEPRECATED}
- *     <li>{@link EncryptionMethod#XC20P}
- * </ul>
- *
- * <p>Supports the following content encryption algorithms for Key wrapping mode:
- *
- * <ul>
- *     <li>{@link EncryptionMethod#A128CBC_HS256}
- *     <li>{@link EncryptionMethod#A192CBC_HS384}
- *     <li>{@link EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A192CBC_HS384}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128GCM}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A192GCM}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256GCM}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#XC20P}
  * </ul>
  *
  * @author Alexander Martynov
- * @version 2021-08-03
+ * @version 2021-08-18
  */
 @ThreadSafe
-public class X25519DecrypterMulti extends ECDHCryptoProvider implements JWEDecrypterMulti<OctetKeyPair>, CriticalHeaderParamsAware {
+public class X25519DecrypterMulti extends ECDHCryptoProvider implements JWEDecrypterMulti, CriticalHeaderParamsAware {
 
 
     /**
@@ -156,16 +144,50 @@ public class X25519DecrypterMulti extends ECDHCryptoProvider implements JWEDecry
 
         critPolicy.ensureHeaderPasses(header);
 
-        return MultiCryptoProvider.decrypt(header, this.recipients, recipients, iv, cipherText, authTag, this);
+        return decryptMulti(header, recipients, iv, cipherText, authTag);
     }
 
-    @Override
-    public byte[] decrypt(JWEHeader header, OctetKeyPair key, Recipient recipient, Base64URL iv, Base64URL cipherText, Base64URL authTag) throws JOSEException {
+    private byte[] decryptMulti(
+            final JWEHeader header,
+            final List<Recipient> recipients,
+            final Base64URL iv,
+            final Base64URL cipherText,
+            final Base64URL authTag
+    ) throws JOSEException {
+        byte[] result = null;
+
+        for (OctetKeyPair recipientKey : this.recipients) {
+            Recipient recipient = null;
+
+            String kid = recipientKey.getKeyID();
+            if (kid == null)
+                throw new JOSEException("\"kid\" header should be specified");
+
+            for (Recipient rec : recipients) {
+                if (kid.equals(rec.getHeader().get("kid"))) {
+                    recipient = rec;
+                }
+            }
+
+            if (recipient == null)
+                throw new JOSEException("Recipient not found");
+
+            result = decrypt(header, recipientKey, recipient, iv, cipherText, authTag);
+        }
+
+        return result;
+    }
+
+    private byte[] decrypt(JWEHeader header, OctetKeyPair key, Recipient recipient, Base64URL iv, Base64URL cipherText, Base64URL authTag) throws JOSEException {
         // Get ephemeral EC key
         OctetKeyPair ephemeralKey = (OctetKeyPair) header.getEphemeralPublicKey();
 
         if (ephemeralKey == null) {
-            throw new JOSEException("Missing ephemeral public EC key \"epk\" JWE header parameter");
+            throw new JOSEException("Missing ephemeral public key epk JWE header parameter");
+        }
+
+        if (!key.getCurve().equals(ephemeralKey.getCurve())) {
+            throw new JOSEException("Curve of ephemeral public key does not match curve of private key");
         }
 
         SecretKey Z = ECDH.deriveSharedSecret(

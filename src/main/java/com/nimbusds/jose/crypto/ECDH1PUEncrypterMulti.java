@@ -32,15 +32,13 @@ import java.util.*;
 
 
 /**
- * Elliptic Curve Diffie-Hellman encrypter of
- * {@link com.nimbusds.jose.JWEObject JWE objects} for curves using EC JWK keys.
+ * Elliptic Curve Diffie-Hellman Multiple encrypter of
+ * {@link com.nimbusds.jose.JWEObjectJSON JWE objects} for curves using EC JWK keys.
  * Expects a public EC key (with a P-256, P-384, or P-521 curve).
  *
  * <p>Public Key Authenticated Encryption for JOSE
  * <a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04">ECDH-1PU</a>
  * for more information.
- *
- * <p>For Curve25519/X25519, see {@link ECDH1PUX25519Encrypter} instead.
  *
  * <p>This class is thread-safe.
  *
@@ -82,12 +80,11 @@ import java.util.*;
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A192CBC_HS384}
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512}
  * </ul>
- *
  * @author Alexander Martynov
- * @version 2021-08-03
+ * @version 2021-08-18
  */
 @ThreadSafe
-public class ECDH1PUEncrypterMulti extends ECDH1PUCryptoProvider implements JWEEncryptorMulti<ECKey> {
+public class ECDH1PUEncrypterMulti extends ECDH1PUCryptoProvider implements JWEEncryptorMulti {
 
     /**
      * The supported EC JWK curves by the ECDH crypto provider class.
@@ -131,27 +128,49 @@ public class ECDH1PUEncrypterMulti extends ECDH1PUCryptoProvider implements JWEE
                 ephemeralPublicKey(new ECKey.Builder(getCurve(), this.ephemeralKeyPair.toECPublicKey()).build()).
                 build();
 
-       return MultiCryptoProvider.encrypt(updatedHeader, recipients, clearText, this);
+       return encryptMulti(updatedHeader, clearText);
     }
 
-    @Override
-    public JWECryptoParts encrypt(JWEHeader header, ECKey key, SecretKey cek, byte[] clearText) throws JOSEException {
-        SecretKey Z = deriveZ(key.toECPublicKey());
-        return encryptWithZ(header, Z, clearText, cek);
-    }
+    private JWECryptoMultiParts encryptMulti(JWEHeader header, byte[] clearText) throws JOSEException {
+        SecretKey cek = ContentCryptoProvider.generateCEK(header.getEncryptionMethod(), getJCAContext().getSecureRandom());
+        List<Recipient> recipients = new ArrayList<>();
+        boolean encrypted = false;
+        JWECryptoParts parts = null;
 
-    @Override
-    public Base64URL deriveEncryptedKey(JWEHeader header, JWECryptoParts parts, ECKey key, SecretKey cek) throws JOSEException {
-        final JWEAlgorithm alg = header.getAlgorithm();
-        final ECDH.AlgorithmMode algMode = ECDH1PU.resolveAlgorithmMode(alg);
-        final SecretKey Z = deriveZ(key.toECPublicKey());
+        for (ECKey key : this.recipients) {
+            Base64URL encryptedKey;
+            SecretKey Z = deriveZ(key.toECPublicKey());
 
-        if (algMode.equals(ECDH.AlgorithmMode.KW)) {
-            SecretKey sharedKey = ECDH1PU.deriveSharedKey(header, Z, parts.getAuthenticationTag(), getConcatKDF());
-            return Base64URL.encode(AESKW.wrapCEK(cek, sharedKey, getJCAContext().getKeyEncryptionProvider()));
+            if (!encrypted) {
+                parts = encryptWithZ(header, Z, clearText, cek);
+                encryptedKey = parts.getEncryptedKey();
+                encrypted = true;
+            } else {
+                encryptedKey = deriveEncryptedKey(header, parts, Z, cek);
+            }
+
+            if (encryptedKey != null) {
+                Recipient recipient = new Recipient
+                        .Builder()
+                        .encryptedKey(encryptedKey)
+                        .kid(key.getKeyID())
+                        .build();
+
+                recipients.add(recipient);
+            }
         }
 
-        return null;
+        if (parts == null) {
+            throw new JOSEException("Content MUST be encrypted");
+        }
+
+        return new JWECryptoMultiParts(
+                parts.getHeader(),
+                Collections.unmodifiableList(recipients),
+                parts.getInitializationVector(),
+                parts.getCipherText(),
+                parts.getAuthenticationTag()
+        );
     }
 
     private SecretKey deriveZ(ECPublicKey publicKey) throws JOSEException {
@@ -166,5 +185,17 @@ public class ECDH1PUEncrypterMulti extends ECDH1PUCryptoProvider implements JWEE
                 getJCAContext().getKeyEncryptionProvider());
 
         return ECDH1PU.deriveZ(Ze, Zs);
+    }
+
+    private Base64URL deriveEncryptedKey(JWEHeader header, JWECryptoParts parts, SecretKey sharedSecret, SecretKey cek) throws JOSEException {
+        final JWEAlgorithm alg = header.getAlgorithm();
+        final ECDH.AlgorithmMode algMode = ECDH1PU.resolveAlgorithmMode(alg);
+
+        if (algMode.equals(ECDH.AlgorithmMode.KW)) {
+            SecretKey sharedKey = ECDH1PU.deriveSharedKey(header, sharedSecret, parts.getAuthenticationTag(), getConcatKDF());
+            return Base64URL.encode(AESKW.wrapCEK(cek, sharedKey, getJCAContext().getKeyEncryptionProvider()));
+        }
+
+        return null;
     }
 }
