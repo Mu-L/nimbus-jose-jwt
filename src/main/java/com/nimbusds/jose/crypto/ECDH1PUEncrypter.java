@@ -124,12 +124,6 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
     private final ECPrivateKey privateKey;
 
     /**
-     * The externally supplied ephemeral EC key pair to use,
-     * {@code null} to generate a ephemeral pair for each JWE.
-     */
-    private final KeyPair ephemeralKeyPair;
-
-    /**
      * The externally supplied AES content encryption key (CEK) to use,
      * {@code null} to generate a CEK for each JWE.
      */
@@ -147,7 +141,7 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
     public ECDH1PUEncrypter(final ECPrivateKey privateKey, final ECPublicKey publicKey)
         throws JOSEException {
 
-        this(privateKey, publicKey, null, null);
+        this(privateKey, publicKey, null);
     }
 
 
@@ -156,50 +150,21 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
      * optionally specified content encryption key (CEK).
      *
      * @param privateKey            The private EC key. Must not be
-     *                              {@code null}.
+     *               			   {@code null}.
      *
-     * @param publicKey             The public EC key. Must not be
-     *                              {@code null}.
-     * @param contentEncryptionKey  The content encryption key (CEK) to use.
-     *                              If specified its algorithm must be "AES"
-     *                              and its length must match the expected
-     *                              for the JWE encryption method ("enc").
-     *                              If {@code null} a CEK will be generated
-     *                              for each JWE.
-     * @throws JOSEException        If the elliptic curve is not supported.
+     * @param publicKey            The public EC key. Must not be
+     *                             {@code null}.
+     * @param contentEncryptionKey The content encryption key (CEK) to use.
+     *                             If specified its algorithm must be "AES"
+     *                             and its length must match the expected
+     *                             for the JWE encryption method ("enc").
+     *                             If {@code null} a CEK will be generated
+     *                             for each JWE.
+     * @throws JOSEException       If the elliptic curve is not supported.
      */
     public ECDH1PUEncrypter(final ECPrivateKey privateKey,
                             final ECPublicKey publicKey,
                             final SecretKey contentEncryptionKey)
-            throws JOSEException {
-
-        this(privateKey, publicKey, contentEncryptionKey, null);
-    }
-
-    /**
-     * Creates a new Elliptic Curve Diffie-Hellman encrypter with an
-     * optionally specified content encryption key (CEK).
-     *
-     * @param privateKey            The private EC key. Must not be
-     *                              {@code null}.
-     *
-     * @param publicKey             The public EC key. Must not be
-     *                              {@code null}.
-     * @param contentEncryptionKey  The content encryption key (CEK) to use.
-     *                              If specified its algorithm must be "AES"
-     *                              and its length must match the expected
-     *                              for the JWE encryption method ("enc").
-     *                              If {@code null} a CEK will be generated
-     *                              for each JWE.
-     * @param ephemeralKeyPair      The externally supplied ephemeral EC
-     *                              key pair to use, {@code null} to generate
-     *                              a ephemeral pair for each JWE.
-     * @throws JOSEException        If the elliptic curve is not supported.
-     */
-    public ECDH1PUEncrypter(final ECPrivateKey privateKey,
-                            final ECPublicKey publicKey,
-                            final SecretKey contentEncryptionKey,
-                            final KeyPair ephemeralKeyPair)
             throws JOSEException {
 
         super(Curve.forECParameterSpec(publicKey.getParams()));
@@ -211,7 +176,6 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
             throw new IllegalArgumentException("The algorithm of the content encryption key (CEK) must be AES");
 
         this.contentEncryptionKey = contentEncryptionKey;
-        this.ephemeralKeyPair = ephemeralKeyPair;
     }
 
 
@@ -250,15 +214,8 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
 
         ECDH1PU.validateSameCurve(privateKey, publicKey);
 
-        final KeyPair ephemeralKeyPair;
-
-        if (this.ephemeralKeyPair != null) {
-            ephemeralKeyPair = this.ephemeralKeyPair;
-        } else {
-            // Generate ephemeral EC key pair on the same curve as the consumer's public key
-            ephemeralKeyPair = generateEphemeralKeyPair(publicKey.getParams());
-        }
-
+        // Generate ephemeral EC key pair on the same curve as the consumer's public key
+        KeyPair ephemeralKeyPair = generateEphemeralKeyPair(publicKey.getParams());
         ECPublicKey ephemeralPublicKey = (ECPublicKey)ephemeralKeyPair.getPublic();
         ECPrivateKey ephemeralPrivateKey = (ECPrivateKey)ephemeralKeyPair.getPrivate();
 

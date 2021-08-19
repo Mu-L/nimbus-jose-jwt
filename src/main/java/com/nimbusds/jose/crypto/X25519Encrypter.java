@@ -18,16 +18,18 @@
 package com.nimbusds.jose.crypto;
 
 
+import java.security.*;
 import java.util.Collections;
 import java.util.Set;
 import javax.crypto.SecretKey;
 
+import com.google.crypto.tink.subtle.X25519;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.impl.ECDH;
 import com.nimbusds.jose.crypto.impl.ECDHCryptoProvider;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.OctetKeyPair;
-import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
+import com.nimbusds.jose.util.Base64URL;
 import net.jcip.annotations.ThreadSafe;
 
 
@@ -84,17 +86,6 @@ public class X25519Encrypter extends ECDHCryptoProvider implements JWEEncrypter 
 	 */
 	private final OctetKeyPair publicKey;
 
-	/**
-	 * The externally supplied ephemeral EC key pair to use,
-	 * {@code null} to generate a ephemeral pair for each JWE.
-	 */
-	private final OctetKeyPair ephemeralKeyPair;
-
-	/**
-	 * The externally supplied AES content encryption key (CEK) to use,
-	 * {@code null} to generate a CEK for each JWE.
-	 */
-	private final SecretKey contentEncryptionKey;
 
 	/**
 	 * Creates a new Curve25519 Elliptic Curve Diffie-Hellman encrypter.
@@ -103,27 +94,7 @@ public class X25519Encrypter extends ECDHCryptoProvider implements JWEEncrypter 
 	 *
 	 * @throws JOSEException If the key subtype is not supported.
 	 */
-	public X25519Encrypter(final OctetKeyPair publicKey) throws JOSEException {
-		this(publicKey, null, null);
-	}
-
-	/**
-	 * Creates a new Curve25519 Elliptic Curve Diffie-Hellman encrypter.
-	 *
-	 * @param publicKey            The public key. Must not be {@code null}.
-	 * @param contentEncryptionKey The content encryption key (CEK) to use.
-	 *                             If specified its algorithm must be "AES"
-	 *                             and its length must match the expected
-	 *                             for the JWE encryption method ("enc").
-	 *                             If {@code null} a CEK will be generated
-	 *                             for each JWE.
-	 * @param ephemeralKeyPair     The externally supplied ephemeral Octet
-	 *                             key pair to use, {@code null} to generate
-	 *                             a ephemeral pair for each JWE.
-	 *
-	 * @throws JOSEException If the key subtype is not supported.
-	 */
-	public X25519Encrypter(final OctetKeyPair publicKey, final SecretKey contentEncryptionKey, final OctetKeyPair ephemeralKeyPair)
+	public X25519Encrypter(final OctetKeyPair publicKey)
 		throws JOSEException {
 
 		super(publicKey.getCurve());
@@ -137,8 +108,6 @@ public class X25519Encrypter extends ECDHCryptoProvider implements JWEEncrypter 
 		}
 
 		this.publicKey = publicKey;
-		this.contentEncryptionKey = contentEncryptionKey;
-		this.ephemeralKeyPair = ephemeralKeyPair;
 	}
 
 
@@ -164,14 +133,21 @@ public class X25519Encrypter extends ECDHCryptoProvider implements JWEEncrypter 
 	public JWECryptoParts encrypt(final JWEHeader header, final byte[] clearText)
 		throws JOSEException {
 
-		final OctetKeyPair ephemeralPrivateKey;
+		// Generate ephemeral X25519 key pair
+		final byte[] ephemeralPrivateKeyBytes = X25519.generatePrivateKey();
+		final byte[] ephemeralPublicKeyBytes;
+		try {
+			ephemeralPublicKeyBytes = X25519.publicFromPrivate(ephemeralPrivateKeyBytes);
 
-		if (this.ephemeralKeyPair != null) {
-			ephemeralPrivateKey = this.ephemeralKeyPair;
-		} else  {
-			ephemeralPrivateKey = new OctetKeyPairGenerator(getCurve()).generate();
+		} catch (InvalidKeyException e) {
+			// Should never happen since we just generated this private key
+			throw new JOSEException(e.getMessage(), e);
 		}
 
+		final OctetKeyPair ephemeralPrivateKey =
+			new OctetKeyPair.Builder(getCurve(), Base64URL.encode(ephemeralPublicKeyBytes)).
+			d(Base64URL.encode(ephemeralPrivateKeyBytes)).
+			build();
 		final OctetKeyPair ephemeralPublicKey = ephemeralPrivateKey.toPublicJWK();
 
 		// Add the ephemeral public EC key to the header
@@ -182,6 +158,6 @@ public class X25519Encrypter extends ECDHCryptoProvider implements JWEEncrypter 
 		// Derive 'Z'
 		SecretKey Z = ECDH.deriveSharedSecret(publicKey, ephemeralPrivateKey);
 
-		return encryptWithZ(updatedHeader, Z, clearText, contentEncryptionKey);
+		return encryptWithZ(updatedHeader, Z, clearText);
 	}
 }

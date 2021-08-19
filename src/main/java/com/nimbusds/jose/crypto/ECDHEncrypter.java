@@ -124,12 +124,6 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
 	private final SecretKey contentEncryptionKey;
 
 	/**
-	 * The externally supplied ephemeral EC key pair to use,
-	 * {@code null} to generate a ephemeral pair for each JWE.
-	 */
-	private final KeyPair ephemeralKeyPair;
-
-	/**
 	 * Creates a new Elliptic Curve Diffie-Hellman encrypter.
 	 *
 	 * @param publicKey The public EC key. Must not be {@code null}.
@@ -139,7 +133,7 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
 	public ECDHEncrypter(final ECPublicKey publicKey)
 		throws JOSEException {
 
-		this(publicKey, null, null);
+		this(publicKey, null);
 	}
 
 
@@ -157,9 +151,8 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
 
 		publicKey = ecJWK.toECPublicKey();
 		contentEncryptionKey = null;
-		ephemeralKeyPair = null;
 	}
-
+	
 	/**
 	 * Creates a new Elliptic Curve Diffie-Hellman encrypter with an
 	 * optionally specified content encryption key (CEK).
@@ -175,29 +168,6 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
 	 * @throws JOSEException       If the elliptic curve is not supported.
 	 */
 	public ECDHEncrypter(final ECPublicKey publicKey, final SecretKey contentEncryptionKey)
-			throws JOSEException {
-
-		this(publicKey, contentEncryptionKey, null);
-	}
-
-	/**
-	 * Creates a new Elliptic Curve Diffie-Hellman encrypter with an
-	 * optionally specified content encryption key (CEK).
-	 *
-	 * @param publicKey            The public EC key. Must not be
-	 *                             {@code null}.
-	 * @param contentEncryptionKey The content encryption key (CEK) to use.
-	 *                             If specified its algorithm must be "AES"
-	 *                             and its length must match the expected
-	 *                             for the JWE encryption method ("enc").
-	 *                             If {@code null} a CEK will be generated
-	 *                             for each JWE.
-	 * @param ephemeralKeyPair     The externally supplied ephemeral EC
-	 *                             key pair to use, {@code null} to generate
-	 *                             a ephemeral pair for each JWE.
-	 * @throws JOSEException       If the elliptic curve is not supported.
-	 */
-	public ECDHEncrypter(final ECPublicKey publicKey, final SecretKey contentEncryptionKey, final KeyPair ephemeralKeyPair)
 		throws JOSEException {
 		
 		super(Curve.forECParameterSpec(publicKey.getParams()));
@@ -213,8 +183,6 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
 		} else {
 			this.contentEncryptionKey = null;
 		}
-
-		this.ephemeralKeyPair = ephemeralKeyPair;
 	}
 
 
@@ -240,15 +208,8 @@ public class ECDHEncrypter extends ECDHCryptoProvider implements JWEEncrypter {
 	public JWECryptoParts encrypt(final JWEHeader header, final byte[] clearText)
 		throws JOSEException {
 
-		final KeyPair ephemeralKeyPair;
-
-		if (this.ephemeralKeyPair != null) {
-			ephemeralKeyPair = this.ephemeralKeyPair;
-		} else {
-			// Generate ephemeral EC key pair on the same curve as the consumer's public key
-			ephemeralKeyPair = generateEphemeralKeyPair(publicKey.getParams());
-		}
-
+		// Generate ephemeral EC key pair on the same curve as the consumer's public key
+		KeyPair ephemeralKeyPair = generateEphemeralKeyPair(publicKey.getParams());
 		ECPublicKey ephemeralPublicKey = (ECPublicKey)ephemeralKeyPair.getPublic();
 		ECPrivateKey ephemeralPrivateKey = (ECPrivateKey)ephemeralKeyPair.getPrivate();
 
