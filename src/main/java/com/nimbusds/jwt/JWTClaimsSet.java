@@ -491,7 +491,7 @@ public final class JWTClaimsSet implements Serializable {
 		if (value == null || value instanceof String) {
 			return (String)value;
 		} else {
-			throw new ParseException("The \"" + name + "\" claim is not a String", 0);
+			throw new ParseException("The " + name + " claim is not a String", 0);
 		}
 	}
 
@@ -522,7 +522,7 @@ public final class JWTClaimsSet implements Serializable {
 			list = (List<?>)getClaim(name);
 
 		} catch (ClassCastException e) {
-			throw new ParseException("The \"" + name + "\" claim is not a list / JSON array", 0);
+			throw new ParseException("The " + name + " claim is not a list / JSON array", 0);
 		}
 
 		String[] stringArray = new String[list.size()];
@@ -532,7 +532,7 @@ public final class JWTClaimsSet implements Serializable {
 			try {
 				stringArray[i] = (String)list.get(i);
 			} catch (ClassCastException e) {
-				throw new ParseException("The \"" + name + "\" claim is not a list / JSON array of strings", 0);
+				throw new ParseException("The " + name + " claim is not a list / JSON array of strings", 0);
 			}
 		}
 

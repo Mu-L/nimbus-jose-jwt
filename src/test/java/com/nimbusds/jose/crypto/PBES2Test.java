@@ -274,7 +274,7 @@ public class PBES2Test extends TestCase {
 			jweObject.decrypt(decrypter);
 			fail();
 		} catch (JOSEException e) {
-			assertEquals("Missing JWE \"p2c\" header parameter", e.getMessage());
+			assertEquals("Missing JWE p2c header parameter", e.getMessage());
 		}
 	}
 }
