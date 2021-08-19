@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.nimbusds.jose.jwk.JWK;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 
