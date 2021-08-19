@@ -59,6 +59,7 @@ import net.jcip.annotations.ThreadSafe;
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256GCM} (requires 256 bit key)
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED} (requires 256 bit key)
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED} (requires 512 bit key)
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#XC20P} (requires 256 bit key)
  * </ul>
  *
  * <p>Also supports a promiscuous mode to decrypt any JWE by passing the

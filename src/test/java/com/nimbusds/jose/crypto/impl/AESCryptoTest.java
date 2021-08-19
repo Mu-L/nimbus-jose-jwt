@@ -49,7 +49,7 @@ public class AESCryptoTest extends TestCase {
 
 	public void testClassEncryptionMethodSupport() {
 
-		assertEquals(8, AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS.size());
+		assertEquals(9, AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS.size());
 
 		assertTrue(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A192CBC_HS384));
@@ -59,5 +59,6 @@ public class AESCryptoTest extends TestCase {
 		assertTrue(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256GCM));
 		assertTrue(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256_DEPRECATED));
 		assertTrue(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256CBC_HS512_DEPRECATED));
+		assertTrue(AESCryptoProvider.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.XC20P));
 	}
 }
