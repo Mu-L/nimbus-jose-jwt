@@ -360,7 +360,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
         ensureJWEEncrypterSupport(encrypter);
 
-        JWECryptoMultiParts parts;
+        JWECryptoParts parts;
 
         try {
             parts = encrypter.encrypt(getHeader(), getPayload().toBytes());

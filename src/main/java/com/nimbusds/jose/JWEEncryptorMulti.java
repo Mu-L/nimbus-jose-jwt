@@ -41,6 +41,6 @@ public interface JWEEncryptorMulti extends JWEProvider {
      *                       supported or if encryption failed for some
      *                       other internal reason.
      */
-    JWECryptoMultiParts encrypt(final JWEHeader header, final byte[] clearText)
+    JWECryptoParts encrypt(final JWEHeader header, final byte[] clearText)
             throws JOSEException;
 }

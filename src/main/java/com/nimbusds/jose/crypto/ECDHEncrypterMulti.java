@@ -23,10 +23,11 @@ import com.nimbusds.jose.crypto.impl.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
-import com.nimbusds.jose.util.Base64URL;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.util.*;
 
 
@@ -93,7 +94,6 @@ public class ECDHEncrypterMulti extends ECDHCryptoProvider implements JWEEncrypt
     }
 
     private final ECKey[] recipients;
-    private ECKey ephemeralKeyPair;
 
     public ECDHEncrypterMulti(final ECKey[] recipients)
         throws JOSEException {
@@ -109,72 +109,30 @@ public class ECDHEncrypterMulti extends ECDHCryptoProvider implements JWEEncrypt
     }
 
     @Override
-    public JWECryptoMultiParts encrypt(JWEHeader header, byte[] clearText) throws JOSEException {
-        this.ephemeralKeyPair = new ECKeyGenerator(getCurve()).generate();
+    public JWECryptoParts encrypt(JWEHeader header, byte[] clearText) throws JOSEException {
+        // Generate ephemeral EC key pair on the same curve as the consumer's public key
+        ECKey ephemeralKeyPair = new ECKeyGenerator(getCurve()).generate();
+        ECPublicKey ephemeralPublicKey = ephemeralKeyPair.toECPublicKey();
+        ECPrivateKey ephemeralPrivateKey = ephemeralKeyPair.toECPrivateKey();
 
         // Add the ephemeral public EC key to the header
         JWEHeader updatedHeader = new JWEHeader.Builder(header).
-                ephemeralPublicKey(new ECKey.Builder(getCurve(), this.ephemeralKeyPair.toECPublicKey()).build()).
+                ephemeralPublicKey(new ECKey.Builder(getCurve(), ephemeralPublicKey).build()).
                 build();
 
-       return encryptMulti(updatedHeader, clearText);
-    }
+        Map<String, SecretKey> sharedKeys = new HashMap<>();
 
-    private JWECryptoMultiParts encryptMulti(JWEHeader header, byte[] clearText) throws JOSEException {
-        SecretKey cek = ContentCryptoProvider.generateCEK(header.getEncryptionMethod(), getJCAContext().getSecureRandom());
-        List<Recipient> recipients = new ArrayList<>();
-        boolean encrypted = false;
-        JWECryptoParts parts = null;
-
-        for (ECKey key : this.recipients) {
-            Base64URL encryptedKey;
+        for (ECKey recipient : recipients) {
             SecretKey Z = ECDH.deriveSharedSecret(
-                    key.toECPublicKey(),
-                    ephemeralKeyPair.toECPrivateKey(),
+                    recipient.toECPublicKey(),
+                    ephemeralPrivateKey,
                     getJCAContext().getKeyEncryptionProvider()
             );
 
-            if (!encrypted) {
-                parts = encryptWithZ(header, Z, clearText, cek);
-                encryptedKey = parts.getEncryptedKey();
-                encrypted = true;
-            } else {
-                encryptedKey = deriveEncryptedKey(header, Z, cek);
-            }
-
-            if (encryptedKey != null) {
-                Recipient recipient = new Recipient
-                        .Builder()
-                        .encryptedKey(encryptedKey)
-                        .kid(key.getKeyID())
-                        .build();
-
-                recipients.add(recipient);
-            }
+            sharedKeys.put(recipient.getKeyID(), Z);
         }
 
-        if (parts == null) {
-            throw new JOSEException("Content MUST be encrypted");
-        }
-
-        return new JWECryptoMultiParts(
-                parts.getHeader(),
-                Collections.unmodifiableList(recipients),
-                parts.getInitializationVector(),
-                parts.getCipherText(),
-                parts.getAuthenticationTag()
-        );
+        return encryptMulti(updatedHeader, sharedKeys, clearText);
     }
 
-    private Base64URL deriveEncryptedKey(JWEHeader header, SecretKey sharedSecret, SecretKey cek) throws JOSEException {
-        final JWEAlgorithm alg = header.getAlgorithm();
-        final ECDH.AlgorithmMode algMode = ECDH.resolveAlgorithmMode(alg);
-
-        if (algMode.equals(ECDH.AlgorithmMode.KW)) {
-            SecretKey sharedKey = ECDH.deriveSharedKey(header, sharedSecret, getConcatKDF());
-            return Base64URL.encode(AESKW.wrapCEK(cek, sharedKey, getJCAContext().getKeyEncryptionProvider()));
-        }
-
-        return null;
-    }
 }

@@ -198,8 +198,6 @@ public class ECDH1PUX25519Decrypter extends ECDH1PUCryptoProvider implements JWE
                           final Base64URL authTag)
             throws JOSEException {
 
-        ECDH1PU.validateSameCurve(privateKey, publicKey);
-
         // Check for unrecognizable "crit" properties
         critPolicy.ensureHeaderPasses(header);
 
@@ -210,23 +208,12 @@ public class ECDH1PUX25519Decrypter extends ECDH1PUCryptoProvider implements JWE
             throw new JOSEException("Missing ephemeral public key \"epk\" JWE header parameter");
         }
 
-        ECDH1PU.validateSameCurve(privateKey, ephemeralPublicKey);
-
-        SecretKey Ze = ECDH.deriveSharedSecret(
-                ephemeralPublicKey,
-                privateKey);
-
-        SecretKey Zs = ECDH.deriveSharedSecret(
+        SecretKey Z = ECDH1PU.deriveRecipientZ(
+                privateKey,
                 publicKey,
-                privateKey);
-
-        // Derive 'Z'
-        // Note: X25519 does not require public key validation
-        // See https://cr.yp.to/ecdh.html#validate
-        SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
+                ephemeralPublicKey
+        );
 
         return decryptWithZ(header, Z, encryptedKey, iv, cipherText, authTag);
     }
-
-
 }

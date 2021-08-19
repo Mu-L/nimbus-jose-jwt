@@ -26,10 +26,7 @@ import com.nimbusds.jose.util.Base64URL;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -140,60 +137,32 @@ public class X25519DecrypterMulti extends ECDHCryptoProvider implements JWEDecry
                           final Base64URL iv,
                           final Base64URL cipherText,
                           final Base64URL authTag)
-        throws JOSEException {
+            throws JOSEException {
 
         critPolicy.ensureHeaderPasses(header);
 
-        return decryptMulti(header, recipients, iv, cipherText, authTag);
-    }
+        // Get ephemeral key from header
+        OctetKeyPair ephemeralPublicKey = (OctetKeyPair) header.getEphemeralPublicKey();
 
-    private byte[] decryptMulti(
-            final JWEHeader header,
-            final List<Recipient> recipients,
-            final Base64URL iv,
-            final Base64URL cipherText,
-            final Base64URL authTag
-    ) throws JOSEException {
-        byte[] result = null;
-
-        for (OctetKeyPair recipientKey : this.recipients) {
-            Recipient recipient = null;
-
-            String kid = recipientKey.getKeyID();
-            if (kid == null)
-                throw new JOSEException("\"kid\" header should be specified");
-
-            for (Recipient rec : recipients) {
-                if (kid.equals(rec.getHeader().get("kid"))) {
-                    recipient = rec;
-                }
-            }
-
-            if (recipient == null)
-                throw new JOSEException("Recipient not found");
-
-            result = decrypt(header, recipientKey, recipient, iv, cipherText, authTag);
-        }
-
-        return result;
-    }
-
-    private byte[] decrypt(JWEHeader header, OctetKeyPair key, Recipient recipient, Base64URL iv, Base64URL cipherText, Base64URL authTag) throws JOSEException {
-        // Get ephemeral EC key
-        OctetKeyPair ephemeralKey = (OctetKeyPair) header.getEphemeralPublicKey();
-
-        if (ephemeralKey == null) {
+        if (ephemeralPublicKey == null) {
             throw new JOSEException("Missing ephemeral public key epk JWE header parameter");
         }
 
-        if (!key.getCurve().equals(ephemeralKey.getCurve())) {
-            throw new JOSEException("Curve of ephemeral public key does not match curve of private key");
+        Map<String, SecretKey> sharedKeys = new HashMap<>();
+
+        for (OctetKeyPair recipient : this.recipients) {
+            if (!recipient.getCurve().equals(ephemeralPublicKey.getCurve())) {
+                throw new JOSEException("Curve of ephemeral public key does not match curve of private key");
+            }
+
+            SecretKey Z = ECDH.deriveSharedSecret(
+                    ephemeralPublicKey,
+                    recipient
+            );
+
+            sharedKeys.put(recipient.getKeyID(), Z);
         }
 
-        SecretKey Z = ECDH.deriveSharedSecret(
-                ephemeralKey.toPublicJWK(),
-                key);
-
-        return decryptWithZ(header, Z, recipient.getEncryptedKey(), iv, cipherText, authTag);
+        return decryptMulti(header, sharedKeys, recipients, iv, cipherText, authTag);
     }
 }

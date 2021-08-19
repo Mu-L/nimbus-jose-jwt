@@ -243,8 +243,6 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
                           final Base64URL authTag)
         throws JOSEException {
 
-        ECDH1PU.validateSameCurve(privateKey, publicKey);
-
         critPolicy.ensureHeaderPasses(header);
 
         // Get ephemeral EC key
@@ -256,19 +254,12 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
 
         ECPublicKey ephemeralPublicKey = ephemeralKey.toECPublicKey();
 
-        ECDH1PU.validateSameCurve(privateKey, ephemeralPublicKey);
-
-        SecretKey Ze = ECDH.deriveSharedSecret(
-            ephemeralPublicKey,
-            privateKey,
-            getJCAContext().getKeyEncryptionProvider());
-
-        SecretKey Zs = ECDH.deriveSharedSecret(
-                publicKey,
+        SecretKey Z = ECDH1PU.deriveRecipientZ(
                 privateKey,
-                getJCAContext().getKeyEncryptionProvider());
-
-        SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
+                publicKey,
+                ephemeralPublicKey,
+                getJCAContext().getKeyEncryptionProvider()
+        );
 
         return decryptWithZ(header, Z, encryptedKey, iv, cipherText, authTag);
     }

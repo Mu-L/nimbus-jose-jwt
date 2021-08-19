@@ -26,10 +26,7 @@ import com.nimbusds.jose.util.Base64URL;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -161,63 +158,26 @@ public class ECDH1PUDecrypterMulti extends ECDH1PUCryptoProvider implements JWED
 
         critPolicy.ensureHeaderPasses(header);
 
-        return decryptMulti(header, recipients, iv, cipherText, authTag);
-    }
-
-    private byte[] decryptMulti(
-            final JWEHeader header,
-            final List<Recipient> recipients,
-            final Base64URL iv,
-            final Base64URL cipherText,
-            final Base64URL authTag
-    ) throws JOSEException {
-        byte[] result = null;
-
-        for (ECKey recipientKey : this.recipients) {
-            Recipient recipient = null;
-
-            String kid = recipientKey.getKeyID();
-            if (kid == null)
-                throw new JOSEException("\"kid\" header should be specified");
-
-            for (Recipient rec : recipients) {
-                if (kid.equals(rec.getHeader().get("kid"))) {
-                    recipient = rec;
-                }
-            }
-
-            if (recipient == null)
-                throw new JOSEException("Recipient not found");
-
-            result = decrypt(header, recipientKey, recipient, iv, cipherText, authTag);
-        }
-
-        return result;
-    }
-
-    private byte[] decrypt(JWEHeader header, ECKey key, Recipient recipient, Base64URL iv, Base64URL cipherText, Base64URL authTag) throws JOSEException {
         // Get ephemeral EC key
         ECKey ephemeralKey = (ECKey) header.getEphemeralPublicKey();
 
-        ECDH1PU.validateSameCurve(key.toECPrivateKey(), sender.toECPublicKey());
-
         if (ephemeralKey == null) {
-            throw new JOSEException("Missing ephemeral public key epk JWE header parameter");
+            throw new JOSEException("Missing ephemeral public EC key \"epk\" JWE header parameter");
         }
 
-        ECDH1PU.validateSameCurve(key.toECPrivateKey(), sender.toECPublicKey());
+        Map<String, SecretKey> sharedKeys = new HashMap<>();
 
-        SecretKey Ze = ECDH.deriveSharedSecret(
-                ephemeralKey.toECPublicKey(),
-                key.toECPrivateKey(),
-                getJCAContext().getKeyEncryptionProvider());
+        for (ECKey recipient : this.recipients) {
+            SecretKey Z = ECDH1PU.deriveRecipientZ(
+                    recipient.toECPrivateKey(),
+                    sender.toECPublicKey(),
+                    ephemeralKey.toECPublicKey(),
+                    getJCAContext().getKeyEncryptionProvider()
+            );
 
-        SecretKey Zs = ECDH.deriveSharedSecret(
-                sender.toECPublicKey(),
-                key.toECPrivateKey(),
-                getJCAContext().getKeyEncryptionProvider());
+            sharedKeys.put(recipient.getKeyID(), Z);
+        }
 
-        SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
-        return decryptWithZ(header, Z, recipient.getEncryptedKey(), iv, cipherText, authTag);
+        return decryptMulti(header, sharedKeys, recipients, iv, cipherText, authTag);
     }
 }

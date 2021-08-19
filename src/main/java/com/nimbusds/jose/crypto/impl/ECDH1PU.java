@@ -28,6 +28,7 @@ import com.nimbusds.jose.util.ByteUtils;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.Provider;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.Objects;
@@ -274,6 +275,88 @@ public class ECDH1PU {
         return new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
     }
 
+    public static SecretKey deriveSenderZ(
+            final ECPrivateKey privateKey,
+            final ECPublicKey publicKey,
+            final ECPrivateKey ephemeralPrivateKey,
+            final Provider provider) throws JOSEException {
+
+        validateSameCurve(privateKey, publicKey);
+        validateSameCurve(ephemeralPrivateKey, publicKey);
+
+        SecretKey Ze = ECDH.deriveSharedSecret(
+                publicKey,
+                ephemeralPrivateKey,
+                provider
+        );
+
+        SecretKey Zs = ECDH.deriveSharedSecret(
+                publicKey,
+                privateKey,
+                provider
+        );
+
+        return deriveZ(Ze, Zs);
+    }
+
+    public static SecretKey deriveSenderZ(
+            final OctetKeyPair privateKey,
+            final OctetKeyPair publicKey,
+            final OctetKeyPair ephemeralPrivateKey) throws JOSEException {
+
+        validateSameCurve(privateKey, publicKey);
+        validateSameCurve(ephemeralPrivateKey, publicKey);
+
+        SecretKey Ze = ECDH.deriveSharedSecret(publicKey, ephemeralPrivateKey);
+        SecretKey Zs = ECDH.deriveSharedSecret(publicKey, privateKey);
+
+        return deriveZ(Ze, Zs);
+    }
+
+    public static SecretKey deriveRecipientZ(
+            final ECPrivateKey privateKey,
+            final ECPublicKey publicKey,
+            final ECPublicKey ephemeralPublicKey,
+            final Provider provider) throws JOSEException {
+
+        validateSameCurve(privateKey, publicKey);
+        validateSameCurve(privateKey, ephemeralPublicKey);
+
+        SecretKey Ze = ECDH.deriveSharedSecret(
+                ephemeralPublicKey,
+                privateKey,
+                provider
+        );
+
+        SecretKey Zs = ECDH.deriveSharedSecret(
+                publicKey,
+                privateKey,
+                provider
+        );
+
+        return deriveZ(Ze, Zs);
+    }
+
+    public static SecretKey deriveRecipientZ(
+            final OctetKeyPair privateKey,
+            final OctetKeyPair publicKey,
+            final OctetKeyPair ephemeralPublicKey) throws JOSEException {
+
+        validateSameCurve(privateKey, publicKey);
+        validateSameCurve(privateKey, ephemeralPublicKey);
+
+        SecretKey Ze = ECDH.deriveSharedSecret(
+                ephemeralPublicKey,
+                privateKey
+        );
+
+        SecretKey Zs = ECDH.deriveSharedSecret(
+                publicKey,
+                privateKey
+        );
+
+        return deriveZ(Ze, Zs);
+    }
 
     /**
      * Check private key and public key are from the same curve

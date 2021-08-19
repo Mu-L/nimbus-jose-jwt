@@ -33,7 +33,8 @@ import java.util.List;
 public interface JWEDecrypterMulti extends JWEProvider {
 
 	/**
-	 * Decrypts the specified cipher text of a {@link JWEObjectJSON JWE Object}.
+	 * Decrypts the specified cipher text of a {@link JWEObject JWE Object}.
+	 * May decrypt multi keys.
 	 *
 	 * @param header       The JSON Web Encryption (JWE) header. Must
 	 *                     specify a supported JWE algorithm and method.
