@@ -75,6 +75,18 @@ public class Recipient {
                 .build();
     }
 
+    public static List<Recipient> parse(Map<String, Object>[] jsonArray) throws ParseException {
+        List<Recipient> recipients = new ArrayList<>();
+
+        if (jsonArray != null) {
+            for (Map<String, Object> json : jsonArray) {
+                recipients.add(parse(json));
+            }
+        }
+
+        return recipients;
+    }
+
     public static class Builder {
         private final Map<String, Object> header = new HashMap<>();
         private Base64URL encryptedKey;

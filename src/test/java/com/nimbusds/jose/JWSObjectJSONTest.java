@@ -33,11 +33,11 @@ import java.util.Map;
  * @author Alexander Martynov
  * @version 2021-08-17
  */
-public class JJWSObjectTest extends TestCase {
+public class JWSObjectJSONTest extends TestCase {
     
     public void testJSONObjectSerialization() throws Exception {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
-        JJWSObject jwsObject = new JJWSObject(header, new Payload("Hello world!"));
+        JWSObjectJSON jwsObject = new JWSObjectJSON(header, new Payload("Hello world!"));
 
         jwsObject.sign(new MACSigner("12345678901234567890123456789012"));
 
@@ -49,7 +49,7 @@ public class JJWSObjectTest extends TestCase {
 
     public void testJSONSerializationAndParse() throws Exception {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
-        JJWSObject jwsObject = new JJWSObject(header, new Payload("Hello world!"));
+        JWSObjectJSON jwsObject = new JWSObjectJSON(header, new Payload("Hello world!"));
 
         OctetSequenceKey jwk = new OctetSequenceKeyGenerator(256).generate();
         jwsObject.sign(new MACSigner(jwk));
@@ -57,7 +57,7 @@ public class JJWSObjectTest extends TestCase {
         String json = jwsObject.toString();
         assertNotNull(json);
 
-        JJWSObject parsed = JJWSObject.parse(json);
+        JWSObjectJSON parsed = JWSObjectJSON.parse(json);
         assertTrue(jwsObject.verify(new MACVerifier(jwk)));
 
         assertEquals(jwsObject.getHeader().toBase64URL(), parsed.getHeader().toBase64URL());

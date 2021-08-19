@@ -2,6 +2,8 @@ package com.nimbusds.jose;
 
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
+import net.jcip.annotations.ThreadSafe;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -9,6 +11,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * JSON Web Encryption (JWE) secured object.
+ *
+ * Provides <a href="https://datatracker.ietf.org/doc/html/rfc7516#section-7.2>JWE JSON Serialization</a>
+ *
+ * This class is thread-safe.
+ *
+ * @author Alexander Martynov
+ * @version 2021-08-17
+ */
+@ThreadSafe
 public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,7 +58,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
 
     /**
-     * The encrypted key, {@code null} if not computed or applicable.
+     * The recipients, {@code null} if not computed or applicable.
      */
     private List<Recipient> recipients;
 
@@ -106,11 +119,24 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
         state = JWEObjectJSON.State.UNENCRYPTED;
     }
 
+    /**
+     * Creates a new encrypted JSON Web Encryption (JWE) object with the
+     * specified serialised parts. The state will be {@link JWEObject.State#ENCRYPTED
+     * encrypted}.
+     *
+     * @param header     The JWE Protected header. Must not be {@code null}.
+     * @param recipients The recipients array. Empty or {@code null} if none.
+     * @param iv         The initialisation vector. Empty or {@code null} if none.
+     * @param ciphertext The cipher text. Must not be {@code null}.
+     * @param tag        The authentication tag. Empty of {@code null} if none.
+     *
+     * @throws ParseException If parsing of the serialised parts failed.
+     */
     public JWEObjectJSON(final Base64URL header,
-                     final List<Recipient> recipients,
-                     final Base64URL iv,
-                     final Base64URL ciphertext,
-                     final Base64URL tag)
+                         final List<Recipient> recipients,
+                         final Base64URL iv,
+                         final Base64URL ciphertext,
+                         final Base64URL tag)
             throws ParseException {
 
         if (header == null) {
@@ -171,6 +197,12 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
     }
 
 
+    /**
+     * Returns the recipients of this JWE object.
+     *
+     * @return The recipients, {@code null} if not
+     *         applicable or the JWE object has not been encrypted yet.
+     */
     public List<Recipient> getRecipients() {
 
         return recipients;
@@ -275,7 +307,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
      *
      * @throws JOSEException If the JWE algorithms are not supported.
      */
-    private void ensureJWEEncrypterSupport(final JWEEncryptorMulti encrypter)
+    private void ensureJWEEncrypterSupport(final JWEEncryptorMulti<?> encrypter)
             throws JOSEException {
 
         if (! encrypter.supportedJWEAlgorithms().contains(getHeader().getAlgorithm())) {
@@ -304,7 +336,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
      * @throws JOSEException         If the JWE object couldn't be 
      *                               encrypted.
      */
-    public synchronized void encrypt(final JWEEncryptorMulti encrypter)
+    public synchronized void encrypt(final JWEEncryptorMulti<?> encrypter)
             throws JOSEException {
 
         ensureUnencryptedState();
@@ -353,7 +385,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
      * @throws JOSEException         If the JWE object couldn't be 
      *                               decrypted.
      */
-    public synchronized void decrypt(final JWEDecrypterMulti decrypter)
+    public synchronized void decrypt(final JWEDecrypterMulti<?> decrypter)
             throws JOSEException {
 
         ensureEncryptedState();
@@ -407,8 +439,10 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
 
     /**
-     * Parses a JWE object from the specified string in compact form. The 
+     * Parses a JWE object from the specified string in json form. The
      * parsed JWE object will be given an {@link JWEObjectJSON.State#ENCRYPTED} state.
+     *
+     * NOTE: Supports only General Serialization Syntax
      *
      * @param s The string to parse. Must not be {@code null}.
      *
@@ -419,28 +453,11 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
      */
     public static JWEObjectJSON parse(final String s)
             throws ParseException {
-
-        List<Recipient> recipients = new ArrayList<>();
         Map<String, Object> json = JSONObjectUtils.parse(s);
-
-        List<Object> recipientsJSON = JSONObjectUtils.getJSONArray(json, "recipients");
-        if (recipientsJSON != null) {
-
-            try {
-                for (Map<String, Object> recipient : recipientsJSON.toArray(new HashMap[0])) {
-                    recipients.add(Recipient.parse(recipient));
-                }
-            } catch (ArrayStoreException e) {
-
-                throw new ParseException("JSON object member with key recipients is not an array of strings", 0);
-            }
-
-        }
-
 
         return new JWEObjectJSON(
                 JSONObjectUtils.getBase64URL(json, "protected"),
-                recipients,
+                Recipient.parse(JSONObjectUtils.getJSONObjectArray(json, "recipients")),
                 JSONObjectUtils.getBase64URL(json, "iv"),
                 JSONObjectUtils.getBase64URL(json, "ciphertext"),
                 JSONObjectUtils.getBase64URL(json, "tag"));
@@ -448,6 +465,11 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
     @Override
     public Map<String, Object> toJSONObject(boolean flattened) {
+        // flattened JSON serialization is not implemented
+        if (flattened) {
+            throw new NotImplementedException();
+        }
+
         List<Map<String, Object>> recipients = new ArrayList<>();
 
         for (Recipient recipient : getRecipients()) {

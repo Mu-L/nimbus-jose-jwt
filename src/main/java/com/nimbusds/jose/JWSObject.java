@@ -241,7 +241,7 @@ public class JWSObject extends JOSEObject {
 	 *
 	 * @throws IllegalStateException If the current state is not unsigned.
 	 */
-	protected void ensureUnsignedState() {
+	private void ensureUnsignedState() {
 
 		if (state.get() != State.UNSIGNED) {
 
@@ -257,7 +257,7 @@ public class JWSObject extends JOSEObject {
 	 * @throws IllegalStateException If the current state is not signed or
 	 *                               verified.
 	 */
-	protected void ensureSignedOrVerifiedState() {
+	private void ensureSignedOrVerifiedState() {
 
 		if (state.get() != State.SIGNED && state.get() != State.VERIFIED) {
 
@@ -272,7 +272,7 @@ public class JWSObject extends JOSEObject {
 	 *
 	 * @throws JOSEException If the JWS algorithm is not supported.
 	 */
-	protected void ensureJWSSignerSupport(final JWSSigner signer)
+	private void ensureJWSSignerSupport(final JWSSigner signer)
 		throws JOSEException {
 
 		if (! signer.supportedJWSAlgorithms().contains(getHeader().getAlgorithm())) {

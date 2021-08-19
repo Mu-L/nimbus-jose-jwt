@@ -23,7 +23,9 @@ import com.nimbusds.jose.util.JSONObjectUtils;
 import net.jcip.annotations.ThreadSafe;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -38,7 +40,7 @@ import java.util.Map;
  * @version 2021-08-17
  */
 @ThreadSafe
-public class JJWSObject extends JWSObject implements JSONSerializable {
+public class JWSObjectJSON extends JWSObject implements JSONSerializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -50,7 +52,7 @@ public class JJWSObject extends JWSObject implements JSONSerializable {
      * @param header  The JWS header. Must not be {@code null}.
      * @param payload The payload. Must not be {@code null}.
      */
-    public JJWSObject(JWSHeader header, Payload payload) {
+    public JWSObjectJSON(JWSHeader header, Payload payload) {
         super(header, payload);
     }
 
@@ -66,7 +68,7 @@ public class JJWSObject extends JWSObject implements JSONSerializable {
      *
      * @throws ParseException If parsing of the serialised parts failed.
      */
-    public JJWSObject(Base64URL protectedHeader, Base64URL payload, Base64URL signature) throws ParseException {
+    public JWSObjectJSON(Base64URL protectedHeader, Base64URL payload, Base64URL signature) throws ParseException {
         super(protectedHeader, payload, signature);
     }
 
@@ -75,9 +77,21 @@ public class JJWSObject extends JWSObject implements JSONSerializable {
         ensureSignedOrVerifiedState();
 
         Map<String, Object> json = new HashMap<>();
-        json.put("protected", getHeader().toBase64URL().toString());
-        json.put("payload", getPayload().toBase64URL().toString());
-        json.put("signature", getSignature().toString());
+
+        if (flattened) {
+            json.put("protected", getHeader().toBase64URL().toString());
+            json.put("payload", getPayload().toBase64URL().toString());
+            json.put("signature", getSignature().toString());
+        } else {
+            List<Map<String, Object>> signatures = new ArrayList<>();
+            Map<String, Object> signature = new HashMap<>();
+            signature.put("protected", getHeader().toBase64URL().toString());
+            signature.put("signature", getSignature().toString());
+            signatures.add(signature);
+
+            json.put("payload", getPayload().toBase64URL().toString());
+            json.put("signatures", signatures);
+        }
 
         return json;
     }
@@ -98,13 +112,42 @@ public class JJWSObject extends JWSObject implements JSONSerializable {
      * @throws ParseException If the string couldn't be parsed to a JWS
      *                        object.
      */
-    public static JJWSObject parse(String s) throws ParseException {
+    public static JWSObjectJSON parse(String s) throws ParseException {
         Map<String, Object> jsonObject = JSONObjectUtils.parse(s);
 
-        Base64URL protectedHeader = JSONObjectUtils.getBase64URL(jsonObject, "protected");
-        Base64URL payload = JSONObjectUtils.getBase64URL(jsonObject, "payload");
         Base64URL signature = JSONObjectUtils.getBase64URL(jsonObject, "signature");
+        Base64URL payload = JSONObjectUtils.getBase64URL(jsonObject, "payload");
+        Base64URL protectedHeader;
 
-        return new JJWSObject(protectedHeader, payload, signature);
+        boolean flattened = signature != null;
+
+        if (flattened) {
+            protectedHeader = JSONObjectUtils.getBase64URL(jsonObject, "protected");
+        } else {
+            Map<String, Object>[] signatures = JSONObjectUtils.getJSONObjectArray(jsonObject, "signatures");
+            if (signatures == null || signatures.length == 0)
+                throw new ParseException("Signatures MUST be presented in General JSON Serialization", 0);
+
+            // Supports only one signature in General JSON Serialization
+            signature = JSONObjectUtils.getBase64URL(signatures[0], "signature");
+            protectedHeader = JSONObjectUtils.getBase64URL(signatures[0], "protected");
+        }
+
+        return new JWSObjectJSON(protectedHeader, payload, signature);
+    }
+
+    /**
+     * Ensures the current state is {@link State#SIGNED signed} or
+     * {@link State#VERIFIED verified}.
+     *
+     * @throws IllegalStateException If the current state is not signed or
+     *                               verified.
+     */
+    private void ensureSignedOrVerifiedState() {
+
+        if (getState() != State.SIGNED && getState() != State.VERIFIED) {
+
+            throw new IllegalStateException("The JWS object must be in a signed or verified state");
+        }
     }
 }
