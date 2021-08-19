@@ -413,14 +413,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
 
     /**
-     * Serialises this JWE object to its compact format consisting of 
-     * Base64URL-encoded parts delimited by period ('.') characters. It 
-     * must be in a {@link JWEObjectJSON.State#ENCRYPTED encrypted} or 
-     * {@link JWEObjectJSON.State#DECRYPTED decrypted} state.
-     *
-     * <pre>
-     * [header-base64url].[encryptedKey-base64url].[iv-base64url].[cipherText-base64url].[authTag-base64url]
-     * </pre>
+     * Serialises this JWE object to its JSON format.
      *
      * @return The serialised JWE object.
      *
