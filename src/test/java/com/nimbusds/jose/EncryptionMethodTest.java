@@ -42,6 +42,8 @@ public class EncryptionMethodTest extends TestCase {
 
 		assertEquals(256, EncryptionMethod.A128CBC_HS256_DEPRECATED.cekBitLength());
 		assertEquals(512, EncryptionMethod.A256CBC_HS512_DEPRECATED.cekBitLength());
+
+		assertEquals(256, EncryptionMethod.XC20P.cekBitLength());
 	}
 
 

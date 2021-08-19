@@ -72,7 +72,7 @@ public class A128GCMKWTest extends TestCase {
 
 		JWEEncrypter encrypter = new AESEncrypter(key128);
 
-		assertEquals(8, encrypter.supportedEncryptionMethods().size());
+		assertEquals(9, encrypter.supportedEncryptionMethods().size());
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A192CBC_HS384));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256CBC_HS512));
@@ -81,10 +81,11 @@ public class A128GCMKWTest extends TestCase {
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256GCM));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256_DEPRECATED));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256CBC_HS512_DEPRECATED));
+		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.XC20P));
 
 		JWEDecrypter decrypter = new AESDecrypter(key128);
 
-		assertEquals(8, decrypter.supportedEncryptionMethods().size());
+		assertEquals(9, decrypter.supportedEncryptionMethods().size());
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A192CBC_HS384));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256CBC_HS512));
@@ -93,6 +94,7 @@ public class A128GCMKWTest extends TestCase {
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128GCM));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A192GCM));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256GCM));
+		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.XC20P));
 	}
 
 

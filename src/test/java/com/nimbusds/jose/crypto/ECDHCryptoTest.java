@@ -361,6 +361,32 @@ public class ECDHCryptoTest extends TestCase {
 		assertEquals("Hello world!", jwe.getPlaintextString());
 	}
 
+	public void testCycle_ECDH_ES_Curve_P256_XC20P()
+			throws Exception {
+
+		ECKey ecJWK = generateECJWK(Curve.P_256);
+
+		JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_ES, EncryptionMethod.XC20P).
+				agreementPartyUInfo(Base64URL.encode("Alice")).
+				agreementPartyVInfo(Base64URL.encode("Bob")).
+				build();
+
+		JWEObject jweObject = new JWEObject(header, new Payload("Hello world!"));
+
+		// Encrypt
+		jweObject.encrypt(new ECDHEncrypter(ecJWK.toECPublicKey()));
+
+		String jwe = jweObject.serialize();
+
+		jweObject = JWEObject.parse(jwe);
+
+		// Decrypt
+		ECDHDecrypter decrypter = new ECDHDecrypter(ecJWK.toECPrivateKey());
+		decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
+		jweObject.decrypt(decrypter);
+
+		assertEquals("Hello world!", jweObject.getPayload().toString());
+	}
 
 	public void testCycle_ECDH_ES_Curve_P256_EncryptWithJose4j()
 		throws Exception {

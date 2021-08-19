@@ -176,7 +176,7 @@ public class RSA1_5Test extends TestCase {
 	public void testClassEncryptionMethodSupport()
 		throws Exception {
 
-		assertEquals(8, RSAEncrypter.SUPPORTED_ENCRYPTION_METHODS.size());
+		assertEquals(9, RSAEncrypter.SUPPORTED_ENCRYPTION_METHODS.size());
 		assertTrue(RSAEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(RSAEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A192CBC_HS384));
 		assertTrue(RSAEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256CBC_HS512));
@@ -185,8 +185,10 @@ public class RSA1_5Test extends TestCase {
 		assertTrue(RSAEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256GCM));
 		assertTrue(RSAEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256_DEPRECATED));
 		assertTrue(RSAEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256CBC_HS512_DEPRECATED));
+		assertTrue(RSAEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256CBC_HS512_DEPRECATED));
+		assertTrue(RSAEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.XC20P));
 
-		assertEquals(8, RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.size());
+		assertEquals(9, RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.size());
 		assertTrue(RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A192CBC_HS384));
 		assertTrue(RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256CBC_HS512));
@@ -195,6 +197,8 @@ public class RSA1_5Test extends TestCase {
 		assertTrue(RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128GCM));
 		assertTrue(RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A192GCM));
 		assertTrue(RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256GCM));
+		assertTrue(RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.XC20P));
+
 	}
 
 
@@ -222,7 +226,7 @@ public class RSA1_5Test extends TestCase {
 
 		JWEEncrypter encrypter = new RSAEncrypter(PUBLIC_KEY);
 
-		assertEquals(8, encrypter.supportedEncryptionMethods().size());
+		assertEquals(9, encrypter.supportedEncryptionMethods().size());
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A192CBC_HS384));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256CBC_HS512));
@@ -231,10 +235,11 @@ public class RSA1_5Test extends TestCase {
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256GCM));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256_DEPRECATED));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256CBC_HS512_DEPRECATED));
+		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.XC20P));
 
 		JWEDecrypter decrypter = new RSADecrypter(PRIVATE_KEY);
 
-		assertEquals(8, decrypter.supportedEncryptionMethods().size());
+		assertEquals(9, decrypter.supportedEncryptionMethods().size());
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A192CBC_HS384));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256CBC_HS512));
@@ -243,6 +248,7 @@ public class RSA1_5Test extends TestCase {
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128GCM));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A192GCM));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256GCM));
+		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.XC20P));
 	}
 	
 	

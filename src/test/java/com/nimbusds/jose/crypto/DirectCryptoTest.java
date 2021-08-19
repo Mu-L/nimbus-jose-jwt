@@ -108,7 +108,7 @@ public class DirectCryptoTest extends TestCase {
 	public void testClassEncryptionMethodSupport()
 		throws Exception {
 
-		assertEquals(8, DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.size());
+		assertEquals(9, DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.size());
 		assertTrue(DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A192CBC_HS384));
 		assertTrue(DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256CBC_HS512));
@@ -117,8 +117,9 @@ public class DirectCryptoTest extends TestCase {
 		assertTrue(DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256GCM));
 		assertTrue(DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256_DEPRECATED));
 		assertTrue(DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256CBC_HS512_DEPRECATED));
+		assertTrue(DirectDecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.XC20P));
 
-		assertEquals(8, DirectEncrypter.SUPPORTED_ENCRYPTION_METHODS.size());
+		assertEquals(9, DirectEncrypter.SUPPORTED_ENCRYPTION_METHODS.size());
 		assertTrue(DirectEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(DirectEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A192CBC_HS384));
 		assertTrue(DirectEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256CBC_HS512));
@@ -127,6 +128,8 @@ public class DirectCryptoTest extends TestCase {
 		assertTrue(DirectEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256GCM));
 		assertTrue(DirectEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A128CBC_HS256_DEPRECATED));
 		assertTrue(DirectEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256CBC_HS512_DEPRECATED));
+		assertTrue(DirectEncrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.XC20P));
+
 	}
 
 
@@ -173,17 +176,19 @@ public class DirectCryptoTest extends TestCase {
 		// 256-bit key
 		encrypter = new DirectEncrypter(key256);
 
-		assertEquals(3, encrypter.supportedEncryptionMethods().size());
+		assertEquals(4, encrypter.supportedEncryptionMethods().size());
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256GCM));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256_DEPRECATED));
+		assertTrue(encrypter.supportedEncryptionMethods().contains(EncryptionMethod.XC20P));
 
 		decrypter = new DirectDecrypter(key256);
 
-		assertEquals(3, decrypter.supportedEncryptionMethods().size());
+		assertEquals(4, decrypter.supportedEncryptionMethods().size());
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A256GCM));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256_DEPRECATED));
+		assertTrue(decrypter.supportedEncryptionMethods().contains(EncryptionMethod.XC20P));
 
 		// 384-bit key
 		encrypter = new DirectEncrypter(key384);

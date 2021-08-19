@@ -108,6 +108,7 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
             new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.X25519, EncryptionMethod.A128GCM),
             new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.X25519, EncryptionMethod.A192GCM),
             new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.X25519, EncryptionMethod.A256GCM),
+            new CycleTest(JWEAlgorithm.ECDH_1PU, Curve.X25519, EncryptionMethod.XC20P),
 
             new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.X25519, EncryptionMethod.A128CBC_HS256),
             new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.X25519, EncryptionMethod.A192CBC_HS384),
@@ -126,14 +127,17 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
             new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.X25519, EncryptionMethod.A128GCM),
             new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.X25519, EncryptionMethod.A192GCM),
             new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.X25519, EncryptionMethod.A256GCM),
+            new CycleTest(JWEAlgorithm.ECDH_1PU_A128KW, Curve.X25519, EncryptionMethod.XC20P),
 
             new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.X25519, EncryptionMethod.A128GCM),
             new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.X25519, EncryptionMethod.A192GCM),
             new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.X25519, EncryptionMethod.A256GCM),
+            new CycleTest(JWEAlgorithm.ECDH_1PU_A192KW, Curve.X25519, EncryptionMethod.XC20P),
 
             new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.X25519, EncryptionMethod.A128GCM),
             new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.X25519, EncryptionMethod.A192GCM),
             new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.X25519, EncryptionMethod.A256GCM),
+            new CycleTest(JWEAlgorithm.ECDH_1PU_A256KW, Curve.X25519, EncryptionMethod.XC20P),
     };
 
     public void testCycle() throws Exception {
