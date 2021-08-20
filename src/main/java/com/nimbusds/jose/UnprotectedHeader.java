@@ -1,6 +1,7 @@
 package com.nimbusds.jose;
 
 import com.nimbusds.jose.util.JSONObjectUtils;
+import net.minidev.json.JSONObject;
 
 import java.text.ParseException;
 import java.util.*;
@@ -55,20 +56,24 @@ public class UnprotectedHeader {
      *
      * @return JSON object
      */
-    public Map<String, Object> toJSONObject() {
+    public JSONObject toJSONObject() {
         Map<String, Object> o = JSONObjectUtils.newJSONObject();
 
         o.putAll(header);
 
-        return o;
+        return new JSONObject(o);
     }
 
     public static UnprotectedHeader parse(Map<String, Object> jsonObject) throws ParseException {
         Builder header = new Builder();
 
+        if (jsonObject == null) {
+            return null;
+        }
+
         for(final String name: jsonObject.keySet()) {
             if(HeaderParameterNames.KEY_ID.equals(name)) {
-                header = header.kid(JSONObjectUtils.getString(jsonObject, name));
+                header = header.keyID(JSONObjectUtils.getString(jsonObject, name));
             } else {
                 header = header.customParam(name, jsonObject.get(name));
             }
@@ -91,8 +96,8 @@ public class UnprotectedHeader {
          *
          * @return This builder.
          */
-        public Builder kid(String kid) {
-            header.put("kid", kid);
+        public Builder keyID(String kid) {
+            header.put(HeaderParameterNames.KEY_ID, kid);
             return this;
         }
 

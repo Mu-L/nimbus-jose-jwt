@@ -274,7 +274,7 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
 
 			if (encryptedKey != null) {
 				UnprotectedHeader unprotectedHeader = new UnprotectedHeader.Builder()
-						.kid(rs.getKey())
+						.keyID(rs.getKey())
 						.build();
 
 				recipients.add(new Recipient(unprotectedHeader, encryptedKey));

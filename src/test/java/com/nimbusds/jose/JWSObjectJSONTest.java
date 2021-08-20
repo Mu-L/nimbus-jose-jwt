@@ -19,18 +19,19 @@ package com.nimbusds.jose;
 
 
 import com.nimbusds.jose.crypto.ECDSASigner;
+import com.nimbusds.jose.crypto.Ed25519Signer;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jose.jwk.Curve;
-import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
+import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
 import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import junit.framework.TestCase;
 
 import java.security.interfaces.ECPrivateKey;
-import java.util.List;
 import java.util.Map;
 
 
@@ -60,6 +61,34 @@ public class JWSObjectJSONTest extends TestCase {
         assertEquals(jwsObject.getHeader().toBase64URL().toString(), signature.get("protected").toString());
         assertEquals(jwsObject.getPayload().toBase64URL().toString(), json.get("payload").toString());
         assertEquals(jwsObject.getSignature().toString(), signature.get("signature").toString());
+    }
+
+    public void testJSONObjectSerializationGeneral_UH() throws Exception {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.EdDSA);
+        JWSObjectJSON jwsObject = new JWSObjectJSON(header, new Payload("Hello world!"));
+
+        UnprotectedHeader uh = new UnprotectedHeader.Builder()
+                .keyID("123345")
+                .build();
+
+        OctetKeyPair privateKey = new OctetKeyPairGenerator(Curve.Ed25519).generate();
+        jwsObject.sign(uh, new Ed25519Signer(privateKey));
+
+        Map<String, Object> json = jwsObject.toJSONObject(false);
+        Map<String, Object>[] signatures = JSONObjectUtils.getJSONObjectArray(json, "signatures");
+        assertNotNull(signatures);
+
+        // support single signature
+        assertEquals(1, signatures.length);
+
+        Map<String, Object> signature = signatures[0];
+        Map<String, Object> signatureUH = JSONObjectUtils.getJSONObject(signature, "header");
+        assertNotNull(signatureUH);
+
+        assertEquals(jwsObject.getHeader().toBase64URL().toString(), signature.get("protected").toString());
+        assertEquals(jwsObject.getPayload().toBase64URL().toString(), json.get("payload").toString());
+        assertEquals(jwsObject.getSignature().toString(), signature.get("signature").toString());
+        assertEquals(jwsObject.getUnprotectedHeader().getKeyID(), signatureUH.get("kid").toString());
     }
 
     public void testJSONObjectSerializationFlattened() throws Exception {
