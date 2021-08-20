@@ -273,13 +273,11 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
 			}
 
 			if (encryptedKey != null) {
-				Recipient recipient = new Recipient
-						.Builder()
-						.encryptedKey(encryptedKey)
+				UnprotectedHeader unprotectedHeader = new UnprotectedHeader.Builder()
 						.kid(rs.getKey())
 						.build();
 
-				recipients.add(recipient);
+				recipients.add(new Recipient(unprotectedHeader, encryptedKey));
 			}
 		}
 
@@ -309,7 +307,7 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
 			Base64URL encryptedKey = null;
 
 			for (Recipient recipient : recipients) {
-				if (rs.getKey().equals(recipient.getHeader().get("kid"))) {
+				if (rs.getKey().equals(recipient.getHeader().getKeyID())) {
 					encryptedKey = recipient.getEncryptedKey();
 				}
 			}

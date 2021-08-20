@@ -32,38 +32,12 @@ import java.util.*;
  * @version 2021-08-19
  */
 public class Recipient {
-    /**
-     * The registered parameter names.
-     */
-    private static final Set<String> REGISTERED_PARAMETER_NAMES;
-
-    /*
-     * Initialises the registered parameter name set.
-     */
-    static {
-        Set<String> p = new HashSet<>();
-
-        p.add(HeaderParameterNames.ALGORITHM);
-        p.add(HeaderParameterNames.KEY_ID);
-
-        REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(p);
-    }
-
-    /**
-     * Gets the registered parameter names for JWE headers.
-     *
-     * @return The registered parameter names, as an unmodifiable set.
-     */
-    public static Set<String> getRegisteredParameterNames() {
-
-        return REGISTERED_PARAMETER_NAMES;
-    }
 
     private final Base64URL encryptedKey;
-    private Map<String, Object> header;
+    private UnprotectedHeader header = null;
 
-    protected Recipient(Map<String, Object> header, Base64URL encryptedKey) {
-        if (header != null && !header.isEmpty()) {
+    public Recipient(UnprotectedHeader header, Base64URL encryptedKey) {
+        if (header != null) {
             this.header = header;
         }
 
@@ -76,7 +50,7 @@ public class Recipient {
      *
      * @return JWE Per-Recipient Unprotected Header
      */
-    public Map<String, Object> getHeader() {
+    public UnprotectedHeader getHeader() {
         return header;
     }
 
@@ -101,7 +75,7 @@ public class Recipient {
         Map<String, Object> json = new HashMap<>();
 
         if (getHeader() != null) {
-            json.put("header", getHeader());
+            json.put("header", getHeader().toJSONObject());
         }
 
         if (getEncryptedKey() != null) {
@@ -119,11 +93,9 @@ public class Recipient {
      * @throws ParseException If parsing of the serialised parts failed.
      */
     public static Recipient parse(Map<String, Object> json) throws ParseException {
-        Map<String, Object> header = JSONObjectUtils.getJSONObject(json, "header");
-        return new Builder()
-                .kid(JSONObjectUtils.getString(header, "kid"))
-                .encryptedKey(JSONObjectUtils.getBase64URL(json, "encrypted_key"))
-                .build();
+        UnprotectedHeader header = UnprotectedHeader.parse(JSONObjectUtils.getJSONObject(json, "header"));
+        Base64URL encryptedKey = JSONObjectUtils.getBase64URL(json, "encrypted_key");
+        return new Recipient(header, encryptedKey);
     }
 
     /**
@@ -144,75 +116,5 @@ public class Recipient {
         }
 
         return recipients;
-    }
-
-    /**
-     * Recipient Builder
-     */
-    public static class Builder {
-        private final Map<String, Object> header = new HashMap<>();
-        private Base64URL encryptedKey;
-
-        /**
-         * Sets the key ID ({@code kid}) parameter.
-         *
-         * @param kid The key ID parameter, {@code null} if not
-         *            specified.
-         *
-         * @return This builder.
-         */
-        public Builder kid(String kid) {
-            header.put("kid", kid);
-            return this;
-        }
-
-        /**
-         * Sets the key ID ({@code encryptedKey}) parameter.
-         *
-         * @param encryptedKey  The encryptedKey parameter,
-         *                      {@code null} if not specified.
-         *
-         * @return This builder.
-         */
-        public Builder encryptedKey(Base64URL encryptedKey) {
-            this.encryptedKey = encryptedKey;
-            return this;
-        }
-
-        /**
-         * Sets a custom (non-registered) parameter.
-         *
-         * @param name  The name of the custom parameter. Must not
-         *              match a registered parameter name and must not
-         *              be {@code null}.
-         * @param value The value of the custom parameter, should map
-         *              to a valid JSON entity, {@code null} if not
-         *              specified.
-         *
-         * @return This builder.
-         *
-         * @throws IllegalArgumentException If the specified parameter
-         *                                  name matches a registered
-         *                                  parameter name.
-         */
-        public Builder customParam(final String name, final Object value) {
-
-            if (getRegisteredParameterNames().contains(name)) {
-                throw new IllegalArgumentException("The parameter name \"" + name + "\" matches a registered name");
-            }
-
-            header.put(name, value);
-
-            return this;
-        }
-
-        /**
-         * Build new {@link Recipient}
-         *
-         * @return recipient
-         */
-        public Recipient build() {
-            return new Recipient(header, encryptedKey);
-        }
     }
 }
