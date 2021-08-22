@@ -356,6 +356,14 @@ public final class JWEAlgorithm extends Algorithm {
 			return ECDH_ES_A192KW;
 		} else if (s.equals(ECDH_ES_A256KW.getName())) {
 			return ECDH_ES_A256KW;
+		} else if (s.equals(ECDH_1PU.getName())) {
+			return ECDH_1PU;
+		} else if (s.equals(ECDH_1PU_A128KW.getName())) {
+			return ECDH_1PU_A128KW;
+		} else if (s.equals(ECDH_1PU_A192KW.getName())) {
+			return ECDH_1PU_A192KW;
+		} else if (s.equals(ECDH_1PU_A256KW.getName())) {
+			return ECDH_1PU_A256KW;
 		} else if (s.equals(A128GCMKW.getName())) {
 			return A128GCMKW;
 		} else if (s.equals(A192GCMKW.getName())) {

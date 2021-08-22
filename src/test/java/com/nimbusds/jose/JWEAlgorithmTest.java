@@ -1,7 +1,7 @@
 /*
  * nimbus-jose-jwt
  *
- * Copyright 2012-2016, Connect2id Ltd.
+ * Copyright 2012-2021, Connect2id Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
  * this file except in compliance with the License. You may obtain a copy of the
@@ -24,7 +24,7 @@ import junit.framework.TestCase;
  * Tests the JWS Algorithm class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2016-08-24
+ * @version 2021-08-22
  */
 public class JWEAlgorithmTest extends TestCase {
 
@@ -46,6 +46,12 @@ public class JWEAlgorithmTest extends TestCase {
 		assertTrue(JWEAlgorithm.ECDH_ES_A128KW == JWEAlgorithm.parse("ECDH-ES+A128KW"));
 		assertTrue(JWEAlgorithm.ECDH_ES_A192KW == JWEAlgorithm.parse("ECDH-ES+A192KW"));
 		assertTrue(JWEAlgorithm.ECDH_ES_A256KW == JWEAlgorithm.parse("ECDH-ES+A256KW"));
+
+		assertTrue(JWEAlgorithm.ECDH_1PU == JWEAlgorithm.parse("ECDH-1PU"));
+
+		assertTrue(JWEAlgorithm.ECDH_1PU_A128KW == JWEAlgorithm.parse("ECDH-1PU+A128KW"));
+		assertTrue(JWEAlgorithm.ECDH_1PU_A192KW == JWEAlgorithm.parse("ECDH-1PU+A192KW"));
+		assertTrue(JWEAlgorithm.ECDH_1PU_A256KW == JWEAlgorithm.parse("ECDH-1PU+A256KW"));
 
 		assertTrue(JWEAlgorithm.A128GCMKW == JWEAlgorithm.parse("A128GCMKW"));
 		assertTrue(JWEAlgorithm.A192GCMKW == JWEAlgorithm.parse("A192GCMKW"));
