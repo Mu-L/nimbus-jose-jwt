@@ -285,7 +285,9 @@ public class ECDH1PU {
      *
      * @throws JOSEException If the key curves don't match.
      */
-    public static void validateSameCurve(ECPrivateKey privateKey, ECPublicKey publicKey) throws JOSEException{
+    public static void validateSameCurve(final ECPrivateKey privateKey, final ECPublicKey publicKey)
+            throws JOSEException{
+        
         Objects.requireNonNull(privateKey, "The parameter \"privateKey\" must not be null");
         Objects.requireNonNull(publicKey, "The parameter \"publicKey\" must not be null");
 
@@ -306,7 +308,9 @@ public class ECDH1PU {
      *
      * @throws JOSEException If the curves don't match.
      */
-    public static void validateSameCurve(OctetKeyPair privateKey, OctetKeyPair publicKey) throws JOSEException {
+    public static void validateSameCurve(final OctetKeyPair privateKey, final OctetKeyPair publicKey)
+            throws JOSEException {
+        
         Objects.requireNonNull(privateKey, "The parameter \"privateKey\" must not be null");
         Objects.requireNonNull(publicKey, "The parameter \"publicKey\" must not be null");
 
