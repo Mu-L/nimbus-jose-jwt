@@ -25,8 +25,8 @@
 			(i.e. arbitrary payload) {@link com.nimbusds.jose.proc JOSE objects}
 			is provided.</p>
 
-		<p>The library {@link com.nimbusds.jose.crypto implements} all standard
-            JWS and JWE algorithms:</p>
+		<p>The library {@link com.nimbusds.jose.crypto implements} the
+            following JWS and JWE algorithms:</p>
 
         <p>JWS algorithms:</p>
 		<ol>
@@ -45,6 +45,7 @@
             <li>Key encryption with AES GCM key wrap: A128CGMKW, A192CGMKW and A256CGMKW</li>
             <li>Direct encryption with a symmetric key: dir</li>
 			<li>Key Agreement with Elliptic Curve Diffie-Hellman Ephemeral Static: ECDH-ES, ECDH-ES+A128KW, ECDH-ES+A192KW and ECDH-ES+A256KW</li>
+			<li>Public key authenticated encryption utilising the One-Pass Unified Model for Elliptic Curve Diffie-Hellman key agreement: ECDH-1PU, ECDH-1PU+A128KW, ECDH-1PU+A128KW, ECDH-1PU+A256KW</li>
 			<li>Password-based encryption: PBES2-HS256+A128KW, PBES2-HS384+A192KW and PBES2-HS512+A256KW</li>
         </ol>
 
@@ -54,6 +55,7 @@
             <li>AES_CBC_HMAC_SHA2: A128CBC-HS256, A192CBC-HS384, A256CBC-HS512,
                 the deprecated A128CBC+HS256 and A256CBC+HS512 are also supported</li>
             <li>AES GCM: A128GCM, A192GCM and A256GCM</li>
+			<li>Extended nonce ChaCha20-Poly1305: XC20P</li>
         </ol>
 
         <p>New JWA algorithms can be easily added. The library provides a set
@@ -74,6 +76,9 @@
 			<li><a href="https://tools.ietf.org/html/rfc7797">RFC 7797 - JWS Unencoded Payload Option</a></li>
 			<li><a href="https://tools.ietf.org/html/rfc8037">RFC 8037 - CFRG ECDH and Signatures in JOSE</a></li>
 			<li><a href="https://tools.ietf.org/html/draft-ietf-cose-webauthn-algorithms-03">draft-ietf-cose-webauthn-algorithms-03 - COSE and JOSE Registrations for WebAuthn Algorithms</a></li>
+			<li><a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04">draft-madden-jose-ecdh-1pu-04 - Public Key Authenticated Encryption for JOSE: ECDH-1PU</a></li>
+			<li><a href="https://tools.ietf.org/id/draft-amringer-jose-chacha-02.html">draft-amringer-jose-chacha-02 - Chacha derived AEAD algorithms in JSON Object Signing and Encryption (JOSE)</a> (support for XC20P only)</li>
+			<li><a href="https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-xchacha-03">XChaCha: eXtended-nonce ChaCha and AEAD_XChaCha20_Poly1305</a></li>
 		</ol>
 		
 		<p>Dependencies (see the Maven pom.xml for details):</p>
@@ -82,7 +87,7 @@
 			<li>JSON Smart for highly efficient parsing and serialisation of JSON.</li>
 			<li>JCIP for concurrency annotations.</li>
 			<li>[optional] BouncyCastle as an alternative JCA provider and for selected key and certificate utilities</li>
-			<li>[optional] Google Tink for OKP key generation and EdDSA</li>
+			<li>[optional] Google Tink for OKP key generation, EdDSA with Ed25519, ECDH with X25519 and content encryption with XC20P</li>
 		</ol>
 
 

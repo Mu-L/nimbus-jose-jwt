@@ -27,17 +27,17 @@ import javax.crypto.*;
 import java.security.*;
 
 /**
- * This class defines the XChaCha20 stream cipher as well as the use
- * of the Poly1305 authenticator.
+ * This class defines the XChaCha20 stream cipher as well as the use of the Poly1305 authenticator.
  *
  * The eXtended-nonce ChaCha cipher construction (XChaCha) allows for
- * ChaCha-based ciphersuites to accept a 192-bit nonce with similar
- * guarantees to the original construction, except with a much lower
- * probability of nonce misuse occurring.
+ * ChaCha-based cipher suites to accept a 192-bit nonce with similar guarantees
+ * to the original construction, except with a much lower probability of nonce
+ * misuse occurring.
  *
  * <p>This class is thread-safe.
  *
- * @see <a href="https://datatracker.ietf.org/doc/html/draft-arciszewski-xchacha-03">XChaCha: eXtended-nonce ChaCha and AEAD_XChaCha20_Poly1305</a>
+ * @see <a href="https://datatracker.ietf.org/doc/html/draft-arciszewski-xchacha-03">XChaCha:
+ * eXtended-nonce ChaCha and AEAD_XChaCha20_Poly1305</a>
  *
  *
  * @author Alexander Martynov
@@ -58,7 +58,6 @@ public class XC20P {
 
 
     /**
-     *
      * Encrypts the specified plain text using XChaCha20_Poly1305.
      *
      * @param secretKey   The AES key. Must not be {@code null}.

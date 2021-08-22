@@ -34,10 +34,11 @@ import java.util.Objects;
 
 
 /**
- * Elliptic Curve Diffie-Hellman One-Pass Unified Model (ECDH-1PU)
- * key agreement functions and utilities.
+ * Elliptic Curve Diffie-Hellman One-Pass Unified Model (ECDH-1PU) key
+ * agreement functions and utilities.
  *
- * @see <a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04">Public Key Authenticated Encryption for JOSE: ECDH-1PU</a>
+ * @see <a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04">Public
+ * Key Authenticated Encryption for JOSE: ECDH-1PU</a>
  *
  * @author Alexander Martynov
  * @version 2021-08-03
@@ -47,8 +48,7 @@ public class ECDH1PU {
     /**
      * Resolves the ECDH algorithm mode.
      *
-     * @param alg The JWE algorithm. Must be supported and not
-     *            {@code null}.
+     * @param alg The JWE algorithm. Must be supported and not {@code null}.
      *
      * @return The algorithm mode.
      *
@@ -128,13 +128,14 @@ public class ECDH1PU {
     /**
      * Derives a shared key (via concat KDF).
      *
-     * The method should only be called in the {@link ECDH.AlgorithmMode#DIRECT} mode.
+     * The method should only be called in the
+     * {@link ECDH.AlgorithmMode#DIRECT} mode.
      *
-     * The method derives the Content Encryption Key (CEK) for the "enc" algorithm,
-     * in the {@link ECDH.AlgorithmMode#DIRECT} mode.
+     * The method derives the Content Encryption Key (CEK) for the "enc"
+     * algorithm, in the {@link ECDH.AlgorithmMode#DIRECT} mode.
      *
-     * The method does not take the auth tag because the auth tag
-     * will be generated using a CEK derived as an output of this method.
+     * The method does not take the auth tag because the auth tag will be
+     * generated using a CEK derived as an output of this method.
      *
      * @param header    The JWE header. Its algorithm and encryption method
      *                  must be supported. Must not be {@code null}.
@@ -189,20 +190,20 @@ public class ECDH1PU {
      *
      * The method should only be called in {@link ECDH.AlgorithmMode#KW}.
      *
-     * In Key Agreement with {@link ECDH.AlgorithmMode#KW} mode,
-     * the JWE Authentication Tag is included in the input to the KDF.
-     * This ensures that the content of the JWE was produced by the original sender
-     * and not by another recipient.
+     * In Key Agreement with {@link ECDH.AlgorithmMode#KW} mode, the JWE
+     * Authentication Tag is included in the input to the KDF. This ensures
+     * that the content of the JWE was produced by the original sender and not
+     * by another recipient.
      *
      *
      * @param header    The JWE header. Its algorithm and encryption method
      *                  must be supported. Must not be {@code null}.
      * @param Z         The derived shared secret ('Z'). Must not be
      *                  {@code null}.
-     * @param tag       In Direct Key Agreement mode this is set to an empty octet
-     *                  string. In Key Agreement with Key Wrapping mode, this is set to a
-     *                  value of the form Data, where Data is the raw octets of
-     *                  the JWE Authentication Tag.
+     * @param tag       In Direct Key Agreement mode this is set to an empty
+     *                  octet string. In Key Agreement with Key Wrapping mode,
+     *                  this is set to a value of the form Data, where Data is
+     *                  the raw octets of the JWE Authentication Tag.
      * @param concatKDF The concat KDF. Must be initialised and not
      *                  {@code null}.
      *
@@ -251,20 +252,21 @@ public class ECDH1PU {
     }
 
     /**
-     * Derives a shared secret (also called 'Z') where Z is the
-     * concatenation of Ze and Zs.
+     * Derives a shared secret (also called 'Z') where Z is the concatenation
+     * of Ze and Zs.
      *
-     * @param Ze	The shared secret derived from applying the ECDH primitive
-     *              to the sender's ephemeral private key and the recipient's
-     *              static public key (when sending) or the recipient's
-     *              static private key and the sender's ephemeral public
-     *       	 	key (when receiving) Must not be {@code null}.
-     * @param Zs 	The shared secret derived from
-     *       		applying the ECDH primitive to the sender's static private key and
-     *       		the recipient's static public key (when sending) or the
-     *       		recipient's static private key and the sender's static public key
-     *       		(when receiving). Must not be {@code null}.
-     * @return		The derived shared key.
+     * @param Ze The shared secret derived from applying the ECDH primitive to
+     *           the sender's ephemeral private key and the recipient's static
+     *           public key (when sending) or the recipient's static private
+     *           key and the sender's ephemeral public key (when receiving).
+     *           Must not be {@code null}.
+     * @param Zs The shared secret derived from applying the ECDH primitive to
+     *           the sender's static private key and the recipient's static
+     *           public key (when sending) or the recipient's static private
+     *           key and the sender's static public key (when receiving). Must
+     *           not be {@code null}.
+     *
+     * @return The derived shared key.
      */
     public static SecretKey deriveZ(final SecretKey Ze, final SecretKey Zs) {
         Objects.requireNonNull(Ze, "The parameter \"Ze\" must not be null");
@@ -276,13 +278,12 @@ public class ECDH1PU {
 
 
     /**
-     * Check private key and public key are from the same curve
+     * Ensures the private key and public key are from the same curve.
      *
      * @param privateKey EC private key. Must not be {@code null}.
-     * @param publicKey EC public key. Must not be {@code null}.
+     * @param publicKey  EC public key. Must not be {@code null}.
      *
-     * @throws JOSEException curves don't match
-     *
+     * @throws JOSEException If the key curves don't match.
      */
     public static void validateSameCurve(ECPrivateKey privateKey, ECPublicKey publicKey) throws JOSEException{
         Objects.requireNonNull(privateKey, "The parameter \"privateKey\" must not be null");
@@ -298,12 +299,12 @@ public class ECDH1PU {
     }
 
     /**
-     * Check private key and public key are from the same curve
+     * Ensures the private key and public key are from the same curve.
      *
      * @param privateKey OKP private key. Must not be {@code null}.
-     * @param publicKey OKP public key. Must not be {@code null}.
+     * @param publicKey  OKP public key. Must not be {@code null}.
      *
-     * @throws JOSEException curves don't match
+     * @throws JOSEException If the curves don't match.
      */
     public static void validateSameCurve(OctetKeyPair privateKey, OctetKeyPair publicKey) throws JOSEException {
         Objects.requireNonNull(privateKey, "The parameter \"privateKey\" must not be null");

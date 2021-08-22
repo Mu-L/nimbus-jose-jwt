@@ -35,7 +35,7 @@ import java.util.Set;
 
 /**
  * Elliptic Curve Diffie-Hellman decrypter of
- * {@link com.nimbusds.jose.JWEObject JWE objects} for curves using EC JWK
+ * {@link com.nimbusds.jose.JWEObject JWE objects} for curves using an OKP JWK.
  * Expects a private {@link OctetKeyPair} key with {@code "crv"} X25519.
  *
  * <p>See <a href="https://tools.ietf.org/html/rfc8037">RFC 8037</a>
@@ -64,7 +64,8 @@ import java.util.Set;
  *     <li>{@link Curve#X25519}
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Direct key agreement mode:
+ * <p>Supports the following content encryption algorithms for Direct key
+ * agreement mode:
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
@@ -78,7 +79,8 @@ import java.util.Set;
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#XC20P}
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Key wrapping mode:
+ * <p>Supports the following content encryption algorithms for Key wrapping
+ * mode:
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
@@ -113,7 +115,7 @@ public class ECDH1PUX25519Decrypter extends ECDH1PUCryptoProvider implements JWE
      * Creates a new Curve25519 Elliptic Curve Diffie-Hellman decrypter.
      *
      * @param privateKey The private key. Must not be {@code null}.
-     * @param publicKey The private key. Must not be {@code null}.
+     * @param publicKey  The private key. Must not be {@code null}.
      *
      * @throws JOSEException If the key subtype is not supported.
      */
@@ -128,7 +130,7 @@ public class ECDH1PUX25519Decrypter extends ECDH1PUCryptoProvider implements JWE
      * Creates a new Curve25519 Elliptic Curve Diffie-Hellman decrypter.
      *
      * @param privateKey     The private key. Must not be {@code null}.
-     * @param publicKey The private key. Must not be {@code null}.
+     * @param publicKey      The private key. Must not be {@code null}.
      * @param defCritHeaders The names of the critical header parameters
      *                       that are deferred to the application for
      *                       processing, empty set or {@code null} if none.
@@ -227,6 +229,4 @@ public class ECDH1PUX25519Decrypter extends ECDH1PUCryptoProvider implements JWE
 
         return decryptWithZ(header, Z, encryptedKey, iv, cipherText, authTag);
     }
-
-
 }

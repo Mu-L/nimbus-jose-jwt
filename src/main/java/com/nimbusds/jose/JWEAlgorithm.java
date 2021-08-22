@@ -26,7 +26,7 @@ import net.jcip.annotations.Immutable;
  * JSON Web Encryption (JWE) algorithm name, represents the {@code alg} header 
  * parameter in JWE objects. This class is immutable.
  *
- * <p>Includes constants for the following standard JWE algorithm names:
+ * <p>Includes constants for the following JWE algorithm names:
  *
  * <ul>
  *     <li>{@link #RSA_OAEP_256 RSA-OAEP-256}
@@ -52,7 +52,7 @@ import net.jcip.annotations.Immutable;
  * <p>Additional JWE algorithm names can be defined using the constructors.
  *
  * @author Vladimir Dzhuvinov
- * @version 2017-04-09
+ * @version 2021-08-22
  */
 @Immutable
 public final class JWEAlgorithm extends Algorithm {
@@ -164,31 +164,32 @@ public final class JWEAlgorithm extends Algorithm {
 
 
 	/**
-	 * Elliptic Curve Diffie-Hellman One-Pass Unified Model key agreement per
-	 * "ECDH-1PU", but where the agreed-upon key is used to wrap the Content
-	 * Encryption Key (CEK) with the "A128KW" function (rather than being
-	 * used directly as the CEK).
+	 * Elliptic Curve Diffie-Hellman One-Pass Unified Model key agreement
+	 * per "ECDH-1PU", but where the agreed-upon key is used to wrap the
+	 * Content Encryption Key (CEK) with the "A128KW" function (rather than
+	 * being used directly as the CEK).
 	 */
 	public static final JWEAlgorithm ECDH_1PU_A128KW = new JWEAlgorithm("ECDH-1PU+A128KW", Requirement.OPTIONAL);
 
 
 	/**
-	 * Elliptic Curve Diffie-Hellman One-Pass Unified Model key agreement per
-	 * "ECDH-1PU", but where the agreed-upon key is used to wrap the Content
-	 * Encryption Key (CEK) with the "A192KW" function (rather than being
-	 * used directly as the CEK).
+	 * Elliptic Curve Diffie-Hellman One-Pass Unified Model key agreement
+	 * per "ECDH-1PU", but where the agreed-upon key is used to wrap the
+	 * Content Encryption Key (CEK) with the "A192KW" function (rather than
+	 * being used directly as the CEK).
 	 */
 	public static final JWEAlgorithm ECDH_1PU_A192KW = new JWEAlgorithm("ECDH-1PU+A192KW", Requirement.OPTIONAL);
 
 
 	/**
-	 * Elliptic Curve Diffie-Hellman One-Pass Unified Model key agreement per
-	 * "ECDH-1PU", but where the agreed-upon key is used to wrap the Content
-	 * Encryption Key (CEK) with the "A256KW" function (rather than being
-	 * used directly as the CEK).
+	 * Elliptic Curve Diffie-Hellman One-Pass Unified Model key agreement
+	 * per "ECDH-1PU", but where the agreed-upon key is used to wrap the
+	 * Content Encryption Key (CEK) with the "A256KW" function (rather than
+	 * being used directly as the CEK).
 	 */
 	public static final JWEAlgorithm ECDH_1PU_A256KW = new JWEAlgorithm("ECDH-1PU+A256KW", Requirement.OPTIONAL);
 
+	
 	/**
 	 * AES in Galois/Counter Mode (GCM) (NIST.800-38D) 128 bit keys.
 	 */

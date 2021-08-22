@@ -41,7 +41,7 @@ import java.util.Set;
 
 /**
  * Elliptic Curve Diffie-Hellman encrypter of
- * {@link com.nimbusds.jose.JWEObject JWE objects} for curves using EC JWK keys.
+ * {@link com.nimbusds.jose.JWEObject JWE objects} for curves using an EC JWK.
  * Expects a public EC key (with a P-256, P-384, or P-521 curve).
  *
  * <p>Public Key Authenticated Encryption for JOSE
@@ -114,12 +114,12 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
 
 
     /**
-     * The public JWK key.
+     * The public EC key.
      */
     private final ECPublicKey publicKey;
 
     /**
-     * The private JWK key;
+     * The private EC key;
      */
     private final ECPrivateKey privateKey;
 
@@ -133,8 +133,7 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
      * Creates a new Elliptic Curve Diffie-Hellman encrypter.
      *
      * @param privateKey The private EC key. Must not be {@code null}.
-     *
-     * @param publicKey The public EC key. Must not be {@code null}.
+     * @param publicKey  The public EC key. Must not be {@code null}.
      *
      * @throws JOSEException If the elliptic curve is not supported.
      */
@@ -149,9 +148,8 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
      * Creates a new Elliptic Curve Diffie-Hellman encrypter with an
      * optionally specified content encryption key (CEK).
      *
-     * @param privateKey            The private EC key. Must not be
-     *               			   {@code null}.
-     *
+     * @param privateKey           The private EC key. Must not be
+     *                             {@code null}.
      * @param publicKey            The public EC key. Must not be
      *                             {@code null}.
      * @param contentEncryptionKey The content encryption key (CEK) to use.
