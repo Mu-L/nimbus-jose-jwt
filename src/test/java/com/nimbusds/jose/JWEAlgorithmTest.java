@@ -107,6 +107,16 @@ public class JWEAlgorithmTest extends TestCase {
 		assertTrue(JWEAlgorithm.Family.ECDH_ES.contains(JWEAlgorithm.ECDH_ES_A256KW));
 		assertEquals(4, JWEAlgorithm.Family.ECDH_ES.size());
 	}
+
+
+	public void testECDH1PUFamily() {
+
+		assertTrue(JWEAlgorithm.Family.ECDH_1PU.contains(JWEAlgorithm.ECDH_1PU));
+		assertTrue(JWEAlgorithm.Family.ECDH_1PU.contains(JWEAlgorithm.ECDH_1PU_A128KW));
+		assertTrue(JWEAlgorithm.Family.ECDH_1PU.contains(JWEAlgorithm.ECDH_1PU_A192KW));
+		assertTrue(JWEAlgorithm.Family.ECDH_1PU.contains(JWEAlgorithm.ECDH_1PU_A256KW));
+		assertEquals(4, JWEAlgorithm.Family.ECDH_ES.size());
+	}
 	
 	
 	public void testAsymmetricSuperFamily() {

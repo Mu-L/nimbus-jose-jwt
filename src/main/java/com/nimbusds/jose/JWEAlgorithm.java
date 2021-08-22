@@ -256,6 +256,12 @@ public final class JWEAlgorithm extends Algorithm {
 		 */
 		public static final Family ECDH_ES = new Family(JWEAlgorithm.ECDH_ES, ECDH_ES_A128KW, ECDH_ES_A192KW, ECDH_ES_A256KW);
 
+		
+		/**
+		 * Public key authenticated encryption with ECDH-1PU.
+		 */
+		public static final Family ECDH_1PU = new Family(JWEAlgorithm.ECDH_1PU, ECDH_1PU_A128KW, ECDH_1PU_A192KW, ECDH_1PU_A256KW);
+
 
 		/**
 		 * AES GCM key wrap.
