@@ -66,8 +66,9 @@ The library handles the following JOSE algorithms:
 * RFC 7797 - JSON Web Signature (JWS) Unencoded Payload Option
 * RFC 8037 - CFRG Elliptic Curve Diffie-Hellman (ECDH) and Signatures in JSON 
   Object Signing and Encryption (JOSE)
-* draft-ietf-cose-webauthn-algorithms-03 - COSE and JOSE Registrations for 
-  WebAuthn Algorithms
+* RFC 8812 - CBOR Object Signing and Encryption (COSE) and JSON Object Signing  
+  and Encryption (JOSE) Registrations for Web Authentication (WebAuthn) 
+  Algorithms
 * draft-madden-jose-ecdh-1pu-04 - Public Key Authenticated Encryption for JOSE: 
   ECDH-1PU
 * draft-amringer-jose-chacha-02 - Chacha derived AEAD algorithms in JSON Object 
