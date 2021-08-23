@@ -275,18 +275,37 @@ public class ECDH1PU {
         return new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
     }
 
+
+    /**
+     * Derives a shared secret (also called 'Z') for sender where Z is the
+     * concatenation of Ze and Zs. Where Ze is shared secret from applying
+     * the ECDH primitive to the sender's ephemeral private key and the recipient's
+     * static public key, Zs is the shared secret derived from
+     * applying the ECDH primitive to the sender's static private key and
+     * the recipient's static public key.
+     *
+     * @param privateKey The sender EC private key.
+     * @param publicKey  The recipient EC public key.
+     * @param epk        The sender EC ephemeral private key.
+     * @param provider   The specific JCA provider for the ECDH key
+     *                   agreement, {@code null} to use the default one.
+     *
+     * @return The derived shared secret ('Z'), with algorithm "AES".
+     *
+     * @throws JOSEException If derivation of the shared secret failed.
+     */
     public static SecretKey deriveSenderZ(
             final ECPrivateKey privateKey,
             final ECPublicKey publicKey,
-            final ECPrivateKey ephemeralPrivateKey,
+            final ECPrivateKey epk,
             final Provider provider) throws JOSEException {
 
         validateSameCurve(privateKey, publicKey);
-        validateSameCurve(ephemeralPrivateKey, publicKey);
+        validateSameCurve(epk, publicKey);
 
         SecretKey Ze = ECDH.deriveSharedSecret(
                 publicKey,
-                ephemeralPrivateKey,
+                epk,
                 provider
         );
 
@@ -299,31 +318,65 @@ public class ECDH1PU {
         return deriveZ(Ze, Zs);
     }
 
+    /**
+     * Derives a shared secret (also called 'Z') for sender where Z is the
+     * concatenation of Ze and Zs. Where Ze is shared secret from applying
+     * the ECDH primitive to the sender's ephemeral public key and the recipient's
+     * static private key, Zs is the shared secret derived from
+     * applying the ECDH primitive to the sender's static public key and
+     * the recipient's static private key.
+     *
+     * @param privateKey The sender OctetKey private key.
+     * @param publicKey  The recipient OctetKey public key.
+     * @param epk        The sender OctetKey ephemeral private key.
+     *
+     * @return The derived shared secret ('Z'), with algorithm "AES".
+     *
+     * @throws JOSEException If derivation of the shared secret failed.
+     */
     public static SecretKey deriveSenderZ(
             final OctetKeyPair privateKey,
             final OctetKeyPair publicKey,
-            final OctetKeyPair ephemeralPrivateKey) throws JOSEException {
+            final OctetKeyPair epk) throws JOSEException {
 
         validateSameCurve(privateKey, publicKey);
-        validateSameCurve(ephemeralPrivateKey, publicKey);
+        validateSameCurve(epk, publicKey);
 
-        SecretKey Ze = ECDH.deriveSharedSecret(publicKey, ephemeralPrivateKey);
+        SecretKey Ze = ECDH.deriveSharedSecret(publicKey, epk);
         SecretKey Zs = ECDH.deriveSharedSecret(publicKey, privateKey);
 
         return deriveZ(Ze, Zs);
     }
 
+    /**
+     * Derives a shared secret (also called 'Z') for sender where Z is the
+     * concatenation of Ze and Zs. Where Ze is shared secret from applying
+     * the ECDH primitive to the sender's ephemeral public key and the recipient's
+     * static private key, Zs is the shared secret derived from
+     * applying the ECDH primitive to the sender's static public key and
+     * the recipient's static private key.
+     *
+     * @param privateKey The sender EC private key.
+     * @param publicKey  The recipient EC public key.
+     * @param epk        The sender EC ephemeral public key.
+     * @param provider   The specific JCA provider for the ECDH key
+     *                   agreement, {@code null} to use the default one.
+     *
+     * @return The derived shared secret ('Z'), with algorithm "AES".
+     *
+     * @throws JOSEException If derivation of the shared secret failed.
+     */
     public static SecretKey deriveRecipientZ(
             final ECPrivateKey privateKey,
             final ECPublicKey publicKey,
-            final ECPublicKey ephemeralPublicKey,
+            final ECPublicKey epk,
             final Provider provider) throws JOSEException {
 
         validateSameCurve(privateKey, publicKey);
-        validateSameCurve(privateKey, ephemeralPublicKey);
+        validateSameCurve(privateKey, epk);
 
         SecretKey Ze = ECDH.deriveSharedSecret(
-                ephemeralPublicKey,
+                epk,
                 privateKey,
                 provider
         );
@@ -337,16 +390,28 @@ public class ECDH1PU {
         return deriveZ(Ze, Zs);
     }
 
+    /**
+     * Derives a shared secret (also called 'Z') for recipient where Z is the
+     * concatenation of Ze and Zs.
+     *
+     * @param privateKey The sender OctetKey private key.
+     * @param publicKey  The recipient OctetKey public key.
+     * @param epk        The sender OctetKey ephemeral private key.
+     *
+     * @return The derived shared secret ('Z'), with algorithm "AES".
+     *
+     * @throws JOSEException If derivation of the shared secret failed.
+     */
     public static SecretKey deriveRecipientZ(
             final OctetKeyPair privateKey,
             final OctetKeyPair publicKey,
-            final OctetKeyPair ephemeralPublicKey) throws JOSEException {
+            final OctetKeyPair epk) throws JOSEException {
 
         validateSameCurve(privateKey, publicKey);
-        validateSameCurve(privateKey, ephemeralPublicKey);
+        validateSameCurve(privateKey, epk);
 
         SecretKey Ze = ECDH.deriveSharedSecret(
-                ephemeralPublicKey,
+                epk,
                 privateKey
         );
 
