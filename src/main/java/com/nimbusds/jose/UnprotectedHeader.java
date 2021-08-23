@@ -86,7 +86,7 @@ public class UnprotectedHeader {
      * Unprotected Header Builder
      */
     public static class Builder {
-        private final Map<String, Object> header = new HashMap<>();
+        private final Map<String, Object> header = JSONObjectUtils.newJSONObject();
 
         /**
          * Sets the key ID ({@code kid}) parameter.

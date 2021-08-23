@@ -431,21 +431,20 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
 
     /**
-     * Serialises this JWE object to its JSON format.
+     * Serialises this JWE object to JSON format.
      *
      * @return The serialised JWE object.
      *
-     * @throws IllegalStateException If the JWE object is not in a 
-     *                               {@link JWEObjectJSON.State#ENCRYPTED encrypted} or
-     *                               {@link JWEObjectJSON.State#DECRYPTED decrypted 
-     *                               state}.
+     * @throws IllegalStateException If the JWS object is not in a
+     *                               {@link JWSObject.State#SIGNED signed} or
+     *                               {@link JWSObject.State#VERIFIED verified} state.
      */
     @Override
     public String serialize() {
 
         ensureEncryptedOrDecryptedState();
 
-        return JSONObjectUtils.toJSONString(toJSONObject(false));
+        return JSONObjectUtils.toJSONString(toJSONObject(false), true);
     }
 
 
@@ -487,7 +486,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
             recipients.add(recipient.toJSONObject());
         }
 
-        Map<String, Object> json = new HashMap<>();
+        Map<String, Object> json = JSONObjectUtils.newJSONObject();
         json.put("iv", getIV().toString());
         json.put("recipients", recipients);
         json.put("tag", getAuthTag().toString());

@@ -30,6 +30,8 @@ public interface JSONSerializable {
     /**
      * Returns a JSON object representation of the JOSE Object.
      *
+     * @param flattened Returns flatted json if true else returns general json.
+     *
      * @throws IllegalStateException If the JOSE object is not in a state
      *                               that permits serialisation.
      * @return The JSON object.

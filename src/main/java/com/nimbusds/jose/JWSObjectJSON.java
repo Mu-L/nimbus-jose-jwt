@@ -94,7 +94,7 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
     public Map<String, Object> toJSONObject(boolean flattened) {
         ensureSignedOrVerifiedState();
 
-        Map<String, Object> json = new HashMap<>();
+        Map<String, Object> json = JSONObjectUtils.newJSONObject();
 
         byte[] header = getHeaderBytes();
         byte[] payload = getPayloadBytes();
@@ -106,7 +106,7 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
             json.put("signature", signatureStr);
         } else {
             List<Map<String, Object>> signatures = new ArrayList<>();
-            Map<String, Object> signature = new HashMap<>();
+            Map<String, Object> signature = JSONObjectUtils.newJSONObject();
             signature.put("protected", Base64URL.encode(header).toString());
             signature.put("signature", signatureStr);
 
@@ -123,10 +123,25 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
         return json;
     }
 
+    /**
+     * Serialises this JWS object to JSON format.
+     *
+     * @return The serialised JWS object.
+     *
+     * @throws IllegalStateException If the JWS object is not in a
+     *                               {@link JW encrypted} or
+     *                               {@link JWEObjectJSON.State#DECRYPTED decrypted
+     *                               state}.
+     */
     @Override
-    public String toString() {
-        return JSONObjectUtils.toJSONString(toJSONObject(true));
+    public String serialize() {
+
+        ensureSignedOrVerifiedState();
+
+        return JSONObjectUtils.toJSONString(toJSONObject(false), true);
     }
+
+
 
     /**
      * Parses a JWS object from the specified string in JSON format. The
