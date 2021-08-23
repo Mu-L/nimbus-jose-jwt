@@ -6,6 +6,12 @@ import net.minidev.json.JSONObject;
 import java.text.ParseException;
 import java.util.*;
 
+/**
+ * The base class for unprotected header.
+ *
+ * @author Alexander Martynov
+ * @version 2021-08-23
+ */
 public class UnprotectedHeader {
     /**
      * The registered parameter names.
@@ -33,17 +39,24 @@ public class UnprotectedHeader {
         return REGISTERED_PARAMETER_NAMES;
     }
 
+    /**
+     * Unprotected headers
+     */
     private final Map<String, Object> header;
 
+    /**
+     * Create unprotected header
+     * @param header map of unprotected headers
+     */
     protected UnprotectedHeader(Map<String, Object> header) {
         this.header = header;
     }
 
     /**
-     * Returns Unprotected Header
-     * might be {@code null} if is not specified.
+     * Returns kid Header might be
+     * {@code null} if is not specified.
      *
-     * @return Unprotected Header
+     * @return kid header
      */
     public String getKeyID() {
         return (String) header.get(HeaderParameterNames.KEY_ID);
@@ -52,7 +65,6 @@ public class UnprotectedHeader {
     /**
      * Returns JSON object. Might be empty if
      * header and encryption_key are not specified.
-     *
      *
      * @return JSON object
      */
@@ -64,6 +76,14 @@ public class UnprotectedHeader {
         return new JSONObject(o);
     }
 
+    /**
+     * Parse json object and returns unprotected header
+     * @param jsonObject json might be {@code null}
+     *
+     * @return unprotected header or {@code null}
+     * @throws ParseException If the json couldn't be parsed to a valid
+     *                        Unprotected header.
+     */
     public static UnprotectedHeader parse(Map<String, Object> jsonObject) throws ParseException {
         Builder header = new Builder();
 
