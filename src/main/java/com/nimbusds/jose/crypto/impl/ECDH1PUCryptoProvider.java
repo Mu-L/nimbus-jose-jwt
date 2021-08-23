@@ -324,9 +324,11 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
         for (Map.Entry<String, SecretKey> rs : sharedSecrets.entrySet()) {
             Base64URL encryptedKey = null;
 
-            for (Recipient recipient : recipients) {
-                if (rs.getKey().equals(recipient.getHeader().getKeyID())) {
-                    encryptedKey = recipient.getEncryptedKey();
+            if (recipients != null) {
+                for (Recipient recipient : recipients) {
+                    if (rs.getKey().equals(recipient.getHeader().getKeyID())) {
+                        encryptedKey = recipient.getEncryptedKey();
+                    }
                 }
             }
 

@@ -123,6 +123,7 @@ public class JWSObjectJSONTest extends TestCase {
         assertEquals(jwsObject.getSignature(), parsed.getSignature());
     }
 
+    // see https://datatracker.ietf.org/doc/html/rfc7515#appendix-A.7
     public void test_flattened_appendix() throws Exception {
         ECKey key = ECKey.parse("{\"kty\":\"EC\",\n" +
                 "      \"crv\":\"P-256\",\n" +
