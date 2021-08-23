@@ -25,7 +25,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -364,7 +363,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
         JWECryptoParts parts;
 
         try {
-            parts = encrypter.encrypt(getHeader(), getPayloadBytes());
+            parts = encrypter.encrypt(getHeader(), getPayload().toBytes());
 
         } catch (JOSEException e) {
 
@@ -486,28 +485,15 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
             recipients.add(recipient.toJSONObject());
         }
 
+        byte[] header = JSONObjectUtils.toJSONString(getHeader().toJSONObject(), true)
+                .getBytes(StandardCharsets.UTF_8);
+
         Map<String, Object> json = JSONObjectUtils.newJSONObject();
         json.put("iv", getIV().toString());
         json.put("recipients", recipients);
         json.put("tag", getAuthTag().toString());
-        json.put("protected", Base64URL.encode(getHeaderBytes()).toString());
+        json.put("protected", Base64URL.encode(header).toString());
         json.put("ciphertext", getCipherText().toString());
         return json;
-    }
-
-    private byte[] getPayloadBytes() {
-        Map<String, Object> jsonPayload = getPayload().toJSONObject();
-
-        if (jsonPayload != null) {
-            return JSONObjectUtils.toJSONString(jsonPayload, true).getBytes(StandardCharsets.UTF_8);
-        }
-
-        return getPayload().toBytes();
-    }
-
-    private byte[] getHeaderBytes() {
-        String header = JSONObjectUtils.toJSONString(getHeader().toJSONObject(), true);
-        System.out.println(header);
-        return header.getBytes(StandardCharsets.UTF_8);
     }
 }

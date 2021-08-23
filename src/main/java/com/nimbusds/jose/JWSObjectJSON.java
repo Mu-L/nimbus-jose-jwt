@@ -96,9 +96,10 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
 
         Map<String, Object> json = JSONObjectUtils.newJSONObject();
 
-        byte[] header = getHeaderBytes();
-        byte[] payload = getPayloadBytes();
         String signatureStr = getSignature().toString();
+        byte[] payload = getPayload().toBytes();
+        byte[] header = JSONObjectUtils.toJSONString(getHeader().toJSONObject(), true)
+                .getBytes(StandardCharsets.UTF_8);
 
         if (flattened) {
             json.put("protected", Base64URL.encode(header).toString());
@@ -129,7 +130,7 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
      * @return The serialised JWS object.
      *
      * @throws IllegalStateException If the JWS object is not in a
-     *                               {@link JW encrypted} or
+     *                               {@link JWEObjectJSON.State#ENCRYPTED encrypted} or
      *                               {@link JWEObjectJSON.State#DECRYPTED decrypted
      *                               state}.
      */
@@ -197,33 +198,5 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
 
         this.unprotectedHeader = header;
         sign(signer);
-    }
-
-    @Override
-    protected String composeSigningInput() {
-        byte[] header = getHeaderBytes();
-        byte[] payload = getPayloadBytes();
-
-        if (getHeader().isBase64URLEncodePayload()) {
-            return Base64URL.encode(header).toString() + '.' + Base64URL.encode(payload).toString();
-        } else {
-            return Base64URL.encode(header).toString() + '.' + Arrays.toString(payload);
-        }
-    }
-
-    private byte[] getPayloadBytes() {
-        Map<String, Object> jsonPayload = getPayload().toJSONObject();
-
-        if (jsonPayload != null) {
-            return JSONObjectUtils.toJSONString(jsonPayload, true).getBytes(StandardCharsets.UTF_8);
-        }
-
-        return getPayload().toBytes();
-    }
-
-    private byte[] getHeaderBytes() {
-        String header = JSONObjectUtils.toJSONString(getHeader().toJSONObject(), true);
-        System.out.println(header);
-        return header.getBytes(StandardCharsets.UTF_8);
     }
 }

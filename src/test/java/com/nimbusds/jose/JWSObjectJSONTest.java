@@ -18,11 +18,9 @@
 package com.nimbusds.jose;
 
 
-import com.nimbusds.jose.crypto.ECDSASigner;
-import com.nimbusds.jose.crypto.Ed25519Signer;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jose.crypto.*;
 import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
@@ -104,13 +102,17 @@ public class JWSObjectJSONTest extends TestCase {
     }
 
     public void testJSONSerializationAndParse() throws Exception {
+        Map<String, Object> jsonPayload = JSONObjectUtils.parse("{\"iss\":\"joe\",\n" +
+                "      \"exp\":1300819380,\n" +
+                "      \"http://example.com/is_root\":true}");
+
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
-        JWSObjectJSON jwsObject = new JWSObjectJSON(header, new Payload("Hello world!"));
+        JWSObjectJSON jwsObject = new JWSObjectJSON(header, new Payload(jsonPayload));
 
         OctetSequenceKey jwk = new OctetSequenceKeyGenerator(256).generate();
         jwsObject.sign(new MACSigner(jwk));
 
-        String json = jwsObject.toString();
+        String json = jwsObject.serialize();
         assertNotNull(json);
 
         JWSObjectJSON parsed = JWSObjectJSON.parse(json);
@@ -119,5 +121,26 @@ public class JWSObjectJSONTest extends TestCase {
         assertEquals(jwsObject.getHeader().toBase64URL(), parsed.getHeader().toBase64URL());
         assertEquals(jwsObject.getPayload().toBase64URL(), parsed.getPayload().toBase64URL());
         assertEquals(jwsObject.getSignature(), parsed.getSignature());
+    }
+
+    public void test_flattened_appendix() throws Exception {
+        ECKey key = ECKey.parse("{\"kty\":\"EC\",\n" +
+                "      \"crv\":\"P-256\",\n" +
+                "      \"x\":\"f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU\",\n" +
+                "      \"y\":\"x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0\",\n" +
+                "      \"d\":\"jpsQnnGQmL-YBIffH1136cspYG6-0iY7X1fCE9-E9LI\"\n" +
+                "     }");
+
+        JWSObjectJSON jwsObjectJSON = JWSObjectJSON.parse("{" +
+                "      \"payload\":" +
+                "       \"eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ\"," +
+                "      \"protected\":\"eyJhbGciOiJFUzI1NiJ9\"," +
+                "      \"header\":" +
+                "       {\"kid\":\"e9bc097a-ce51-4036-9562-d2ade882db0d\"}," +
+                "      \"signature\":" +
+                "       \"DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q\"" +
+                "     }");
+
+        assertTrue(jwsObjectJSON.verify(new ECDSAVerifier(key.toECPublicKey())));
     }
 }
