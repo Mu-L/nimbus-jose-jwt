@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.minidev.json.JSONObject;
+import net.minidev.json.JSONStyle;
+import net.minidev.json.JSONValue;
 import net.minidev.json.parser.JSONParser;
 
 
@@ -382,6 +384,33 @@ public class JSONObjectUtils {
 		}
 	}
 
+	/**
+	 * Gets a JSON objects array member of a JSON object.
+	 *
+	 * @param o   The JSON object. Must not be {@code null}.
+	 * @param key The JSON object member key. Must not be {@code null}.
+	 *
+	 * @return The JSON object member value, may be {@code null}.
+	 *
+	 * @throws ParseException If the value is not of the expected type.
+	 */
+	public static Map<String, Object>[] getJSONObjectArray(final Map<String, Object> o, final String key)
+			throws ParseException {
+
+		List<Object> jsonArray = getJSONArray(o, key);
+
+		if (jsonArray == null) {
+			return null;
+		}
+
+		try {
+			return jsonArray.toArray(new HashMap[0]);
+
+		} catch (ArrayStoreException e) {
+
+			throw new ParseException("JSON object member with key \"" + key + "\" is not an array of JSON objects", 0);
+		}
+	}
 	
 	/**
 	 * Gets a string list member of a JSON object
@@ -457,6 +486,25 @@ public class JSONObjectUtils {
 		return JSONObject.toJSONString(o);
 	}
 
+	/**
+	 * Serialises the specified map to a JSON object using the entity
+	 * mapping specified in {@link #parse(String)}.
+	 *
+	 * @param o The map. Must not be {@code null}.
+	 * @param protect4Web If true then forward slash is not escaped
+	 *                    else forward slash is escaped by back slash.
+	 *
+	 * @return The JSON object as string.
+	 */
+	public static String toJSONString(final Map<String, ?> o, boolean protect4Web) {
+		JSONStyle style = JSONValue.COMPRESSION;
+
+		if (protect4Web) {
+			style = JSONStyle.LT_COMPRESS;
+		}
+
+		return JSONObject.toJSONString(o, style);
+	}
 
 	/**
 	 * Creates a new JSON object (unordered).

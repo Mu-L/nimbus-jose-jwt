@@ -18,17 +18,11 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import javax.crypto.SecretKey;
 
-import com.nimbusds.jose.EncryptionMethod;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWEAlgorithm;
-import com.nimbusds.jose.JWECryptoParts;
-import com.nimbusds.jose.JWEHeader;
+import com.nimbusds.jose.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.util.Base64URL;
 
@@ -252,4 +246,77 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
 	}
 
 
+	protected JWECryptoParts encryptMulti(final JWEHeader header,
+										  final Map<String, SecretKey> sharedSecrets,
+										  final byte[] clearText) throws JOSEException {
+
+		final ECDH.AlgorithmMode algMode = ECDH.resolveAlgorithmMode(header.getAlgorithm());
+		final SecretKey cek = ContentCryptoProvider.generateCEK(
+				header.getEncryptionMethod(),
+				getJCAContext().getSecureRandom()
+		);
+
+		List<Recipient> recipients = new ArrayList<>();
+		boolean encrypted = false;
+		JWECryptoParts parts = null;
+
+		for (Map.Entry<String, SecretKey> rs : sharedSecrets.entrySet()) {
+			Base64URL encryptedKey = null;
+
+			if (!encrypted) {
+				parts = encryptWithZ(header, rs.getValue(), clearText, cek);
+				encryptedKey = parts.getEncryptedKey();
+				encrypted = true;
+			} else if (algMode.equals(ECDH.AlgorithmMode.KW)) {
+				SecretKey sharedKey = ECDH.deriveSharedKey(header, rs.getValue(), getConcatKDF());
+				encryptedKey = Base64URL.encode(AESKW.wrapCEK(cek, sharedKey, getJCAContext().getKeyEncryptionProvider()));
+			}
+
+			if (encryptedKey != null) {
+				UnprotectedHeader unprotectedHeader = new UnprotectedHeader.Builder()
+						.keyID(rs.getKey())
+						.build();
+
+				recipients.add(new Recipient(unprotectedHeader, encryptedKey));
+			}
+		}
+
+		if (parts == null) {
+			throw new JOSEException("Content MUST be encrypted");
+		}
+
+		return new JWECryptoParts(
+				parts.getHeader(),
+				Collections.unmodifiableList(recipients),
+				parts.getInitializationVector(),
+				parts.getCipherText(),
+				parts.getAuthenticationTag()
+		);
+	}
+
+	protected byte[] decryptMulti(final JWEHeader header,
+								  final Map<String, SecretKey> sharedSecrets,
+								  final List<Recipient> recipients,
+								  final Base64URL iv,
+								  final Base64URL cipherText,
+								  final Base64URL authTag) throws JOSEException {
+
+		byte[] result = null;
+
+		for (Map.Entry<String, SecretKey> rs : sharedSecrets.entrySet()) {
+			Base64URL encryptedKey = null;
+
+			if (recipients != null) {
+				for (Recipient recipient : recipients) {
+					if (rs.getKey().equals(recipient.getHeader().getKeyID())) {
+						encryptedKey = recipient.getEncryptedKey();
+					}
+				}
+			}
+
+			result = decryptWithZ(header, rs.getValue(), encryptedKey, iv, cipherText, authTag);
+		}
+
+		return result;
+	}
 }
