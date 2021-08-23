@@ -22,11 +22,9 @@ import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import net.jcip.annotations.ThreadSafe;
 
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -98,15 +96,19 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
 
         Map<String, Object> json = new HashMap<>();
 
+        byte[] header = getHeaderBytes();
+        byte[] payload = getPayloadBytes();
+        String signatureStr = getSignature().toString();
+
         if (flattened) {
-            json.put("protected", getHeader().toBase64URL().toString());
-            json.put("payload", getPayload().toBase64URL().toString());
-            json.put("signature", getSignature().toString());
+            json.put("protected", Base64URL.encode(header).toString());
+            json.put("payload", Base64URL.encode(payload).toString());
+            json.put("signature", signatureStr);
         } else {
             List<Map<String, Object>> signatures = new ArrayList<>();
             Map<String, Object> signature = new HashMap<>();
-            signature.put("protected", getHeader().toBase64URL().toString());
-            signature.put("signature", getSignature().toString());
+            signature.put("protected", Base64URL.encode(header).toString());
+            signature.put("signature", signatureStr);
 
             if (unprotectedHeader != null) {
                 signature.put("header", unprotectedHeader.toJSONObject());
@@ -114,7 +116,7 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
 
             signatures.add(signature);
 
-            json.put("payload", getPayload().toBase64URL().toString());
+            json.put("payload", Base64URL.encode(payload).toString());
             json.put("signatures", signatures);
         }
 
@@ -163,20 +165,6 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
         return new JWSObjectJSON(protectedHeader, unprotectedHeader, payload, signature);
     }
 
-    /**
-     * Ensures the current state is {@link State#SIGNED signed} or
-     * {@link State#VERIFIED verified}.
-     *
-     * @throws IllegalStateException If the current state is not signed or
-     *                               verified.
-     */
-    private void ensureSignedOrVerifiedState() {
-
-        if (getState() != State.SIGNED && getState() != State.VERIFIED) {
-
-            throw new IllegalStateException("The JWS object must be in a signed or verified state");
-        }
-    }
 
     /**
      * Signs this JWS object with the specified signer and unprotected header.
@@ -194,5 +182,33 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
 
         this.unprotectedHeader = header;
         sign(signer);
+    }
+
+    @Override
+    protected String composeSigningInput() {
+        byte[] header = getHeaderBytes();
+        byte[] payload = getPayloadBytes();
+
+        if (getHeader().isBase64URLEncodePayload()) {
+            return Base64URL.encode(header).toString() + '.' + Base64URL.encode(payload).toString();
+        } else {
+            return Base64URL.encode(header).toString() + '.' + Arrays.toString(payload);
+        }
+    }
+
+    private byte[] getPayloadBytes() {
+        Map<String, Object> jsonPayload = getPayload().toJSONObject();
+
+        if (jsonPayload != null) {
+            return JSONObjectUtils.toJSONString(jsonPayload, true).getBytes(StandardCharsets.UTF_8);
+        }
+
+        return getPayload().toBytes();
+    }
+
+    private byte[] getHeaderBytes() {
+        String header = JSONObjectUtils.toJSONString(getHeader().toJSONObject(), true);
+        System.out.println(header);
+        return header.getBytes(StandardCharsets.UTF_8);
     }
 }
