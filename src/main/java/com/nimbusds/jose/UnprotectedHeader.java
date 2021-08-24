@@ -63,6 +63,19 @@ public class UnprotectedHeader {
     }
 
     /**
+     * Gets a custom (non-registered) parameter.
+     *
+     * @param name The name of the custom parameter. Must not be
+     *             {@code null}.
+     *
+     * @return The custom parameter, {@code null} if not specified.
+     */
+    public Object getCustomParam(final String name) {
+
+        return header.get(name);
+    }
+
+    /**
      * Returns JSON object. Might be empty if
      * header and encryption_key are not specified.
      *

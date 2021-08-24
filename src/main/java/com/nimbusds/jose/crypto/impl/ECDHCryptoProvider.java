@@ -305,7 +305,7 @@ public abstract class ECDHCryptoProvider extends BaseJWEProvider {
 			Base64URL encryptedKey = null;
 
 			if (kid == null) {
-				throw new JOSEException("kid should be specified");
+				throw new JOSEException("\"kid\" should be specified");
 			}
 
 			if (recipients != null) {

@@ -153,7 +153,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
         if (header == null) {
 
-            throw new IllegalArgumentException("The header part must not be null");
+            throw new IllegalArgumentException("The header must not be null");
         }
 
         try {
