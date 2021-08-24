@@ -23,6 +23,7 @@ import com.nimbusds.jose.crypto.impl.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.Pair;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
@@ -30,7 +31,7 @@ import java.util.*;
 
 
 /**
- * Elliptic Curve Diffie-Hellman Multi decrypter of
+ * Elliptic Curve Diffie-Hellman Multi-recipient decrypter of
  * {@link com.nimbusds.jose.JWEObjectJSON JWE objects} for curves using EC JWK
  * keys. Expects a private EC key (with a P-256, P-384 or P-521 curve).
  *
@@ -107,17 +108,46 @@ public class ECDH1PUDecrypterMulti extends ECDH1PUCryptoProvider implements JWED
      */
     private final CriticalHeaderParamsDeferral critPolicy = new CriticalHeaderParamsDeferral();
 
-
+    /**
+     * The public sender JWK key.
+     */
     private final ECKey sender;
-    private final ECKey[] recipients;
 
-    public ECDH1PUDecrypterMulti(final ECKey sender, final ECKey[] recipients)
+    /**
+     * The list of private recipient's keys.
+     */
+    private final List<Pair<UnprotectedHeader, ECKey>> recipients;
+
+    /**
+     * Creates Elliptic Curve Diffie-Hellman Multi-recipient decrypter.
+     *
+     * @param sender     The public sender JWK key.
+     * @param recipients The list of private recipient's keys.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public ECDH1PUDecrypterMulti(final ECKey sender, final List<Pair<UnprotectedHeader, ECKey>>recipients)
             throws JOSEException {
 
         this(sender, recipients, null);
     }
 
-    public ECDH1PUDecrypterMulti(final ECKey sender, final ECKey[] recipients, final Set<String> defCritHeaders)
+    /**
+     * Creates Elliptic Curve Diffie-Hellman Multi-recipient decrypter.
+     *
+     * @param sender         The public sender JWK key.
+     * @param recipients     The list of private recipient's keys.
+     * @param defCritHeaders The names of the critical header parameters
+     *                       that are deferred to the application for
+     *                       processing, empty set or {@code null} if none.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public ECDH1PUDecrypterMulti(
+            final ECKey sender,
+            final List<Pair<UnprotectedHeader, ECKey>>recipients,
+            final Set<String> defCritHeaders)
+
         throws JOSEException {
 
         super(sender.getCurve());
@@ -165,17 +195,17 @@ public class ECDH1PUDecrypterMulti extends ECDH1PUCryptoProvider implements JWED
             throw new JOSEException("Missing ephemeral public EC key \"epk\" JWE header parameter");
         }
 
-        Map<String, SecretKey> sharedKeys = new HashMap<>();
+        List<Pair<UnprotectedHeader, SecretKey>> sharedKeys = new ArrayList<>();
 
-        for (ECKey recipient : this.recipients) {
+        for (Pair<UnprotectedHeader, ECKey> recipient : this.recipients) {
             SecretKey Z = ECDH1PU.deriveRecipientZ(
-                    recipient.toECPrivateKey(),
+                    recipient.getRight().toECPrivateKey(),
                     sender.toECPublicKey(),
                     ephemeralKey.toECPublicKey(),
                     getJCAContext().getKeyEncryptionProvider()
             );
 
-            sharedKeys.put(recipient.getKeyID(), Z);
+            sharedKeys.add(Pair.of(recipient.getLeft(), Z));
         }
 
         return decryptMulti(header, sharedKeys, recipients, iv, cipherText, authTag);

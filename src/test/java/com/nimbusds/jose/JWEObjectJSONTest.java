@@ -1,3 +1,20 @@
+/*
+ * nimbus-jose-jwt
+ *
+ * Copyright 2012-2021, Connect2id Ltd and contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+ * this file except in compliance with the License. You may obtain a copy of the
+ * License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+
 package com.nimbusds.jose;
 
 import com.nimbusds.jose.crypto.*;
@@ -8,7 +25,11 @@ import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.Pair;
 import junit.framework.TestCase;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class JWEObjectJSONTest extends TestCase {
 
@@ -114,13 +135,19 @@ public class JWEObjectJSONTest extends TestCase {
         ECKey charlieKey = generateEC(Curve.P_521, "charlie");
 
         JWEObjectJSON jwe = new JWEObjectJSON(header, new Payload("Hello, world"));
-        ECDH1PUEncrypterMulti encrypterMulti = new ECDH1PUEncrypterMulti(aliceKey, new ECKey[]{ bobKey, charlieKey });
+
+        List<Pair<UnprotectedHeader, ECKey>> recipients = Arrays.asList(
+                Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+        );
+
+        ECDH1PUEncrypterMulti encrypterMulti = new ECDH1PUEncrypterMulti(aliceKey, recipients);
         jwe.encrypt(encrypterMulti);
 
         String json = jwe.serialize();
 
         JWEObjectJSON decrypted = JWEObjectJSON.parse(json);
-        ECDH1PUDecrypterMulti decryptor = new ECDH1PUDecrypterMulti(aliceKey, new ECKey[]{ bobKey, charlieKey });
+        ECDH1PUDecrypterMulti decryptor = new ECDH1PUDecrypterMulti(aliceKey, recipients);
         decrypted.decrypt(decryptor);
 
         assertEquals("Hello, world", decrypted.getPayload().toString());
@@ -135,14 +162,19 @@ public class JWEObjectJSONTest extends TestCase {
         ECKey bobKey = generateEC(Curve.P_521, "bob");
         ECKey charlieKey = generateEC(Curve.P_521, "charlie");
 
+        List<Pair<UnprotectedHeader, ECKey>> recipients = Arrays.asList(
+                Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+        );
+
         JWEObjectJSON jwe = new JWEObjectJSON(header, new Payload("Hello, world"));
-        ECDHEncrypterMulti encrypterMulti = new ECDHEncrypterMulti(new ECKey[]{ bobKey, charlieKey });
+        ECDHEncrypterMulti encrypterMulti = new ECDHEncrypterMulti(recipients);
         jwe.encrypt(encrypterMulti);
 
         String json = jwe.serialize();
 
         JWEObjectJSON decrypted = JWEObjectJSON.parse(json);
-        ECDHDecrypterMulti decryptor = new ECDHDecrypterMulti(new ECKey[]{ bobKey, charlieKey });
+        ECDHDecrypterMulti decryptor = new ECDHDecrypterMulti(recipients);
         decrypted.decrypt(decryptor);
 
         assertEquals("Hello, world", decrypted.getPayload().toString());
@@ -158,14 +190,19 @@ public class JWEObjectJSONTest extends TestCase {
         OctetKeyPair bobKey = generateOKP(Curve.X25519, "bob");
         OctetKeyPair charlieKey = generateOKP(Curve.X25519, "charlie");
 
+        List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Arrays.asList(
+                Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+        );
+
         JWEObjectJSON jwe = new JWEObjectJSON(header, new Payload("Hello, world"));
-        ECDH1PUX25519EncrypterMulti encrypterMulti = new ECDH1PUX25519EncrypterMulti(aliceKey, new OctetKeyPair[]{ bobKey, charlieKey });
+        ECDH1PUX25519EncrypterMulti encrypterMulti = new ECDH1PUX25519EncrypterMulti(aliceKey, recipients);
         jwe.encrypt(encrypterMulti);
 
         String json = jwe.serialize();
 
         JWEObjectJSON decrypted = JWEObjectJSON.parse(json);
-        ECDH1PUX25519DecrypterMulti decryptor = new ECDH1PUX25519DecrypterMulti(aliceKey, new OctetKeyPair[]{ bobKey, charlieKey });
+        ECDH1PUX25519DecrypterMulti decryptor = new ECDH1PUX25519DecrypterMulti(aliceKey, recipients);
         decrypted.decrypt(decryptor);
 
         assertEquals("Hello, world", decrypted.getPayload().toString());
@@ -181,14 +218,20 @@ public class JWEObjectJSONTest extends TestCase {
         OctetKeyPair bobKey = generateOKP(Curve.X25519, "bob");
         OctetKeyPair charlieKey = generateOKP(Curve.X25519, "charlie");
 
+        List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Arrays.asList(
+                Pair.of(new UnprotectedHeader.Builder().keyID("alice").build(), aliceKey),
+                Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+        );
+
         JWEObjectJSON jwe = new JWEObjectJSON(header, new Payload("Hello, world"));
-        X25519EncrypterMulti encrypterMulti = new X25519EncrypterMulti(new OctetKeyPair[]{ aliceKey, bobKey, charlieKey });
+        X25519EncrypterMulti encrypterMulti = new X25519EncrypterMulti(recipients);
         jwe.encrypt(encrypterMulti);
 
         String json = jwe.serialize();
 
         JWEObjectJSON decrypted = JWEObjectJSON.parse(json);
-        X25519DecrypterMulti decryptor = new X25519DecrypterMulti(new OctetKeyPair[]{ aliceKey, bobKey, charlieKey });
+        X25519DecrypterMulti decryptor = new X25519DecrypterMulti(recipients);
         decrypted.decrypt(decryptor);
 
         assertEquals("Hello, world", decrypted.getPayload().toString());
@@ -209,8 +252,12 @@ public class JWEObjectJSONTest extends TestCase {
 
             JWEObjectJSON jweObject = new JWEObjectJSON(header, payload);
 
-            ECDH1PUX25519EncrypterMulti encrypter = new ECDH1PUX25519EncrypterMulti(aliceKey,
-                    new OctetKeyPair[]{ bobKey.toPublicJWK(), charlieKey.toPublicJWK() });
+            List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Arrays.asList(
+                    Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
+                    Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+            );
+
+            ECDH1PUX25519EncrypterMulti encrypter = new ECDH1PUX25519EncrypterMulti(aliceKey, recipients);
 
             encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
             jweObject.encrypt(encrypter);
@@ -225,8 +272,7 @@ public class JWEObjectJSONTest extends TestCase {
             assertNotNull(jweObject.getRecipients());
             assertEquals(2, jweObject.getRecipients().size());
 
-            ECDH1PUX25519DecrypterMulti decrypter = new ECDH1PUX25519DecrypterMulti(aliceKey.toPublicJWK(),
-                    new OctetKeyPair[] { bobKey, charlieKey });
+            ECDH1PUX25519DecrypterMulti decrypter = new ECDH1PUX25519DecrypterMulti(aliceKey.toPublicJWK(), recipients);
 
             decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
             jweObject.decrypt(decrypter);
@@ -250,7 +296,13 @@ public class JWEObjectJSONTest extends TestCase {
 
             JWEObjectJSON jweObject = new JWEObjectJSON(header, payload);
 
-            ECDHEncrypterMulti encrypter = new ECDHEncrypterMulti(new ECKey[]{ aliceKey, bobKey, charlieKey });
+            List<Pair<UnprotectedHeader, ECKey>> recipients = Arrays.asList(
+                    Pair.of(new UnprotectedHeader.Builder().keyID("alice").build(), aliceKey),
+                    Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
+                    Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+            );
+
+            ECDHEncrypterMulti encrypter = new ECDHEncrypterMulti(recipients);
             encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
             jweObject.encrypt(encrypter);
 
@@ -264,7 +316,7 @@ public class JWEObjectJSONTest extends TestCase {
             assertNotNull(jweObject.getRecipients());
             assertEquals(3, jweObject.getRecipients().size());
 
-            ECDHDecrypterMulti decrypter = new ECDHDecrypterMulti(new ECKey[] { aliceKey, bobKey, charlieKey });
+            ECDHDecrypterMulti decrypter = new ECDHDecrypterMulti(recipients);
             decrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
             jweObject.decrypt(decrypter);
 
@@ -287,9 +339,13 @@ public class JWEObjectJSONTest extends TestCase {
 
             JWEObjectJSON jweObject = new JWEObjectJSON(header, payload);
 
+            List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Arrays.asList(
+                    Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
+                    Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+            );
+
             try {
-                ECDH1PUX25519EncrypterMulti encrypter = new ECDH1PUX25519EncrypterMulti(aliceKey,
-                        new OctetKeyPair[]{ bobKey.toPublicJWK(), charlieKey.toPublicJWK() });
+                ECDH1PUX25519EncrypterMulti encrypter = new ECDH1PUX25519EncrypterMulti(aliceKey, recipients);
 
                 encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
                 jweObject.encrypt(encrypter);
@@ -346,7 +402,12 @@ public class JWEObjectJSONTest extends TestCase {
                 "      \"HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ\"" +
                 "    }");
 
-        ECDH1PUX25519DecrypterMulti decrypterMulti = new ECDH1PUX25519DecrypterMulti(aliceKey.toPublicJWK(), new OctetKeyPair[]{bobKey, charlieKey});
+        List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Arrays.asList(
+                Pair.of(new UnprotectedHeader.Builder().keyID("bob-key-2").build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder().keyID("2021-05-06").build(), charlieKey)
+        );
+
+        ECDH1PUX25519DecrypterMulti decrypterMulti = new ECDH1PUX25519DecrypterMulti(aliceKey.toPublicJWK(), recipients);
         jwe.decrypt(decrypterMulti);
 
         assertEquals("Three is a magic number.", jwe.getPayload().toString());

@@ -21,6 +21,7 @@ package com.nimbusds.jose.crypto.impl;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.Pair;
 
 import javax.crypto.SecretKey;
 import java.util.*;
@@ -265,7 +266,7 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
     }
 
     protected JWECryptoParts encryptMulti(final JWEHeader header,
-                                          final Map<String, SecretKey> sharedSecrets,
+                                          final List<Pair<UnprotectedHeader, SecretKey>> sharedSecrets,
                                           final byte[] clearText) throws JOSEException {
 
         final ECDH.AlgorithmMode algMode = ECDH1PU.resolveAlgorithmMode(header.getAlgorithm());
@@ -278,24 +279,20 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
         boolean encrypted = false;
         JWECryptoParts parts = null;
 
-        for (Map.Entry<String, SecretKey> rs : sharedSecrets.entrySet()) {
+        for (Pair<UnprotectedHeader, SecretKey> rs : sharedSecrets) {
             Base64URL encryptedKey = null;
 
             if (!encrypted) {
-                parts = encryptWithZ(header, rs.getValue(), clearText, cek);
+                parts = encryptWithZ(header, rs.getRight(), clearText, cek);
                 encryptedKey = parts.getEncryptedKey();
                 encrypted = true;
             } else if (algMode.equals(ECDH.AlgorithmMode.KW)) {
-                SecretKey sharedKey = ECDH1PU.deriveSharedKey(header, rs.getValue(), parts.getAuthenticationTag(), getConcatKDF());
+                SecretKey sharedKey = ECDH1PU.deriveSharedKey(header, rs.getRight(), parts.getAuthenticationTag(), getConcatKDF());
                 encryptedKey = Base64URL.encode(AESKW.wrapCEK(cek, sharedKey, getJCAContext().getKeyEncryptionProvider()));
             }
 
             if (encryptedKey != null) {
-                UnprotectedHeader unprotectedHeader = new UnprotectedHeader.Builder()
-                        .keyID(rs.getKey())
-                        .build();
-
-                recipients.add(new Recipient(unprotectedHeader, encryptedKey));
+                recipients.add(new Recipient(rs.getLeft(), encryptedKey));
             }
         }
 
@@ -313,7 +310,7 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
     }
 
     protected byte[] decryptMulti(final JWEHeader header,
-                                  final Map<String, SecretKey> sharedSecrets,
+                                  final List<Pair<UnprotectedHeader, SecretKey>> sharedSecrets,
                                   final List<Recipient> recipients,
                                   final Base64URL iv,
                                   final Base64URL cipherText,
@@ -321,18 +318,24 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
 
         byte[] result = null;
 
-        for (Map.Entry<String, SecretKey> rs : sharedSecrets.entrySet()) {
+        for (Pair<UnprotectedHeader, SecretKey> rs : sharedSecrets) {
+            String kid = rs.getLeft().getKeyID();
             Base64URL encryptedKey = null;
+
+            if (kid == null) {
+                throw new JOSEException("kid should be specified");
+            }
 
             if (recipients != null) {
                 for (Recipient recipient : recipients) {
-                    if (rs.getKey().equals(recipient.getHeader().getKeyID())) {
+                    if (kid.equals(recipient.getHeader().getKeyID())) {
                         encryptedKey = recipient.getEncryptedKey();
+                        break;
                     }
                 }
             }
 
-            result = decryptWithZ(header, rs.getValue(), encryptedKey, iv, cipherText, authTag);
+            result = decryptWithZ(header, rs.getRight(), encryptedKey, iv, cipherText, authTag);
         }
 
         return result;

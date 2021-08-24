@@ -23,6 +23,7 @@ import com.nimbusds.jose.crypto.impl.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
+import com.nimbusds.jose.util.Pair;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
@@ -32,7 +33,7 @@ import java.util.*;
 
 
 /**
- * Elliptic Curve Diffie-Hellman Multiple encrypter of
+ * Elliptic Curve Diffie-Hellman Multi-recipient encrypter of
  * {@link com.nimbusds.jose.JWEObjectJSON JWE objects} for curves using EC JWK keys.
  * Expects a public EC key (with a P-256, P-384, or P-521 curve).
  *
@@ -100,10 +101,25 @@ public class ECDH1PUEncrypterMulti extends ECDH1PUCryptoProvider implements JWEE
         SUPPORTED_ELLIPTIC_CURVES = Collections.unmodifiableSet(curves);
     }
 
+    /**
+     * The private sender JWK key.
+     */
     private final ECKey sender;
-    private final ECKey[] recipients;
 
-    public ECDH1PUEncrypterMulti(final ECKey sender, final ECKey[] recipients)
+    /**
+     * The list of public recipient's keys.
+     */
+    private final List<Pair<UnprotectedHeader, ECKey>>recipients;
+
+    /**
+     * Creates Elliptic Curve Diffie-Hellman Multi-recipient encryptor.
+     *
+     * @param sender     The private sender JWK key.
+     * @param recipients The list of public recipient's keys.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public ECDH1PUEncrypterMulti(final ECKey sender, final List<Pair<UnprotectedHeader, ECKey>>recipients)
         throws JOSEException {
 
         super(sender.getCurve());
@@ -130,17 +146,17 @@ public class ECDH1PUEncrypterMulti extends ECDH1PUCryptoProvider implements JWEE
                 ephemeralPublicKey(new ECKey.Builder(getCurve(), ephemeralPublicKey).build()).
                 build();
 
-        Map<String, SecretKey> sharedKeys = new HashMap<>();
+        List<Pair<UnprotectedHeader, SecretKey>> sharedKeys = new ArrayList<>();
 
-        for (ECKey recipient : recipients) {
+        for (Pair<UnprotectedHeader, ECKey> recipient : recipients) {
             SecretKey Z = ECDH1PU.deriveSenderZ(
                     sender.toECPrivateKey(),
-                    recipient.toECPublicKey(),
+                    recipient.getRight().toECPublicKey(),
                     ephemeralPrivateKey,
                     getJCAContext().getKeyEncryptionProvider()
             );
 
-            sharedKeys.put(recipient.getKeyID(), Z);
+            sharedKeys.add(Pair.of(recipient.getLeft(), Z));
         }
 
         return encryptMulti(updatedHeader, sharedKeys, clearText);

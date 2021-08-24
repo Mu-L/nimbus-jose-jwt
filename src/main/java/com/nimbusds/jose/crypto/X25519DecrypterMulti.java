@@ -23,6 +23,7 @@ import com.nimbusds.jose.crypto.impl.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.Pair;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
@@ -30,7 +31,7 @@ import java.util.*;
 
 
 /**
- * Elliptic Curve Diffie-Hellman Multi decrypter of
+ * Elliptic Curve Diffie-Hellman Multi-recipient decrypter of
  * {@link JWEObjectJSON JWE objects} for curves using EC JWK
  * keys. Expects a private EC key (with a P-256, P-384 or P-521 curve).
  *
@@ -93,18 +94,38 @@ public class X25519DecrypterMulti extends ECDHCryptoProvider implements JWEDecry
      */
     private final CriticalHeaderParamsDeferral critPolicy = new CriticalHeaderParamsDeferral();
 
-    private final OctetKeyPair[] recipients;
+    /**
+     * The list of private recipient's keys.
+     */
+    private final List<Pair<UnprotectedHeader, OctetKeyPair>>recipients;
 
-    public X25519DecrypterMulti(final OctetKeyPair[] recipients)
+    /**
+     * Creates a curve x25519 Elliptic Curve Diffie-Hellman Multi-recipient decrypter.
+     *
+     * @param recipients     The list of private recipient's keys.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public X25519DecrypterMulti(final List<Pair<UnprotectedHeader, OctetKeyPair>>recipients)
             throws JOSEException {
 
         this(recipients, null);
     }
 
-    public X25519DecrypterMulti(final OctetKeyPair[] recipients, final Set<String> defCritHeaders)
+    /**
+     * Creates a curve x25519 Elliptic Curve Diffie-Hellman Multi-recipient decrypter.
+     *
+     * @param recipients     The list of private recipient's keys.
+     * @param defCritHeaders The names of the critical header parameters
+     *                       that are deferred to the application for
+     *                       processing, empty set or {@code null} if none.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public X25519DecrypterMulti(final List<Pair<UnprotectedHeader, OctetKeyPair>> recipients, final Set<String> defCritHeaders)
         throws JOSEException {
 
-        super(recipients[0].getCurve());
+        super(recipients.get(0).getRight().getCurve());
 
         this.recipients = recipients;
         critPolicy.setDeferredCriticalHeaderParams(defCritHeaders);
@@ -148,19 +169,19 @@ public class X25519DecrypterMulti extends ECDHCryptoProvider implements JWEDecry
             throw new JOSEException("Missing ephemeral public key epk JWE header parameter");
         }
 
-        Map<String, SecretKey> sharedKeys = new HashMap<>();
+        List<Pair<UnprotectedHeader, SecretKey>> sharedKeys = new ArrayList<>();
 
-        for (OctetKeyPair recipient : this.recipients) {
-            if (!recipient.getCurve().equals(ephemeralPublicKey.getCurve())) {
+        for (Pair<UnprotectedHeader, OctetKeyPair> recipient : this.recipients) {
+            if (!recipient.getRight().getCurve().equals(ephemeralPublicKey.getCurve())) {
                 throw new JOSEException("Curve of ephemeral public key does not match curve of private key");
             }
 
             SecretKey Z = ECDH.deriveSharedSecret(
                     ephemeralPublicKey,
-                    recipient
+                    recipient.getRight()
             );
 
-            sharedKeys.put(recipient.getKeyID(), Z);
+            sharedKeys.add(Pair.of(recipient.getLeft(), Z));
         }
 
         return decryptMulti(header, sharedKeys, recipients, iv, cipherText, authTag);

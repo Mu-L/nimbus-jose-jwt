@@ -23,6 +23,7 @@ import com.nimbusds.jose.crypto.impl.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.Pair;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
@@ -30,7 +31,7 @@ import java.util.*;
 
 
 /**
- * Elliptic Curve Diffie-Hellman Multi decrypter of
+ * Elliptic Curve Diffie-Hellman Multi-recipient decrypter of
  * {@link com.nimbusds.jose.JWEObjectJSON JWE objects} for curves using EC JWK
  * Expects a private {@link OctetKeyPair} key with {@code "crv"} X25519.
  *
@@ -104,17 +105,46 @@ public class ECDH1PUX25519DecrypterMulti extends ECDH1PUCryptoProvider implement
      */
     private final CriticalHeaderParamsDeferral critPolicy = new CriticalHeaderParamsDeferral();
 
-
+    /**
+     * The public sender JWK key.
+     */
     private final OctetKeyPair sender;
-    private final OctetKeyPair[] recipients;
 
-    public ECDH1PUX25519DecrypterMulti(final OctetKeyPair sender, final OctetKeyPair[] recipients)
+    /**
+     * The list of private recipient's keys.
+     */
+    private final List<Pair<UnprotectedHeader, OctetKeyPair>>recipients;
+
+    /**
+     * Creates a curve x25519 Elliptic Curve Diffie-Hellman Multi-recipient decrypter.
+     *
+     * @param sender         The sender public JWK key.
+     * @param recipients     The list of private recipient's keys.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public ECDH1PUX25519DecrypterMulti(final OctetKeyPair sender, final List<Pair<UnprotectedHeader, OctetKeyPair>> recipients)
             throws JOSEException {
 
         this(sender, recipients, null);
     }
 
-    public ECDH1PUX25519DecrypterMulti(final OctetKeyPair sender, final OctetKeyPair[] recipients, final Set<String> defCritHeaders)
+    /**
+     * Creates a curve x25519 Elliptic Curve Diffie-Hellman Multi-recipient decrypter.
+     *
+     * @param sender         The sender public JWK key.
+     * @param recipients     The list of private recipient's keys.
+     * @param defCritHeaders The names of the critical header parameters
+     *                       that are deferred to the application for
+     *                       processing, empty set or {@code null} if none.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public ECDH1PUX25519DecrypterMulti(
+            final OctetKeyPair sender,
+            final List<Pair<UnprotectedHeader, OctetKeyPair>>recipients,
+            final Set<String> defCritHeaders)
+
             throws JOSEException {
 
         super(sender.getCurve());
@@ -162,16 +192,16 @@ public class ECDH1PUX25519DecrypterMulti extends ECDH1PUCryptoProvider implement
             throw new JOSEException("Missing ephemeral public key epk JWE header parameter");
         }
 
-        Map<String, SecretKey> sharedKeys = new HashMap<>();
+        List<Pair<UnprotectedHeader, SecretKey>> sharedKeys = new ArrayList<>();
 
-        for (OctetKeyPair recipient : this.recipients) {
+        for (Pair<UnprotectedHeader, OctetKeyPair> recipient : this.recipients) {
             SecretKey Z = ECDH1PU.deriveRecipientZ(
-                    recipient,
+                    recipient.getRight(),
                     sender.toPublicJWK(),
                     ephemeralPublicKey
             );
 
-            sharedKeys.put(recipient.getKeyID(), Z);
+            sharedKeys.add(Pair.of(recipient.getLeft(), Z));
         }
 
         return decryptMulti(header, sharedKeys, recipients, iv, cipherText, authTag);

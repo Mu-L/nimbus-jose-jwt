@@ -23,6 +23,7 @@ import com.nimbusds.jose.crypto.impl.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
+import com.nimbusds.jose.util.Pair;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
@@ -30,7 +31,7 @@ import java.util.*;
 
 
 /**
- * Elliptic Curve Diffie-Hellman Multi encrypter of
+ * Elliptic Curve Diffie-Hellman Multi-recipient encrypter of
  * {@link JWEObjectJSON JWE objects} for curves using EC JWK keys.
  * Expects a public EC key (with a P-256, P-384, or P-521 curve).
  *
@@ -87,12 +88,22 @@ public class X25519EncrypterMulti extends ECDHCryptoProvider implements JWEEncry
         SUPPORTED_ELLIPTIC_CURVES = Collections.unmodifiableSet(curves);
     }
 
-    private final OctetKeyPair[] recipients;
+    /**
+     * The list of public recipient's keys.
+     */
+    private final List<Pair<UnprotectedHeader, OctetKeyPair>> recipients;
 
-    public X25519EncrypterMulti(final OctetKeyPair[] recipients)
+    /**
+     * Creates a curve x25519 Elliptic Curve Diffie-Hellman Multi-recipient encryptor.
+     *
+     * @param recipients The list of public recipient's keys.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public X25519EncrypterMulti(final List<Pair<UnprotectedHeader, OctetKeyPair>> recipients)
         throws JOSEException {
 
-        super(recipients[0].getCurve());
+        super(recipients.get(0).getRight().getCurve());
 
         this.recipients = recipients;
     }
@@ -113,15 +124,15 @@ public class X25519EncrypterMulti extends ECDHCryptoProvider implements JWEEncry
                 .ephemeralPublicKey(ephemeralPublicKey)
                 .build();
 
-        Map<String, SecretKey> sharedKeys = new HashMap<>();
+        List<Pair<UnprotectedHeader, SecretKey>> sharedKeys = new ArrayList<>();
 
-        for (OctetKeyPair recipient : recipients) {
+        for (Pair<UnprotectedHeader, OctetKeyPair> recipient : recipients) {
             SecretKey Z = ECDH.deriveSharedSecret(
-                    recipient.toPublicJWK(),
+                    recipient.getRight().toPublicJWK(),
                     ephemeralPrivateKey
             );
 
-            sharedKeys.put(recipient.getKeyID(), Z);
+            sharedKeys.add(Pair.of(recipient.getLeft(), Z));
         }
 
         return encryptMulti(updatedHeader, sharedKeys, clearText);
