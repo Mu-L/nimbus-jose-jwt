@@ -57,7 +57,7 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
      * @param payload The payload. Must not be {@code null}.
      */
     public JWSObjectJSON(JWSHeader header, Payload payload) {
-        super(header, payload);
+        super(escapeJWSHeader(header), payload);
     }
 
     /**
@@ -198,5 +198,22 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
 
         this.unprotectedHeader = header;
         sign(signer);
+    }
+
+
+    private static JWSHeader escapeJWSHeader(JWSHeader jwsHeader) {
+        if (jwsHeader == null) {
+
+            throw new IllegalArgumentException("The JWS header must not be null");
+        }
+
+        try {
+            String json = JSONObjectUtils.toJSONString(jwsHeader.toJSONObject(), true);
+            Base64URL base64URL = Base64URL.encode(json.getBytes(StandardCharsets.UTF_8));
+            return JWSHeader.parse(base64URL);
+        } catch (ParseException e) {
+
+            throw new IllegalArgumentException("Invalid JWS header: " + e.getMessage());
+        }
     }
 }

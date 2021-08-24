@@ -115,12 +115,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
      */
     public JWEObjectJSON(final JWEHeader header, final Payload payload) {
 
-        if (header == null) {
-
-            throw new IllegalArgumentException("The JWE header must not be null");
-        }
-
-        this.header = header;
+        setHeader(header);
 
         if (payload == null) {
 
@@ -158,7 +153,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
         if (header == null) {
 
-            throw new IllegalArgumentException("The first part must not be null");
+            throw new IllegalArgumentException("The header part must not be null");
         }
 
         try {
@@ -189,7 +184,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
         if (ciphertext == null) {
 
-            throw new IllegalArgumentException("The fourth part must not be null");
+            throw new IllegalArgumentException("The ciphertext must not be null");
         }
 
         this.cipherText = ciphertext;
@@ -495,5 +490,21 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
         json.put("protected", Base64URL.encode(header).toString());
         json.put("ciphertext", getCipherText().toString());
         return json;
+    }
+
+    protected void setHeader(JWEHeader jweHeader) {
+        if (jweHeader == null) {
+
+            throw new IllegalArgumentException("The JWE header must not be null");
+        }
+
+        try {
+            String json = JSONObjectUtils.toJSONString(jweHeader.toJSONObject(), true);
+            Base64URL base64URL = Base64URL.encode(json.getBytes(StandardCharsets.UTF_8));
+            this.header = JWEHeader.parse(base64URL);
+        } catch (ParseException e) {
+
+            throw new IllegalArgumentException("Invalid JWE header: " + e.getMessage());
+        }
     }
 }
