@@ -138,8 +138,8 @@ public class JWEObjectJSONTest extends TestCase {
         JWEObjectJSON jwe = new JWEObjectJSON(header, new Payload("Hello, world"));
 
         List<Pair<UnprotectedHeader, ECKey>> recipients = Arrays.asList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
-                Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+                Pair.of(new UnprotectedHeader.Builder("bob").build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder("charlie").build(), charlieKey)
         );
 
         ECDH1PUEncrypterMulti encrypterMulti = new ECDH1PUEncrypterMulti(aliceKey, recipients);
@@ -164,8 +164,8 @@ public class JWEObjectJSONTest extends TestCase {
         ECKey charlieKey = generateEC(Curve.P_521, "charlie");
 
         List<Pair<UnprotectedHeader, ECKey>> recipients = Arrays.asList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
-                Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+                Pair.of(new UnprotectedHeader.Builder("bob").build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder("charlie").build(), charlieKey)
         );
 
         JWEObjectJSON jwe = new JWEObjectJSON(header, new Payload("Hello, world"));
@@ -192,8 +192,8 @@ public class JWEObjectJSONTest extends TestCase {
         OctetKeyPair charlieKey = generateOKP(Curve.X25519, "charlie");
 
         List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Arrays.asList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
-                Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+                Pair.of(new UnprotectedHeader.Builder("bob").build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder("charlie").build(), charlieKey)
         );
 
         JWEObjectJSON jwe = new JWEObjectJSON(header, new Payload("Hello, world"));
@@ -220,9 +220,9 @@ public class JWEObjectJSONTest extends TestCase {
         OctetKeyPair charlieKey = generateOKP(Curve.X25519, "charlie");
 
         List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Arrays.asList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("alice").build(), aliceKey),
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
-                Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+                Pair.of(new UnprotectedHeader.Builder("alice").build(), aliceKey),
+                Pair.of(new UnprotectedHeader.Builder("bob").build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder("charlie").build(), charlieKey)
         );
 
         JWEObjectJSON jwe = new JWEObjectJSON(header, new Payload("Hello, world"));
@@ -254,8 +254,8 @@ public class JWEObjectJSONTest extends TestCase {
             JWEObjectJSON jweObject = new JWEObjectJSON(header, payload);
 
             List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Arrays.asList(
-                    Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
-                    Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+                    Pair.of(new UnprotectedHeader.Builder("bob").build(), bobKey),
+                    Pair.of(new UnprotectedHeader.Builder("charlie").build(), charlieKey)
             );
 
             ECDH1PUX25519EncrypterMulti encrypter = new ECDH1PUX25519EncrypterMulti(aliceKey, recipients);
@@ -298,9 +298,9 @@ public class JWEObjectJSONTest extends TestCase {
             JWEObjectJSON jweObject = new JWEObjectJSON(header, payload);
 
             List<Pair<UnprotectedHeader, ECKey>> recipients = Arrays.asList(
-                    Pair.of(new UnprotectedHeader.Builder().keyID("alice").build(), aliceKey),
-                    Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
-                    Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+                    Pair.of(new UnprotectedHeader.Builder("alice").build(), aliceKey),
+                    Pair.of(new UnprotectedHeader.Builder("bob").build(), bobKey),
+                    Pair.of(new UnprotectedHeader.Builder("charlie").build(), charlieKey)
             );
 
             ECDHEncrypterMulti encrypter = new ECDHEncrypterMulti(recipients);
@@ -341,8 +341,8 @@ public class JWEObjectJSONTest extends TestCase {
             JWEObjectJSON jweObject = new JWEObjectJSON(header, payload);
 
             List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Arrays.asList(
-                    Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey),
-                    Pair.of(new UnprotectedHeader.Builder().keyID("charlie").build(), charlieKey)
+                    Pair.of(new UnprotectedHeader.Builder("bob").build(), bobKey),
+                    Pair.of(new UnprotectedHeader.Builder("charlie").build(), charlieKey)
             );
 
             try {
@@ -409,8 +409,8 @@ public class JWEObjectJSONTest extends TestCase {
         // both key decryption
         JWEObjectJSON jwe = JWEObjectJSON.parse(json);
         List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Arrays.asList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob-key-2").build(), bobKey),
-                Pair.of(new UnprotectedHeader.Builder().keyID("2021-05-06").build(), charlieKey)
+                Pair.of(new UnprotectedHeader.Builder("bob-key-2").build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder("2021-05-06").build(), charlieKey)
         );
 
         ECDH1PUX25519DecrypterMulti decrypterMulti = new ECDH1PUX25519DecrypterMulti(aliceKey.toPublicJWK(), recipients);
@@ -419,14 +419,14 @@ public class JWEObjectJSONTest extends TestCase {
 
         // bob key decryption
         jwe = JWEObjectJSON.parse(json);
-        recipients = Collections.singletonList(Pair.of(new UnprotectedHeader.Builder().keyID("bob-key-2").build(), bobKey));
+        recipients = Collections.singletonList(Pair.of(new UnprotectedHeader.Builder("bob-key-2").build(), bobKey));
         decrypterMulti = new ECDH1PUX25519DecrypterMulti(aliceKey.toPublicJWK(), recipients);
         jwe.decrypt(decrypterMulti);
         assertEquals("Three is a magic number.", jwe.getPayload().toString());
 
         // charlie key decryption
         jwe = JWEObjectJSON.parse(json);
-        recipients = Collections.singletonList(Pair.of(new UnprotectedHeader.Builder().keyID("2021-05-06").build(), charlieKey));
+        recipients = Collections.singletonList(Pair.of(new UnprotectedHeader.Builder("2021-05-06").build(), charlieKey));
         decrypterMulti = new ECDH1PUX25519DecrypterMulti(aliceKey.toPublicJWK(), recipients);
         jwe.decrypt(decrypterMulti);
         assertEquals("Three is a magic number.", jwe.getPayload().toString());
@@ -445,9 +445,9 @@ public class JWEObjectJSONTest extends TestCase {
         JWEObjectJSON jweObject = new JWEObjectJSON(header, new Payload("hello"));
 
         List<Pair<UnprotectedHeader, ECKey>> recipients = Arrays.asList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("alice").build(), aliceKey),
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob").customParam("test", "test").build(), bobKey),
-                Pair.of(new UnprotectedHeader.Builder().keyID("charlie").customParam("test1", "test1").build(), charlieKey)
+                Pair.of(new UnprotectedHeader.Builder("alice").build(), aliceKey),
+                Pair.of(new UnprotectedHeader.Builder("bob").customParam("test", "test").build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder("charlie").customParam("test1", "test1").build(), charlieKey)
         );
 
         ECDHEncrypterMulti encrypter = new ECDHEncrypterMulti(recipients);
@@ -483,7 +483,7 @@ public class JWEObjectJSONTest extends TestCase {
         ECKey bobKey = generateEC(Curve.P_521, "1");
 
         List<Pair<UnprotectedHeader, ECKey>> recipients = Collections.singletonList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob").build(), bobKey)
+                Pair.of(new UnprotectedHeader.Builder("bob").build(), bobKey)
         );
 
         try {
@@ -550,7 +550,7 @@ public class JWEObjectJSONTest extends TestCase {
                 "    }");
 
         List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Collections.singletonList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob-key-2").build(), bobKey)
+                Pair.of(new UnprotectedHeader.Builder("bob-key-2").build(), bobKey)
         );
 
         try {
@@ -568,7 +568,7 @@ public class JWEObjectJSONTest extends TestCase {
 
 
         List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Collections.singletonList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob-key-3").build(), bobKey)
+                Pair.of(new UnprotectedHeader.Builder("bob-key-3").build(), bobKey)
         );
 
         try {
@@ -646,11 +646,11 @@ public class JWEObjectJSONTest extends TestCase {
                 "    }");
 
         List<Pair<UnprotectedHeader, OctetKeyPair>> recipientsOKP = Collections.singletonList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob-key-3").build(), bobKeyOKP)
+                Pair.of(new UnprotectedHeader.Builder("bob-key-3").build(), bobKeyOKP)
         );
 
         List<Pair<UnprotectedHeader, ECKey>> recipientsEC = Collections.singletonList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob-key-3").build(), bobKeyEC)
+                Pair.of(new UnprotectedHeader.Builder("bob-key-3").build(), bobKeyEC)
         );
 
         try {
@@ -728,8 +728,8 @@ public class JWEObjectJSONTest extends TestCase {
 
         try {
             List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Arrays.asList(
-                    Pair.of(new UnprotectedHeader.Builder().keyID("bob-key-2").build(), bobKey),
-                    Pair.of(new UnprotectedHeader.Builder().keyID("2021-05-06").build(), charlieKey)
+                    Pair.of(new UnprotectedHeader.Builder("bob-key-2").build(), bobKey),
+                    Pair.of(new UnprotectedHeader.Builder("2021-05-06").build(), charlieKey)
             );
 
             ECDH1PUX25519DecrypterMulti decrypterMulti = new ECDH1PUX25519DecrypterMulti(aliceKey.toPublicJWK(), recipients);
@@ -775,7 +775,7 @@ public class JWEObjectJSONTest extends TestCase {
                 "    }");
 
         List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Collections.singletonList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob-key-2").build(), bobKey)
+                Pair.of(new UnprotectedHeader.Builder("bob-key-2").build(), bobKey)
         );
 
         ECDH1PUX25519DecrypterMulti decrypterMulti = new ECDH1PUX25519DecrypterMulti(aliceKey.toPublicJWK(), recipients);
@@ -786,10 +786,10 @@ public class JWEObjectJSONTest extends TestCase {
 
     public void test_kid_is_not_passed() {
         try {
-            new UnprotectedHeader.Builder().build();
+            new UnprotectedHeader.Builder(null).build();
             fail();
         } catch (Exception e) {
-            assertEquals("\"kid\" should be specified", e.getMessage());
+            assertEquals("The \"kid\" should be specified", e.getMessage());
         }
     }
 
@@ -797,7 +797,7 @@ public class JWEObjectJSONTest extends TestCase {
         OctetKeyPair bobKeyOKP = generateOKP(Curve.X25519, "2");
 
         List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Collections.singletonList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob-2").build(), bobKeyOKP)
+                Pair.of(new UnprotectedHeader.Builder("bob-2").build(), bobKeyOKP)
         );
 
         try {
@@ -829,7 +829,7 @@ public class JWEObjectJSONTest extends TestCase {
         OctetKeyPair bobKeyOKP = generateOKP(Curve.X25519, "2");
 
         List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Collections.singletonList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob-2").build(), bobKeyOKP)
+                Pair.of(new UnprotectedHeader.Builder("bob-2").build(), bobKeyOKP)
         );
 
         try {
@@ -874,8 +874,8 @@ public class JWEObjectJSONTest extends TestCase {
         JWEObjectJSON jwe = new JWEObjectJSON(header, new Payload("Hello, world"));
 
         List<Pair<UnprotectedHeader, ECKey>> recipients = Arrays.asList(
-                Pair.of(new UnprotectedHeader.Builder().keyID(bobKid).build(), bobKey),
-                Pair.of(new UnprotectedHeader.Builder().keyID(charlieKid).build(), charlieKey)
+                Pair.of(new UnprotectedHeader.Builder(bobKid).build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder(charlieKid).build(), charlieKey)
         );
 
         ECDH1PUEncrypterMulti encrypterMulti = new ECDH1PUEncrypterMulti(aliceKey, recipients);
@@ -947,7 +947,7 @@ public class JWEObjectJSONTest extends TestCase {
         assertEquals(1, jwe.getRecipients().size());
 
         List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Collections.singletonList(
-                Pair.of(new UnprotectedHeader.Builder().keyID("bob-key-2").build(), bobKey)
+                Pair.of(new UnprotectedHeader.Builder("bob-key-2").build(), bobKey)
         );
 
         ECDH1PUX25519DecrypterMulti decrypterMulti = new ECDH1PUX25519DecrypterMulti(aliceKey, recipients);

@@ -65,8 +65,7 @@ public class JWSObjectJSONTest extends TestCase {
         JWSHeader header = new JWSHeader(JWSAlgorithm.EdDSA);
         JWSObjectJSON jwsObject = new JWSObjectJSON(header, new Payload("Hello world!"));
 
-        UnprotectedHeader uh = new UnprotectedHeader.Builder()
-                .keyID("123345")
+        UnprotectedHeader uh = new UnprotectedHeader.Builder("123345")
                 .build();
 
         OctetKeyPair privateKey = new OctetKeyPairGenerator(Curve.Ed25519).generate();

@@ -49,8 +49,8 @@ public class UnprotectedHeader {
      * @param header map of unprotected headers
      */
     protected UnprotectedHeader(Map<String, Object> header) {
-        if (!header.containsKey(HeaderParameterNames.KEY_ID)) {
-            throw new IllegalArgumentException("\"kid\" should be specified");
+        if(!header.containsKey(HeaderParameterNames.KEY_ID)) {
+            throw new IllegalArgumentException("The \"kid\" should be specified");
         }
 
         this.header = header;
@@ -102,16 +102,15 @@ public class UnprotectedHeader {
      *                        Unprotected header.
      */
     public static UnprotectedHeader parse(Map<String, Object> jsonObject) throws ParseException {
-        Builder header = new Builder();
-
         if (jsonObject == null) {
             return null;
         }
 
+        String kid = JSONObjectUtils.getString(jsonObject, HeaderParameterNames.KEY_ID);
+        Builder header = new Builder(kid);
+
         for(final String name: jsonObject.keySet()) {
-            if(HeaderParameterNames.KEY_ID.equals(name)) {
-                header = header.keyID(JSONObjectUtils.getString(jsonObject, name));
-            } else {
+            if(!HeaderParameterNames.KEY_ID.equals(name)) {
                 header = header.customParam(name, jsonObject.get(name));
             }
         }
@@ -126,16 +125,13 @@ public class UnprotectedHeader {
         private final Map<String, Object> header = JSONObjectUtils.newJSONObject();
 
         /**
-         * Sets the key ID ({@code kid}) parameter.
+         * Creates Unprotected Header with specified key ID.
          *
-         * @param kid The key ID parameter, {@code null} if not
-         *            specified.
-         *
-         * @return This builder.
+         * @param kid The key ID parameter. MUST be not {@code null}.
          */
-        public Builder keyID(String kid) {
+        public Builder(String kid) {
+            Objects.requireNonNull(kid, "The \"kid\" should be specified");
             header.put(HeaderParameterNames.KEY_ID, kid);
-            return this;
         }
 
         /**
