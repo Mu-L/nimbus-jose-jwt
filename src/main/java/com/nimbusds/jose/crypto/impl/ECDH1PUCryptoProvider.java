@@ -322,10 +322,6 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
             String kid = rs.getLeft().getKeyID();
             Base64URL encryptedKey = null;
 
-            if (kid == null) {
-                throw new JOSEException("\"kid\" should be specified");
-            }
-
             if (recipients != null) {
                 for (Recipient recipient : recipients) {
                     if (recipient.getHeader() == null)

@@ -49,6 +49,10 @@ public class UnprotectedHeader {
      * @param header map of unprotected headers
      */
     protected UnprotectedHeader(Map<String, Object> header) {
+        if (!header.containsKey(HeaderParameterNames.KEY_ID)) {
+            throw new IllegalArgumentException("\"kid\" should be specified");
+        }
+
         this.header = header;
     }
 

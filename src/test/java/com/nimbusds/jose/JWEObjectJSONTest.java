@@ -784,40 +784,16 @@ public class JWEObjectJSONTest extends TestCase {
         assertEquals("Three is a magic number.", jwe.getPayload().toString());
     }
 
-    public void test_kid_is_not_passed() throws Exception {
-        OctetKeyPair bobKeyOKP = generateOKP(Curve.X25519, "2");
-
-        List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Collections.singletonList(
-                Pair.of(new UnprotectedHeader.Builder().build(), bobKeyOKP)
-        );
-
+    public void test_kid_is_not_passed() {
         try {
-            JWEObjectJSON jwe = JWEObjectJSON.parse("{" +
-                    "     \"protected\":" +
-                    "      \"eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkEyNTZDQkMtSFM1MTIiLCJhcHUiOiJRV3hwWTJVIiwiYXB2IjoiUW05aUlHRnVaQ0JEYUdGeWJHbGwiLCJlcGsiOnsia3R5IjoiT0tQIiwiY3J2IjoiWDI1NTE5IiwieCI6Ims5b2ZfY3BBYWp5MHBvVzVnYWl4WEdzOW5Ia3dnMUFGcVVBRmEzOWR5QmMifX0=\"," +
-                    "     \"recipients\":[" +
-                    "      {\"header\":" +
-                    "        {\"kid\":\"bob-key-2\"}," +
-                    "       \"encrypted_key\":" +
-                    "        \"pOMVA9_PtoRe7xXW1139NzzN1UhiFoio8lGto9cf0t8PyU-sjNXH8-LIRLycq8CHJQbDwvQ" +
-                    "        eU1cSl55cQ0hGezJu2N9IY0QN\"}]," +
-                    "     \"iv\":" +
-                    "      \"AAECAwQFBgcICQoLDA0ODw\"," +
-                    "     \"ciphertext\":" +
-                    "      \"Az2IWsISEMDJvyc5XRL-3-d-RgNBOGolCsxFFoUXFYw22\"," +
-                    "     \"tag\":" +
-                    "      \"HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ\"" +
-                    "    }");
-
-            X25519DecrypterMulti decrypterMulti = new X25519DecrypterMulti(recipients);
-            jwe.decrypt(decrypterMulti);
+            new UnprotectedHeader.Builder().build();
             fail();
         } catch (Exception e) {
             assertEquals("\"kid\" should be specified", e.getMessage());
         }
     }
 
-    public void test_unprotected_header_kid_is_not_present() throws Exception {
+    public void test_unprotected_header_kid_is_not_found() throws Exception {
         OctetKeyPair bobKeyOKP = generateOKP(Curve.X25519, "2");
 
         List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Collections.singletonList(
@@ -932,12 +908,23 @@ public class JWEObjectJSONTest extends TestCase {
         assertEquals("Hello, world", decrypted.getPayload().toString());
     }
 
-    public void test_jwe_parsing_success() throws Exception{
+    public void test_jwe_custom_header_decrypt_success() throws Exception{
+        OctetKeyPair aliceKey = OctetKeyPair.parse("{\"kty\": \"OKP\"," +
+                "         \"crv\": \"X25519\"," +
+                "         \"x\": \"Knbm_BcdQr7WIoz-uqit9M0wbcfEr6y-9UfIZ8QnBD4\"," +
+                "         \"d\": \"i9KuFhSzEBsiv3PKVL5115OCdsqQai5nj_Flzfkw5jU\"}");
+
+        OctetKeyPair bobKey = OctetKeyPair.parse("{\"kid\": \"bob-key-2\"," +
+                "         \"kty\": \"OKP\"," +
+                "         \"crv\": \"X25519\"," +
+                "         \"x\": \"BT7aR0ItXfeDAldeeOlXL_wXqp-j5FltT0vRSG16kRw\"," +
+                "         \"d\": \"1gDirl_r_Y3-qUa3WXHgEXrrEHngWThU3c9zj9A2uBg\"}");
+
         JWEObjectJSON jwe = JWEObjectJSON.parse("{" +
                 "    \"custom\": \"1223\"," +
                 "    \"aad\": \"eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkEyNTZDQ\"," +
                 "     \"protected\":" +
-                "      \"eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkEyNTZDQkMtSFM1MTIiLCJhcHUiOiJRV3hwWTJVIiwiYXB2IjoiUW05aUlHRnVaQ0JEYUdGeWJHbGwiLCJlcGsiOnsia3R5IjoiT0tQIiwiY3J2IjoiWDI1NTE5IiwieCI6Ims5b2ZfY3BBYWp5MHBvVzVnYWl4WEdzOW5Ia3dnMUFGcVVBRmEzOWR5QmMifX0=\"," +
+                "      \"eyJhbGciOiJFQ0RILTFQVStBMTI4S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiYXB1IjoiUVd4cFkyVSIsImFwdiI6IlFtOWlJR0Z1WkNCRGFHRnliR2xsIiwiZXBrIjp7Imt0eSI6Ik9LUCIsImNydiI6IlgyNTUxOSIsIngiOiJrOW9mX2NwQWFqeTBwb1c1Z2FpeFhHczluSGt3ZzFBRnFVQUZhMzlkeUJjIn19\"," +
                 "     \"recipients\":[" +
                 "      {\"header\":" +
                 "        {\"kid\":\"bob-key-2\"}," +
@@ -947,7 +934,7 @@ public class JWEObjectJSONTest extends TestCase {
                 "     \"iv\":" +
                 "      \"AAECAwQFBgcICQoLDA0ODw\"," +
                 "     \"ciphertext\":" +
-                "      \"Az2IWsISEMDJvyc5XRL-3-d-RgNBOGolCsxFFoUXFYw22\"," +
+                "      \"Az2IWsISEMDJvyc5XRL-3-d-RgNBOGolCsxFFoUXFYw\"," +
                 "     \"tag\":" +
                 "      \"HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ\"" +
                 "    }");
@@ -958,6 +945,15 @@ public class JWEObjectJSONTest extends TestCase {
         assertNotNull(jwe.getCipherText());
         assertNotNull(jwe.getHeader());
         assertEquals(1, jwe.getRecipients().size());
+
+        List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Collections.singletonList(
+                Pair.of(new UnprotectedHeader.Builder().keyID("bob-key-2").build(), bobKey)
+        );
+
+        ECDH1PUX25519DecrypterMulti decrypterMulti = new ECDH1PUX25519DecrypterMulti(aliceKey, recipients);
+        jwe.decrypt(decrypterMulti);
+
+        assertEquals("Three is a magic number.", jwe.getPayload().toString());
     }
 
     public void test_jwe_parsing_failed() {
