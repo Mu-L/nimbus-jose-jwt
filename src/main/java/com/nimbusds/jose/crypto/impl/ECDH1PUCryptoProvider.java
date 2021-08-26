@@ -328,6 +328,9 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
 
             if (recipients != null) {
                 for (Recipient recipient : recipients) {
+                    if (recipient.getHeader() == null)
+                        continue;
+
                     if (kid.equals(recipient.getHeader().getKeyID())) {
                         encryptedKey = recipient.getEncryptedKey();
                         break;

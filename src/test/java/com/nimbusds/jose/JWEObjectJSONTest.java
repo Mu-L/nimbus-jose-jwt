@@ -686,7 +686,7 @@ public class JWEObjectJSONTest extends TestCase {
         }
     }
 
-    public void test_wrong_encrypted_key_passed() throws Exception {
+    public void test_wrong_bob_encrypted_key_passed() throws Exception {
         OctetKeyPair aliceKey = OctetKeyPair.parse("{\"kty\": \"OKP\"," +
                 "         \"crv\": \"X25519\"," +
                 "         \"x\": \"Knbm_BcdQr7WIoz-uqit9M0wbcfEr6y-9UfIZ8QnBD4\"," +
@@ -738,6 +738,41 @@ public class JWEObjectJSONTest extends TestCase {
         } catch (Exception e) {
             assertEquals("Couldn't unwrap AES key: Integrity check failed", e.getMessage());
         }
+    }
+
+    public void test_wrong_bob_encrypted_key_passed_charlie_can_decrypt() throws Exception {
+        OctetKeyPair aliceKey = OctetKeyPair.parse("{\"kty\": \"OKP\"," +
+                "         \"crv\": \"X25519\"," +
+                "         \"x\": \"Knbm_BcdQr7WIoz-uqit9M0wbcfEr6y-9UfIZ8QnBD4\"," +
+                "         \"d\": \"i9KuFhSzEBsiv3PKVL5115OCdsqQai5nj_Flzfkw5jU\"}");
+
+        OctetKeyPair bobKey = OctetKeyPair.parse("{\"kid\": \"bob-key-2\"," +
+                "         \"kty\": \"OKP\"," +
+                "         \"crv\": \"X25519\"," +
+                "         \"x\": \"BT7aR0ItXfeDAldeeOlXL_wXqp-j5FltT0vRSG16kRw\"," +
+                "         \"d\": \"1gDirl_r_Y3-qUa3WXHgEXrrEHngWThU3c9zj9A2uBg\"}");
+
+        JWEObjectJSON jwe = JWEObjectJSON.parse("{" +
+                "     \"protected\":" +
+                "      \"eyJhbGciOiJFQ0RILTFQVStBMTI4S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiYXB1IjoiUVd4cFkyVSIsImFwdiI6IlFtOWlJR0Z1WkNCRGFHRnliR2xsIiwiZXBrIjp7Imt0eSI6Ik9LUCIsImNydiI6IlgyNTUxOSIsIngiOiJrOW9mX2NwQWFqeTBwb1c1Z2FpeFhHczluSGt3ZzFBRnFVQUZhMzlkeUJjIn19\"," +
+                "     \"recipients\":[" +
+                "      {\"header\":" +
+                "        {\"kid\":\"bob-key-2\"}," +
+                "       \"encrypted_key\":" +
+                "        \"pOMVA9_PtoRe7xXW1139NzzN1UhiFoio8lGto9cf0t8PyU-sjNXH8-LIRLycq8CHJQbDwvQ" +
+                "        eU1cSl55cQ0hGezJu2N9IY0QN\"}," +
+                "      {\"header\":" +
+                "        {\"kid\":\"2021-05-06\"}," +
+                "       \"encrypted_key\":" +
+                "        \"56GVudgRLIMEElQ7DpXsijJVRSWUSDNdbWkdV3g012Nq6hcT_GkxwnxlPIWrTXCqRpVKQC8" +
+                "         fe4z3PQ2YH2afvjQ28aiCTWFE\"}]," +
+                "     \"iv\":" +
+                "      \"AAECAwQFBgcICQoLDA0ODw\"," +
+                "     \"ciphertext\":" +
+                "      \"Az2IWsISEMDJvyc5XRL-3-d-RgNBOGolCsxFFoUXFYw\"," +
+                "     \"tag\":" +
+                "      \"HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ\"" +
+                "    }");
 
         List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Collections.singletonList(
                 Pair.of(new UnprotectedHeader.Builder().keyID("bob-key-2").build(), bobKey)
@@ -780,6 +815,149 @@ public class JWEObjectJSONTest extends TestCase {
         } catch (Exception e) {
             assertEquals("\"kid\" should be specified", e.getMessage());
         }
+    }
+
+    public void test_unprotected_header_kid_is_not_present() throws Exception {
+        OctetKeyPair bobKeyOKP = generateOKP(Curve.X25519, "2");
+
+        List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Collections.singletonList(
+                Pair.of(new UnprotectedHeader.Builder().keyID("bob-2").build(), bobKeyOKP)
+        );
+
+        try {
+            JWEObjectJSON jwe = JWEObjectJSON.parse("{" +
+                    "     \"protected\":" +
+                    "      \"eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkEyNTZDQkMtSFM1MTIiLCJhcHUiOiJRV3hwWTJVIiwiYXB2IjoiUW05aUlHRnVaQ0JEYUdGeWJHbGwiLCJlcGsiOnsia3R5IjoiT0tQIiwiY3J2IjoiWDI1NTE5IiwieCI6Ims5b2ZfY3BBYWp5MHBvVzVnYWl4WEdzOW5Ia3dnMUFGcVVBRmEzOWR5QmMifX0=\"," +
+                    "     \"recipients\":[{\"header\":" +
+                    "        {\"kid\":\"bob-key-2\"}," +
+                    "       \"encrypted_key\":" +
+                    "        \"pOMVA9_PtoRe7xXW1139NzzN1UhiFoio8lGto9cf0t8PyU-sjNXH8-LIRLycq8CHJQbDwvQ" +
+                    "        eU1cSl55cQ0hGezJu2N9IY0QN\"}]," +
+                    "     \"iv\":" +
+                    "      \"AAECAwQFBgcICQoLDA0ODw\"," +
+                    "     \"ciphertext\":" +
+                    "      \"Az2IWsISEMDJvyc5XRL-3-d-RgNBOGolCsxFFoUXFYw22\"," +
+                    "     \"tag\":" +
+                    "      \"HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ\"" +
+                    "    }");
+
+            X25519DecrypterMulti decrypterMulti = new X25519DecrypterMulti(recipients);
+            jwe.decrypt(decrypterMulti);
+            fail();
+        } catch (Exception e) {
+            assertEquals("Missing JWE encrypted key", e.getMessage());
+        }
+    }
+
+    public void test_unprotected_header_is_not_present() throws Exception {
+        OctetKeyPair bobKeyOKP = generateOKP(Curve.X25519, "2");
+
+        List<Pair<UnprotectedHeader, OctetKeyPair>> recipients = Collections.singletonList(
+                Pair.of(new UnprotectedHeader.Builder().keyID("bob-2").build(), bobKeyOKP)
+        );
+
+        try {
+            JWEObjectJSON jwe = JWEObjectJSON.parse("{" +
+                    "     \"protected\":" +
+                    "      \"eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkEyNTZDQkMtSFM1MTIiLCJhcHUiOiJRV3hwWTJVIiwiYXB2IjoiUW05aUlHRnVaQ0JEYUdGeWJHbGwiLCJlcGsiOnsia3R5IjoiT0tQIiwiY3J2IjoiWDI1NTE5IiwieCI6Ims5b2ZfY3BBYWp5MHBvVzVnYWl4WEdzOW5Ia3dnMUFGcVVBRmEzOWR5QmMifX0=\"," +
+                    "     \"recipients\":[{" +
+                    "       \"encrypted_key\":" +
+                    "        \"pOMVA9_PtoRe7xXW1139NzzN1UhiFoio8lGto9cf0t8PyU-sjNXH8-LIRLycq8CHJQbDwvQ" +
+                    "        eU1cSl55cQ0hGezJu2N9IY0QN\"}]," +
+                    "     \"iv\":" +
+                    "      \"AAECAwQFBgcICQoLDA0ODw\"," +
+                    "     \"ciphertext\":" +
+                    "      \"Az2IWsISEMDJvyc5XRL-3-d-RgNBOGolCsxFFoUXFYw22\"," +
+                    "     \"tag\":" +
+                    "      \"HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ\"" +
+                    "    }");
+
+            X25519DecrypterMulti decrypterMulti = new X25519DecrypterMulti(recipients);
+            jwe.decrypt(decrypterMulti);
+            fail();
+        } catch (Exception e) {
+            assertEquals("Missing JWE encrypted key", e.getMessage());
+        }
+    }
+
+    public void test_encryption_decryption_where_kid_is_url() throws Exception {
+        String aliceKid = "https://www.crockford.com/blog.html";
+        String bobKid = "https://www.crockford.com/books.html";
+        String charlieKid = "https://www.json.org/json-en.html";
+
+        JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU_A256KW, EncryptionMethod.A256CBC_HS512)
+                .agreementPartyVInfo(Base64URL.encode(bobKid + "." + charlieKid))
+                .agreementPartyUInfo(Base64URL.encode(aliceKid))
+                .customParam("skid", aliceKid)
+                .build();
+
+        ECKey aliceKey = generateEC(Curve.P_521, aliceKid);
+        ECKey bobKey = generateEC(Curve.P_521, bobKid);
+        ECKey charlieKey = generateEC(Curve.P_521, charlieKid);
+
+        JWEObjectJSON jwe = new JWEObjectJSON(header, new Payload("Hello, world"));
+
+        List<Pair<UnprotectedHeader, ECKey>> recipients = Arrays.asList(
+                Pair.of(new UnprotectedHeader.Builder().keyID(bobKid).build(), bobKey),
+                Pair.of(new UnprotectedHeader.Builder().keyID(charlieKid).build(), charlieKey)
+        );
+
+        ECDH1PUEncrypterMulti encrypterMulti = new ECDH1PUEncrypterMulti(aliceKey, recipients);
+        jwe.encrypt(encrypterMulti);
+
+        String json = jwe.serialize();
+
+        JWEObjectJSON decrypted = JWEObjectJSON.parse(json);
+
+        assertEquals(aliceKid, decrypted.getHeader().getCustomParam("skid"));
+        assertEquals(2, decrypted.getRecipients().size());
+
+        UnprotectedHeader bobPerRecipientHeader = null;
+        for (Recipient recipient: decrypted.getRecipients()) {
+            if (recipient.getHeader().getKeyID().equals(bobKid))
+                bobPerRecipientHeader = recipient.getHeader();
+        }
+        assertNotNull(bobPerRecipientHeader);
+
+        UnprotectedHeader charliePerRecipientHeader = null;
+        for (Recipient recipient: decrypted.getRecipients()) {
+            if (recipient.getHeader().getKeyID().equals(charlieKid))
+                charliePerRecipientHeader = recipient.getHeader();
+        }
+        assertNotNull(charliePerRecipientHeader);
+
+        ECDH1PUDecrypterMulti decryptor = new ECDH1PUDecrypterMulti(aliceKey, recipients);
+        decrypted.decrypt(decryptor);
+
+        assertEquals("Hello, world", decrypted.getPayload().toString());
+    }
+
+    public void test_jwe_parsing_success() throws Exception{
+        JWEObjectJSON jwe = JWEObjectJSON.parse("{" +
+                "    \"custom\": \"1223\"," +
+                "    \"aad\": \"eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkEyNTZDQ\"," +
+                "     \"protected\":" +
+                "      \"eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkEyNTZDQkMtSFM1MTIiLCJhcHUiOiJRV3hwWTJVIiwiYXB2IjoiUW05aUlHRnVaQ0JEYUdGeWJHbGwiLCJlcGsiOnsia3R5IjoiT0tQIiwiY3J2IjoiWDI1NTE5IiwieCI6Ims5b2ZfY3BBYWp5MHBvVzVnYWl4WEdzOW5Ia3dnMUFGcVVBRmEzOWR5QmMifX0=\"," +
+                "     \"recipients\":[" +
+                "      {\"header\":" +
+                "        {\"kid\":\"bob-key-2\"}," +
+                "       \"encrypted_key\":" +
+                "        \"pOMVA9_PtoRe7xXW1139NzzN1UhiFoio8lGto9cf0t8PyU-sjNXH8-LIRLycq8CHJQbDwvQ" +
+                "        eU1cSl55cQ0hGezJu2N9IY0QN\"}]," +
+                "     \"iv\":" +
+                "      \"AAECAwQFBgcICQoLDA0ODw\"," +
+                "     \"ciphertext\":" +
+                "      \"Az2IWsISEMDJvyc5XRL-3-d-RgNBOGolCsxFFoUXFYw22\"," +
+                "     \"tag\":" +
+                "      \"HLb4fTlm8spGmij3RyOs2gJ4DpHM4hhVRwdF_hGb3WQ\"" +
+                "    }");
+
+        assertNotNull(jwe.getRecipients());
+        assertNotNull(jwe.getIV());
+        assertNotNull(jwe.getAuthTag());
+        assertNotNull(jwe.getCipherText());
+        assertNotNull(jwe.getHeader());
+        assertEquals(1, jwe.getRecipients().size());
     }
 
     public void test_jwe_parsing_failed() {
