@@ -28,13 +28,20 @@ import java.util.Map;
 public interface JSONSerializable {
 
     /**
-     * Returns a JSON object representation of the JOSE Object.
-     *
-     * @param flattened Returns flatted json if true else returns general json.
+     * Returns a General JSON object representation of the JOSE Object.
      *
      * @throws IllegalStateException If the JOSE object is not in a state
      *                               that permits serialisation.
      * @return The JSON object.
      */
-    Map<String, Object> toJSONObject(boolean flattened);
+    Map<String, Object> toGeneralJSONObject();
+
+    /**
+     * Returns a Flattened JSON object representation of the JOSE Object.
+     *
+     * @throws IllegalStateException If the JOSE object is not in a state
+     *                               that permits serialisation.
+     * @return The JSON object.
+     */
+    Map<String, Object> toFlattenedJSONObject();
 }

@@ -451,12 +451,17 @@ public class JWEObjectJSONTest extends TestCase {
         );
 
         ECDHEncrypterMulti encrypter = new ECDHEncrypterMulti(recipients);
-        encrypter.getJCAContext().setContentEncryptionProvider(BouncyCastleProviderSingleton.getInstance());
         jweObject.encrypt(encrypter);
 
         assertEquals(3, jweObject.getRecipients().size());
         assertEquals("test", jweObject.getRecipients().get(1).getHeader().getCustomParam("test").toString());
         assertEquals("test1", jweObject.getRecipients().get(2).getHeader().getCustomParam("test1").toString());
+
+        JWEObjectJSON decrypted = JWEObjectJSON.parse(jweObject.serialize());
+        ECDHDecrypterMulti decryptor = new ECDHDecrypterMulti(recipients);
+        decrypted.decrypt(decryptor);
+        assertEquals("test", decrypted.getRecipients().get(1).getHeader().getCustomParam("test").toString());
+        assertEquals("test1", decrypted.getRecipients().get(2).getHeader().getCustomParam("test1").toString());
     }
 
     public void test_curves_not_matched() throws Exception {
@@ -702,8 +707,6 @@ public class JWEObjectJSONTest extends TestCase {
         JWEObjectJSON jwe = JWEObjectJSON.parse("{" +
                 "     \"protected\":" +
                 "      \"eyJhbGciOiJFQ0RILTFQVStBMTI4S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiYXB1IjoiUVd4cFkyVSIsImFwdiI6IlFtOWlJR0Z1WkNCRGFHRnliR2xsIiwiZXBrIjp7Imt0eSI6Ik9LUCIsImNydiI6IlgyNTUxOSIsIngiOiJrOW9mX2NwQWFqeTBwb1c1Z2FpeFhHczluSGt3ZzFBRnFVQUZhMzlkeUJjIn19\"," +
-                "     \"unprotected\":" +
-                "      {\"jku\":\"https://alice.example.com/keys.jwks\"}," +
                 "     \"recipients\":[" +
                 "      {\"header\":" +
                 "        {\"kid\":\"bob-key-2\"}," +

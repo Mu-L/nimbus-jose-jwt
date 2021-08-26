@@ -19,6 +19,7 @@ package com.nimbusds.jose;
 
 
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONArrayUtils;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import net.jcip.annotations.ThreadSafe;
 
@@ -90,42 +91,42 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
         return unprotectedHeader;
     }
 
+
     @Override
-    public Map<String, Object> toJSONObject(boolean flattened) {
+    public Map<String, Object> toFlattenedJSONObject() {
         ensureSignedOrVerifiedState();
 
         Map<String, Object> json = JSONObjectUtils.newJSONObject();
-
-        String signatureStr = getSignature().toString();
-        byte[] payload = getPayload().toBytes();
-        byte[] header = JSONObjectUtils.toJSONString(getHeader().toJSONObject(), true)
-                .getBytes(StandardCharsets.UTF_8);
-
-        if (flattened) {
-            json.put("protected", Base64URL.encode(header).toString());
-            json.put("payload", Base64URL.encode(payload).toString());
-            json.put("signature", signatureStr);
-        } else {
-            List<Map<String, Object>> signatures = new ArrayList<>();
-            Map<String, Object> signature = JSONObjectUtils.newJSONObject();
-            signature.put("protected", Base64URL.encode(header).toString());
-            signature.put("signature", signatureStr);
-
-            if (unprotectedHeader != null) {
-                signature.put("header", unprotectedHeader.toJSONObject());
-            }
-
-            signatures.add(signature);
-
-            json.put("payload", Base64URL.encode(payload).toString());
-            json.put("signatures", signatures);
-        }
+        json.put("protected", getHeader().toBase64URL().toString());
+        json.put("payload", getPayload().toBase64URL().toString());
+        json.put("signature", getSignature().toString());
 
         return json;
     }
 
+    @Override
+    public Map<String, Object> toGeneralJSONObject() {
+        ensureSignedOrVerifiedState();
+
+        List<Object> signatures = JSONArrayUtils.newJSONArray();
+        Map<String, Object> signature = JSONObjectUtils.newJSONObject();
+        signature.put("protected", getHeader().toBase64URL().toString());
+        signature.put("signature", getSignature().toString());
+
+        if (unprotectedHeader != null) {
+            signature.put("header", unprotectedHeader.toJSONObject());
+        }
+
+        signatures.add(signature);
+
+        Map<String, Object> json = JSONObjectUtils.newJSONObject();
+        json.put("payload", getPayload().toBase64URL().toString());
+        json.put("signatures", signatures);
+        return json;
+    }
+
     /**
-     * Serialises this JWS object to JSON format.
+     * Serialises this JWS object to General JSON format.
      *
      * @return The serialised JWS object.
      *
@@ -139,10 +140,8 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
 
         ensureSignedOrVerifiedState();
 
-        return JSONObjectUtils.toJSONString(toJSONObject(false), true);
+        return JSONObjectUtils.toJSONStringForWeb(toGeneralJSONObject());
     }
-
-
 
     /**
      * Parses a JWS object from the specified string in JSON format. The
@@ -208,7 +207,7 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
         }
 
         try {
-            String json = JSONObjectUtils.toJSONString(jwsHeader.toJSONObject(), true);
+            String json = JSONObjectUtils.toJSONStringForWeb(jwsHeader.toJSONObject());
             Base64URL base64URL = Base64URL.encode(json.getBytes(StandardCharsets.UTF_8));
             return JWSHeader.parse(base64URL);
         } catch (ParseException e) {

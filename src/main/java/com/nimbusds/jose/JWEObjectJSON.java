@@ -18,13 +18,13 @@
 package com.nimbusds.jose;
 
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONArrayUtils;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import net.jcip.annotations.ThreadSafe;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -425,7 +425,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
 
     /**
-     * Serialises this JWE object to JSON format.
+     * Serialises this JWE object to General JSON format.
      *
      * @return The serialised JWE object.
      *
@@ -438,7 +438,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
         ensureEncryptedOrDecryptedState();
 
-        return JSONObjectUtils.toJSONString(toJSONObject(false), true);
+        return JSONObjectUtils.toJSONStringForWeb(toGeneralJSONObject());
     }
 
 
@@ -468,28 +468,29 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
     }
 
     @Override
-    public Map<String, Object> toJSONObject(boolean flattened) {
-        // flattened JSON serialization is not implemented
-        if (flattened) {
-            throw new NotImplementedException();
-        }
+    public Map<String, Object> toGeneralJSONObject() {
+        ensureEncryptedOrDecryptedState();
 
-        List<Map<String, Object>> recipients = new ArrayList<>();
+        List<Object> recipients = JSONArrayUtils.newJSONArray();
 
         for (Recipient recipient : getRecipients()) {
             recipients.add(recipient.toJSONObject());
         }
 
-        byte[] header = JSONObjectUtils.toJSONString(getHeader().toJSONObject(), true)
-                .getBytes(StandardCharsets.UTF_8);
-
         Map<String, Object> json = JSONObjectUtils.newJSONObject();
         json.put("iv", getIV().toString());
         json.put("recipients", recipients);
         json.put("tag", getAuthTag().toString());
-        json.put("protected", Base64URL.encode(header).toString());
+        json.put("protected", getHeader().toBase64URL().toString());
         json.put("ciphertext", getCipherText().toString());
         return json;
+    }
+
+    @Override
+    public Map<String, Object> toFlattenedJSONObject() {
+        // flattened JSON serialization is not implemented
+        throw new NotImplementedException();
+
     }
 
     protected void setHeader(JWEHeader jweHeader) {
@@ -499,7 +500,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
         }
 
         try {
-            String json = JSONObjectUtils.toJSONString(jweHeader.toJSONObject(), true);
+            String json = JSONObjectUtils.toJSONStringForWeb(jweHeader.toJSONObject());
             Base64URL base64URL = Base64URL.encode(json.getBytes(StandardCharsets.UTF_8));
             this.header = JWEHeader.parse(base64URL);
         } catch (ParseException e) {

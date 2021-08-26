@@ -28,7 +28,6 @@ import java.util.Map;
 
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONStyle;
-import net.minidev.json.JSONValue;
 import net.minidev.json.parser.JSONParser;
 
 
@@ -404,8 +403,8 @@ public class JSONObjectUtils {
 		}
 
 		try {
-			return jsonArray.toArray(new HashMap[0]);
 
+			return jsonArray.toArray(new HashMap[0]);
 		} catch (ArrayStoreException e) {
 
 			throw new ParseException("JSON object member with key \"" + key + "\" is not an array of JSON objects", 0);
@@ -488,22 +487,14 @@ public class JSONObjectUtils {
 
 	/**
 	 * Serialises the specified map to a JSON object using the entity
-	 * mapping specified in {@link #parse(String)}.
+	 * mapping specified in {@link #parse(String)}. Forward slash is not escaped.
 	 *
 	 * @param o The map. Must not be {@code null}.
-	 * @param protect4Web If true then forward slash is not escaped
-	 *                    else forward slash is escaped by back slash.
 	 *
 	 * @return The JSON object as string.
 	 */
-	public static String toJSONString(final Map<String, ?> o, boolean protect4Web) {
-		JSONStyle style = JSONValue.COMPRESSION;
-
-		if (protect4Web) {
-			style = JSONStyle.LT_COMPRESS;
-		}
-
-		return JSONObject.toJSONString(o, style);
+	public static String toJSONStringForWeb(final Map<String, ?> o) {
+		return JSONObject.toJSONString(o, JSONStyle.LT_COMPRESS);
 	}
 
 	/**

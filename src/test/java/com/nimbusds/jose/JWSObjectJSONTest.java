@@ -48,7 +48,7 @@ public class JWSObjectJSONTest extends TestCase {
         ECPrivateKey privateKey = new ECKeyGenerator(Curve.SECP256K1).generate().toECPrivateKey();
         jwsObject.sign(new ECDSASigner(privateKey));
 
-        Map<String, Object> json = jwsObject.toJSONObject(false);
+        Map<String, Object> json = jwsObject.toGeneralJSONObject();
         Map<String, Object>[] signatures = JSONObjectUtils.getJSONObjectArray(json, "signatures");
         assertNotNull(signatures);
 
@@ -72,7 +72,7 @@ public class JWSObjectJSONTest extends TestCase {
         OctetKeyPair privateKey = new OctetKeyPairGenerator(Curve.Ed25519).generate();
         jwsObject.sign(uh, new Ed25519Signer(privateKey));
 
-        Map<String, Object> json = jwsObject.toJSONObject(false);
+        Map<String, Object> json = jwsObject.toGeneralJSONObject();
         Map<String, Object>[] signatures = JSONObjectUtils.getJSONObjectArray(json, "signatures");
         assertNotNull(signatures);
 
@@ -95,7 +95,7 @@ public class JWSObjectJSONTest extends TestCase {
 
         jwsObject.sign(new MACSigner("12345678901234567890123456789012"));
 
-        Map<String, Object> json = jwsObject.toJSONObject(true);
+        Map<String, Object> json = jwsObject.toFlattenedJSONObject();
         assertEquals(jwsObject.getHeader().toBase64URL().toString(), json.get("protected").toString());
         assertEquals(jwsObject.getPayload().toBase64URL().toString(), json.get("payload").toString());
         assertEquals(jwsObject.getSignature().toString(), json.get("signature").toString());
