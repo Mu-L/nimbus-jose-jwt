@@ -28,8 +28,9 @@ import java.util.*;
 
 
 /**
- * The base abstract class for Elliptic Curve Diffie-Hellman One-Pass Unified Model
- * encrypters and decrypters of {@link com.nimbusds.jose.JWEObject JWE objects}.
+ * The base abstract class for Elliptic Curve Diffie-Hellman One-Pass Unified
+ * Model encrypters and decrypters of {@link com.nimbusds.jose.JWEObject JWE
+ * objects}.
  *
  * <p>Supports the following key management algorithms:
  *
@@ -49,7 +50,8 @@ import java.util.*;
  *     <li>{@link Curve#X25519}
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Direct key agreement mode:
+ * <p>Supports the following content encryption algorithms for Direct key
+ * agreement mode:
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
@@ -63,7 +65,8 @@ import java.util.*;
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#XC20P}
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Key wrapping mode:
+ * <p>Supports the following content encryption algorithms for Key wrapping
+ * mode:
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
@@ -151,7 +154,7 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
 
     /**
      * Returns the names of the supported elliptic curves. These correspond
-     * to the {@code crv} EC JWK parameter.
+     * to the {@code crv} JWK parameter.
      *
      * @return The supported elliptic curves.
      */
@@ -168,12 +171,11 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
         return curve;
     }
 
+    
     /**
      * Encrypts the specified plaintext using the specified shared secret
-     * ("Z").
-     *
-     * Encrypts the specified plaintext using if provided,
-     * the content encryption key (CEK) for {@link ECDH.AlgorithmMode#KW}.
+     * ("Z"), with an optionally externally supplied content encryption key
+     * (CEK) for {@link ECDH.AlgorithmMode#KW}.
      */
     protected JWECryptoParts encryptWithZ(final JWEHeader header,
                                           final SecretKey Z,

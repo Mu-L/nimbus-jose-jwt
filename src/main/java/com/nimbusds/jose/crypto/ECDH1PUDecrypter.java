@@ -39,8 +39,8 @@ import java.util.Set;
 
 /**
  * Elliptic Curve Diffie-Hellman decrypter of
- * {@link com.nimbusds.jose.JWEObject JWE objects} for curves using EC JWK
- * keys. Expects a private EC key (with a P-256, P-384 or P-521 curve).
+ * {@link com.nimbusds.jose.JWEObject JWE objects} for curves using an EC JWK.
+ * Expects a private EC key (with a P-256, P-384 or P-521 curve).
  *
  * <p>Public Key Authenticated Encryption for JOSE
  * <a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04">ECDH-1PU</a>
@@ -67,7 +67,8 @@ import java.util.Set;
  *     <li>{@link Curve#P_521}
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Direct key agreement mode:
+ * <p>Supports the following content encryption algorithms for Direct key
+ * agreement mode:
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
@@ -81,7 +82,8 @@ import java.util.Set;
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#XC20P}
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Key wrapping mode:
+ * <p>Supports the following content encryption algorithms for Key wrapping
+ * mode:
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
@@ -145,7 +147,7 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
      * Creates a new Elliptic Curve Diffie-Hellman decrypter.
      *
      * @param privateKey     The private EC key. Must not be {@code null}.
-     * @param publicKey 	 The public EC key. Must not be {@code null}.
+     * @param publicKey      The public EC key. Must not be {@code null}.
      * @param defCritHeaders The names of the critical header parameters
      *                       that are deferred to the application for
      *                       processing, empty set or {@code null} if none.
@@ -168,7 +170,7 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
      * smart card or HSM).
      *
      * @param privateKey     The private EC key. Must not be {@code null}.
-     * @param publicKey 	 The public EC key. Must not be {@code null}.
+     * @param publicKey      The public EC key. Must not be {@code null}.
      * @param defCritHeaders The names of the critical header parameters
      *                       that are deferred to the application for
      *                       processing, empty set or {@code null} if none.
