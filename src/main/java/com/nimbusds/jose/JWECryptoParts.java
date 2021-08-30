@@ -22,6 +22,8 @@ import net.jcip.annotations.Immutable;
 
 import com.nimbusds.jose.util.Base64URL;
 
+import java.util.List;
+
 
 /**
  * The cryptographic parts of a JSON Web Encryption (JWE) object. This class is 
@@ -64,6 +66,12 @@ public final class JWECryptoParts {
 	 * The authentication tag (optional).
 	 */
 	private final Base64URL authenticationTag;
+
+
+	/**
+	 * The recipients (optional)
+	 */
+	private final List<Recipient> recipients;
 
 
 	/**
@@ -123,6 +131,48 @@ public final class JWECryptoParts {
 		this.cipherText = cipherText;
 
 		this.authenticationTag = authenticationTag;
+
+		this.recipients = null;
+	}
+
+
+	/**
+	 * Creates a new cryptographic JWE parts instance.
+	 *
+	 * @param header            The modified JWE header, {@code null} if
+	 *                          not.
+	 * @param recipients        The recipients, {@code null} if not
+	 *                          required by the encryption algorithm.
+	 * @param iv                The initialisation vector (IV),
+	 *                          {@code null} if not required by the
+	 *                          encryption algorithm.
+	 * @param cipherText        The cipher text. Must not be {@code null}.
+	 * @param authenticationTag The authentication tag, {@code null} if the
+	 *                          JWE algorithm provides built-in integrity
+	 *                          check.
+	 */
+	public JWECryptoParts(final JWEHeader header,
+						  final List<Recipient> recipients,
+						  final Base64URL iv,
+						  final Base64URL cipherText,
+						  final Base64URL authenticationTag) {
+
+		this.header = header;
+
+		this.encryptedKey = null;
+
+		this.iv = iv;
+
+		if (cipherText == null) {
+
+			throw new IllegalArgumentException("The cipher text must not be null");
+		}
+
+		this.cipherText = cipherText;
+
+		this.authenticationTag = authenticationTag;
+
+		this.recipients = recipients;
 	}
 
 
@@ -141,7 +191,7 @@ public final class JWECryptoParts {
 	 * Gets the encrypted key.
 	 *
 	 * @return The encrypted key, {@code null} if not required by 
-	 *         the JWE algorithm.
+	 *         the JWE algorithm or {@code recipients} are specified.
 	 */
 	public Base64URL getEncryptedKey() {
 
@@ -181,5 +231,16 @@ public final class JWECryptoParts {
 	public Base64URL getAuthenticationTag() {
 
 		return authenticationTag;
+	}
+
+	/**
+	 * Gets the recipients.
+	 *
+	 * @return The recipients, {@code null} if not required by
+	 * 	       the JWE algorithm or {@code encryptedKey} is
+	 * 	       specified.
+	 */
+	public List<Recipient> getRecipients() {
+		return recipients;
 	}
 }

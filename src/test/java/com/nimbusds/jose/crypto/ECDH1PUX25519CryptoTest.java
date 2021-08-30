@@ -292,10 +292,8 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
     }
 
     public void testCurveNotMatch() throws Exception {
-        JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU, EncryptionMethod.A128CBC_HS256).
-                customParam(JWTClaimNames.EXPIRATION_TIME, "2014-04-24").
-                criticalParams(Collections.singleton(JWTClaimNames.EXPIRATION_TIME)).
-                build();
+        JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU, EncryptionMethod.A128CBC_HS256)
+                .build();
 
         for (CurveTest curveTest : notMatchedCurves) {
             try {

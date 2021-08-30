@@ -18,35 +18,28 @@
 package com.nimbusds.jose.crypto;
 
 
-import com.nimbusds.jose.CriticalHeaderParamsAware;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWEDecrypter;
-import com.nimbusds.jose.JWEHeader;
+import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.impl.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.Pair;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
-import java.security.PrivateKey;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 
 /**
- * Elliptic Curve Diffie-Hellman decrypter of
- * {@link com.nimbusds.jose.JWEObject JWE objects} for curves using EC JWK
+ * Elliptic Curve Diffie-Hellman Multi-recipient decrypter of
+ * {@link com.nimbusds.jose.JWEObjectJSON JWE objects} for curves using EC JWK
  * keys. Expects a private EC key (with a P-256, P-384 or P-521 curve).
  *
  * <p>Public Key Authenticated Encryption for JOSE
  * <a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04">ECDH-1PU</a>
  * for more information.
  *
- * <p>For Curve25519/X25519, see {@link ECDH1PUX25519Decrypter} instead.
+ * <p>For Single decryption, see {@link ECDH1PUDecrypter} instead.
  *
  * <p>This class is thread-safe.
  *
@@ -93,7 +86,7 @@ import java.util.Set;
  * @version 2021-08-03
  */
 @ThreadSafe
-public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecrypter, CriticalHeaderParamsAware {
+public class ECDH1PUDecrypterMulti extends ECDH1PUCryptoProvider implements JWEDecrypterMulti, CriticalHeaderParamsAware {
 
 
     /**
@@ -110,109 +103,59 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
         SUPPORTED_ELLIPTIC_CURVES = Collections.unmodifiableSet(curves);
     }
 
-
-    /**
-     * The private EC key.
-     */
-    private final ECPrivateKey privateKey;
-
-    /**
-     * The public EC key.
-     */
-    private final ECPublicKey publicKey;
-
     /**
      * The critical header policy.
      */
     private final CriticalHeaderParamsDeferral critPolicy = new CriticalHeaderParamsDeferral();
 
+    /**
+     * The public sender JWK key.
+     */
+    private final ECKey sender;
 
     /**
-     * Creates a new Elliptic Curve Diffie-Hellman decrypter.
-     *
-     * @param privateKey 	The private EC key. Must not be {@code null}.
-     * @param publicKey 	The public EC key. Must not be {@code null}.
-     *
-     * @throws JOSEException If the elliptic curve is not supported.
+     * The list of private recipient's keys.
      */
-    public ECDH1PUDecrypter(final ECPrivateKey privateKey, final ECPublicKey publicKey)
-        throws JOSEException {
+    private final List<Pair<UnprotectedHeader, ECKey>> recipients;
 
-        this(privateKey, publicKey, null);
+    /**
+     * Creates Elliptic Curve Diffie-Hellman Multi-recipient decrypter.
+     *
+     * @param sender     The public sender JWK key.
+     * @param recipients The list of private recipient's keys.
+     *
+     * @throws JOSEException If the key subtype is not supported.
+     */
+    public ECDH1PUDecrypterMulti(final ECKey sender, final List<Pair<UnprotectedHeader, ECKey>>recipients)
+            throws JOSEException {
+
+        this(sender, recipients, null);
     }
 
     /**
-     * Creates a new Elliptic Curve Diffie-Hellman decrypter.
+     * Creates Elliptic Curve Diffie-Hellman Multi-recipient decrypter.
      *
-     * @param privateKey     The private EC key. Must not be {@code null}.
-     * @param publicKey 	 The public EC key. Must not be {@code null}.
+     * @param sender         The public sender JWK key.
+     * @param recipients     The list of private recipient's keys.
      * @param defCritHeaders The names of the critical header parameters
      *                       that are deferred to the application for
      *                       processing, empty set or {@code null} if none.
      *
-     * @throws JOSEException If the elliptic curve is not supported.
+     * @throws JOSEException If the key subtype is not supported.
      */
-    public ECDH1PUDecrypter(final ECPrivateKey privateKey,
-                            final ECPublicKey publicKey,
-                            final Set<String> defCritHeaders)
+    public ECDH1PUDecrypterMulti(
+            final ECKey sender,
+            final List<Pair<UnprotectedHeader, ECKey>>recipients,
+            final Set<String> defCritHeaders)
+
         throws JOSEException {
 
-        this(privateKey, publicKey, defCritHeaders, Curve.forECParameterSpec(privateKey.getParams()));
-    }
+        super(sender.getCurve());
 
-
-    /**
-     * Creates a new Elliptic Curve Diffie-Hellman decrypter. This
-     * constructor can also accept a private EC key located in a PKCS#11
-     * store that doesn't expose the private key parameters (such as a
-     * smart card or HSM).
-     *
-     * @param privateKey     The private EC key. Must not be {@code null}.
-     * @param publicKey 	 The public EC key. Must not be {@code null}.
-     * @param defCritHeaders The names of the critical header parameters
-     *                       that are deferred to the application for
-     *                       processing, empty set or {@code null} if none.
-     * @param curve          The key curve. Must not be {@code null}.
-     *
-     * @throws JOSEException If the elliptic curve is not supported.
-     */
-    public ECDH1PUDecrypter(final ECPrivateKey privateKey,
-                            final ECPublicKey publicKey,
-                            final Set<String> defCritHeaders,
-                            final Curve curve)
-        throws JOSEException {
-
-        super(curve);
-
+        this.sender = sender;
+        this.recipients = recipients;
         critPolicy.setDeferredCriticalHeaderParams(defCritHeaders);
-
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
     }
-
-    /**
-     * Returns the public EC key.
-     *
-     * @return The public EC key.
-     */
-    public ECPublicKey getPublicKey() {
-
-        return publicKey;
-    }
-
-    /**
-     * Returns the private EC key.
-     *
-     * @return The private EC key. Casting to
-     *         {@link ECPrivateKey} may not be
-     *         possible if the key is located in a PKCS#11 store that
-     *         doesn't expose the private key parameters.
-     */
-    public PrivateKey getPrivateKey() {
-
-        return privateKey;
-    }
-
 
     @Override
     public Set<Curve> supportedEllipticCurves() {
@@ -237,7 +180,7 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
 
     @Override
     public byte[] decrypt(final JWEHeader header,
-                          final Base64URL encryptedKey,
+                          final List<Recipient> recipients,
                           final Base64URL iv,
                           final Base64URL cipherText,
                           final Base64URL authTag)
@@ -252,15 +195,19 @@ public class ECDH1PUDecrypter extends ECDH1PUCryptoProvider implements JWEDecryp
             throw new JOSEException("Missing ephemeral public EC key \"epk\" JWE header parameter");
         }
 
-        ECPublicKey ephemeralPublicKey = ephemeralKey.toECPublicKey();
+        List<Pair<UnprotectedHeader, SecretKey>> sharedKeys = new ArrayList<>();
 
-        SecretKey Z = ECDH1PU.deriveRecipientZ(
-                privateKey,
-                publicKey,
-                ephemeralPublicKey,
-                getJCAContext().getKeyEncryptionProvider()
-        );
+        for (Pair<UnprotectedHeader, ECKey> recipient : this.recipients) {
+            SecretKey Z = ECDH1PU.deriveRecipientZ(
+                    recipient.getRight().toECPrivateKey(),
+                    sender.toECPublicKey(),
+                    ephemeralKey.toECPublicKey(),
+                    getJCAContext().getKeyEncryptionProvider()
+            );
 
-        return decryptWithZ(header, Z, encryptedKey, iv, cipherText, authTag);
+            sharedKeys.add(Pair.of(recipient.getLeft(), Z));
+        }
+
+        return decryptMulti(header, sharedKeys, recipients, iv, cipherText, authTag);
     }
 }

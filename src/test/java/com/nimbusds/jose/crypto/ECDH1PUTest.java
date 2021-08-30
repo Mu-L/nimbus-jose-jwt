@@ -37,6 +37,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.Provider;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
@@ -160,6 +161,54 @@ public class ECDH1PUTest extends TestCase{
         ECDH1PU.validateSameCurve(aliceOKPKey, bobOKPKey);
     }
 
+    public void testSameCurve_deriveSenderZ() throws Exception {
+        Provider provider = new JWEJCAContext().getKeyEncryptionProvider();
+
+        ECPrivateKey aliceEpkP_256 = generateECJWK(Curve.P_256).toECPrivateKey();
+        ECPrivateKey aliceKeyP_256 = generateECJWK(Curve.P_256).toECPrivateKey();
+        ECPublicKey bobKeyP_256 = generateECJWK(Curve.P_256).toECPublicKey();
+        ECDH1PU.deriveSenderZ(aliceKeyP_256, bobKeyP_256, aliceEpkP_256, provider);
+
+        ECPrivateKey aliceEpkP_384 = generateECJWK(Curve.P_384).toECPrivateKey();
+        ECPrivateKey aliceKeyP_384 = generateECJWK(Curve.P_384).toECPrivateKey();
+        ECPublicKey bobKeyP_384 = generateECJWK(Curve.P_384).toECPublicKey();
+        ECDH1PU.deriveSenderZ(aliceKeyP_384, bobKeyP_384, aliceEpkP_384, provider);
+
+        ECPrivateKey aliceEpkP_521 = generateECJWK(Curve.P_521).toECPrivateKey();
+        ECPrivateKey aliceKeyP_521 = generateECJWK(Curve.P_521).toECPrivateKey();
+        ECPublicKey bobKeyP_521 = generateECJWK(Curve.P_521).toECPublicKey();
+        ECDH1PU.deriveSenderZ(aliceKeyP_521, bobKeyP_521, aliceEpkP_521, provider);
+
+        OctetKeyPair aliceEpkKey = generateOKP(Curve.X25519);
+        OctetKeyPair aliceOKPKey = generateOKP(Curve.X25519);
+        OctetKeyPair bobOKPKey = generateOKP(Curve.X25519).toPublicJWK();
+        ECDH1PU.deriveSenderZ(aliceOKPKey, bobOKPKey, aliceEpkKey);
+    }
+
+    public void testSameCurve_recipientSenderZ() throws Exception {
+        Provider provider = new JWEJCAContext().getKeyEncryptionProvider();
+
+        ECPublicKey aliceEpkP_256 = generateECJWK(Curve.P_256).toECPublicKey();
+        ECPrivateKey aliceKeyP_256 = generateECJWK(Curve.P_256).toECPrivateKey();
+        ECPublicKey bobKeyP_256 = generateECJWK(Curve.P_256).toECPublicKey();
+        ECDH1PU.deriveRecipientZ(aliceKeyP_256, bobKeyP_256, aliceEpkP_256, provider);
+
+        ECPublicKey aliceEpkP_384 = generateECJWK(Curve.P_384).toECPublicKey();
+        ECPrivateKey aliceKeyP_384 = generateECJWK(Curve.P_384).toECPrivateKey();
+        ECPublicKey bobKeyP_384 = generateECJWK(Curve.P_384).toECPublicKey();
+        ECDH1PU.deriveRecipientZ(aliceKeyP_384, bobKeyP_384, aliceEpkP_384, provider);
+
+        ECPublicKey aliceEpkP_521 = generateECJWK(Curve.P_521).toECPublicKey();
+        ECPrivateKey aliceKeyP_521 = generateECJWK(Curve.P_521).toECPrivateKey();
+        ECPublicKey bobKeyP_521 = generateECJWK(Curve.P_521).toECPublicKey();
+        ECDH1PU.deriveRecipientZ(aliceKeyP_521, bobKeyP_521, aliceEpkP_521, provider);
+
+        OctetKeyPair aliceEpkKey = generateOKP(Curve.X25519).toPublicJWK();
+        OctetKeyPair aliceOKPKey = generateOKP(Curve.X25519);
+        OctetKeyPair bobOKPKey = generateOKP(Curve.X25519).toPublicJWK();
+        ECDH1PU.deriveRecipientZ(aliceOKPKey, bobOKPKey, aliceEpkKey);
+    }
+
     public void testCurveNotMatch() throws Exception {
         try {
             ECPrivateKey aliceKeyP_256 = generateECJWK(Curve.P_256).toECPrivateKey();
@@ -201,6 +250,114 @@ public class ECDH1PUTest extends TestCase{
             OctetKeyPair aliceOKPKey = generateOKP(Curve.Ed25519);
             OctetKeyPair bobOKPKey = generateOKP(Curve.Ed25519).toPublicJWK();
             ECDH1PU.validateSameCurve(aliceOKPKey, bobOKPKey);
+            fail();
+        } catch (JOSEException e) {
+            assertEquals("Only supports OctetKeyPairs with crv=X25519", e.getMessage());
+        }
+    }
+
+    public void testCurveNotMatch_deriveSenderZ() throws Exception {
+        Provider provider = new JWEJCAContext().getKeyEncryptionProvider();
+
+        try {
+            ECPrivateKey epk = generateECJWK(Curve.P_256).toECPrivateKey();
+            ECPrivateKey aliceKeyP_256 = generateECJWK(Curve.P_256).toECPrivateKey();
+            ECPublicKey bobKeyP_521 = generateECJWK(Curve.P_521).toECPublicKey();
+            ECDH1PU.deriveSenderZ(aliceKeyP_256, bobKeyP_521, epk, provider);
+            fail();
+        } catch (JOSEException e) {
+            assertEquals("Curve of public key does not match curve of private key", e.getMessage());
+        }
+
+        try {
+            OctetKeyPair epk = generateOKP(Curve.X25519);
+            OctetKeyPair aliceOKPKey = generateOKP(Curve.X25519);
+            OctetKeyPair bobOKPKey = generateOKP(Curve.X25519);
+            ECDH1PU.deriveSenderZ(aliceOKPKey, bobOKPKey, epk);
+            fail();
+        } catch (JOSEException e) {
+            assertEquals("OKP public key should not be a private key", e.getMessage());
+        }
+
+        try {
+            OctetKeyPair epk = generateOKP(Curve.X25519).toPublicJWK();
+            OctetKeyPair aliceOKPKey = generateOKP(Curve.X25519).toPublicJWK();
+            OctetKeyPair bobOKPKey = generateOKP(Curve.X25519);
+            ECDH1PU.deriveSenderZ(aliceOKPKey, bobOKPKey, epk);
+            fail();
+        } catch (JOSEException e) {
+            assertEquals("OKP private key should be a private key", e.getMessage());
+        }
+
+        try {
+            OctetKeyPair epk = generateOKP(Curve.X25519).toPublicJWK();
+            OctetKeyPair aliceOKPKey = generateOKP(Curve.Ed25519);
+            OctetKeyPair bobOKPKey = generateOKP(Curve.X25519).toPublicJWK();
+            ECDH1PU.deriveSenderZ(aliceOKPKey, bobOKPKey, epk);
+            fail();
+        } catch (JOSEException e) {
+            assertEquals("Curve of public key does not match curve of private key", e.getMessage());
+        }
+
+        try {
+            OctetKeyPair epk = generateOKP(Curve.Ed25519);
+            OctetKeyPair aliceOKPKey = generateOKP(Curve.Ed25519);
+            OctetKeyPair bobOKPKey = generateOKP(Curve.Ed25519).toPublicJWK();
+            ECDH1PU.deriveSenderZ(aliceOKPKey, bobOKPKey, epk);
+            fail();
+        } catch (JOSEException e) {
+            assertEquals("Only supports OctetKeyPairs with crv=X25519", e.getMessage());
+        }
+    }
+
+    public void testCurveNotMatch_deriveRecipientZ() throws Exception {
+        Provider provider = new JWEJCAContext().getKeyEncryptionProvider();
+
+        try {
+            ECPublicKey epk = generateECJWK(Curve.P_256).toECPublicKey();
+            ECPrivateKey aliceKeyP_256 = generateECJWK(Curve.P_256).toECPrivateKey();
+            ECPublicKey bobKeyP_521 = generateECJWK(Curve.P_521).toECPublicKey();
+            ECDH1PU.deriveRecipientZ(aliceKeyP_256, bobKeyP_521, epk, provider);
+            fail();
+        } catch (JOSEException e) {
+            assertEquals("Curve of public key does not match curve of private key", e.getMessage());
+        }
+
+        try {
+            OctetKeyPair epk = generateOKP(Curve.X25519);
+            OctetKeyPair aliceOKPKey = generateOKP(Curve.X25519);
+            OctetKeyPair bobOKPKey = generateOKP(Curve.X25519);
+            ECDH1PU.deriveRecipientZ(aliceOKPKey, bobOKPKey, epk);
+            fail();
+        } catch (JOSEException e) {
+            assertEquals("OKP public key should not be a private key", e.getMessage());
+        }
+
+        try {
+            OctetKeyPair epk = generateOKP(Curve.X25519).toPublicJWK();
+            OctetKeyPair aliceOKPKey = generateOKP(Curve.X25519).toPublicJWK();
+            OctetKeyPair bobOKPKey = generateOKP(Curve.X25519);
+            ECDH1PU.deriveRecipientZ(aliceOKPKey, bobOKPKey, epk);
+            fail();
+        } catch (JOSEException e) {
+            assertEquals("OKP private key should be a private key", e.getMessage());
+        }
+
+        try {
+            OctetKeyPair epk = generateOKP(Curve.X25519).toPublicJWK();
+            OctetKeyPair aliceOKPKey = generateOKP(Curve.Ed25519);
+            OctetKeyPair bobOKPKey = generateOKP(Curve.X25519).toPublicJWK();
+            ECDH1PU.deriveRecipientZ(aliceOKPKey, bobOKPKey, epk);
+            fail();
+        } catch (JOSEException e) {
+            assertEquals("Curve of public key does not match curve of private key", e.getMessage());
+        }
+
+        try {
+            OctetKeyPair epk = generateOKP(Curve.Ed25519);
+            OctetKeyPair aliceOKPKey = generateOKP(Curve.Ed25519);
+            OctetKeyPair bobOKPKey = generateOKP(Curve.Ed25519).toPublicJWK();
+            ECDH1PU.deriveRecipientZ(aliceOKPKey, bobOKPKey, epk);
             fail();
         } catch (JOSEException e) {
             assertEquals("Only supports OctetKeyPairs with crv=X25519", e.getMessage());
