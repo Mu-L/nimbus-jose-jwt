@@ -25,7 +25,7 @@ The less frequently used alternative JSON encoding is on the road map.
 
 ## Supported JOSE algorithms
 
-The library can handle all standard JOSE algorithms:
+The library handles the following JOSE algorithms:
 
 * HMAC integrity protection: HS256, HS384 and HS512
 * RSASSA-PKCS1-V1_5 signatures: RS256, RS384 and RS512
@@ -36,14 +36,18 @@ The library can handle all standard JOSE algorithms:
 * Key encryption with AES key wrap: A128KW, A192KW and A256KW
 * Key encryption with AES GCM: A128CGMKW, A192CGMKW and A256CGMKW
 * Direct shared symmetric key encryption: dir
-* Key Agreement with Elliptic Curve Diffie-Hellman Ephemeral Static: ECDH-ES,
+* Key agreement with Elliptic Curve Diffie-Hellman Ephemeral Static: ECDH-ES,
   ECDH-ES+A128KW, ECDH-ES+A192KW and ECDH-ES+A256KW
+* Public key authenticated encryption utilising the One-Pass Unified Model for 
+  Elliptic Curve Diffie-Hellman key agreement: ECDH-1PU, ECDH-1PU+A128KW, 
+  ECDH-1PU+A128KW, ECDH-1PU+A256KW
 * Password-based encryption: PBES2-HS256+A128KW, PBES2-HS384+A192KW and
   PBES2-HS512+A256KW
 * Content encryption with AES_CBC_HMAC_SHA2: A128CBC-HS256, A192CBC-HS384,
   A256CBC-HS512, the deprecated A128CBC+HS256 and A256CBC+HS512 are also
   supported
 * Content encryption with AES GCM: A128GCM, A192GCM and A256GCM
+* Content encryption with extended nonce ChaCha20-Poly1305: XC20P
 * JWE Compression with DEFLATE.
 
 
@@ -62,8 +66,15 @@ The library can handle all standard JOSE algorithms:
 * RFC 7797 - JSON Web Signature (JWS) Unencoded Payload Option
 * RFC 8037 - CFRG Elliptic Curve Diffie-Hellman (ECDH) and Signatures in JSON 
   Object Signing and Encryption (JOSE)
-* draft-ietf-cose-webauthn-algorithms-03 - COSE and JOSE Registrations for 
-  WebAuthn Algorithms
+* RFC 8812 - CBOR Object Signing and Encryption (COSE) and JSON Object Signing  
+  and Encryption (JOSE) Registrations for Web Authentication (WebAuthn) 
+  Algorithms
+* draft-madden-jose-ecdh-1pu-04 - Public Key Authenticated Encryption for JOSE: 
+  ECDH-1PU
+* draft-amringer-jose-chacha-02 - Chacha derived AEAD algorithms in JSON Object 
+  Signing and Encryption (JOSE) (note, support for XC20P only)
+* draft-irtf-cfrg-xchacha-03 - XChaCha: eXtended-nonce ChaCha and 
+  AEAD_XChaCha20_Poly1305
 
 
 ## System requirements and dependencies
@@ -74,7 +85,8 @@ The Nimbus JOSE+JWT library requires Java 7+ and has minimal dependencies.
   together with the BouncyCastle FIPS provider!
 * (optional) BouncyCastle FIPS as a FIPS 140-2, Level 1 compliant JCA provider.
   Must not be imported together with the plain BouncyCastle provider!
-* (optional) Tink for EdDSA with Ed25519 and ECDH with X25519.
+* (optional) Tink for EdDSA with Ed25519, ECDH with X25519 and content 
+  encryption with XC20P.
 
 
 For Maven add:

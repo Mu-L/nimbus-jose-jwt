@@ -1258,7 +1258,7 @@ public class DefaultJWTProcessorTest extends TestCase {
 			processor.process(signedJWT, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("Signed JWT rejected: No JWS header \"typ\" (type) verifier is configured", e.getMessage());
+			assertEquals("Signed JWT rejected: No JWS header typ (type) verifier is configured", e.getMessage());
 		}
 	}
 	
@@ -1283,7 +1283,7 @@ public class DefaultJWTProcessorTest extends TestCase {
 			processor.process(encryptedJWT, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("Encrypted JWT rejected: No JWE header \"typ\" (type) verifier is configured", e.getMessage());
+			assertEquals("Encrypted JWT rejected: No JWE header typ (type) verifier is configured", e.getMessage());
 		}
 	}
 	
@@ -1308,7 +1308,7 @@ public class DefaultJWTProcessorTest extends TestCase {
 			processor.process(signedJWT, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("Required JOSE header \"typ\" (type) parameter is missing", e.getMessage());
+			assertEquals("Required JOSE header typ (type) parameter is missing", e.getMessage());
 		}
 		
 		// doesn't match
@@ -1318,7 +1318,7 @@ public class DefaultJWTProcessorTest extends TestCase {
 			processor.process(signedJWT, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("JOSE header \"typ\" (type) \"at+jose\" not allowed", e.getMessage());
+			assertEquals("JOSE header typ (type) at+jose not allowed", e.getMessage());
 		}
 	}
 	
@@ -1348,7 +1348,7 @@ public class DefaultJWTProcessorTest extends TestCase {
 			processor.process(jweObject, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("Required JOSE header \"typ\" (type) parameter is missing", e.getMessage());
+			assertEquals("Required JOSE header typ (type) parameter is missing", e.getMessage());
 		}
 		
 		// doesn't match
@@ -1358,7 +1358,7 @@ public class DefaultJWTProcessorTest extends TestCase {
 			processor.process(jweObject, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("JOSE header \"typ\" (type) \"at+jose\" not allowed", e.getMessage());
+			assertEquals("JOSE header typ (type) at+jose not allowed", e.getMessage());
 		}
 	}
 	
@@ -1371,7 +1371,7 @@ public class DefaultJWTProcessorTest extends TestCase {
 			processor.process(new PlainJWT(new JWTClaimsSet.Builder().build()), null);
 			fail();
 		} catch (BadJOSEException | JOSEException e) {
-			assertEquals("Plain JWT rejected: No JWS header \"typ\" (type) verifier is configured", e.getMessage());
+			assertEquals("Plain JWT rejected: No JWS header typ (type) verifier is configured", e.getMessage());
 		}
 	}
 }

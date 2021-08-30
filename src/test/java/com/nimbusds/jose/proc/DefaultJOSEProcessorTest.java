@@ -481,13 +481,13 @@ public class DefaultJOSEProcessorTest extends TestCase {
 		try {
 			new DefaultJOSEProcessor<SimpleSecurityContext>().process(plainObject, null);
 		} catch (BadJOSEException e) {
-			assertEquals("JOSE header \"typ\" (type) \"at+jwt\" not allowed", e.getMessage());
+			assertEquals("JOSE header typ (type) at+jwt not allowed", e.getMessage());
 		}
 
 		try {
 			new DefaultJOSEProcessor<SimpleSecurityContext>().process(plainObject.serialize(), null);
 		} catch (BadJOSEException e) {
-			assertEquals("JOSE header \"typ\" (type) \"at+jwt\" not allowed", e.getMessage());
+			assertEquals("JOSE header typ (type) at+jwt not allowed", e.getMessage());
 		}
 	}
 	
@@ -786,7 +786,7 @@ public class DefaultJOSEProcessorTest extends TestCase {
 			processor.process(jwsObject, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("JWS object rejected: No JWS header \"typ\" (type) verifier is configured", e.getMessage());
+			assertEquals("JWS object rejected: No JWS header typ (type) verifier is configured", e.getMessage());
 		}
 	}
 	
@@ -811,7 +811,7 @@ public class DefaultJOSEProcessorTest extends TestCase {
 			processor.process(jweObject, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("JWE object rejected: No JWE header \"typ\" (type) verifier is configured", e.getMessage());
+			assertEquals("JWE object rejected: No JWE header typ (type) verifier is configured", e.getMessage());
 		}
 	}
 	
@@ -836,7 +836,7 @@ public class DefaultJOSEProcessorTest extends TestCase {
 			processor.process(jwsObject, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("Required JOSE header \"typ\" (type) parameter is missing", e.getMessage());
+			assertEquals("Required JOSE header typ (type) parameter is missing", e.getMessage());
 		}
 		
 		// doesn't match
@@ -846,7 +846,7 @@ public class DefaultJOSEProcessorTest extends TestCase {
 			processor.process(jwsObject, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("JOSE header \"typ\" (type) \"at+jose\" not allowed", e.getMessage());
+			assertEquals("JOSE header typ (type) at+jose not allowed", e.getMessage());
 		}
 	}
 	
@@ -876,7 +876,7 @@ public class DefaultJOSEProcessorTest extends TestCase {
 			processor.process(jweObject, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("Required JOSE header \"typ\" (type) parameter is missing", e.getMessage());
+			assertEquals("Required JOSE header typ (type) parameter is missing", e.getMessage());
 		}
 		
 		// doesn't match
@@ -886,7 +886,7 @@ public class DefaultJOSEProcessorTest extends TestCase {
 			processor.process(jweObject, null);
 			fail();
 		} catch (BadJOSEException e) {
-			assertEquals("JOSE header \"typ\" (type) \"at+jose\" not allowed", e.getMessage());
+			assertEquals("JOSE header typ (type) at+jose not allowed", e.getMessage());
 		}
 	}
 }

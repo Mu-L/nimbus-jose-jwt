@@ -58,7 +58,8 @@ public class ContentCryptoProviderTest extends TestCase {
 		assertTrue(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256).contains(EncryptionMethod.A256GCM));
 		assertTrue(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256).contains(EncryptionMethod.A128CBC_HS256));
 		assertTrue(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256).contains(EncryptionMethod.A128CBC_HS256_DEPRECATED));
-		assertEquals(3, ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256).size());
+		assertTrue(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256).contains(EncryptionMethod.XC20P));
+		assertEquals(4, ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(256).size());
 
 		// 384 bit cek
 		assertTrue(ContentCryptoProvider.COMPATIBLE_ENCRYPTION_METHODS.get(384).contains(EncryptionMethod.A192CBC_HS384));

@@ -142,11 +142,11 @@ public class DefaultJOSEObjectTypeVerifier <C extends SecurityContext> implement
 		throws BadJOSEException {
 	
 		if (type == null && ! allowedTypes.contains(null)) {
-			throw new BadJOSEException("Required JOSE header \"typ\" (type) parameter is missing");
+			throw new BadJOSEException("Required JOSE header typ (type) parameter is missing");
 		}
 		
 		if (! allowedTypes.contains(type)) {
-			throw new BadJOSEException("JOSE header \"typ\" (type) \"" + type + "\" not allowed");
+			throw new BadJOSEException("JOSE header typ (type) " + type + " not allowed");
 		}
 	}
 }

@@ -57,6 +57,7 @@ import net.jcip.annotations.ThreadSafe;
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256GCM}
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#XC20P}
  * </ul>
  *
  * @author Vladimir Dzhuvinov
@@ -132,13 +133,13 @@ public class PasswordBasedDecrypter extends PasswordBasedCryptoProvider implemen
 		}
 
 		if (header.getPBES2Salt() == null) {
-			throw new JOSEException("Missing JWE \"p2s\" header parameter");
+			throw new JOSEException("Missing JWE p2s header parameter");
 		}
 
 		final byte[] salt = header.getPBES2Salt().decode();
 
 		if (header.getPBES2Count() < 1) {
-			throw new JOSEException("Missing JWE \"p2c\" header parameter");
+			throw new JOSEException("Missing JWE p2c header parameter");
 		}
 
 		final int iterationCount = header.getPBES2Count();

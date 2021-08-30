@@ -69,6 +69,7 @@ import com.nimbusds.jose.util.Base64URL;
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256GCM}
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256_DEPRECATED}
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512_DEPRECATED}
+ *     <li>{@link com.nimbusds.jose.EncryptionMethod#XC20P}
  * </ul>
  *
  * @author Tim McLean
@@ -179,7 +180,7 @@ public class X25519Decrypter extends ECDHCryptoProvider implements JWEDecrypter,
 		OctetKeyPair ephemeralPublicKey = (OctetKeyPair) header.getEphemeralPublicKey();
 
 		if (ephemeralPublicKey == null) {
-			throw new JOSEException("Missing ephemeral public key \"epk\" JWE header parameter");
+			throw new JOSEException("Missing ephemeral public key epk JWE header parameter");
 		}
 
 		if (! privateKey.getCurve().equals(ephemeralPublicKey.getCurve())) {

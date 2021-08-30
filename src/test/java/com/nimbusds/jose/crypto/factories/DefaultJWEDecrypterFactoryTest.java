@@ -70,8 +70,9 @@ public class DefaultJWEDecrypterFactoryTest extends TestCase {
 		assertTrue(factory.supportedEncryptionMethods().containsAll(EncryptionMethod.Family.AES_CBC_HMAC_SHA));
 		assertTrue(factory.supportedEncryptionMethods().contains(EncryptionMethod.A128CBC_HS256_DEPRECATED));
 		assertTrue(factory.supportedEncryptionMethods().contains(EncryptionMethod.A256CBC_HS512_DEPRECATED));
+		assertTrue(factory.supportedEncryptionMethods().contains(EncryptionMethod.XC20P));
 
-		assertEquals(8, factory.supportedEncryptionMethods().size());
+		assertEquals(9, factory.supportedEncryptionMethods().size());
 	}
 
 

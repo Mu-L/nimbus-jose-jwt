@@ -26,7 +26,7 @@ import net.jcip.annotations.Immutable;
  * JSON Web Encryption (JWE) algorithm name, represents the {@code alg} header 
  * parameter in JWE objects. This class is immutable.
  *
- * <p>Includes constants for the following standard JWE algorithm names:
+ * <p>Includes constants for the following JWE algorithm names:
  *
  * <ul>
  *     <li>{@link #RSA_OAEP_256 RSA-OAEP-256}
@@ -40,6 +40,10 @@ import net.jcip.annotations.Immutable;
  *     <li>{@link #ECDH_ES_A128KW ESDH-ES+A128KW}
  *     <li>{@link #ECDH_ES_A128KW ESDH-ES+A192KW}
  *     <li>{@link #ECDH_ES_A256KW ESDH-ES+A256KW}
+ *     <li>{@link #ECDH_1PU ECDH-1PU}
+ *     <li>{@link #ECDH_1PU_A128KW ESDH-1PU+A128KW}
+ *     <li>{@link #ECDH_1PU_A128KW ESDH-1PU+A192KW}
+ *     <li>{@link #ECDH_1PU_A256KW ESDH-1PU+A256KW}
  *     <li>{@link #PBES2_HS256_A128KW PBES2-HS256+A128KW}
  *     <li>{@link #PBES2_HS384_A192KW PBES2-HS256+A192KW}
  *     <li>{@link #PBES2_HS512_A256KW PBES2-HS256+A256KW}
@@ -48,7 +52,7 @@ import net.jcip.annotations.Immutable;
  * <p>Additional JWE algorithm names can be defined using the constructors.
  *
  * @author Vladimir Dzhuvinov
- * @version 2017-04-09
+ * @version 2021-08-22
  */
 @Immutable
 public final class JWEAlgorithm extends Algorithm {
@@ -150,6 +154,43 @@ public final class JWEAlgorithm extends Algorithm {
 
 
 	/**
+	 * Elliptic Curve Diffie-Hellman One-Pass Unified Model key
+	 * agreement using the Concat KDF, as defined in section 5.8.1 of
+	 * NIST.800-56A, with the agreed-upon key being used directly as the
+	 * Content Encryption Key (CEK) (rather than being used to wrap the
+	 * CEK).
+	 */
+	public static final JWEAlgorithm ECDH_1PU = new JWEAlgorithm("ECDH-1PU", Requirement.OPTIONAL);
+
+
+	/**
+	 * Elliptic Curve Diffie-Hellman One-Pass Unified Model key agreement
+	 * per "ECDH-1PU", but where the agreed-upon key is used to wrap the
+	 * Content Encryption Key (CEK) with the "A128KW" function (rather than
+	 * being used directly as the CEK).
+	 */
+	public static final JWEAlgorithm ECDH_1PU_A128KW = new JWEAlgorithm("ECDH-1PU+A128KW", Requirement.OPTIONAL);
+
+
+	/**
+	 * Elliptic Curve Diffie-Hellman One-Pass Unified Model key agreement
+	 * per "ECDH-1PU", but where the agreed-upon key is used to wrap the
+	 * Content Encryption Key (CEK) with the "A192KW" function (rather than
+	 * being used directly as the CEK).
+	 */
+	public static final JWEAlgorithm ECDH_1PU_A192KW = new JWEAlgorithm("ECDH-1PU+A192KW", Requirement.OPTIONAL);
+
+
+	/**
+	 * Elliptic Curve Diffie-Hellman One-Pass Unified Model key agreement
+	 * per "ECDH-1PU", but where the agreed-upon key is used to wrap the
+	 * Content Encryption Key (CEK) with the "A256KW" function (rather than
+	 * being used directly as the CEK).
+	 */
+	public static final JWEAlgorithm ECDH_1PU_A256KW = new JWEAlgorithm("ECDH-1PU+A256KW", Requirement.OPTIONAL);
+
+	
+	/**
 	 * AES in Galois/Counter Mode (GCM) (NIST.800-38D) 128 bit keys.
 	 */
 	public static final JWEAlgorithm A128GCMKW = new JWEAlgorithm("A128GCMKW", Requirement.OPTIONAL);
@@ -214,6 +255,12 @@ public final class JWEAlgorithm extends Algorithm {
 		 * agreement.
 		 */
 		public static final Family ECDH_ES = new Family(JWEAlgorithm.ECDH_ES, ECDH_ES_A128KW, ECDH_ES_A192KW, ECDH_ES_A256KW);
+
+		
+		/**
+		 * Public key authenticated encryption with ECDH-1PU.
+		 */
+		public static final Family ECDH_1PU = new Family(JWEAlgorithm.ECDH_1PU, ECDH_1PU_A128KW, ECDH_1PU_A192KW, ECDH_1PU_A256KW);
 
 
 		/**
@@ -315,6 +362,14 @@ public final class JWEAlgorithm extends Algorithm {
 			return ECDH_ES_A192KW;
 		} else if (s.equals(ECDH_ES_A256KW.getName())) {
 			return ECDH_ES_A256KW;
+		} else if (s.equals(ECDH_1PU.getName())) {
+			return ECDH_1PU;
+		} else if (s.equals(ECDH_1PU_A128KW.getName())) {
+			return ECDH_1PU_A128KW;
+		} else if (s.equals(ECDH_1PU_A192KW.getName())) {
+			return ECDH_1PU_A192KW;
+		} else if (s.equals(ECDH_1PU_A256KW.getName())) {
+			return ECDH_1PU_A256KW;
 		} else if (s.equals(A128GCMKW.getName())) {
 			return A128GCMKW;
 		} else if (s.equals(A192GCMKW.getName())) {

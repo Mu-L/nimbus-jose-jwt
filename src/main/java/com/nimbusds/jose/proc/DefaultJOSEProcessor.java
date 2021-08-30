@@ -238,7 +238,7 @@ public class DefaultJOSEProcessor<C extends SecurityContext> implements Configur
 		
 		// JWS type verifier applies to unsecured JOSE as well
 		if (jwsTypeVerifier == null) {
-			throw new BadJOSEException("Unsecured (plain) JOSE object rejected: No JWS header \"typ\" (type) verifier is configured");
+			throw new BadJOSEException("Unsecured (plain) JOSE object rejected: No JWS header typ (type) verifier is configured");
 		}
 		jwsTypeVerifier.verify(plainObject.getHeader().getType(), context);
 
@@ -251,7 +251,7 @@ public class DefaultJOSEProcessor<C extends SecurityContext> implements Configur
 		throws BadJOSEException, JOSEException {
 		
 		if (jwsTypeVerifier == null) {
-			throw new BadJOSEException("JWS object rejected: No JWS header \"typ\" (type) verifier is configured");
+			throw new BadJOSEException("JWS object rejected: No JWS header typ (type) verifier is configured");
 		}
 		
 		jwsTypeVerifier.verify(jwsObject.getHeader().getType(), context);
@@ -302,7 +302,7 @@ public class DefaultJOSEProcessor<C extends SecurityContext> implements Configur
 		throws BadJOSEException, JOSEException {
 		
 		if (jweTypeVerifier == null) {
-			throw new BadJOSEException("JWE object rejected: No JWE header \"typ\" (type) verifier is configured");
+			throw new BadJOSEException("JWE object rejected: No JWE header typ (type) verifier is configured");
 		}
 		
 		jweTypeVerifier.verify(jweObject.getHeader().getType(), context);

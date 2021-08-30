@@ -1343,3 +1343,19 @@ version 9.11.3 (2021-08-01)
 version 9.12 (2021-08-11)
     * Increases MAX_HEADER_STRING_LENGTH from 10K to 20K to accommodate larger
       JOSE x5c header parameters (iss #440).
+
+version 9.12.1 (2021-08-14)
+    * Removes double quote (") characters from ParseException, JOSEException,
+      BadJOSEException and other exception messages to make the strings
+      compliant when used in OAuth 2.0 error_description strings. See RFC 6749,
+      section 5.2.
+
+version 9.13 (2021-08-22)
+    * Adds support for ECDH public key authenticated encryption with JWE
+      algorithm identifiers ECDH-1PU, ECDH-1PU+A128KW, ECDH-1PU+A128KW and
+      ECDH-1PU+A256KW. See Public Key Authenticated Encryption for JOSE:
+      ECDH-1PU (draft-madden-jose-ecdh-1pu-04).
+    * Adds support for extended nonce ChaCha20-Poly1305 content encryption with
+      JWE encryption method identifier XC20P. See Chacha derived AEAD
+      algorithms in JSON Object Signing and Encryption (JOSE)
+      (draft-amringer-jose-chacha-02).

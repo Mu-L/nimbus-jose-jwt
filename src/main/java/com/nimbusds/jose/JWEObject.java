@@ -333,14 +333,14 @@ public class JWEObject extends JOSEObject {
 
 		if (! encrypter.supportedJWEAlgorithms().contains(getHeader().getAlgorithm())) {
 
-			throw new JOSEException("The \"" + getHeader().getAlgorithm() + 
-					        "\" algorithm is not supported by the JWE encrypter: Supported algorithms: " + encrypter.supportedJWEAlgorithms());
+			throw new JOSEException("The " + getHeader().getAlgorithm() +
+					        " algorithm is not supported by the JWE encrypter: Supported algorithms: " + encrypter.supportedJWEAlgorithms());
 		}
 
 		if (! encrypter.supportedEncryptionMethods().contains(getHeader().getEncryptionMethod())) {
 
-			throw new JOSEException("The \"" + getHeader().getEncryptionMethod() + 
-					        "\" encryption method or key size is not supported by the JWE encrypter: Supported methods: " + encrypter.supportedEncryptionMethods());
+			throw new JOSEException("The " + getHeader().getEncryptionMethod() +
+					        " encryption method or key size is not supported by the JWE encrypter: Supported methods: " + encrypter.supportedEncryptionMethods());
 		}
 	}
 

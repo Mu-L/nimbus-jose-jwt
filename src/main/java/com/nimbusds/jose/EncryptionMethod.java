@@ -25,7 +25,7 @@ import net.jcip.annotations.Immutable;
  * Encryption method name, represents the {@code enc} header parameter in JSON
  * Web Encryption (JWE) objects. This class is immutable.
  *
- * <p>Includes constants for the following standard encryption method names:
+ * <p>Includes constants for the following encryption method names:
  *
  * <ul>
  *     <li>{@link #A128CBC_HS256 A128CBC-HS256}
@@ -34,6 +34,7 @@ import net.jcip.annotations.Immutable;
  *     <li>{@link #A128GCM}
  *     <li>{@link #A192GCM}
  *     <li>{@link #A256GCM}
+ *     <li>{@link #XC20P}
  *     <li>{@link #A128CBC_HS256_DEPRECATED A128CBC+HS256 (deprecated)}
  *     <li>{@link #A256CBC_HS512_DEPRECATED A256CBC+HS512 (deprecated)}
  * </ul>
@@ -41,7 +42,7 @@ import net.jcip.annotations.Immutable;
  * <p>Additional encryption method names can be defined using the constructors.
  *
  * @author Vladimir Dzhuvinov
- * @version 2015-10-14
+ * @version 2021-08-22
  */
 @Immutable
 public final class EncryptionMethod extends Algorithm {
@@ -118,6 +119,14 @@ public final class EncryptionMethod extends Algorithm {
 	 */
 	public static final EncryptionMethod A256GCM = 
 		new EncryptionMethod("A256GCM", Requirement.RECOMMENDED, 256);
+
+
+	/**
+	 * XChaCha: eXtended-nonce ChaCha and AEAD_XChaCha20_Poly1305
+	 * (optional)
+	 */
+	public static final EncryptionMethod XC20P =
+		new EncryptionMethod("XC20P", Requirement.OPTIONAL, 256);
 
 
 	/**
@@ -251,6 +260,9 @@ public final class EncryptionMethod extends Algorithm {
 
 			return A256CBC_HS512_DEPRECATED;
 
+		} else if (s.equals(XC20P.getName())){
+
+			return XC20P;
 		} else {
 
 			return new EncryptionMethod(s);

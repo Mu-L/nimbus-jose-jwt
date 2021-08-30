@@ -322,7 +322,7 @@ public class DefaultJWTProcessor<C extends SecurityContext> implements Configura
 		
 		// JWS type verifier applies to unsecured JOSE as well
 		if (jwsTypeVerifier == null) {
-			throw new BadJOSEException("Plain JWT rejected: No JWS header \"typ\" (type) verifier is configured");
+			throw new BadJOSEException("Plain JWT rejected: No JWS header typ (type) verifier is configured");
 		}
 		jwsTypeVerifier.verify(plainJWT.getHeader().getType(), context);
 		
@@ -335,7 +335,7 @@ public class DefaultJWTProcessor<C extends SecurityContext> implements Configura
 		throws BadJOSEException, JOSEException {
 		
 		if (jwsTypeVerifier == null) {
-			throw new BadJOSEException("Signed JWT rejected: No JWS header \"typ\" (type) verifier is configured");
+			throw new BadJOSEException("Signed JWT rejected: No JWS header typ (type) verifier is configured");
 		}
 		
 		jwsTypeVerifier.verify(signedJWT.getHeader().getType(), context);
@@ -388,7 +388,7 @@ public class DefaultJWTProcessor<C extends SecurityContext> implements Configura
 		throws BadJOSEException, JOSEException {
 		
 		if (jweTypeVerifier == null) {
-			throw new BadJOSEException("Encrypted JWT rejected: No JWE header \"typ\" (type) verifier is configured");
+			throw new BadJOSEException("Encrypted JWT rejected: No JWE header typ (type) verifier is configured");
 		}
 		
 		jweTypeVerifier.verify(encryptedJWT.getHeader().getType(), context);
