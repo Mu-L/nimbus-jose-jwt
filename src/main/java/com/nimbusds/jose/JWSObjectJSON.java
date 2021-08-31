@@ -154,9 +154,23 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
      * @throws ParseException If the string couldn't be parsed to a JWS
      *                        object.
      */
-    public static JWSObjectJSON parse(String s) throws ParseException {
+    public static JWSObjectJSON parse(final String s) throws ParseException {
         Map<String, Object> jsonObject = JSONObjectUtils.parse(s);
 
+        return parse(jsonObject);
+    }
+
+    /**
+     * Parses a JWS object from the map. The
+     * parsed JWS object will be given a {@link State#SIGNED} state.
+     *
+     * @param jsonObject The json map.
+     * @return The JWS object.
+     *
+     * @throws ParseException If the string couldn't be parsed to a JWS
+     *                        object.
+     */
+    public static JWSObjectJSON parse(final Map<String, Object> jsonObject) throws ParseException {
         Base64URL signature = JSONObjectUtils.getBase64URL(jsonObject, "signature");
         Base64URL payload = JSONObjectUtils.getBase64URL(jsonObject, "payload");
         Base64URL protectedHeader;
@@ -179,7 +193,6 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
 
         return new JWSObjectJSON(protectedHeader, unprotectedHeader, payload, signature);
     }
-
 
     /**
      * Signs this JWS object with the specified signer and unprotected header.
