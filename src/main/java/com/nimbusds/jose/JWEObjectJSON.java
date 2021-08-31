@@ -459,12 +459,32 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
             throws ParseException {
         Map<String, Object> json = JSONObjectUtils.parse(s);
 
+        return parse(json);
+    }
+
+    /**
+     * Parses a JWE object from the map. The
+     * parsed JWE object will be given
+     * an {@link JWEObjectJSON.State#ENCRYPTED} state.
+     *
+     * NOTE: Supports only General Serialization Syntax
+     *
+     * @param jsonObject The json map. Must not be {@code null}.
+     *
+     * @return The JWE object.
+     *
+     * @throws ParseException If the string couldn't be parsed to a valid
+     *                        JWE object.
+     */
+    public static JWEObjectJSON parse(final Map<String, Object> jsonObject)
+            throws ParseException {
+
         return new JWEObjectJSON(
-                JSONObjectUtils.getBase64URL(json, "protected"),
-                Recipient.parse(JSONObjectUtils.getJSONObjectArray(json, "recipients")),
-                JSONObjectUtils.getBase64URL(json, "iv"),
-                JSONObjectUtils.getBase64URL(json, "ciphertext"),
-                JSONObjectUtils.getBase64URL(json, "tag"));
+                JSONObjectUtils.getBase64URL(jsonObject, "protected"),
+                Recipient.parse(JSONObjectUtils.getJSONObjectArray(jsonObject, "recipients")),
+                JSONObjectUtils.getBase64URL(jsonObject, "iv"),
+                JSONObjectUtils.getBase64URL(jsonObject, "ciphertext"),
+                JSONObjectUtils.getBase64URL(jsonObject, "tag"));
     }
 
     @Override
