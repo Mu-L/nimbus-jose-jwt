@@ -864,7 +864,7 @@ public class JWEObjectJSONTest extends TestCase {
         JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.ECDH_1PU_A256KW, EncryptionMethod.A256CBC_HS512)
                 .agreementPartyVInfo(Base64URL.encode(bobKid + "." + charlieKid))
                 .agreementPartyUInfo(Base64URL.encode(aliceKid))
-                .customParam("skid", aliceKid)
+                .senderKeyID(aliceKid)
                 .build();
 
         ECKey aliceKey = generateEC(Curve.P_521, aliceKid);
@@ -885,7 +885,7 @@ public class JWEObjectJSONTest extends TestCase {
 
         JWEObjectJSON decrypted = JWEObjectJSON.parse(json);
 
-        assertEquals(aliceKid, decrypted.getHeader().getCustomParam("skid"));
+        assertEquals(aliceKid, decrypted.getHeader().getSenderKeyID());
         assertEquals(2, decrypted.getRecipients().size());
 
         UnprotectedHeader bobPerRecipientHeader = null;
