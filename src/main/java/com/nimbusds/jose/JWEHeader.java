@@ -114,6 +114,7 @@ public final class JWEHeader extends CommonSEHeader {
 		p.add(HeaderParameterNames.PBES2_COUNT);
 		p.add(HeaderParameterNames.INITIALIZATION_VECTOR);
 		p.add(HeaderParameterNames.AUTHENTICATION_TAG);
+		p.add(HeaderParameterNames.SENDER_KEY_ID);
 		p.add("authTag"); // this is a non-standard header, but we should leave it for backwards compatibility
 
 		REGISTERED_PARAMETER_NAMES = Collections.unmodifiableSet(p);
@@ -208,6 +209,10 @@ public final class JWEHeader extends CommonSEHeader {
 		 */
 		private String kid;
 
+		/**
+		 * Sender Key ID.
+		 */
+		private String skid;
 
 		/**
 		 * The ephemeral public key.
@@ -324,6 +329,8 @@ public final class JWEHeader extends CommonSEHeader {
 			p2c = jweHeader.getPBES2Count();
 			iv = jweHeader.getIV();
 			tag = jweHeader.getAuthTag();
+
+			skid = jweHeader.getSenderKeyID();
 
 			customParams = jweHeader.getCustomParams();
 		}
@@ -606,6 +613,19 @@ public final class JWEHeader extends CommonSEHeader {
 			return this;
 		}
 
+		/**
+		 * Sets the key ID ({@code kid}) parameter.
+		 *
+		 * @param skid The sender Key ID parameter, {@code null} if not
+		 *             specified.
+		 *
+		 * @return This builder.
+		 */
+		public Builder senderKeyID(final String skid) {
+
+			this.skid = skid;
+			return this;
+		}
 
 		/**
 		 * Sets a custom (non-registered) parameter.
@@ -681,7 +701,7 @@ public final class JWEHeader extends CommonSEHeader {
 				alg, enc, typ, cty, crit,
 				jku, jwk, x5u, x5t, x5t256, x5c, kid,
 				epk, zip, apu, apv, p2s, p2c,
-				iv, tag,
+				iv, tag, skid,
 				customParams, parsedBase64URL);
 		}
 	}
@@ -740,6 +760,10 @@ public final class JWEHeader extends CommonSEHeader {
 	 */
 	private final Base64URL tag;
 
+	/**
+	 * The Sender Key ID
+	 */
+	private final String skid;
 
 	/**
 	 * Creates a new minimal JSON Web Encryption (JWE) header.
@@ -759,7 +783,7 @@ public final class JWEHeader extends CommonSEHeader {
 			null, null, null, null, null, null, null, null, null, null,
 			null, null, null, null, null, 0,
 			null, null,
-			null, null);
+			null, null, null);
 	}
 
 
@@ -812,6 +836,7 @@ public final class JWEHeader extends CommonSEHeader {
 	 *                        parameter, {@code null} if not specified.
 	 * @param tag             The authentication tag ({@code tag})
 	 *                        parameter, {@code null} if not specified.
+	 * @param skid            The
 	 * @param customParams    The custom parameters, empty map or
 	 *                        {@code null} if none.
 	 * @param parsedBase64URL The parsed Base64URL, {@code null} if the
@@ -837,6 +862,7 @@ public final class JWEHeader extends CommonSEHeader {
 			 final int p2c,
 			 final Base64URL iv,
 			 final Base64URL tag,
+			 final String skid,
 			 final Map<String,Object> customParams,
 			 final Base64URL parsedBase64URL) {
 
@@ -864,6 +890,7 @@ public final class JWEHeader extends CommonSEHeader {
 		this.p2c = p2c;
 		this.iv = iv;
 		this.tag = tag;
+		this.skid = skid;
 	}
 
 
@@ -895,6 +922,7 @@ public final class JWEHeader extends CommonSEHeader {
 			jweHeader.getPBES2Count(),
 			jweHeader.getIV(),
 			jweHeader.getAuthTag(),
+			jweHeader.getSenderKeyID(),
 			jweHeader.getCustomParams(),
 			jweHeader.getParsedBase64URL()
 		);
@@ -1026,6 +1054,10 @@ public final class JWEHeader extends CommonSEHeader {
 		return tag;
 	}
 
+	public String getSenderKeyID() {
+
+		return skid;
+	}
 
 	@Override
 	public Set<String> getIncludedParams() {
@@ -1066,6 +1098,10 @@ public final class JWEHeader extends CommonSEHeader {
 
 		if (tag != null) {
 			includedParameters.add(HeaderParameterNames.AUTHENTICATION_TAG);
+		}
+
+		if (skid != null) {
+			includedParameters.add(HeaderParameterNames.SENDER_KEY_ID);
 		}
 
 		return includedParameters;
@@ -1111,6 +1147,10 @@ public final class JWEHeader extends CommonSEHeader {
 
 		if (tag != null) {
 			o.put(HeaderParameterNames.AUTHENTICATION_TAG, tag.toString());
+		}
+
+		if (skid != null) {
+			o.put(HeaderParameterNames.SENDER_KEY_ID, skid);
 		}
 
 		return o;
@@ -1237,6 +1277,8 @@ public final class JWEHeader extends CommonSEHeader {
 				header = header.iv(Base64URL.from(JSONObjectUtils.getString(jsonObject, name)));
 			} else if(HeaderParameterNames.AUTHENTICATION_TAG.equals(name)) {
 				header = header.authTag(Base64URL.from(JSONObjectUtils.getString(jsonObject, name)));
+			} else if(HeaderParameterNames.SENDER_KEY_ID.equals(name)) {
+				header = header.senderKeyID(JSONObjectUtils.getString(jsonObject, name));
 			} else {
 				header = header.customParam(name, jsonObject.get(name));
 			}

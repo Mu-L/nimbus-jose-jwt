@@ -147,7 +147,13 @@ public final class HeaderParameterNames {
 	 * @see <a href="https://datatracker.ietf.org/doc/html/rfc7518#section-4.6.1.1">RFC 7518 "epk" (Ephemeral Public Key) Header Parameter</a>
 	 */
 	public static final String EPHEMERAL_PUBLIC_KEY = "epk";
-	
+
+	/**
+	 * Used in {@link JWEHeader} with ECDH-1PU key agreement.
+	 *
+	 * @see <a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04#section-2.2.1">"skid" Header Parameter</a>
+	 */
+	public static final String SENDER_KEY_ID = "skid";
 	
 	/**
 	 * Used in {@link JWEHeader} with ECDH key agreement.
