@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.minidev.json.JSONObject;
-import net.minidev.json.JSONStyle;
 import net.minidev.json.parser.JSONParser;
 
 
@@ -483,18 +482,6 @@ public class JSONObjectUtils {
 	 */
 	public static String toJSONString(final Map<String, ?> o) {
 		return JSONObject.toJSONString(o);
-	}
-
-	/**
-	 * Serialises the specified map to a JSON object using the entity
-	 * mapping specified in {@link #parse(String)}. Forward slash is not escaped.
-	 *
-	 * @param o The map. Must not be {@code null}.
-	 *
-	 * @return The JSON object as string.
-	 */
-	public static String toJSONStringForWeb(final Map<String, ?> o) {
-		return JSONObject.toJSONString(o, JSONStyle.LT_COMPRESS);
 	}
 
 	/**

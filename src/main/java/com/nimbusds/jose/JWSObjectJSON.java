@@ -23,7 +23,6 @@ import com.nimbusds.jose.util.JSONArrayUtils;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import net.jcip.annotations.ThreadSafe;
 
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
 
@@ -58,7 +57,7 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
      * @param payload The payload. Must not be {@code null}.
      */
     public JWSObjectJSON(JWSHeader header, Payload payload) {
-        super(escapeJWSHeader(header), payload);
+        super(header, payload);
     }
 
     /**
@@ -140,7 +139,7 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
 
         ensureSignedOrVerifiedState();
 
-        return JSONObjectUtils.toJSONStringForWeb(toGeneralJSONObject());
+        return JSONObjectUtils.toJSONString(toGeneralJSONObject());
     }
 
     /**
@@ -210,22 +209,5 @@ public class JWSObjectJSON extends JWSObject implements JSONSerializable {
 
         this.unprotectedHeader = header;
         sign(signer);
-    }
-
-
-    private static JWSHeader escapeJWSHeader(JWSHeader jwsHeader) {
-        if (jwsHeader == null) {
-
-            throw new IllegalArgumentException("The JWS header must not be null");
-        }
-
-        try {
-            String json = JSONObjectUtils.toJSONStringForWeb(jwsHeader.toJSONObject());
-            Base64URL base64URL = Base64URL.encode(json.getBytes(StandardCharsets.UTF_8));
-            return JWSHeader.parse(base64URL);
-        } catch (ParseException e) {
-
-            throw new IllegalArgumentException("Invalid JWS header: " + e.getMessage());
-        }
     }
 }
