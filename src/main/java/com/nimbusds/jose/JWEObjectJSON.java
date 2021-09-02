@@ -23,7 +23,6 @@ import com.nimbusds.jose.util.JSONObjectUtils;
 import net.jcip.annotations.ThreadSafe;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +114,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
      */
     public JWEObjectJSON(final JWEHeader header, final Payload payload) {
 
-        setHeader(header);
+        this.header = header;
 
         if (payload == null) {
 
@@ -438,7 +437,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
         ensureEncryptedOrDecryptedState();
 
-        return JSONObjectUtils.toJSONStringForWeb(toGeneralJSONObject());
+        return JSONObjectUtils.toJSONString(toGeneralJSONObject());
     }
 
 
@@ -511,21 +510,5 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
         // flattened JSON serialization is not implemented
         throw new NotImplementedException();
 
-    }
-
-    protected void setHeader(JWEHeader jweHeader) {
-        if (jweHeader == null) {
-
-            throw new IllegalArgumentException("The JWE header must not be null");
-        }
-
-        try {
-            String json = JSONObjectUtils.toJSONStringForWeb(jweHeader.toJSONObject());
-            Base64URL base64URL = Base64URL.encode(json.getBytes(StandardCharsets.UTF_8));
-            this.header = JWEHeader.parse(base64URL);
-        } catch (ParseException e) {
-
-            throw new IllegalArgumentException("Invalid JWE header: " + e.getMessage());
-        }
     }
 }
