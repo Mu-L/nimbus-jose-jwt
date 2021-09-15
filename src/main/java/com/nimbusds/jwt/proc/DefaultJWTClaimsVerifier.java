@@ -327,22 +327,33 @@ public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWT
 		}
 		
 		// Check time window
-		final Date now = new Date();
-		
-		final Date exp = claimsSet.getExpirationTime();
-		if (exp != null) {
-			
-			if (! DateUtils.isAfter(exp, now, maxClockSkew)) {
-				throw new BadJWTException("Expired JWT");
+		final Date now = currentTime();
+
+		if (now != null) {
+			final Date exp = claimsSet.getExpirationTime();
+			if (exp != null) {
+
+				if (! DateUtils.isAfter(exp, now, maxClockSkew)) {
+					throw new BadJWTException("Expired JWT");
+				}
+			}
+
+			final Date nbf = claimsSet.getNotBeforeTime();
+			if (nbf != null) {
+
+				if (! DateUtils.isBefore(nbf, now, maxClockSkew)) {
+					throw new BadJWTException("JWT before use time");
+				}
 			}
 		}
-		
-		final Date nbf = claimsSet.getNotBeforeTime();
-		if (nbf != null) {
-			
-			if (! DateUtils.isBefore(nbf, now, maxClockSkew)) {
-				throw new BadJWTException("JWT before use time");
-			}
-		}
+	}
+
+	/**
+	 * Returns current time
+	 *
+	 * @return the current time or null
+	 */
+	protected Date currentTime() {
+		return new Date();
 	}
 }
