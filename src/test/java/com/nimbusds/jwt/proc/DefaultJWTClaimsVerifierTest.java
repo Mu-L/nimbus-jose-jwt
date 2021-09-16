@@ -23,10 +23,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 
-import com.nimbusds.jwt.JWTClaimNames;
 import junit.framework.TestCase;
 
 import com.nimbusds.jose.proc.BadJOSEException;
+import com.nimbusds.jwt.JWTClaimNames;
 import com.nimbusds.jwt.JWTClaimsSet;
 
 
@@ -430,36 +430,113 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 				.build(),
 			null);
 	}
-
-	public void testCurrentDate() throws BadJWTException {
-
+	
+	
+	public void testCurrentDate() {
+		
 		final Date now = new Date();
-		final Date yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-				.expirationTime(yesterday)
-				.build();
-		JWTClaimsSetVerifier verifier = new DefaultJWTClaimsVerifier() {
-			@Override
-			protected Date currentTime() {
-				return yesterday;
-			}
-		};
-		verifier.verify(claimsSet, null);
+		final Date oneSecondAgo = new Date(now.getTime() - 60 * 1000);
+		final Date oneSecondAhead = new Date(now.getTime() + 60 * 1000);
+		
+		final Date currentTime = new DefaultJWTClaimsVerifier<>(
+			new JWTClaimsSet.Builder().build(),
+			Collections.singleton("exp")
+		).currentTime();
+		
+		assertTrue(currentTime.after(oneSecondAgo));
+		assertTrue(currentTime.before(oneSecondAhead));
 	}
 
-	public void testNullCurrentDate() throws BadJWTException {
+	
+	public void testCurrentDateOverride() throws BadJWTException {
+
+		final Date t = new Date(60_000);
+		final Date t_plus2Minutes = new Date(t.getTime() + 2 * 60 * 1000);
+		final Date t_minus2Minutes = new Date(t.getTime() - 2 * 60 * 1000);
+		
+		JWTClaimsSetVerifier overriddenVerifier = new DefaultJWTClaimsVerifier(new JWTClaimsSet.Builder().build(), Collections.singleton("exp")) {
+			@Override
+			protected Date currentTime() {
+				return t;
+			}
+		};
+		
+		// Pass
+		overriddenVerifier.verify(
+			new JWTClaimsSet.Builder()
+				.expirationTime(t_plus2Minutes)
+				.build(),
+			null
+		);
+		
+		// Expired
+		try {
+			overriddenVerifier.verify(
+				new JWTClaimsSet.Builder()
+					.expirationTime(t_minus2Minutes)
+					.build(),
+				null
+			);
+			fail();
+		} catch (BadJWTException e) {
+			assertEquals("Expired JWT", e.getMessage());
+		}
+	}
+
+	
+	public void testCurrentDateOverrideReturnsNull_disablesExpCheck() throws BadJWTException {
 
 		final Date now = new Date();
 		Date yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-				.expirationTime(yesterday)
-				.build();
-		JWTClaimsSetVerifier verifier = new DefaultJWTClaimsVerifier() {
+			.expirationTime(yesterday)
+			.build();
+		
+		// Return null to disable exp check
+		JWTClaimsSetVerifier overriddenVerifier = new DefaultJWTClaimsVerifier() {
 			@Override
 			protected Date currentTime() {
 				return null;
 			}
 		};
-		verifier.verify(claimsSet, null);
+		overriddenVerifier.verify(claimsSet, null);
+		
+		// Std behaviour is expired JWT
+		try {
+			new DefaultJWTClaimsVerifier<>().verify(claimsSet, null);
+			fail();
+		} catch (BadJWTException e) {
+			assertEquals("Expired JWT", e.getMessage());
+		}
+	}
+
+	
+	public void testCurrentDateOverrideReturnsNull_disablesNbfCheck() throws BadJWTException {
+
+		final Date now = new Date();
+		Date tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+			.notBeforeTime(tomorrow)
+			.build();
+		
+		// Return null to disable nbf check
+		JWTClaimsSetVerifier overriddenVerifier = new DefaultJWTClaimsVerifier(
+			new JWTClaimsSet.Builder().build(),
+			Collections.singleton("nbf")
+		) {
+			@Override
+			protected Date currentTime() {
+				return null;
+			}
+		};
+		overriddenVerifier.verify(claimsSet, null);
+		
+		// Std behaviour is JWT is before use time
+		try {
+			new DefaultJWTClaimsVerifier<>().verify(claimsSet, null);
+			fail();
+		} catch (BadJWTException e) {
+			assertEquals("JWT before use time", e.getMessage());
+		}
 	}
 }
