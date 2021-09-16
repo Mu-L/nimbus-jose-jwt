@@ -72,12 +72,17 @@ import com.nimbusds.jwt.util.DateUtils;
  * verifier.verify(jwtClaimsSet, null);
  * </pre>
  *
+ * <p>The {@link #currentTime()} method can be overridden to use an alternative
+ * time provider for the "exp" (expiration time) and "nbf" (not-before time)
+ * verification, or to disable "exp" and "nbf" verification entirely.
+ *
  * <p>This class may be extended to perform additional checks.
  *
  * <p>This class is thread-safe.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-06-05
+ * @author Eugene Kuleshov
+ * @version 2021-09-16
  */
 @ThreadSafe
 public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWTClaimsSetVerifier<C>, ClockSkewAware {
@@ -348,12 +353,18 @@ public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWT
 		}
 	}
 
+	
 	/**
-	 * Returns current time
+	 * Returns the current time for the purpose of "exp" (expiration time)
+	 * and "nbf" (not-before time) claim verification. This method can be
+	 * overridden to inject an alternative time provider (e.g. for testing
+	 * purposes) or to disable "exp" and "nbf" verification.
 	 *
-	 * @return the current time or null
+	 * @return The current time or {@code null} to disable "exp" and "nbf"
+	 *         claim verification entirely.
 	 */
 	protected Date currentTime() {
+		
 		return new Date();
 	}
 }
