@@ -1359,3 +1359,10 @@ version 9.13 (2021-08-22)
       JWE encryption method identifier XC20P. See Chacha derived AEAD
       algorithms in JSON Object Signing and Encryption (JOSE)
       (draft-amringer-jose-chacha-02).
+
+version 9.14 (2021-09-16)
+    * Adds a DefaultJWTClaimsVerifier.currentTime method that returns the
+      current time for the purpose of "exp" (expiration time) and "nbf"
+      (not-before time) claim verification. This method can be overridden to
+      inject an alternative time provider (e.g. for testing purposes) or to
+      disable "exp" and "nbf" verification.
