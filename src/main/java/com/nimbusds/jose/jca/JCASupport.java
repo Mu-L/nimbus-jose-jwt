@@ -246,6 +246,8 @@ public final class JCASupport {
 				jcaName = "RSA/ECB/OAEPWithSHA-1AndMGF1Padding";
 			} else if (alg.equals(JWEAlgorithm.RSA_OAEP_256)) {
 				jcaName = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
+			} else if (alg.equals(JWEAlgorithm.RSA_OAEP_512)) {
+				jcaName = "RSA/ECB/OAEPWithSHA-512AndMGF1Padding";
 			} else {
 				return false;
 			}

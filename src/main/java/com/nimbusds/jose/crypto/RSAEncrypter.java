@@ -190,6 +190,10 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
 			
 			encryptedKey = Base64URL.encode(RSA_OAEP_256.encryptCEK(publicKey, cek, getJCAContext().getKeyEncryptionProvider()));
 			
+		} else if (alg.equals(JWEAlgorithm.RSA_OAEP_512)) {
+
+			encryptedKey = Base64URL.encode(RSA_OAEP_512.encryptCEK(publicKey, cek, getJCAContext().getKeyEncryptionProvider()));
+
 		} else {
 
 			throw new JOSEException(AlgorithmSupportMessage.unsupportedJWEAlgorithm(alg, SUPPORTED_ALGORITHMS));

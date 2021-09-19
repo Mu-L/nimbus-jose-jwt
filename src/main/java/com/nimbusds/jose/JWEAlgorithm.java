@@ -82,6 +82,13 @@ public final class JWEAlgorithm extends Algorithm {
 	 */
 	public static final JWEAlgorithm RSA_OAEP_256 = new JWEAlgorithm("RSA-OAEP-256", Requirement.OPTIONAL);
 
+/**
+	 * RSAES using Optimal Asymmetric Encryption Padding (OAEP) (RFC 3447),
+	 * with the SHA-512 hash function and the MGF1 with SHA-512 mask
+	 * generation function.
+	 */
+	public static final JWEAlgorithm RSA_OAEP_512 = new JWEAlgorithm("RSA-OAEP-512", Requirement.OPTIONAL);
+
 
 	/**
 	 * Advanced Encryption Standard (AES) Key Wrap Algorithm (RFC 3394) 
@@ -200,7 +207,7 @@ public final class JWEAlgorithm extends Algorithm {
 		/**
 		 * RSA key encryption.
 		 */
-		public static final Family RSA = new Family(RSA1_5, RSA_OAEP, RSA_OAEP_256);
+		public static final Family RSA = new Family(RSA1_5, RSA_OAEP, RSA_OAEP_256, RSA_OAEP_512);
 
 
 		/**
@@ -299,6 +306,8 @@ public final class JWEAlgorithm extends Algorithm {
 			return RSA_OAEP;
 		} else if (s.equals(RSA_OAEP_256.getName())) {
 			return RSA_OAEP_256;
+		} else if (s.equals(RSA_OAEP_512.getName())) {
+			return RSA_OAEP_512;
 		} else if (s.equals(A128KW.getName())) {
 			return A128KW;
 		} else if (s.equals(A192KW.getName())) {

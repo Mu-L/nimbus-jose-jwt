@@ -34,6 +34,7 @@ public class JWEAlgorithmTest extends TestCase {
 		assertTrue(JWEAlgorithm.RSA1_5 == JWEAlgorithm.parse("RSA1_5"));
 		assertTrue(JWEAlgorithm.RSA_OAEP == JWEAlgorithm.parse("RSA-OAEP"));
 		assertTrue(JWEAlgorithm.RSA_OAEP_256 == JWEAlgorithm.parse("RSA-OAEP-256"));
+		assertTrue(JWEAlgorithm.RSA_OAEP_512 == JWEAlgorithm.parse("RSA-OAEP-512"));
 
 		assertTrue(JWEAlgorithm.A128KW == JWEAlgorithm.parse("A128KW"));
 		assertTrue(JWEAlgorithm.A192KW == JWEAlgorithm.parse("A192KW"));
@@ -62,7 +63,8 @@ public class JWEAlgorithmTest extends TestCase {
 		assertTrue(JWEAlgorithm.Family.RSA.contains(JWEAlgorithm.RSA1_5));
 		assertTrue(JWEAlgorithm.Family.RSA.contains(JWEAlgorithm.RSA_OAEP));
 		assertTrue(JWEAlgorithm.Family.RSA.contains(JWEAlgorithm.RSA_OAEP_256));
-		assertEquals(3, JWEAlgorithm.Family.RSA.size());
+		assertTrue(JWEAlgorithm.Family.RSA.contains(JWEAlgorithm.RSA_OAEP_512));
+		assertEquals(4, JWEAlgorithm.Family.RSA.size());
 	}
 
 
@@ -112,7 +114,7 @@ public class JWEAlgorithmTest extends TestCase {
 		assertTrue(JWEAlgorithm.Family.ASYMMETRIC.contains(JWEAlgorithm.ECDH_ES_A128KW));
 		assertTrue(JWEAlgorithm.Family.ASYMMETRIC.contains(JWEAlgorithm.ECDH_ES_A192KW));
 		assertTrue(JWEAlgorithm.Family.ASYMMETRIC.contains(JWEAlgorithm.ECDH_ES_A256KW));
-		assertEquals(7, JWEAlgorithm.Family.ASYMMETRIC.size());
+		assertEquals(8, JWEAlgorithm.Family.ASYMMETRIC.size());
 	}
 	
 	
@@ -125,6 +127,6 @@ public class JWEAlgorithmTest extends TestCase {
 		assertTrue(JWEAlgorithm.Family.SYMMETRIC.contains(JWEAlgorithm.A256GCMKW));
 		assertTrue(JWEAlgorithm.Family.SYMMETRIC.contains(JWEAlgorithm.A256GCMKW));
 		assertTrue(JWEAlgorithm.Family.SYMMETRIC.contains(JWEAlgorithm.DIR));
-		assertEquals(7, JWEAlgorithm.Family.ASYMMETRIC.size());
+		assertEquals(8, JWEAlgorithm.Family.ASYMMETRIC.size());
 	}
 }
