@@ -277,6 +277,10 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter, Cri
 			
 			cek = RSA_OAEP_256.decryptCEK(privateKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
 			
+		} else if (alg.equals(JWEAlgorithm.RSA_OAEP_512)){
+
+			cek = RSA_OAEP_512.decryptCEK(privateKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
+
 		} else {
 		
 			throw new JOSEException(AlgorithmSupportMessage.unsupportedJWEAlgorithm(alg, SUPPORTED_ALGORITHMS));

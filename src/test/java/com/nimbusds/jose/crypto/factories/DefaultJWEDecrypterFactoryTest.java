@@ -58,7 +58,7 @@ public class DefaultJWEDecrypterFactoryTest extends TestCase {
 		assertTrue(factory.supportedJWEAlgorithms().containsAll(JWEAlgorithm.Family.PBES2));
 		assertTrue(factory.supportedJWEAlgorithms().contains(JWEAlgorithm.DIR));
 
-		assertEquals(17, factory.supportedJWEAlgorithms().size());
+		assertEquals(18, factory.supportedJWEAlgorithms().size());
 	}
 
 

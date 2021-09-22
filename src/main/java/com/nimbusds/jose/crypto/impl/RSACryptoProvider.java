@@ -75,6 +75,7 @@ public abstract class RSACryptoProvider extends BaseJWEProvider {
 		algs.add(JWEAlgorithm.RSA1_5);
 		algs.add(JWEAlgorithm.RSA_OAEP);
 		algs.add(JWEAlgorithm.RSA_OAEP_256);
+		algs.add(JWEAlgorithm.RSA_OAEP_512);
 		SUPPORTED_ALGORITHMS = Collections.unmodifiableSet(algs);
 	}
 
