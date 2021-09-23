@@ -69,7 +69,7 @@ import net.jcip.annotations.ThreadSafe;
  * @author David Ortiz
  * @author Vladimir Dzhuvinov
  * @author Dimitar A. Stoikov
- * @version 2018-10-11
+ * @version 2021-09-22
  */
 @ThreadSafe
 public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter, CriticalHeaderParamsAware {
@@ -277,6 +277,10 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter, Cri
 		} else if (alg.equals(JWEAlgorithm.RSA_OAEP_256)) {
 			
 			cek = RSA_OAEP_256.decryptCEK(privateKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
+			
+		} else if (alg.equals(JWEAlgorithm.RSA_OAEP_512)){
+			
+			cek = RSA_OAEP_512.decryptCEK(privateKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
 			
 		} else {
 		
