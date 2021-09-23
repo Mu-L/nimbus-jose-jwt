@@ -48,6 +48,7 @@ import net.jcip.annotations.ThreadSafe;
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP_256}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP_512}
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP} (deprecated)
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA1_5} (deprecated)
  * </ul>
@@ -68,7 +69,7 @@ import net.jcip.annotations.ThreadSafe;
  * @author David Ortiz
  * @author Vladimir Dzhuvinov
  * @author Dimitar A. Stoikov
- * @version 2018-10-11
+ * @version 2021-09-23
  */
 @ThreadSafe
 public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter, CriticalHeaderParamsAware {

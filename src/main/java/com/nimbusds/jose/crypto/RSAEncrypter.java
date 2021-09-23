@@ -52,6 +52,7 @@ import com.nimbusds.jose.util.Base64URL;
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP_256}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP_512}
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP} (deprecated)
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA1_5} (deprecated)
  * </ul>
@@ -72,7 +73,7 @@ import com.nimbusds.jose.util.Base64URL;
  * @author David Ortiz
  * @author Vladimir Dzhuvinov
  * @author Jun Yu
- * @version 2018-07-17
+ * @version 2021-09-23
  */
 @ThreadSafe
 public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {

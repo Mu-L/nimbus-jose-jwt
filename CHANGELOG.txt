@@ -1214,3 +1214,6 @@ version 8.22 (2021-06-05)
 version 8.22.1 (2021-07-01)
     * Updates JSONObjectUtils.parse(String, int) to catch StackOverflowErrors
       and throw them as ParseException (iss #434).
+
+version 8.23 (2021-09-23)
+    * Adds RSA-OAEP-512 support to RSAEncrypter and RSADecrypter.
