@@ -1366,3 +1366,6 @@ version 9.14 (2021-09-16)
       (not-before time) claim verification. This method can be overridden to
       inject an alternative time provider (e.g. for testing purposes) or to
       disable "exp" and "nbf" verification.
+
+version 9.15 (2021-09-23)
+    * Adds RSA-OAEP-512 JWE algorithm support to RSAEncrypter and RSADecrypter.

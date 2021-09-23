@@ -32,7 +32,7 @@ The library handles the following JOSE algorithms:
 * RSASSA-PSS signatures: PS256, PS384 and PS512
 * EC signatures: ES256, ES256K, ES384, ES512 and EdDSA
 * Key encryption with RSAES-PKCS1-V1_5: RSA1_5 (deprecated)
-* Key encryption with RSAES OAEP: RSA-OAEP and RSA-OAEP-256
+* Key encryption with RSAES OAEP: RSA-OAEP, RSA-OAEP-256 and RSA-OAEP-512
 * Key encryption with AES key wrap: A128KW, A192KW and A256KW
 * Key encryption with AES GCM: A128CGMKW, A192CGMKW and A256CGMKW
 * Direct shared symmetric key encryption: dir
