@@ -24,11 +24,12 @@ import javax.crypto.SecretKey;
 
 import static com.nimbusds.jose.jwk.gen.RSAKeyGenerator.MIN_KEY_SIZE_BITS;
 
+import net.jcip.annotations.ThreadSafe;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.impl.*;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.util.Base64URL;
-import net.jcip.annotations.ThreadSafe;
 
 
 /**
@@ -48,6 +49,7 @@ import net.jcip.annotations.ThreadSafe;
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP_256}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP_512}
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP} (deprecated)
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA1_5} (deprecated)
  * </ul>
@@ -69,7 +71,7 @@ import net.jcip.annotations.ThreadSafe;
  * @author David Ortiz
  * @author Vladimir Dzhuvinov
  * @author Dimitar A. Stoikov
- * @version 2021-09-22
+ * @version 2021-09-23
  */
 @ThreadSafe
 public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter, CriticalHeaderParamsAware {
@@ -271,19 +273,12 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter, Cri
 			cekDecryptionException = null;
 		
 		} else if (alg.equals(JWEAlgorithm.RSA_OAEP)) {
-
 			cek = RSA_OAEP.decryptCEK(privateKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
-
 		} else if (alg.equals(JWEAlgorithm.RSA_OAEP_256)) {
-			
-			cek = RSA_OAEP_256.decryptCEK(privateKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
-			
+			cek = RSA_OAEP_SHA2.decryptCEK(privateKey, encryptedKey.decode(), 256, getJCAContext().getKeyEncryptionProvider());
 		} else if (alg.equals(JWEAlgorithm.RSA_OAEP_512)){
-			
-			cek = RSA_OAEP_512.decryptCEK(privateKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
-			
+			cek = RSA_OAEP_SHA2.decryptCEK(privateKey, encryptedKey.decode(), 512, getJCAContext().getKeyEncryptionProvider());
 		} else {
-		
 			throw new JOSEException(AlgorithmSupportMessage.unsupportedJWEAlgorithm(alg, SUPPORTED_ALGORITHMS));
 		}
 

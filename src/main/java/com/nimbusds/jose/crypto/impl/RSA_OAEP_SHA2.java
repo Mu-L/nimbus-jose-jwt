@@ -18,62 +18,100 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import java.security.AlgorithmParameters;
-import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.MGF1ParameterSpec;
+import com.nimbusds.jose.JOSEException;
+import net.jcip.annotations.ThreadSafe;
+
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 import javax.crypto.spec.SecretKeySpec;
-
-import com.nimbusds.jose.JOSEException;
-import net.jcip.annotations.ThreadSafe;
+import java.security.AlgorithmParameters;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.MGF1ParameterSpec;
 
 
 /**
- * RSAES OAEP (SHA-256) methods for Content Encryption Key (CEK) encryption and
- * decryption. Uses the BouncyCastle.org provider. This class is thread-safe
+ * RSAES OAEP (SHA-256, SHA-512) methods for Content Encryption Key (CEK)
+ * encryption and decryption. Uses the BouncyCastle.org provider. This class is
+ * thread-safe.
  *
  * @author Vladimir Dzhuvinov
  * @author Justin Richer
- * @version 2017-11-27
+ * @author Peter Laurina
+ * @version 2021-09-23
  */
 @ThreadSafe
-public class RSA_OAEP_256 {
+public class RSA_OAEP_SHA2 {
 	
 	
 	/**
 	 * The JCA algorithm name for RSA-OAEP-256.
 	 */
 	private static final String RSA_OEAP_256_JCA_ALG = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
-
-
+	
+	
+	/**
+	 * The JCA algorithm name for RSA-OAEP-512.
+	 */
+	private static final String RSA_OEAP_512_JCA_ALG = "RSA/ECB/OAEPWithSHA-512AndMGF1Padding";
+	
+	
+	/**
+	 * The JCA algorithm name for SHA-256.
+	 */
+	private static final String SHA_256_JCA_ALG = "SHA-256";
+	
+	/**
+	 * The JCA algorithm name for SHA-512.
+	 */
+	private static final String SHA_512_JCA_ALG = "SHA-512";
+	
+	
 	/**
 	 * Encrypts the specified Content Encryption Key (CEK).
 	 *
-	 * @param pub      The public RSA key. Must not be {@code null}.
-	 * @param cek      The Content Encryption Key (CEK) to encrypt. Must
-	 *                 not be {@code null}.
-	 * @param provider The JCA provider, or {@code null} to use the default
-	 *                 one.
+	 * @param pub        The public RSA key. Must not be {@code null}.
+	 * @param cek        The Content Encryption Key (CEK) to encrypt. Must
+	 *                   not be {@code null}.
+	 * @param shaBitSize The SHA-2 bit size. Must be 256 or 512.
+	 * @param provider   The JCA provider, or {@code null} to use the
+	 *                   default one.
 	 *
 	 * @return The encrypted Content Encryption Key (CEK).
 	 *
 	 * @throws JOSEException If encryption failed.
 	 */
-	public static byte[] encryptCEK(final RSAPublicKey pub, final SecretKey cek, final Provider provider)
+	public static byte[] encryptCEK(final RSAPublicKey pub,
+					final SecretKey cek,
+					final int shaBitSize,
+					final Provider provider)
 		throws JOSEException {
-
+		
+		final String jcaAlgName;
+		final String jcaShaAlgName;
+		final MGF1ParameterSpec mgf1ParameterSpec;
+		if (256 == shaBitSize) {
+			jcaAlgName = RSA_OEAP_256_JCA_ALG;
+			jcaShaAlgName = SHA_256_JCA_ALG;
+			mgf1ParameterSpec = MGF1ParameterSpec.SHA256;
+		} else if (512 == shaBitSize) {
+			jcaAlgName = RSA_OEAP_512_JCA_ALG;
+			jcaShaAlgName = SHA_512_JCA_ALG;
+			mgf1ParameterSpec = MGF1ParameterSpec.SHA512;
+		} else {
+			throw new JOSEException("Unsupported SHA-2 bit size: " + shaBitSize);
+		}
+		
 		try {
 			AlgorithmParameters algp = AlgorithmParametersHelper.getInstance("OAEP", provider);
-			AlgorithmParameterSpec paramSpec = new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT);
+			AlgorithmParameterSpec paramSpec = new OAEPParameterSpec(jcaShaAlgName, "MGF1", mgf1ParameterSpec, PSource.PSpecified.DEFAULT);
 			algp.init(paramSpec);
-			Cipher cipher = CipherHelper.getInstance(RSA_OEAP_256_JCA_ALG, provider);
+			Cipher cipher = CipherHelper.getInstance(jcaAlgName, provider);
 			cipher.init(Cipher.ENCRYPT_MODE, pub, algp);
 			return cipher.doFinal(cek.getEncoded());
 			
@@ -87,7 +125,7 @@ public class RSA_OAEP_256 {
 			throw new JOSEException(e.getMessage(), e);
 		}
 	}
-
+	
 	
 	/**
 	 * Decrypts the specified encrypted Content Encryption Key (CEK).
@@ -95,6 +133,7 @@ public class RSA_OAEP_256 {
 	 * @param priv         The private RSA key. Must not be {@code null}.
 	 * @param encryptedCEK The encrypted Content Encryption Key (CEK) to
 	 *                     decrypt. Must not be {@code null}.
+	 * @param shaBitSize   The SHA-2 bit size. Must be 256 or 512.
 	 * @param provider     The JCA provider, or {@code null} to use the
 	 *                     default one.
 	 *
@@ -103,17 +142,34 @@ public class RSA_OAEP_256 {
 	 * @throws JOSEException If decryption failed.
 	 */
 	public static SecretKey decryptCEK(final PrivateKey priv,
-		                           final byte[] encryptedCEK, final Provider provider)
+					   final byte[] encryptedCEK,
+					   final int shaBitSize,
+					   final Provider provider)
 		throws JOSEException {
-
+		
+		final String jcaAlgName;
+		final String jcaShaAlgName;
+		final MGF1ParameterSpec mgf1ParameterSpec;
+		if (256 == shaBitSize) {
+			jcaAlgName = RSA_OEAP_256_JCA_ALG;
+			jcaShaAlgName = SHA_256_JCA_ALG;
+			mgf1ParameterSpec = MGF1ParameterSpec.SHA256;
+		} else if (512 == shaBitSize) {
+			jcaAlgName = RSA_OEAP_512_JCA_ALG;
+			jcaShaAlgName = SHA_512_JCA_ALG;
+			mgf1ParameterSpec = MGF1ParameterSpec.SHA512;
+		} else {
+			throw new JOSEException("Unsupported SHA-2 bit size: " + shaBitSize);
+		}
+		
 		try {
 			AlgorithmParameters algp = AlgorithmParametersHelper.getInstance("OAEP", provider);
-			AlgorithmParameterSpec paramSpec = new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT);
+			AlgorithmParameterSpec paramSpec = new OAEPParameterSpec(jcaShaAlgName, "MGF1", mgf1ParameterSpec, PSource.PSpecified.DEFAULT);
 			algp.init(paramSpec);
-			Cipher cipher = CipherHelper.getInstance(RSA_OEAP_256_JCA_ALG, provider);
+			Cipher cipher = CipherHelper.getInstance(jcaAlgName, provider);
 			cipher.init(Cipher.DECRYPT_MODE, priv, algp);
 			return new SecretKeySpec(cipher.doFinal(encryptedCEK), "AES");
-
+			
 		} catch (Exception e) {
 			// java.security.NoSuchAlgorithmException
 			// java.security.NoSuchPaddingException
@@ -123,10 +179,10 @@ public class RSA_OAEP_256 {
 			throw new JOSEException(e.getMessage(), e);
 		}
 	}
-
-
+	
+	
 	/**
 	 * Prevents public instantiation.
 	 */
-	private RSA_OAEP_256() { }
+	private RSA_OAEP_SHA2() { }
 }
