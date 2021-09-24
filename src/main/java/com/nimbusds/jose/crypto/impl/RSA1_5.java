@@ -36,7 +36,7 @@ import net.jcip.annotations.ThreadSafe;
  * decryption. This class is thread-safe.
  *
  * @author Vladimir Dzhuvinov
- * @version 2017-06-01
+ * @version 2021-09-24
  */
 @ThreadSafe
 public class RSA1_5 {
@@ -64,7 +64,7 @@ public class RSA1_5 {
 			return cipher.doFinal(cek.getEncoded());
 			
 		} catch (IllegalBlockSizeException e) {
-			throw new JOSEException("RSA block size exception: The RSA key is too short, try a longer one", e);
+			throw new JOSEException("RSA block size exception: The RSA key is too short, use a longer one", e);
 		} catch (Exception e) {
 			// java.security.NoSuchAlgorithmException
 			// java.security.InvalidKeyException

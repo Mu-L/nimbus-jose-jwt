@@ -49,6 +49,7 @@ import com.nimbusds.jose.util.Base64URL;
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP_256}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP_384}
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP_512}
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA_OAEP} (deprecated)
  *     <li>{@link com.nimbusds.jose.JWEAlgorithm#RSA1_5} (deprecated)
@@ -276,6 +277,8 @@ public class RSADecrypter extends RSACryptoProvider implements JWEDecrypter, Cri
 			cek = RSA_OAEP.decryptCEK(privateKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
 		} else if (alg.equals(JWEAlgorithm.RSA_OAEP_256)) {
 			cek = RSA_OAEP_SHA2.decryptCEK(privateKey, encryptedKey.decode(), 256, getJCAContext().getKeyEncryptionProvider());
+		} else if (alg.equals(JWEAlgorithm.RSA_OAEP_384)) {
+			cek = RSA_OAEP_SHA2.decryptCEK(privateKey, encryptedKey.decode(), 384, getJCAContext().getKeyEncryptionProvider());
 		} else if (alg.equals(JWEAlgorithm.RSA_OAEP_512)){
 			cek = RSA_OAEP_SHA2.decryptCEK(privateKey, encryptedKey.decode(), 512, getJCAContext().getKeyEncryptionProvider());
 		} else {

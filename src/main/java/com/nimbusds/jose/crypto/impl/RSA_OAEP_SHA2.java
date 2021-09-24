@@ -18,32 +18,32 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import com.nimbusds.jose.JOSEException;
-import net.jcip.annotations.ThreadSafe;
-
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.AlgorithmParameters;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.MGF1ParameterSpec;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
+import javax.crypto.spec.SecretKeySpec;
+
+import net.jcip.annotations.ThreadSafe;
+
+import com.nimbusds.jose.JOSEException;
 
 
 /**
- * RSAES OAEP (SHA-256, SHA-512) methods for Content Encryption Key (CEK)
- * encryption and decryption. Uses the BouncyCastle.org provider. This class is
- * thread-safe.
+ * RSAES OAEP with SHA-256, SHA-384 and SHA-512 methods for Content Encryption
+ * Key (CEK) encryption and decryption. This class is thread-safe.
  *
  * @author Vladimir Dzhuvinov
  * @author Justin Richer
  * @author Peter Laurina
- * @version 2021-09-23
+ * @version 2021-09-24
  */
 @ThreadSafe
 public class RSA_OAEP_SHA2 {
@@ -53,6 +53,12 @@ public class RSA_OAEP_SHA2 {
 	 * The JCA algorithm name for RSA-OAEP-256.
 	 */
 	private static final String RSA_OEAP_256_JCA_ALG = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
+	
+	
+	/**
+	 * The JCA algorithm name for RSA-OAEP-384.
+	 */
+	private static final String RSA_OEAP_384_JCA_ALG = "RSA/ECB/OAEPWithSHA-384AndMGF1Padding";
 	
 	
 	/**
@@ -66,6 +72,12 @@ public class RSA_OAEP_SHA2 {
 	 */
 	private static final String SHA_256_JCA_ALG = "SHA-256";
 	
+	
+	/**
+	 * The JCA algorithm name for SHA-384.
+	 */
+	private static final String SHA_384_JCA_ALG = "SHA-384";
+	
 	/**
 	 * The JCA algorithm name for SHA-512.
 	 */
@@ -78,7 +90,7 @@ public class RSA_OAEP_SHA2 {
 	 * @param pub        The public RSA key. Must not be {@code null}.
 	 * @param cek        The Content Encryption Key (CEK) to encrypt. Must
 	 *                   not be {@code null}.
-	 * @param shaBitSize The SHA-2 bit size. Must be 256 or 512.
+	 * @param shaBitSize The SHA-2 bit size. Must be 256, 384 or 512.
 	 * @param provider   The JCA provider, or {@code null} to use the
 	 *                   default one.
 	 *
@@ -99,6 +111,10 @@ public class RSA_OAEP_SHA2 {
 			jcaAlgName = RSA_OEAP_256_JCA_ALG;
 			jcaShaAlgName = SHA_256_JCA_ALG;
 			mgf1ParameterSpec = MGF1ParameterSpec.SHA256;
+		} else if (384 == shaBitSize) {
+			jcaAlgName = RSA_OEAP_384_JCA_ALG;
+			jcaShaAlgName = SHA_384_JCA_ALG;
+			mgf1ParameterSpec = MGF1ParameterSpec.SHA384;
 		} else if (512 == shaBitSize) {
 			jcaAlgName = RSA_OEAP_512_JCA_ALG;
 			jcaShaAlgName = SHA_512_JCA_ALG;
@@ -116,7 +132,7 @@ public class RSA_OAEP_SHA2 {
 			return cipher.doFinal(cek.getEncoded());
 			
 		} catch (IllegalBlockSizeException e) {
-			throw new JOSEException("RSA block size exception: The RSA key is too short, try a longer one", e);
+			throw new JOSEException("RSA block size exception: The RSA key is too short, use a longer one", e);
 		} catch (Exception e) {
 			// java.security.NoSuchAlgorithmException
 			// java.security.NoSuchPaddingException
@@ -154,6 +170,10 @@ public class RSA_OAEP_SHA2 {
 			jcaAlgName = RSA_OEAP_256_JCA_ALG;
 			jcaShaAlgName = SHA_256_JCA_ALG;
 			mgf1ParameterSpec = MGF1ParameterSpec.SHA256;
+		} else if (384 == shaBitSize) {
+			jcaAlgName = RSA_OEAP_384_JCA_ALG;
+			jcaShaAlgName = SHA_384_JCA_ALG;
+			mgf1ParameterSpec = MGF1ParameterSpec.SHA384;
 		} else if (512 == shaBitSize) {
 			jcaAlgName = RSA_OEAP_512_JCA_ALG;
 			jcaShaAlgName = SHA_512_JCA_ALG;

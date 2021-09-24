@@ -53,7 +53,7 @@ import net.jcip.annotations.Immutable;
  * <p>Additional JWE algorithm names can be defined using the constructors.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-09-22
+ * @version 2021-09-24
  */
 @Immutable
 public final class JWEAlgorithm extends Algorithm {
@@ -86,6 +86,14 @@ public final class JWEAlgorithm extends Algorithm {
 	 * generation function.
 	 */
 	public static final JWEAlgorithm RSA_OAEP_256 = new JWEAlgorithm("RSA-OAEP-256", Requirement.OPTIONAL);
+	
+	
+	/**
+	 * RSAES using Optimal Asymmetric Encryption Padding (OAEP) (RFC 3447),
+	 * with the SHA-512 hash function and the MGF1 with SHA-384 mask
+	 * generation function.
+	 */
+	public static final JWEAlgorithm RSA_OAEP_384 = new JWEAlgorithm("RSA-OAEP-384", Requirement.OPTIONAL);
 	
 	
 	/**
@@ -250,7 +258,7 @@ public final class JWEAlgorithm extends Algorithm {
 		/**
 		 * RSA key encryption.
 		 */
-		public static final Family RSA = new Family(RSA1_5, RSA_OAEP, RSA_OAEP_256, RSA_OAEP_512);
+		public static final Family RSA = new Family(RSA1_5, RSA_OAEP, RSA_OAEP_256, RSA_OAEP_384, RSA_OAEP_512);
 
 
 		/**
@@ -355,6 +363,8 @@ public final class JWEAlgorithm extends Algorithm {
 			return RSA_OAEP;
 		} else if (s.equals(RSA_OAEP_256.getName())) {
 			return RSA_OAEP_256;
+		} else if (s.equals(RSA_OAEP_384.getName())) {
+			return RSA_OAEP_384;
 		} else if (s.equals(RSA_OAEP_512.getName())) {
 			return RSA_OAEP_512;
 		} else if (s.equals(A128KW.getName())) {

@@ -1368,4 +1368,5 @@ version 9.14 (2021-09-16)
       disable "exp" and "nbf" verification.
 
 version 9.15 (2021-09-23)
-    * Adds RSA-OAEP-512 JWE algorithm support to RSAEncrypter and RSADecrypter.
+    * Adds RSA-OAEP-384 and RSA-OAEP-512 JWE algorithm support to RSAEncrypter
+      and RSADecrypter.

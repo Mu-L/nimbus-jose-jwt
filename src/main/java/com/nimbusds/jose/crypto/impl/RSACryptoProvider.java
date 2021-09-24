@@ -54,7 +54,7 @@ import com.nimbusds.jose.JWEAlgorithm;
  * 
  * @author David Ortiz
  * @author Vladimir Dzhuvinov
- * @version 2021-09-22
+ * @version 2021-09-23
  */
 public abstract class RSACryptoProvider extends BaseJWEProvider {
 
@@ -76,6 +76,7 @@ public abstract class RSACryptoProvider extends BaseJWEProvider {
 		algs.add(JWEAlgorithm.RSA1_5);
 		algs.add(JWEAlgorithm.RSA_OAEP);
 		algs.add(JWEAlgorithm.RSA_OAEP_256);
+		algs.add(JWEAlgorithm.RSA_OAEP_384);
 		algs.add(JWEAlgorithm.RSA_OAEP_512);
 		SUPPORTED_ALGORITHMS = Collections.unmodifiableSet(algs);
 	}
