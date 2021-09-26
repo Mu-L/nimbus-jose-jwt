@@ -18,7 +18,6 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import com.nimbusds.jose.crypto.impl.AESCryptoProvider;
 import junit.framework.TestCase;
 
 import com.nimbusds.jose.EncryptionMethod;
