@@ -19,6 +19,10 @@ package com.nimbusds.jose.crypto;
 
 
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import javax.crypto.SecretKey;
 
 import com.nimbusds.jose.crypto.impl.*;
@@ -75,7 +79,7 @@ import com.nimbusds.jose.util.Base64URL;
  * @author David Ortiz
  * @author Vladimir Dzhuvinov
  * @author Jun Yu
- * @version 2021-09-23
+ * @version 2021-09-26
  */
 @ThreadSafe
 public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
@@ -127,10 +131,10 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
 	 *                             {@code null}.
 	 * @param contentEncryptionKey The content encryption key (CEK) to use.
 	 *                             If specified its algorithm must be "AES"
-	 *                             and its length must match the expected
-	 *                             for the JWE encryption method ("enc").
-	 *                             If {@code null} a CEK will be generated
-	 *                             for each JWE.
+	 *                             or "ChaCha20" and its length must match
+	 *                             the expected for the JWE encryption
+	 *                             method ("enc"). If {@code null} a CEK
+	 *                             will be generated for each JWE.
 	 */
 	public RSAEncrypter(final RSAPublicKey publicKey, final SecretKey contentEncryptionKey) {
 		
@@ -139,9 +143,13 @@ public class RSAEncrypter extends RSACryptoProvider implements JWEEncrypter {
 		}
 		this.publicKey = publicKey;
 
+		Set<String> acceptableCEKAlgs = Collections.unmodifiableSet(
+			new HashSet<>(Arrays.asList("AES", "ChaCha20"))
+		);
+		
 		if (contentEncryptionKey != null) {
-			if (contentEncryptionKey.getAlgorithm() == null || !contentEncryptionKey.getAlgorithm().equals("AES")) {
-				throw new IllegalArgumentException("The algorithm of the content encryption key (CEK) must be AES");
+			if (contentEncryptionKey.getAlgorithm() == null || ! acceptableCEKAlgs.contains(contentEncryptionKey.getAlgorithm())) {
+				throw new IllegalArgumentException("The algorithm of the content encryption key (CEK) must be AES or ChaCha20");
 			} else {
 				this.contentEncryptionKey = contentEncryptionKey;
 			}

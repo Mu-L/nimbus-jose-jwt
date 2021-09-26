@@ -19,10 +19,7 @@ package com.nimbusds.jose.crypto;
 
 
 import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
+import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPrivateKeySpec;
@@ -32,13 +29,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import junit.framework.TestCase;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
+import com.nimbusds.jose.util.ByteUtils;
 import com.nimbusds.jwt.JWTClaimNames;
-import junit.framework.TestCase;
 
 
 /**
@@ -46,9 +48,24 @@ import junit.framework.TestCase;
  * spec.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-09-22
+ * @version 2021-09-26
  */
 public class RSA1_5Test extends TestCase {
+	
+	
+	private static final List<EncryptionMethod> ENCRYPTION_METHODS_TO_TEST =
+		Collections.unmodifiableList(
+			Arrays.asList(
+				EncryptionMethod.A128CBC_HS256,
+				EncryptionMethod.A192CBC_HS384,
+				EncryptionMethod.A256CBC_HS512,
+				EncryptionMethod.A128GCM,
+				EncryptionMethod.A192GCM,
+				EncryptionMethod.A256GCM,
+				EncryptionMethod.A128CBC_HS256_DEPRECATED,
+				EncryptionMethod.A256CBC_HS512_DEPRECATED
+			)
+		);
 
 
 	private final static byte[] MOD = {
@@ -200,7 +217,6 @@ public class RSA1_5Test extends TestCase {
 		assertTrue(RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A192GCM));
 		assertTrue(RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.A256GCM));
 		assertTrue(RSADecrypter.SUPPORTED_ENCRYPTION_METHODS.contains(EncryptionMethod.XC20P));
-
 	}
 
 
@@ -266,21 +282,11 @@ public class RSA1_5Test extends TestCase {
 		RSAPublicKey publicKey = (RSAPublicKey)kp.getPublic();
 		RSAPrivateKey privateKey = (RSAPrivateKey)kp.getPrivate();
 		
-		List<EncryptionMethod> encs = Arrays.asList(
-			EncryptionMethod.A128CBC_HS256,
-			EncryptionMethod.A192CBC_HS384,
-			EncryptionMethod.A256CBC_HS512,
-			EncryptionMethod.A128GCM,
-			EncryptionMethod.A192GCM,
-			EncryptionMethod.A256GCM,
-			EncryptionMethod.A128CBC_HS256_DEPRECATED,
-			EncryptionMethod.A256CBC_HS512_DEPRECATED);
-		
 		RSAEncrypter encrypter = new RSAEncrypter(publicKey);
 		
 		RSADecrypter decrypter = new RSADecrypter(privateKey);
 		
-		for (EncryptionMethod enc: encs) {
+		for (EncryptionMethod enc: ENCRYPTION_METHODS_TO_TEST) {
 			
 			JWEObject jwe = new JWEObject(
 				new JWEHeader(JWEAlgorithm.RSA1_5, enc),
@@ -314,23 +320,13 @@ public class RSA1_5Test extends TestCase {
 		RSAPublicKey publicKey = (RSAPublicKey)kp.getPublic();
 		RSAPrivateKey privateKey = (RSAPrivateKey)kp.getPrivate();
 		
-		List<EncryptionMethod> encs = Arrays.asList(
-			EncryptionMethod.A128CBC_HS256,
-			EncryptionMethod.A192CBC_HS384,
-			EncryptionMethod.A256CBC_HS512,
-			EncryptionMethod.A128GCM,
-			EncryptionMethod.A192GCM,
-			EncryptionMethod.A256GCM,
-			EncryptionMethod.A128CBC_HS256_DEPRECATED,
-			EncryptionMethod.A256CBC_HS512_DEPRECATED);
-		
 		RSAEncrypter encrypter = new RSAEncrypter(publicKey);
 		encrypter.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
 		
 		RSADecrypter decrypter = new RSADecrypter(privateKey);
 		decrypter.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
 		
-		for (EncryptionMethod enc: encs) {
+		for (EncryptionMethod enc: ENCRYPTION_METHODS_TO_TEST) {
 			
 			JWEObject jwe = new JWEObject(
 				new JWEHeader(JWEAlgorithm.RSA1_5, enc),
@@ -352,6 +348,82 @@ public class RSA1_5Test extends TestCase {
 			
 			assertEquals("Hello, world!", jwe.getPayload().toString());
 		}
+	}
+	
+	
+	public void testRoundTripWithContentEncryptionKeySpecified_AES()
+		throws Exception {
+		
+		// Generate RSA key pair
+		KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
+		rsaGen.initialize(4096);
+		KeyPair rsaKeyPair = rsaGen.generateKeyPair();
+		RSAPublicKey rsaPublicKey = (RSAPublicKey)rsaKeyPair.getPublic();
+		RSAPrivateKey rsaPrivateKey = (RSAPrivateKey)rsaKeyPair.getPrivate();
+		
+		// Generate AES content encryption key
+		EncryptionMethod encryptionMethod = EncryptionMethod.A128CBC_HS256;
+		KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+		keyGenerator.init(EncryptionMethod.A128CBC_HS256.cekBitLength());
+		SecretKey cek = keyGenerator.generateKey();
+		
+		// Encrypt JWE with rsa public key + specified AES key
+		JWEObject jwe = new JWEObject(
+			new JWEHeader(JWEAlgorithm.RSA1_5, encryptionMethod),
+			new Payload("Hello, world!"));
+		jwe.encrypt(new RSAEncrypter(rsaPublicKey, cek));
+		assertEquals(JWEObject.State.ENCRYPTED, jwe.getState());
+		String jweString = jwe.serialize();
+		
+		// Decrypt JWE with RSA private key
+		jwe = JWEObject.parse(jweString);
+		jwe.decrypt(new RSADecrypter(rsaPrivateKey));
+		assertEquals(JWEObject.State.DECRYPTED, jwe.getState());
+		assertEquals("Hello, world!", jwe.getPayload().toString());
+		
+		// Decrypt JWE with CEK directly
+		jwe = JWEObject.parse(jweString);
+		jwe.decrypt(new DirectDecrypter(cek, true));
+		assertEquals(JWEObject.State.DECRYPTED, jwe.getState());
+		assertEquals("Hello, world!", jwe.getPayload().toString());
+	}
+	
+	
+	public void testRoundTripWithContentEncryptionKeySpecified_ChaCha20()
+		throws Exception {
+		
+		// Generate RSA key pair
+		KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
+		rsaGen.initialize(4096);
+		KeyPair rsaKeyPair = rsaGen.generateKeyPair();
+		RSAPublicKey rsaPublicKey = (RSAPublicKey)rsaKeyPair.getPublic();
+		RSAPrivateKey rsaPrivateKey = (RSAPrivateKey)rsaKeyPair.getPrivate();
+		
+		// Generate ChaCha20 content encryption key
+		EncryptionMethod encryptionMethod = EncryptionMethod.XC20P;
+		byte[] cekBytes = new byte[ByteUtils.byteLength(encryptionMethod.cekBitLength())];
+		new SecureRandom().nextBytes(cekBytes);
+		SecretKey cek = new SecretKeySpec(cekBytes, "ChaCha20");
+		
+		// Encrypt JWE with rsa public key + specified AES key
+		JWEObject jwe = new JWEObject(
+			new JWEHeader(JWEAlgorithm.RSA1_5, encryptionMethod),
+			new Payload("Hello, world!"));
+		jwe.encrypt(new RSAEncrypter(rsaPublicKey, cek));
+		assertEquals(JWEObject.State.ENCRYPTED, jwe.getState());
+		String jweString = jwe.serialize();
+		
+		// Decrypt JWE with RSA private key
+		jwe = JWEObject.parse(jweString);
+		jwe.decrypt(new RSADecrypter(rsaPrivateKey));
+		assertEquals(JWEObject.State.DECRYPTED, jwe.getState());
+		assertEquals("Hello, world!", jwe.getPayload().toString());
+		
+		// Decrypt JWE with CEK directly
+		jwe = JWEObject.parse(jweString);
+		jwe.decrypt(new DirectDecrypter(cek, true));
+		assertEquals(JWEObject.State.DECRYPTED, jwe.getState());
+		assertEquals("Hello, world!", jwe.getPayload().toString());
 	}
 
 

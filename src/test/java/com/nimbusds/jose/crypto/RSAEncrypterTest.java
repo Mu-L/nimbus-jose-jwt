@@ -20,6 +20,7 @@ package com.nimbusds.jose.crypto;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPublicKey;
 import javax.crypto.SecretKey;
@@ -31,8 +32,8 @@ import junit.framework.TestCase;
 public class RSAEncrypterTest extends TestCase {
 	
 	
-	public void testConstructorWithCEK_algNotAES()
-		throws Exception {
+	public void testWithContentEncryptionKeySpecified_unsupportedKeyAlgorithm()
+		throws NoSuchAlgorithmException {
 		
 		KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
 		rsaGen.initialize(2048);
@@ -40,13 +41,15 @@ public class RSAEncrypterTest extends TestCase {
 		
 		byte[] keyMaterial = new byte[16];
 		new SecureRandom().nextBytes(keyMaterial);
-		SecretKey cek = new SecretKeySpec(keyMaterial, "Not-AES");
+		SecretKey cek = new SecretKeySpec(keyMaterial, "Unsupported-Alg");
 		
+		IllegalArgumentException exception = null;
 		try {
 			new RSAEncrypter((RSAPublicKey)rsaKeyPair.getPublic(), cek);
 			fail();
 		} catch (IllegalArgumentException e) {
-			assertEquals("The algorithm of the content encryption key (CEK) must be AES", e.getMessage());
+			exception = e;
 		}
+		assertEquals("The algorithm of the content encryption key (CEK) must be AES or ChaCha20", exception.getMessage());
 	}
 }
