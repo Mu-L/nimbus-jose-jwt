@@ -30,6 +30,7 @@ import net.jcip.annotations.Immutable;
  *
  * <ul>
  *     <li>{@link #RSA_OAEP_256 RSA-OAEP-256}
+ *     <li>{@link #RSA_OAEP_384 RSA-OAEP-384}
  *     <li>{@link #RSA_OAEP_512 RSA-OAEP-512}
  *     <li>{@link #RSA_OAEP RSA-OAEP} (deprecated)
  *     <li>{@link #RSA1_5} (deprecated)
