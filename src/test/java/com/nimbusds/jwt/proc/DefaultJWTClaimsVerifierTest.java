@@ -18,10 +18,7 @@
 package com.nimbusds.jwt.proc;
 
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 import junit.framework.TestCase;
 
@@ -334,6 +331,39 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 	}
 
 
+	public void testNamesOfProhibitedClaimsMustBeSorted() {
+
+		Set<String> prohibitedClaims = new HashSet<>(Arrays.asList(
+				JWTClaimNames.ISSUER,
+				JWTClaimNames.AUDIENCE,
+				JWTClaimNames.ISSUED_AT,
+				JWTClaimNames.EXPIRATION_TIME,
+				JWTClaimNames.JWT_ID));
+		
+		DefaultJWTClaimsVerifier<?> verifier = new DefaultJWTClaimsVerifier<>(
+			null,
+			null,
+			null,
+			prohibitedClaims);
+
+		try {
+			verifier.verify(
+				new JWTClaimsSet.Builder()
+					.issuer("https://issuer.example.com")
+					.audience("https://audience.example.com")
+					.issueTime(new Date())
+					.expirationTime(new Date(new Date().getTime() + 3_600_1000L))
+					.jwtID("3cb541d5-51d6-462f-9038-a37185cbf041")
+					.build(),
+				null);
+			fail();
+		} catch (BadJWTException e) {
+			// Prohibited claim names must be sorted
+			assertEquals("JWT has prohibited claims: " + new TreeSet<>(prohibitedClaims), e.getMessage());
+		}
+	}
+
+
 	public void testRequiresIAT() throws BadJWTException {
 
 		DefaultJWTClaimsVerifier verifier = new DefaultJWTClaimsVerifier(null, null, Collections.singleton(JWTClaimNames.ISSUED_AT));
@@ -401,7 +431,38 @@ public class DefaultJWTClaimsVerifierTest extends TestCase {
 			verifier.verify(new JWTClaimsSet.Builder().build(), null);
 			fail();
 		} catch (BadJWTException e) {
-			assertEquals("JWT missing required claims: [iss, iat, jti]", e.getMessage());
+			// Missing claim names must be sorted
+			SortedSet<String> missingClaims = new TreeSet<>(Arrays.asList("iss", "iat", "jti"));
+			assertEquals("JWT missing required claims: " + missingClaims, e.getMessage());
+		}
+	}
+
+
+	// https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/444
+	public void testNamesOfMissingRequiredClaimsMustBeSorted() {
+		
+		Set<String> requiredClaims = new HashSet<>(Arrays.asList(
+			JWTClaimNames.ISSUER,
+			JWTClaimNames.AUDIENCE,
+			JWTClaimNames.ISSUED_AT,
+			JWTClaimNames.EXPIRATION_TIME,
+			JWTClaimNames.JWT_ID));
+		
+		DefaultJWTClaimsVerifier<?> verifier = new DefaultJWTClaimsVerifier<>(
+			new JWTClaimsSet.Builder()
+				.issuer("https://example.com")
+				.build(),
+			requiredClaims);
+
+		assertEquals(requiredClaims, verifier.getRequiredClaims());
+
+		try {
+			verifier.verify(new JWTClaimsSet.Builder().build(), null);
+			fail();
+		} catch (BadJWTException e) {
+			// Missing claim names must be sorted
+			SortedSet<String> missingClaims = new TreeSet<>(requiredClaims);
+			assertEquals("JWT missing required claims: " + missingClaims, e.getMessage());
 		}
 	}
 

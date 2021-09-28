@@ -82,7 +82,7 @@ import com.nimbusds.jwt.util.DateUtils;
  *
  * @author Vladimir Dzhuvinov
  * @author Eugene Kuleshov
- * @version 2021-09-16
+ * @version 2021-09-28
  */
 @ThreadSafe
 public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWTClaimsSetVerifier<C>, ClockSkewAware {
@@ -306,20 +306,20 @@ public class DefaultJWTClaimsVerifier <C extends SecurityContext> implements JWT
 		
 		// Check if all required claims are present
 		if (! claimsSet.getClaims().keySet().containsAll(requiredClaims)) {
-			Set<String> missingClaims = new HashSet<>(requiredClaims);
+			SortedSet<String> missingClaims = new TreeSet<>(requiredClaims);
 			missingClaims.removeAll(claimsSet.getClaims().keySet());
 			throw new BadJWTException("JWT missing required claims: " + missingClaims);
 		}
 		
 		// Check if prohibited claims are present
-		Set<String> presentProhibitedClaims = new HashSet<>();
+		SortedSet<String> presentProhibitedClaims = new TreeSet<>();
 		for (String prohibited: prohibitedClaims) {
 			if (claimsSet.getClaims().containsKey(prohibited)) {
 				presentProhibitedClaims.add(prohibited);
 			}
-			if (! presentProhibitedClaims.isEmpty()) {
-				throw new BadJWTException("JWT has prohibited claims: " + presentProhibitedClaims);
-			}
+		}
+		if (! presentProhibitedClaims.isEmpty()) {
+			throw new BadJWTException("JWT has prohibited claims: " + presentProhibitedClaims);
 		}
 		
 		// Check exact matches
