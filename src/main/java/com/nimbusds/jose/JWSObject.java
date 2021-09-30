@@ -192,7 +192,7 @@ public class JWSObject extends JOSEObject {
 	 *
 	 * @return The signing input string.
 	 */
-	private String composeSigningInput() {
+	protected String composeSigningInput() {
 		
 		if (header.isBase64URLEncodePayload()) {
 			return getHeader().toBase64URL().toString() + '.' + getPayload().toBase64URL().toString();
@@ -257,7 +257,7 @@ public class JWSObject extends JOSEObject {
 	 * @throws IllegalStateException If the current state is not signed or
 	 *                               verified.
 	 */
-	private void ensureSignedOrVerifiedState() {
+	protected void ensureSignedOrVerifiedState() {
 
 		if (state.get() != State.SIGNED && state.get() != State.VERIFIED) {
 

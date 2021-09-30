@@ -21,11 +21,10 @@ package com.nimbusds.jose.crypto.impl;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.Pair;
 
 import javax.crypto.SecretKey;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -250,21 +249,16 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
         // Derive shared key via concat KDF
         getConcatKDF().getJCAContext().setProvider(getJCAContext().getMACProvider()); // update before concat
 
-        JWEHeader updatedHeader = new JWEHeader.Builder(header).
-                iv(iv).
-                authTag(authTag).
-                build();
-
         final SecretKey cek;
 
         if (algMode.equals(ECDH.AlgorithmMode.DIRECT)) {
-            cek = ECDH1PU.deriveSharedKey(updatedHeader, Z, getConcatKDF());
+            cek = ECDH1PU.deriveSharedKey(header, Z, getConcatKDF());
         } else if (algMode.equals(ECDH.AlgorithmMode.KW)) {
             if (encryptedKey == null) {
                 throw new JOSEException("Missing JWE encrypted key");
             }
 
-            SecretKey sharedKey = ECDH1PU.deriveSharedKey(updatedHeader, Z, authTag, getConcatKDF());
+            SecretKey sharedKey = ECDH1PU.deriveSharedKey(header, Z, authTag, getConcatKDF());
             cek = AESKW.unwrapCEK(sharedKey, encryptedKey.decode(), getJCAContext().getKeyEncryptionProvider());
         } else {
             throw new JOSEException("Unexpected JWE ECDH algorithm mode: " + algMode);
@@ -273,4 +267,78 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
         return ContentCryptoProvider.decrypt(header, null, iv, cipherText, authTag, cek, getJCAContext());
     }
 
+    protected JWECryptoParts encryptMulti(final JWEHeader header,
+                                          final List<Pair<UnprotectedHeader, SecretKey>> sharedSecrets,
+                                          final byte[] clearText) throws JOSEException {
+
+        final ECDH.AlgorithmMode algMode = ECDH1PU.resolveAlgorithmMode(header.getAlgorithm());
+        final SecretKey cek = ContentCryptoProvider.generateCEK(
+                header.getEncryptionMethod(),
+               getJCAContext().getSecureRandom()
+        );
+
+        List<Recipient> recipients = new ArrayList<>();
+        boolean encrypted = false;
+        JWECryptoParts parts = null;
+
+        for (Pair<UnprotectedHeader, SecretKey> rs : sharedSecrets) {
+            Base64URL encryptedKey = null;
+
+            if (!encrypted) {
+                parts = encryptWithZ(header, rs.getRight(), clearText, cek);
+                encryptedKey = parts.getEncryptedKey();
+                encrypted = true;
+            } else if (algMode.equals(ECDH.AlgorithmMode.KW)) {
+                SecretKey sharedKey = ECDH1PU.deriveSharedKey(header, rs.getRight(), parts.getAuthenticationTag(), getConcatKDF());
+                encryptedKey = Base64URL.encode(AESKW.wrapCEK(cek, sharedKey, getJCAContext().getKeyEncryptionProvider()));
+            }
+
+            if (encryptedKey != null) {
+                recipients.add(new Recipient(rs.getLeft(), encryptedKey));
+            }
+        }
+
+        if (parts == null) {
+            throw new JOSEException("Content MUST be encrypted");
+        }
+
+        return new JWECryptoParts(
+                parts.getHeader(),
+                Collections.unmodifiableList(recipients),
+                parts.getInitializationVector(),
+                parts.getCipherText(),
+                parts.getAuthenticationTag()
+        );
+    }
+
+    protected byte[] decryptMulti(final JWEHeader header,
+                                  final List<Pair<UnprotectedHeader, SecretKey>> sharedSecrets,
+                                  final List<Recipient> recipients,
+                                  final Base64URL iv,
+                                  final Base64URL cipherText,
+                                  final Base64URL authTag) throws JOSEException {
+
+        byte[] result = null;
+
+        for (Pair<UnprotectedHeader, SecretKey> rs : sharedSecrets) {
+            String kid = rs.getLeft().getKeyID();
+            Base64URL encryptedKey = null;
+
+            if (recipients != null) {
+                for (Recipient recipient : recipients) {
+                    if (recipient.getHeader() == null)
+                        continue;
+
+                    if (kid.equals(recipient.getHeader().getKeyID())) {
+                        encryptedKey = recipient.getEncryptedKey();
+                        break;
+                    }
+                }
+            }
+
+            result = decryptWithZ(header, rs.getRight(), encryptedKey, iv, cipherText, authTag);
+        }
+
+        return result;
+    }
 }
