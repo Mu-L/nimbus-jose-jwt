@@ -18,30 +18,33 @@
 package com.nimbusds.jose.util;
 
 
-import java.util.Arrays;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
 import junit.framework.TestCase;
 
+
 /**
- * Tests JWS JSON Serialization object methods.
- *
  * @author Alexander Martynov
- * @version 2021-08-24
+ * @version 2021-09-30
  */
-public class PairUtilTest extends TestCase {
-
-
-    public void test_PairCreation() {
-        String expectedLeft = "True";
-        Integer expectedRight = 42;
-
-        Pair<String, Integer> pair = Pair.of("True", 42);
-
-        assertEquals(expectedLeft, pair.getLeft());
-        assertEquals(expectedRight, pair.getRight());
-    }
-
+public class PairTest extends TestCase {
+	
+	
+	public void test_PairCreation() {
+		
+		String expectedLeft = "True";
+		Integer expectedRight = 42;
+		
+		Pair<String, Integer> pair = Pair.of("True", 42);
+		
+		assertEquals(expectedLeft, pair.getLeft());
+		assertEquals(expectedRight, pair.getRight());
+	}
+	
+	
+	public void test_PairCreation_NullValues() {
+		
+		Pair<Object,Object> pair = Pair.of(null, null);
+		
+		assertNull(pair.getLeft());
+		assertNull(pair.getRight());
+	}
 }

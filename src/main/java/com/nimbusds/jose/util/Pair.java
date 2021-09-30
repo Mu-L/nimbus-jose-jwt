@@ -17,49 +17,65 @@
 
 package com.nimbusds.jose.util;
 
+
 import net.jcip.annotations.Immutable;
-import net.jcip.annotations.ThreadSafe;
+
 
 /**
- * A pair consisting of two elements.
+ * A pair of two objects.
  *
- * This class Immutable and ThreadSafe.
+ * <p>This class is immutable.
  *
- * @param <L> the left element type
- * @param <R> the right element type
- *
+ * @param <L> the left object type.
+ * @param <R> the right object type
  * @author Alexander Martynov
- * @version 2021-08-24
+ * @version 2021-09-30
  */
 @Immutable
-@ThreadSafe
 public class Pair<L, R> {
-    private L left;
-    private R right;
-
-    protected Pair(L left, R right) {
-        this.left = left;
-        this.right = right;
-    }
-
-    public static <L, R> Pair<L, R> of(L left, R right) {
-        return new Pair<>(left, right);
-    }
-
-    /**
-     * Gets the left element from this pair.
-     *
-     * @return the left element
-     */
-    public L getLeft() {
-        return left;
-    }
-
-    /**
-     * Gets the right element from this pair.
-     * @return the right element
-     */
-    public R getRight() {
-        return right;
-    }
+	
+	
+	private final L left;
+	
+	
+	private final R right;
+	
+	
+	protected Pair(final L left, final R right) {
+		this.left = left;
+		this.right = right;
+	}
+	
+	
+	/**
+	 * Creates a new pair of two objects.
+	 *
+	 * @param left  The left object, {@code null} if not specified.
+	 * @param right The right object, {@code null} if not specified.
+	 *
+	 * @return The pair.
+	 */
+	public static <L, R> Pair<L, R> of(final L left, final R right) {
+		return new Pair<>(left, right);
+	}
+	
+	
+	/**
+	 * Returns the left object of this pair.
+	 *
+	 * @return The left object, {@code null} if not specified.
+	 */
+	public L getLeft() {
+		return left;
+	}
+	
+	
+	/**
+	 * Returns the right object of this pair.
+	 *
+	 * @return The right object, {@code null} if not specified.
+	 */
+	public R getRight() {
+		return right;
+	}
 }
