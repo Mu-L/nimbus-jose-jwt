@@ -889,14 +889,14 @@ public class JWEObjectJSONTest extends TestCase {
         assertEquals(2, decrypted.getRecipients().size());
 
         UnprotectedHeader bobPerRecipientHeader = null;
-        for (Recipient recipient: decrypted.getRecipients()) {
+        for (JWERecipient recipient: decrypted.getRecipients()) {
             if (recipient.getHeader().getKeyID().equals(bobKid))
                 bobPerRecipientHeader = recipient.getHeader();
         }
         assertNotNull(bobPerRecipientHeader);
 
         UnprotectedHeader charliePerRecipientHeader = null;
-        for (Recipient recipient: decrypted.getRecipients()) {
+        for (JWERecipient recipient: decrypted.getRecipients()) {
             if (recipient.getHeader().getKeyID().equals(charlieKid))
                 charliePerRecipientHeader = recipient.getHeader();
         }

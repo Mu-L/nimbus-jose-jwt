@@ -277,7 +277,7 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
                getJCAContext().getSecureRandom()
         );
 
-        List<Recipient> recipients = new ArrayList<>();
+        List<JWERecipient> recipients = new ArrayList<>();
         boolean encrypted = false;
         JWECryptoParts parts = null;
 
@@ -294,7 +294,7 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
             }
 
             if (encryptedKey != null) {
-                recipients.add(new Recipient(rs.getLeft(), encryptedKey));
+                recipients.add(new JWERecipient(rs.getLeft(), encryptedKey));
             }
         }
 
@@ -313,7 +313,7 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
 
     protected byte[] decryptMulti(final JWEHeader header,
                                   final List<Pair<UnprotectedHeader, SecretKey>> sharedSecrets,
-                                  final List<Recipient> recipients,
+                                  final List<JWERecipient> recipients,
                                   final Base64URL iv,
                                   final Base64URL cipherText,
                                   final Base64URL authTag) throws JOSEException {
@@ -325,7 +325,7 @@ public abstract class ECDH1PUCryptoProvider extends BaseJWEProvider {
             Base64URL encryptedKey = null;
 
             if (recipients != null) {
-                for (Recipient recipient : recipients) {
+                for (JWERecipient recipient : recipients) {
                     if (recipient.getHeader() == null)
                         continue;
 

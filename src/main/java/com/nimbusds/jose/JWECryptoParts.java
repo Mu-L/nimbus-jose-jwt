@@ -71,7 +71,7 @@ public final class JWECryptoParts {
 	/**
 	 * The recipients (optional)
 	 */
-	private final List<Recipient> recipients;
+	private final List<JWERecipient> recipients;
 
 
 	/**
@@ -152,7 +152,7 @@ public final class JWECryptoParts {
 	 *                          check.
 	 */
 	public JWECryptoParts(final JWEHeader header,
-						  final List<Recipient> recipients,
+						  final List<JWERecipient> recipients,
 						  final Base64URL iv,
 						  final Base64URL cipherText,
 						  final Base64URL authenticationTag) {
@@ -240,7 +240,7 @@ public final class JWECryptoParts {
 	 * 	       the JWE algorithm or {@code encryptedKey} is
 	 * 	       specified.
 	 */
-	public List<Recipient> getRecipients() {
+	public List<JWERecipient> getRecipients() {
 		return recipients;
 	}
 }

@@ -158,7 +158,7 @@ public class UnprotectedHeader {
         }
 
         /**
-         * Build new {@link Recipient}
+         * Build new {@link JWERecipient}
          *
          * @return recipient
          */

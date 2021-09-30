@@ -76,7 +76,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
     /**
      * The recipients, {@code null} if not computed or applicable.
      */
-    private List<Recipient> recipients;
+    private List<JWERecipient> recipients;
 
 
     /**
@@ -144,7 +144,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
      * @throws ParseException If parsing of the serialised parts failed.
      */
     public JWEObjectJSON(final Base64URL header,
-                         final List<Recipient> recipients,
+                         final List<JWERecipient> recipients,
                          final Base64URL iv,
                          final Base64URL ciphertext,
                          final Base64URL tag)
@@ -214,7 +214,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
      * @return The recipients, {@code null} if not
      *         applicable or the JWE object has not been encrypted yet.
      */
-    public List<Recipient> getRecipients() {
+    public List<JWERecipient> getRecipients() {
 
         return recipients;
     }
@@ -480,7 +480,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
         return new JWEObjectJSON(
                 JSONObjectUtils.getBase64URL(jsonObject, "protected"),
-                Recipient.parse(JSONObjectUtils.getJSONObjectArray(jsonObject, "recipients")),
+                JWERecipient.parse(JSONObjectUtils.getJSONObjectArray(jsonObject, "recipients")),
                 JSONObjectUtils.getBase64URL(jsonObject, "iv"),
                 JSONObjectUtils.getBase64URL(jsonObject, "ciphertext"),
                 JSONObjectUtils.getBase64URL(jsonObject, "tag"));
@@ -492,7 +492,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
 
         List<Object> recipients = JSONArrayUtils.newJSONArray();
 
-        for (Recipient recipient : getRecipients()) {
+        for (JWERecipient recipient : getRecipients()) {
             recipients.add(recipient.toJSONObject());
         }
 

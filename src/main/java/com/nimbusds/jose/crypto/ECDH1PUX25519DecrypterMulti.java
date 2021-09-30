@@ -177,7 +177,7 @@ public class ECDH1PUX25519DecrypterMulti extends ECDH1PUCryptoProvider implement
 
     @Override
     public byte[] decrypt(final JWEHeader header,
-                          final List<Recipient> recipients,
+                          final List<JWERecipient> recipients,
                           final Base64URL iv,
                           final Base64URL cipherText,
                           final Base64URL authTag)
