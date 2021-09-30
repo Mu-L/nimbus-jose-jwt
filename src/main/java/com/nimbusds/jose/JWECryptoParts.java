@@ -26,13 +26,10 @@ import java.util.List;
 
 
 /**
- * The cryptographic parts of a JSON Web Encryption (JWE) object. This class is 
- * an immutable wrapper for returning the cipher text, initialisation vector
- * (IV), encrypted key and authentication authTag from {@link JWEEncrypter}
- * implementations.
+ * The cryptographic parts of a JSON Web Encryption (JWE) object.
  *
  * @author Vladimir Dzhuvinov
- * @version 2014-07-11
+ * @version 2021-09-30
  */
 @Immutable
 public final class JWECryptoParts {
@@ -141,7 +138,7 @@ public final class JWECryptoParts {
 	 *
 	 * @param header            The modified JWE header, {@code null} if
 	 *                          not.
-	 * @param recipients        The recipients, {@code null} if not
+	 * @param recipients        The JWE recipients, {@code null} if not
 	 *                          required by the encryption algorithm.
 	 * @param iv                The initialisation vector (IV),
 	 *                          {@code null} if not required by the
@@ -152,10 +149,10 @@ public final class JWECryptoParts {
 	 *                          check.
 	 */
 	public JWECryptoParts(final JWEHeader header,
-						  final List<JWERecipient> recipients,
-						  final Base64URL iv,
-						  final Base64URL cipherText,
-						  final Base64URL authenticationTag) {
+			      final List<JWERecipient> recipients,
+			      final Base64URL iv,
+			      final Base64URL cipherText,
+			      final Base64URL authenticationTag) {
 
 		this.header = header;
 
@@ -232,15 +229,16 @@ public final class JWECryptoParts {
 
 		return authenticationTag;
 	}
+	
 
 	/**
-	 * Gets the recipients.
+	 * Gets the JWE recipients.
 	 *
-	 * @return The recipients, {@code null} if not required by
-	 * 	       the JWE algorithm or {@code encryptedKey} is
-	 * 	       specified.
+	 * @return The JWE recipients, {@code null} if not required by the JWE
+	 *         algorithm or an {@code encryptedKey} is specified.
 	 */
 	public List<JWERecipient> getRecipients() {
+		
 		return recipients;
 	}
 }
