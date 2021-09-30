@@ -18,30 +18,22 @@
 package com.nimbusds.jose.crypto;
 
 
-import com.nimbusds.jose.CriticalHeaderParamsAware;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWEDecrypter;
-import com.nimbusds.jose.JWEHeader;
+import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.impl.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.Pair;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.crypto.SecretKey;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
 
 /**
- * Elliptic Curve Diffie-Hellman decrypter of
- * {@link com.nimbusds.jose.JWEObject JWE objects} for curves using an OKP JWK.
- * Expects a private {@link OctetKeyPair} key with {@code "crv"} X25519.
- *
- * <p>See <a href="https://tools.ietf.org/html/rfc8037">RFC 8037</a>
- * for more information.
- *
- * <p>See also {@link ECDH1PUDecrypter} for ECDH on other curves.
+ * Elliptic Curve Diffie-Hellman Multi-recipient decrypter of
+ * {@link JWEObjectJSON JWE objects} for curves using EC JWK
+ * keys. Expects a private EC key (with a P-256, P-384 or P-521 curve).
  *
  * <p>Public Key Authenticated Encryption for JOSE
  * <a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04">ECDH-1PU</a>
@@ -52,20 +44,19 @@ import java.util.Set;
  * <p>Supports the following key management algorithms:
  *
  * <ul>
- *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_1PU}
- *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_1PU_A128KW}
- *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_1PU_A192KW}
- *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_1PU_A256KW}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_ES}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_ES_A128KW}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_ES_A192KW}
+ *     <li>{@link com.nimbusds.jose.JWEAlgorithm#ECDH_ES_A256KW}
  * </ul>
  *
- * <p>Supports the following elliptic curves:
+ * <p>Supports the following elliptic curve:
  *
  * <ul>
- *     <li>{@link Curve#X25519}
+ *     <li>{@link com.nimbusds.jose.jwk.Curve#X25519} (Curve25519)
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Direct key
- * agreement mode:
+ * <p>Supports the following content encryption algorithms:
  *
  * <ul>
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
@@ -79,104 +70,73 @@ import java.util.Set;
  *     <li>{@link com.nimbusds.jose.EncryptionMethod#XC20P}
  * </ul>
  *
- * <p>Supports the following content encryption algorithms for Key wrapping
- * mode:
- *
- * <ul>
- *     <li>{@link com.nimbusds.jose.EncryptionMethod#A128CBC_HS256}
- *     <li>{@link com.nimbusds.jose.EncryptionMethod#A192CBC_HS384}
- *     <li>{@link com.nimbusds.jose.EncryptionMethod#A256CBC_HS512}
- * </ul>
- *
  * @author Alexander Martynov
- * @version 2021-08-03
+ * @version 2021-08-18
  */
 @ThreadSafe
-public class ECDH1PUX25519Decrypter extends ECDH1PUCryptoProvider implements JWEDecrypter, CriticalHeaderParamsAware {
+public class X25519DecrypterMulti extends ECDHCryptoProvider implements JWEDecrypterMulti, CriticalHeaderParamsAware {
 
 
     /**
-     * The private key.
+     * The supported EC JWK curves by the ECDH crypto provider class.
      */
-    private final OctetKeyPair privateKey;
+    public static final Set<Curve> SUPPORTED_ELLIPTIC_CURVES;
 
-    /**
-     * The public key.
-     */
-    private final OctetKeyPair publicKey;
+
+    static {
+        Set<Curve> curves = new LinkedHashSet<>();
+        curves.add(Curve.X25519);
+        SUPPORTED_ELLIPTIC_CURVES = Collections.unmodifiableSet(curves);
+    }
 
     /**
      * The critical header policy.
      */
     private final CriticalHeaderParamsDeferral critPolicy = new CriticalHeaderParamsDeferral();
 
+    /**
+     * The list of private recipient's keys.
+     */
+    private final List<Pair<UnprotectedHeader, OctetKeyPair>>recipients;
 
     /**
-     * Creates a new Curve25519 Elliptic Curve Diffie-Hellman decrypter.
+     * Creates a curve x25519 Elliptic Curve Diffie-Hellman Multi-recipient decrypter.
      *
-     * @param privateKey The private key. Must not be {@code null}.
-     * @param publicKey  The private key. Must not be {@code null}.
+     * @param recipients     The list of private recipient's keys.
      *
      * @throws JOSEException If the key subtype is not supported.
      */
-    public ECDH1PUX25519Decrypter(final OctetKeyPair privateKey, final OctetKeyPair publicKey)
+    public X25519DecrypterMulti(final List<Pair<UnprotectedHeader, OctetKeyPair>>recipients)
             throws JOSEException {
 
-        this(privateKey, publicKey, null);
+        this(recipients, null);
     }
 
-
     /**
-     * Creates a new Curve25519 Elliptic Curve Diffie-Hellman decrypter.
+     * Creates a curve x25519 Elliptic Curve Diffie-Hellman Multi-recipient decrypter.
      *
-     * @param privateKey     The private key. Must not be {@code null}.
-     * @param publicKey      The private key. Must not be {@code null}.
+     * @param recipients     The list of private recipient's keys.
      * @param defCritHeaders The names of the critical header parameters
      *                       that are deferred to the application for
      *                       processing, empty set or {@code null} if none.
      *
      * @throws JOSEException If the key subtype is not supported.
      */
-    public ECDH1PUX25519Decrypter(final OctetKeyPair privateKey,
-                                  final OctetKeyPair publicKey,
-                                  final Set<String> defCritHeaders)
-            throws JOSEException {
+    public X25519DecrypterMulti(final List<Pair<UnprotectedHeader, OctetKeyPair>> recipients, final Set<String> defCritHeaders)
+        throws JOSEException {
 
-        super(privateKey.getCurve());
+        super(recipients.get(0).getRight().getCurve());
 
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
-
+        this.recipients = recipients;
         critPolicy.setDeferredCriticalHeaderParams(defCritHeaders);
     }
-
 
     @Override
     public Set<Curve> supportedEllipticCurves() {
 
-        return Collections.singleton(Curve.X25519);
+        return SUPPORTED_ELLIPTIC_CURVES;
     }
 
-
-    /**
-     * Returns the private key.
-     *
-     * @return The private key.
-     */
-    public OctetKeyPair getPrivateKey() {
-
-        return privateKey;
-    }
-
-    /**
-     * Returns the public key.
-     *
-     * @return The public key.
-     */
-    public OctetKeyPair getPublicKey() {
-
-        return publicKey;
-    }
 
     @Override
     public Set<String> getProcessedCriticalHeaderParams() {
@@ -194,28 +154,36 @@ public class ECDH1PUX25519Decrypter extends ECDH1PUCryptoProvider implements JWE
 
     @Override
     public byte[] decrypt(final JWEHeader header,
-                          final Base64URL encryptedKey,
+                          final List<Recipient> recipients,
                           final Base64URL iv,
                           final Base64URL cipherText,
                           final Base64URL authTag)
             throws JOSEException {
 
-        // Check for unrecognizable "crit" properties
         critPolicy.ensureHeaderPasses(header);
 
         // Get ephemeral key from header
         OctetKeyPair ephemeralPublicKey = (OctetKeyPair) header.getEphemeralPublicKey();
 
         if (ephemeralPublicKey == null) {
-            throw new JOSEException("Missing ephemeral public key \"epk\" JWE header parameter");
+            throw new JOSEException("Missing ephemeral public key epk JWE header parameter");
         }
 
-        SecretKey Z = ECDH1PU.deriveRecipientZ(
-                privateKey,
-                publicKey,
-                ephemeralPublicKey
-        );
+        List<Pair<UnprotectedHeader, SecretKey>> sharedKeys = new ArrayList<>();
 
-        return decryptWithZ(header, Z, encryptedKey, iv, cipherText, authTag);
+        for (Pair<UnprotectedHeader, OctetKeyPair> recipient : this.recipients) {
+            if (!recipient.getRight().getCurve().equals(ephemeralPublicKey.getCurve())) {
+                throw new JOSEException("Curve of ephemeral public key does not match curve of private key");
+            }
+
+            SecretKey Z = ECDH.deriveSharedSecret(
+                    ephemeralPublicKey,
+                    recipient.getRight()
+            );
+
+            sharedKeys.add(Pair.of(recipient.getLeft(), Z));
+        }
+
+        return decryptMulti(header, sharedKeys, recipients, iv, cipherText, authTag);
     }
 }

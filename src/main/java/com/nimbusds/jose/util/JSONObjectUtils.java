@@ -382,6 +382,33 @@ public class JSONObjectUtils {
 		}
 	}
 
+	/**
+	 * Gets a JSON objects array member of a JSON object.
+	 *
+	 * @param o   The JSON object. Must not be {@code null}.
+	 * @param key The JSON object member key. Must not be {@code null}.
+	 *
+	 * @return The JSON object member value, may be {@code null}.
+	 *
+	 * @throws ParseException If the value is not of the expected type.
+	 */
+	public static Map<String, Object>[] getJSONObjectArray(final Map<String, Object> o, final String key)
+			throws ParseException {
+
+		List<Object> jsonArray = getJSONArray(o, key);
+
+		if (jsonArray == null) {
+			return null;
+		}
+
+		try {
+
+			return jsonArray.toArray(new HashMap[0]);
+		} catch (ArrayStoreException e) {
+
+			throw new ParseException("JSON object member with key \"" + key + "\" is not an array of JSON objects", 0);
+		}
+	}
 	
 	/**
 	 * Gets a string list member of a JSON object
@@ -456,7 +483,6 @@ public class JSONObjectUtils {
 	public static String toJSONString(final Map<String, ?> o) {
 		return JSONObject.toJSONString(o);
 	}
-
 
 	/**
 	 * Creates a new JSON object (unordered).

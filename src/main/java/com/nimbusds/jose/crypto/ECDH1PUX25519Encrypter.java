@@ -22,7 +22,6 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWECryptoParts;
 import com.nimbusds.jose.JWEEncrypter;
 import com.nimbusds.jose.JWEHeader;
-import com.nimbusds.jose.crypto.impl.ECDH;
 import com.nimbusds.jose.crypto.impl.ECDH1PU;
 import com.nimbusds.jose.crypto.impl.ECDH1PUCryptoProvider;
 import com.nimbusds.jose.jwk.Curve;
@@ -189,8 +188,6 @@ public class ECDH1PUX25519Encrypter extends ECDH1PUCryptoProvider implements JWE
     public JWECryptoParts encrypt(final JWEHeader header, final byte[] clearText)
             throws JOSEException {
 
-        ECDH1PU.validateSameCurve(privateKey, publicKey);
-
         final OctetKeyPair ephemeralPrivateKey = new OctetKeyPairGenerator(getCurve()).generate();
         final OctetKeyPair ephemeralPublicKey = ephemeralPrivateKey.toPublicJWK();
 
@@ -199,15 +196,11 @@ public class ECDH1PUX25519Encrypter extends ECDH1PUCryptoProvider implements JWE
                 ephemeralPublicKey(ephemeralPublicKey).
                 build();
 
-        SecretKey Ze = ECDH.deriveSharedSecret(
+        SecretKey Z = ECDH1PU.deriveSenderZ(
+                privateKey,
                 publicKey,
-                ephemeralPrivateKey);
-
-        SecretKey Zs = ECDH.deriveSharedSecret(
-                publicKey,
-                privateKey);
-
-        SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
+                ephemeralPrivateKey
+        );
 
         return encryptWithZ(updatedHeader, Z, clearText, contentEncryptionKey);
     }

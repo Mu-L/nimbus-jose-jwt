@@ -210,8 +210,6 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
     public JWECryptoParts encrypt(final JWEHeader header, final byte[] clearText)
         throws JOSEException {
 
-        ECDH1PU.validateSameCurve(privateKey, publicKey);
-
         // Generate ephemeral EC key pair on the same curve as the consumer's public key
         KeyPair ephemeralKeyPair = generateEphemeralKeyPair(publicKey.getParams());
         ECPublicKey ephemeralPublicKey = (ECPublicKey)ephemeralKeyPair.getPublic();
@@ -222,17 +220,12 @@ public class ECDH1PUEncrypter extends ECDH1PUCryptoProvider implements JWEEncryp
             ephemeralPublicKey(new ECKey.Builder(getCurve(), ephemeralPublicKey).build()).
             build();
 
-        SecretKey Ze = ECDH.deriveSharedSecret(
-            publicKey,
-            ephemeralPrivateKey,
-            getJCAContext().getKeyEncryptionProvider());
-
-        SecretKey Zs = ECDH.deriveSharedSecret(
-                publicKey,
+        SecretKey Z = ECDH1PU.deriveSenderZ(
                 privateKey,
-                getJCAContext().getKeyEncryptionProvider());
-
-        SecretKey Z = ECDH1PU.deriveZ(Ze, Zs);
+                publicKey,
+                ephemeralPrivateKey,
+                getJCAContext().getKeyEncryptionProvider()
+        );
 
         return encryptWithZ(updatedHeader, Z, clearText, contentEncryptionKey);
     }
