@@ -3,15 +3,20 @@ package com.nimbusds.jose;
 
 /**
  * JSON Web Signature (JWS) and JSON Web Encryption (JWE) header parameter
- * names. The header parameter names defined in
+ * names.
+ *
+ * <p>The header parameter names defined in
  * <a href="https://datatracker.ietf.org/doc/html/rfc7515">RFC 7515</a> (JWS),
  * <a href="https://datatracker.ietf.org/doc/html/rfc7516">RFC 7516</a> (JWE)
  * and other JOSE related standards are tracked in a
  * <a href="https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-header-parameters">JWS
  * and JWE header parameters registry</a> administered by IANA.
  *
+ * <p>Note, some header parameters here may not be present in the IANA registry
+ * (yet).
+ *
  * @author Nathaniel Hart
- * @version 2021-07-11
+ * @version 2021-09-30
  */
 public final class HeaderParameterNames {
 	
@@ -148,12 +153,6 @@ public final class HeaderParameterNames {
 	 */
 	public static final String EPHEMERAL_PUBLIC_KEY = "epk";
 
-	/**
-	 * Used in {@link JWEHeader} with ECDH-1PU key agreement.
-	 *
-	 * @see <a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04#section-2.2.1">"skid" Header Parameter</a>
-	 */
-	public static final String SENDER_KEY_ID = "skid";
 	
 	/**
 	 * Used in {@link JWEHeader} with ECDH key agreement.
@@ -201,6 +200,14 @@ public final class HeaderParameterNames {
 	 * @see <a href="https://datatracker.ietf.org/doc/html/rfc7518#section-4.8.1.2">RFC 7518 "p2c" (PBES2 Count) Header Parameter</a>
 	 */
 	public static final String PBES2_COUNT = "p2c";
+	
+	
+	/**
+	 * Used in {@link JWEHeader} with ECDH-1PU key agreement.
+	 *
+	 * @see <a href="https://datatracker.ietf.org/doc/html/draft-madden-jose-ecdh-1pu-04#section-2.2.1">"skid" Header Parameter</a>
+	 */
+	public static final String SENDER_KEY_ID = "skid";
 	
 	
 	////////////////////////////////////////////////////////////////////////////////
