@@ -22,18 +22,20 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import com.nimbusds.jose.HeaderParameterNames;
 import junit.framework.TestCase;
 import org.junit.Assert;
+
+import com.nimbusds.jose.HeaderParameterNames;
 
 
 /**
  * Tests the JSON object utilities.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-06-26
+ * @version 2021-10-01
  */
 public class JSONObjectUtilsTest extends TestCase {
 
@@ -431,6 +433,97 @@ public class JSONObjectUtilsTest extends TestCase {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		assertNull(JSONObjectUtils.getStringList(jsonObject, "key"));
+	}
+	
+	
+	public void testGetJSONObjectArray() throws ParseException {
+		
+		Map<String, Object> o1 = JSONObjectUtils.newJSONObject();
+		o1.put("o1-key-1", "o1-val-1");
+		
+		Map<String, Object> o2 = JSONObjectUtils.newJSONObject();
+		o2.put("o2-key-1", "o2-val-1");
+		
+		List<Object> jsonArray = Arrays.asList((Object) o1, (Object) o2);
+		
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
+		jsonObject.put("key", jsonArray);
+		
+		Map<String, Object>[] array = JSONObjectUtils.getJSONObjectArray(jsonObject, "key");
+		
+		assertEquals("o1-val-1", array[0].get("o1-key-1"));
+		assertEquals(1, array[0].size());
+		
+		assertEquals("o2-val-1", array[1].get("o2-key-1"));
+		assertEquals(1, array[1].size());
+		
+		assertEquals(2, array.length);
+	}
+	
+	
+	public void testGetJSONObjectArray_null() throws ParseException {
+		
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
+		jsonObject.put("key", null);
+		
+		assertNull(JSONObjectUtils.getJSONObjectArray(jsonObject, "key"));
+	}
+	
+	
+	public void testGetJSONObjectArray_none() throws ParseException {
+		
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
+		
+		assertNull(JSONObjectUtils.getJSONObjectArray(jsonObject, "key"));
+	}
+	
+	
+	public void testGetJSONObjectArray_empty() throws ParseException {
+		
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
+		jsonObject.put("key", JSONArrayUtils.newJSONArray());
+		
+		assertEquals(0, JSONObjectUtils.getJSONObjectArray(jsonObject, "key").length);
+	}
+	
+	
+	public void testGetJSONObjectArray_itemTypeNotJSONObject() {
+		
+		Map<String, Object> o1 = JSONObjectUtils.newJSONObject();
+		o1.put("o1-key-1", "o1-val-1");
+		
+		List<Object> jsonArray = Arrays.asList(o1, "string-item");
+		
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
+		jsonObject.put("key", jsonArray);
+		
+		try {
+			JSONObjectUtils.getJSONObjectArray(jsonObject, "key");
+			fail();
+		} catch (ParseException e) {
+			assertEquals("JSON object member with key \"key\" is not an array of JSON objects", e.getMessage());
+		}
+	}
+	
+	
+	public void testGetJSONObjectArray_itemNull() throws ParseException {
+		
+		Map<String, Object> o1 = JSONObjectUtils.newJSONObject();
+		o1.put("o1-key-1", "o1-val-1");
+		
+		List<Object> jsonArray = Arrays.asList((Object) o1, null);
+		
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
+		jsonObject.put("key", jsonArray);
+		
+		Map<String, Object>[] array = JSONObjectUtils.getJSONObjectArray(jsonObject, "key");
+		
+		assertEquals("o1-val-1", array[0].get("o1-key-1"));
+		assertEquals(1, array[0].size());
+		
+		assertNull(array[1]);
+		
+		assertEquals(2, array.length);
 	}
 	
 	
