@@ -20,13 +20,9 @@ package com.nimbusds.jose;
 
 import java.net.URI;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import junit.framework.TestCase;
 
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
@@ -34,16 +30,14 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
-
 import com.nimbusds.jwt.JWTClaimNames;
-import junit.framework.TestCase;
 
 
 /**
  * Tests JWE header parsing and serialisation.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-10-04
+ * @version 2021-10-01
  */
 public class JWEHeaderTest extends TestCase {
 
@@ -68,14 +62,16 @@ public class JWEHeaderTest extends TestCase {
 		assertNull(h.getAgreementPartyUInfo());
 		assertNull(h.getAgreementPartyVInfo());
 		assertNull(h.getPBES2Salt());
+		assertEquals(0, h.getPBES2Count());
 		assertNull(h.getIV());
 		assertNull(h.getAuthTag());
-		assertEquals(0, h.getPBES2Count());
+		assertNull(h.getSenderKeyID());
 		assertTrue(h.getCustomParams().isEmpty());
 	}
 
 
-	public void testParse1()
+	// https://datatracker.ietf.org/doc/html/rfc7516#section-3.3
+	public void testParseExample_RFC7516_1()
 		throws Exception {
 
 		// Example header from JWE spec
@@ -100,7 +96,8 @@ public class JWEHeaderTest extends TestCase {
 	}
 
 
-	public void testParse2()
+	// https://datatracker.ietf.org/doc/html/rfc7516#appendix-A.2.1
+	public void testParseExample_RFC7516_2()
 		throws Exception {
 
 		// Example header from JWE spec
@@ -131,7 +128,8 @@ public class JWEHeaderTest extends TestCase {
 		final Base64URL mod = new Base64URL("abc123");
 		final Base64URL exp = new Base64URL("def456");
 		final KeyUse use = KeyUse.ENCRYPTION;
-		final String kid = "1234";
+		final String kid = "id-1234";
+		final String skid = "sender-id-5678";
 
 		RSAKey jwk = new RSAKey.Builder(mod, exp).keyUse(use).algorithm(JWEAlgorithm.RSA1_5).keyID(kid).build();
 
@@ -140,24 +138,25 @@ public class JWEHeaderTest extends TestCase {
 		certChain.add(new Base64("fgh"));
 		certChain.add(new Base64("jkl"));
 
-		JWEHeader h = new JWEHeader.Builder(JWEAlgorithm.RSA1_5, EncryptionMethod.A256GCM).
-			type(new JOSEObjectType("JWT")).
-			compressionAlgorithm(CompressionAlgorithm.DEF).
-			jwkURL(new URI("https://example.com/jku.json")).
-			jwk(jwk).
-			x509CertURL(new URI("https://example/cert.b64")).
-			x509CertThumbprint(new Base64URL("789iop")).
-			x509CertSHA256Thumbprint(new Base64URL("789asd")).
-			x509CertChain(certChain).
-			keyID("1234").
-			agreementPartyUInfo(new Base64URL("abc")).
-			agreementPartyVInfo(new Base64URL("xyz")).
-			pbes2Salt(new Base64URL("omg")).
-			pbes2Count(1000).
-			iv(new Base64URL("101010")).
-			authTag(new Base64URL("202020")).
-			customParam("xCustom", "+++").
-			build();
+		JWEHeader h = new JWEHeader.Builder(JWEAlgorithm.RSA1_5, EncryptionMethod.A256GCM)
+			.type(new JOSEObjectType("JWT"))
+			.compressionAlgorithm(CompressionAlgorithm.DEF)
+			.jwkURL(new URI("https://example.com/jku.json"))
+			.jwk(jwk)
+			.x509CertURL(new URI("https://example/cert.b64"))
+			.x509CertThumbprint(new Base64URL("789iop"))
+			.x509CertSHA256Thumbprint(new Base64URL("789asd"))
+			.x509CertChain(certChain)
+			.keyID(kid)
+			.agreementPartyUInfo(new Base64URL("abc"))
+			.agreementPartyVInfo(new Base64URL("xyz"))
+			.pbes2Salt(new Base64URL("omg"))
+			.pbes2Count(1000)
+			.iv(new Base64URL("101010"))
+			.authTag(new Base64URL("202020"))
+			.senderKeyID(skid)
+			.customParam("xCustom", "+++")
+			.build();
 
 
 		Base64URL base64URL = h.toBase64URL();
@@ -170,7 +169,7 @@ public class JWEHeaderTest extends TestCase {
 		assertEquals(EncryptionMethod.A256GCM, h.getEncryptionMethod());
 		assertEquals(CompressionAlgorithm.DEF, h.getCompressionAlgorithm());
 		assertEquals(new URI("https://example.com/jku.json"), h.getJWKURL());
-		assertEquals("1234", h.getKeyID());
+		assertEquals(kid, h.getKeyID());
 
 		jwk = (RSAKey)h.getJWK();
 		assertNotNull(jwk);
@@ -178,7 +177,7 @@ public class JWEHeaderTest extends TestCase {
 		assertEquals(new Base64URL("def456"), jwk.getPublicExponent());
 		assertEquals(KeyUse.ENCRYPTION, jwk.getKeyUse());
 		assertEquals(JWEAlgorithm.RSA1_5, jwk.getAlgorithm());
-		assertEquals("1234", jwk.getKeyID());
+		assertEquals(kid, jwk.getKeyID());
 
 		assertEquals(new URI("https://example/cert.b64"), h.getX509CertURL());
 		assertEquals(new Base64URL("789iop"), h.getX509CertThumbprint());
@@ -198,6 +197,8 @@ public class JWEHeaderTest extends TestCase {
 
 		assertEquals(new Base64URL("101010"), h.getIV());
 		assertEquals(new Base64URL("202020"), h.getAuthTag());
+		
+		assertEquals(skid, h.getSenderKeyID());
 
 		assertEquals("+++", (String)h.getCustomParam("xCustom"));
 		assertEquals(1, h.getCustomParams().size());
@@ -220,8 +221,9 @@ public class JWEHeaderTest extends TestCase {
 		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.PBES2_COUNT));
 		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.INITIALIZATION_VECTOR));
 		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.AUTHENTICATION_TAG));
+		assertTrue(h.getIncludedParams().contains(HeaderParameterNames.SENDER_KEY_ID));
 		assertTrue(h.getIncludedParams().contains("xCustom"));
-		assertEquals(18, h.getIncludedParams().size());
+		assertEquals(19, h.getIncludedParams().size());
 
 		// Test copy constructor
 		h = new JWEHeader(h);
@@ -231,7 +233,7 @@ public class JWEHeaderTest extends TestCase {
 		assertEquals(EncryptionMethod.A256GCM, h.getEncryptionMethod());
 		assertEquals(CompressionAlgorithm.DEF, h.getCompressionAlgorithm());
 		assertEquals(new URI("https://example.com/jku.json"), h.getJWKURL());
-		assertEquals("1234", h.getKeyID());
+		assertEquals(kid, h.getKeyID());
 
 		jwk = (RSAKey)h.getJWK();
 		assertNotNull(jwk);
@@ -239,7 +241,7 @@ public class JWEHeaderTest extends TestCase {
 		assertEquals(new Base64URL("def456"), jwk.getPublicExponent());
 		assertEquals(KeyUse.ENCRYPTION, jwk.getKeyUse());
 		assertEquals(JWEAlgorithm.RSA1_5, jwk.getAlgorithm());
-		assertEquals("1234", jwk.getKeyID());
+		assertEquals(kid, jwk.getKeyID());
 
 		assertEquals(new URI("https://example/cert.b64"), h.getX509CertURL());
 		assertEquals(new Base64URL("789iop"), h.getX509CertThumbprint());
@@ -259,6 +261,8 @@ public class JWEHeaderTest extends TestCase {
 
 		assertEquals(new Base64URL("101010"), h.getIV());
 		assertEquals(new Base64URL("202020"), h.getAuthTag());
+		
+		assertEquals(skid, h.getSenderKeyID());
 
 		assertEquals("+++", (String)h.getCustomParam("xCustom"));
 		assertEquals(1, h.getCustomParams().size());

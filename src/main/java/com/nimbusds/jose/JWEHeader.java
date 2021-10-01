@@ -34,8 +34,8 @@ import com.nimbusds.jose.util.X509CertChainUtils;
 /**
  * JSON Web Encryption (JWE) header. This class is immutable.
  *
- * <p>Supports all {@link #getRegisteredParameterNames registered header
- * parameters} of the JWE specification:
+ * <p>Supports the following {@link #getRegisteredParameterNames registered
+ * header parameters}:
  *
  * <ul>
  *     <li>alg
@@ -57,6 +57,7 @@ import com.nimbusds.jose.util.X509CertChainUtils;
  *     <li>p2s
  *     <li>p2c
  *     <li>iv
+ *     <li>skid
  *     <li>authTag
  * </ul>
  *
@@ -73,7 +74,7 @@ import com.nimbusds.jose.util.X509CertChainUtils;
  * </pre>
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-06-05
+ * @version 2021-10-01
  */
 @Immutable
 public final class JWEHeader extends CommonSEHeader {
@@ -88,9 +89,6 @@ public final class JWEHeader extends CommonSEHeader {
 	private static final Set<String> REGISTERED_PARAMETER_NAMES;
 
 
-	/*
-	 * Initialises the registered parameter name set.
-	 */
 	static {
 		Set<String> p = new HashSet<>();
 
@@ -209,57 +207,59 @@ public final class JWEHeader extends CommonSEHeader {
 		 */
 		private String kid;
 
-		/**
-		 * Sender Key ID.
-		 */
-		private String skid;
-
+		
 		/**
 		 * The ephemeral public key.
 		 */
 		private JWK epk;
-
-
+		
+		
 		/**
 		 * The compression algorithm.
 		 */
 		private CompressionAlgorithm zip;
-
-
+		
+		
 		/**
 		 * The agreement PartyUInfo.
 		 */
 		private Base64URL apu;
-
-
+		
+		
 		/**
 		 * The agreement PartyVInfo.
 		 */
 		private Base64URL apv;
-
-
+		
+		
 		/**
 		 * The PBES2 salt.
 		 */
 		private Base64URL p2s;
-
-
+		
+		
 		/**
 		 * The PBES2 count.
 		 */
 		private int p2c;
-
-
+		
+		
 		/**
 		 * The initialisation vector.
 		 */
 		private Base64URL iv;
-
-
+		
+		
 		/**
 		 * The authentication authTag.
 		 */
 		private Base64URL tag;
+		
+		
+		/**
+		 * Sender key ID.
+		 */
+		private String skid;
 
 
 		/**
@@ -301,7 +301,7 @@ public final class JWEHeader extends CommonSEHeader {
 		 * Creates a new JWE header builder with the parameters from
 		 * the specified header.
 		 *
-		 * @param jweHeader The JWE header to use. Must not not be 
+		 * @param jweHeader The JWE header to use. Must not be
 		 *                  {@code null}.              
 		 */
 		public Builder(final JWEHeader jweHeader) {
@@ -613,8 +613,9 @@ public final class JWEHeader extends CommonSEHeader {
 			return this;
 		}
 
+		
 		/**
-		 * Sets the key ID ({@code kid}) parameter.
+		 * Sets the sender key ID ({@code skid}) parameter.
 		 *
 		 * @param skid The sender Key ID parameter, {@code null} if not
 		 *             specified.
@@ -627,6 +628,7 @@ public final class JWEHeader extends CommonSEHeader {
 			return this;
 		}
 
+		
 		/**
 		 * Sets a custom (non-registered) parameter.
 		 *
@@ -760,11 +762,13 @@ public final class JWEHeader extends CommonSEHeader {
 	 */
 	private final Base64URL tag;
 
+	
 	/**
-	 * The Sender Key ID
+	 * The sender key ID ({@code skid}) parameter.
 	 */
 	private final String skid;
 
+	
 	/**
 	 * Creates a new minimal JSON Web Encryption (JWE) header.
 	 *
@@ -836,7 +840,8 @@ public final class JWEHeader extends CommonSEHeader {
 	 *                        parameter, {@code null} if not specified.
 	 * @param tag             The authentication tag ({@code tag})
 	 *                        parameter, {@code null} if not specified.
-	 * @param skid            The
+	 * @param skid            The sender key ID ({@code skid}) parameter,
+	 *                        {@code null} if not specified.
 	 * @param customParams    The custom parameters, empty map or
 	 *                        {@code null} if none.
 	 * @param parsedBase64URL The parsed Base64URL, {@code null} if the
@@ -1053,11 +1058,18 @@ public final class JWEHeader extends CommonSEHeader {
 
 		return tag;
 	}
-
+	
+	
+	/**
+	 * Gets the sender key ID ({@code skid}) parameter.
+	 *
+	 * @return The sender key ID, {@code null} if not specified.
+	 */
 	public String getSenderKeyID() {
 
 		return skid;
 	}
+	
 
 	@Override
 	public Set<String> getIncludedParams() {
