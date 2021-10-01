@@ -34,9 +34,8 @@ import com.nimbusds.jose.util.X509CertChainUtils;
 /**
  * JSON Web Signature (JWS) header. This class is immutable.
  *
- * <p>Supports all {@link #getRegisteredParameterNames registered header
- * parameters} of the JWS specification (RFC 7515) and the "b64" header from
- * JWS Unencoded Payload Option (RFC 7797):
+ * <p>Supports the following {@link #getRegisteredParameterNames registered
+ * header parameters}:
  *
  * <ul>
  *     <li>alg
