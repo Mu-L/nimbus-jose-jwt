@@ -85,7 +85,7 @@ import java.util.*;
  * @version 2021-08-18
  */
 @ThreadSafe
-public class ECDH1PUEncrypterMulti extends ECDH1PUCryptoProvider implements JWEEncryptorMulti {
+public class ECDH1PUEncrypterMulti extends ECDH1PUCryptoProvider implements JWEEncrypterMulti {
 
     /**
      * The supported EC JWK curves by the ECDH crypto provider class.

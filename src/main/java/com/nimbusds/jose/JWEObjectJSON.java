@@ -318,7 +318,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
      *
      * @throws JOSEException If the JWE algorithms are not supported.
      */
-    private void ensureJWEEncrypterSupport(final JWEEncryptorMulti encrypter)
+    private void ensureJWEEncrypterSupport(final JWEEncrypterMulti encrypter)
             throws JOSEException {
 
         if (! encrypter.supportedJWEAlgorithms().contains(getHeader().getAlgorithm())) {
@@ -347,7 +347,7 @@ public class JWEObjectJSON extends JOSEObject implements JSONSerializable {
      * @throws JOSEException         If the JWE object couldn't be 
      *                               encrypted.
      */
-    public synchronized void encrypt(final JWEEncryptorMulti encrypter)
+    public synchronized void encrypt(final JWEEncrypterMulti encrypter)
             throws JOSEException {
 
         ensureUnencryptedState();

@@ -21,7 +21,6 @@ package com.nimbusds.jose.crypto;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.impl.*;
 import com.nimbusds.jose.jwk.Curve;
-import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
 import com.nimbusds.jose.util.Pair;
@@ -85,7 +84,7 @@ import java.util.*;
  * @version 2021-08-18
  */
 @ThreadSafe
-public class ECDH1PUX25519EncrypterMulti extends ECDH1PUCryptoProvider implements JWEEncryptorMulti {
+public class ECDH1PUX25519EncrypterMulti extends ECDH1PUCryptoProvider implements JWEEncrypterMulti {
 
     /**
      * The supported EC JWK curves by the ECDH crypto provider class.

@@ -25,7 +25,7 @@ package com.nimbusds.jose;
  * @author Alexander Martynov
  * @version 2021-08-19
  */
-public interface JWEEncryptorMulti extends JWEProvider {
+public interface JWEEncrypterMulti extends JWEProvider {
 
     /**
      * Encrypts the specified clear text of a {@link JWEObjectJSON JWE object}.
