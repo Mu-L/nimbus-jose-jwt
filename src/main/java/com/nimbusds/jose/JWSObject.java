@@ -29,7 +29,7 @@ import com.nimbusds.jose.util.StandardCharset;
 
 /**
  * JSON Web Signature (JWS) secured object serialisable to
- * <a href="https://datatracker.ietf.org/doc/html/rfc7515#section-7.1>compact
+ * <a href="https://datatracker.ietf.org/doc/html/rfc7515#section-7.1">compact
  * encoding</a>.
  *
  * <p>This class is thread-safe.
@@ -38,10 +38,37 @@ import com.nimbusds.jose.util.StandardCharset;
  * @version 2021-10-03
  */
 @ThreadSafe
-public class JWSObject  extends JOSEObject implements JWSLifeCycle {
+public class JWSObject extends JOSEObject {
 
 
 	private static final long serialVersionUID = 1L;
+	
+	
+	/**
+	 * Enumeration of the states of a JSON Web Signature (JWS) secured
+	 * object.
+	 */
+	public enum State {
+		
+		
+		/**
+		 * The JWS secured object is created but not signed yet.
+		 */
+		UNSIGNED,
+		
+		
+		/**
+		 * The JWS secured object is signed but its signature is not
+		 * verified.
+		 */
+		SIGNED,
+		
+		
+		/**
+		 * The JWS secured object is signed and its signature was successfully verified.
+		 */
+		VERIFIED
+	}
 
 
 	/**
@@ -202,9 +229,13 @@ public class JWSObject  extends JOSEObject implements JWSLifeCycle {
 
 		return signature;
 	}
-
-
-	@Override
+	
+	
+	/**
+	 * Returns the state of the JWS secured object.
+	 *
+	 * @return The state.
+	 */
 	public State getState() {
 
 		return state.get();
