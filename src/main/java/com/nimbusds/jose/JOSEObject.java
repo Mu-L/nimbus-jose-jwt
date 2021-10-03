@@ -28,10 +28,11 @@ import com.nimbusds.jose.util.JSONObjectUtils;
 
 /**
  * The base abstract class for unsecured (plain / {@code alg=none}), JSON Web
- * Signature (JWS) secured and JSON Web Encryption (JWE) secured objects.
+ * Signature (JWS) secured and JSON Web Encryption (JWE) secured objects
+ * serialisable to compact encoding.
  *
  * @author Vladimir Dzhuvinov
- * @version 2017-07-11
+ * @version 2021-10-03
  */
 public abstract class JOSEObject implements Serializable {
 	
@@ -40,14 +41,14 @@ public abstract class JOSEObject implements Serializable {
 
 
 	/**
-	 * The MIME type of JOSE objects serialised to a compact form:
+	 * The MIME type of JOSE objects serialised to compact encoding:
 	 * {@code application/jose; charset=UTF-8}
 	 */
 	public static final String MIME_TYPE_COMPACT = "application/jose; charset=UTF-8";
 
 
 	/**
-	 * The MIME type of JOSE objects serialised to a JSON object form:
+	 * The MIME type of JOSE objects serialised to JSON:
 	 * {@code application/jose+json; charset=UTF-8}
 	 */
 	public static final String MIME_TYPE_JS = "application/jose+json; charset=UTF-8";
@@ -141,7 +142,7 @@ public abstract class JOSEObject implements Serializable {
 	 * Returns the original parsed Base64URL parts used to create this JOSE
 	 * object.
 	 *
-	 * @return The original Base64URL parts used to creates this JOSE 
+	 * @return The original Base64URL parts used to create this JOSE
 	 *         object, {@code null} if the object was created from scratch. 
 	 *         The individual parts may be empty or {@code null} to 
 	 *         indicate a missing part.
@@ -175,7 +176,7 @@ public abstract class JOSEObject implements Serializable {
 			}
 
 			if (part != null) {
-				sb.append(part.toString());
+				sb.append(part);
 			}
 		}
 
@@ -184,7 +185,7 @@ public abstract class JOSEObject implements Serializable {
 
 
 	/**
-	 * Serialises this JOSE object to its compact format consisting of 
+	 * Serialises this JOSE object to compact encoding consisting of
 	 * Base64URL-encoded parts delimited by period ('.') characters.
 	 *
 	 * @return The serialised JOSE object.
@@ -264,7 +265,7 @@ public abstract class JOSEObject implements Serializable {
 
 
 	/**
-	 * Parses a JOSE object from the specified string in compact format.
+	 * Parses a JOSE object from the specified string in compact encoding.
 	 *
 	 * @param s The string to parse. Must not be {@code null}.
 	 *
