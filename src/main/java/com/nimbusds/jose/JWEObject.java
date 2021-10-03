@@ -26,41 +26,20 @@ import com.nimbusds.jose.util.Base64URL;
 
 
 /**
- * JSON Web Encryption (JWE) secured object. This class is thread-safe.
+ * JSON Web Encryption (JWE) secured object serialisable to
+ * <a href="https://datatracker.ietf.org/doc/html/rfc7516#section-7.1>compact
+ * encoding</a>.
+ *
+ * <p>This class is thread-safe.
  *
  * @author Vladimir Dzhuvinov
- * @version 2016-04-13
+ * @version 2021-10-03
  */
 @ThreadSafe
-public class JWEObject extends JOSEObject {
+public class JWEObject extends JOSEObject implements JWELifeCycle {
 
 
 	private static final long serialVersionUID = 1L;
-
-
-	/**
-	 * Enumeration of the states of a JSON Web Encryption (JWE) object.
-	 */
-	public enum State {
-
-
-		/**
-		 * The JWE object is created but not encrypted yet.
-		 */
-		UNENCRYPTED,
-
-
-		/**
-		 * The JWE object is encrypted.
-		 */
-		ENCRYPTED,
-
-
-		/**
-		 * The JWE object is decrypted.
-		 */
-		DECRYPTED
-	}
 
 
 	/**
@@ -266,11 +245,7 @@ public class JWEObject extends JOSEObject {
 	}
 
 
-	/**
-	 * Returns the state of this JWE object.
-	 *
-	 * @return The state.
-	 */
+	@Override
 	public State getState() {
 
 		return state;
