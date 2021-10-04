@@ -222,7 +222,7 @@ public final class JWSHeader extends CommonSEHeader {
 		 * Creates a new JWS header builder with the parameters from
 		 * the specified header.
 		 *
-		 * @param jwsHeader The JWS header to use. Must not not be
+		 * @param jwsHeader The JWS header to use. Must not be
 		 *                  {@code null}.
 		 */
 		public Builder(final JWSHeader jwsHeader) {
