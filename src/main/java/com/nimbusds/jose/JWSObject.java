@@ -35,7 +35,7 @@ import com.nimbusds.jose.util.StandardCharset;
  * <p>This class is thread-safe.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-10-03
+ * @version 2021-10-05
  */
 @ThreadSafe
 public class JWSObject extends JOSEObject {
@@ -65,7 +65,8 @@ public class JWSObject extends JOSEObject {
 		
 		
 		/**
-		 * The JWS secured object is signed and its signature was successfully verified.
+		 * The JWS secured object is signed and its signature was
+		 * successfully verified.
 		 */
 		VERIFIED
 	}
@@ -198,7 +199,7 @@ public class JWSObject extends JOSEObject {
 	 *
 	 * @return The signing input string.
 	 */
-	protected String composeSigningInput() {
+	private String composeSigningInput() {
 		
 		if (header.isBase64URLEncodePayload()) {
 			return getHeader().toBase64URL().toString() + '.' + getPayload().toBase64URL().toString();
@@ -263,7 +264,7 @@ public class JWSObject extends JOSEObject {
 	 * @throws IllegalStateException If the current state is not signed or
 	 *                               verified.
 	 */
-	protected void ensureSignedOrVerifiedState() {
+	private void ensureSignedOrVerifiedState() {
 
 		if (state.get() != State.SIGNED && state.get() != State.VERIFIED) {
 
@@ -432,6 +433,7 @@ public class JWSObject extends JOSEObject {
 		return signingInputString + '.' + signature.toString();
 	}
 
+	
 	/**
 	 * Parses a JWS object from the specified string in compact format. The
 	 * parsed JWS object will be given a {@link State#SIGNED} state.
