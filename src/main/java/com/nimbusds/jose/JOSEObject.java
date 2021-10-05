@@ -27,12 +27,12 @@ import com.nimbusds.jose.util.JSONObjectUtils;
 
 
 /**
- * The base abstract class for unsecured (plain / {@code alg=none}), JSON Web
- * Signature (JWS) secured and JSON Web Encryption (JWE) secured objects
+ * The base abstract class for JSON Web Signature (JWS) secured, JSON Web
+ * Encryption (JWE) secured and unsecured (plain / {@code alg=none}) objects
  * serialisable to compact encoding.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-10-03
+ * @version 2021-10-05
  */
 public abstract class JOSEObject implements Serializable {
 	
@@ -50,7 +50,10 @@ public abstract class JOSEObject implements Serializable {
 	/**
 	 * The MIME type of JOSE objects serialised to JSON:
 	 * {@code application/jose+json; charset=UTF-8}
+	 *
+	 * @deprecated Use {@link JOSEObjectJSON#MIME_TYPE_JOSE_JSON} instead.
 	 */
+	@Deprecated
 	public static final String MIME_TYPE_JS = "application/jose+json; charset=UTF-8";
 
 
@@ -82,7 +85,7 @@ public abstract class JOSEObject implements Serializable {
 	/**
 	 * Creates a new JOSE object with the specified payload.
 	 *
-	 * @param payload The payload, {@code null} if not available (e.g for 
+	 * @param payload The payload, {@code null} if not available (e.g. for
 	 *                an encrypted JWE object).
 	 */
 	protected JOSEObject(final Payload payload) {
@@ -127,7 +130,7 @@ public abstract class JOSEObject implements Serializable {
 	 * Sets the original parsed Base64URL parts used to create this JOSE 
 	 * object.
 	 *
-	 * @param parts The original Base64URL parts used to creates this JOSE
+	 * @param parts The original Base64URL parts used to create this JOSE
 	 *              object, {@code null} if the object was created from
 	 *              scratch. The individual parts may be empty or 
 	 *              {@code null} to indicate a missing part.
@@ -269,11 +272,11 @@ public abstract class JOSEObject implements Serializable {
 	 *
 	 * @param s The string to parse. Must not be {@code null}.
 	 *
-	 * @return The corresponding {@link PlainObject}, {@link JWSObject} or
-	 *         {@link JWEObject} instance.
+	 * @return The corresponding {@link JWSObject}, {@link JWEObject} or
+	 *         {@link PlainObject}.
 	 *
 	 * @throws ParseException If the string couldn't be parsed to a valid 
-	 *                        unsecured, JWS or JWE object.
+	 *                        JWS, JWE or unsecured object.
 	 */
 	public static JOSEObject parse(final String s) 
 		throws ParseException {
