@@ -19,7 +19,9 @@ package com.nimbusds.jose;
 
 
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -28,12 +30,6 @@ import com.nimbusds.jose.util.JSONObjectUtils;
 
 
 public class UnprotectedHeaderTest extends TestCase {
-
-
-	public void testRegisteredParameterNames() {
-		
-		assertEquals(Collections.singleton("kid"), UnprotectedHeader.getRegisteredParameterNames());
-	}
 	
 	
 	public void testLifeCycle()
@@ -41,10 +37,13 @@ public class UnprotectedHeaderTest extends TestCase {
 		
 		String kid = "123";
 		
-		UnprotectedHeader header = new UnprotectedHeader.Builder(kid)
+		UnprotectedHeader header = new UnprotectedHeader.Builder()
+			.keyID(kid)
 			.build();
 		
 		assertEquals(kid, header.getKeyID());
+		
+		assertEquals(Collections.singleton("kid"), header.getIncludedParams());
 		
 		Map<String, Object> jsonObject = header.toJSONObject();
 		assertEquals(kid, jsonObject.get("kid"));
@@ -60,19 +59,22 @@ public class UnprotectedHeaderTest extends TestCase {
 	}
 	
 	
-	public void testLifeCycle_withCustomParam()
+	public void testLifeCycle_withCustomParam_String()
 		throws ParseException {
 		
 		String kid = "123";
 		String customParamName = "x_custom";
 		String customParamValue = "abc";
 		
-		UnprotectedHeader header = new UnprotectedHeader.Builder(kid)
-			.customParam(customParamName, customParamValue)
+		UnprotectedHeader header = new UnprotectedHeader.Builder()
+			.keyID(kid)
+			.param(customParamName, customParamValue)
 			.build();
 		
 		assertEquals(kid, header.getKeyID());
-		assertEquals(customParamValue, header.getCustomParam(customParamName));
+		assertEquals(customParamValue, header.getParam(customParamName));
+		
+		assertEquals(new HashSet<>(Arrays.asList("kid", customParamName)), header.getIncludedParams());
 		
 		Map<String, Object> jsonObject = header.toJSONObject();
 		assertEquals(kid, jsonObject.get("kid"));
@@ -82,7 +84,7 @@ public class UnprotectedHeaderTest extends TestCase {
 		header = UnprotectedHeader.parse(jsonObject);
 		
 		assertEquals(kid, header.getKeyID());
-		assertEquals(customParamValue, header.getCustomParam(customParamName));
+		assertEquals(customParamValue, header.getParam(customParamName));
 		
 		jsonObject = header.toJSONObject();
 		assertEquals(customParamValue, jsonObject.get(customParamName));
@@ -90,14 +92,71 @@ public class UnprotectedHeaderTest extends TestCase {
 	}
 	
 	
-	public void testBuilder_requireNonNullKeyID() {
+	public void testLifeCycle_with2CustomParams_String()
+		throws ParseException {
 		
-		try {
-			new UnprotectedHeader.Builder(null);
-			fail();
-		} catch (NullPointerException e) {
-			assertEquals("The \"kid\" must not be null", e.getMessage());
-		}
+		String customParam1Name = "x_custom";
+		String customParam1Value = "abc";
+		String customParam2Name = "y_custom";
+		String customParam2Value = "def";
+		
+		UnprotectedHeader header = new UnprotectedHeader.Builder()
+			.param(customParam1Name, customParam1Value)
+			.param(customParam2Name, customParam2Value)
+			.build();
+		
+		assertNull(header.getKeyID());
+		assertEquals(customParam1Value, header.getParam(customParam1Name));
+		assertEquals(customParam2Value, header.getParam(customParam2Name));
+		
+		assertEquals(new HashSet<>(Arrays.asList(customParam1Name, customParam2Name)), header.getIncludedParams());
+		
+		Map<String, Object> jsonObject = header.toJSONObject();
+		assertEquals(customParam1Value, jsonObject.get(customParam1Name));
+		assertEquals(customParam2Value, jsonObject.get(customParam2Name));
+		assertEquals(2, jsonObject.size());
+		
+		header = UnprotectedHeader.parse(jsonObject);
+		
+		assertNull(header.getKeyID());
+		assertEquals(customParam1Value, header.getParam(customParam1Name));
+		assertEquals(customParam2Value, header.getParam(customParam2Name));
+		
+		jsonObject = header.toJSONObject();
+		assertEquals(customParam1Value, jsonObject.get(customParam1Name));
+		assertEquals(customParam2Value, jsonObject.get(customParam2Name));
+		assertEquals(2, jsonObject.size());
+	}
+	
+	
+	public void testLifeCycle_empty()
+		throws ParseException {
+		
+		UnprotectedHeader header = new UnprotectedHeader.Builder()
+			.build();
+		
+		assertTrue(header.getIncludedParams().isEmpty());
+		
+		Map<String, Object> jsonObject = header.toJSONObject();
+		
+		assertTrue(jsonObject.isEmpty());
+		
+		header = UnprotectedHeader.parse(jsonObject);
+		
+		assertTrue(header.getIncludedParams().isEmpty());
+	}
+	
+	
+	public void testSetKeyIDViaParamMethod() {
+		
+		UnprotectedHeader unprotectedHeader = new UnprotectedHeader.Builder()
+			.param("kid", "123")
+			.build();
+		
+		assertEquals("123", unprotectedHeader.getParam("kid"));
+		assertEquals("123", unprotectedHeader.getKeyID());
+		
+		assertEquals(Collections.singleton("kid"), unprotectedHeader.getIncludedParams());
 	}
 	
 	
@@ -108,12 +167,11 @@ public class UnprotectedHeaderTest extends TestCase {
 	}
 	
 	
-	// TODO Define expected behaviour if kid == null
-	public void testParse_missingKeyID()
+	public void testParse_empty()
 		throws ParseException {
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		
-		UnprotectedHeader.parse(jsonObject);
+		assertTrue(UnprotectedHeader.parse(jsonObject).getIncludedParams().isEmpty());
 	}
 }
