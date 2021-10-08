@@ -52,7 +52,7 @@ public class JWSObject extends JOSEObject {
 		
 		
 		/**
-		 * The JWS secured object is created but not signed yet.
+		 * The object is not signed yet.
 		 */
 		UNSIGNED,
 		

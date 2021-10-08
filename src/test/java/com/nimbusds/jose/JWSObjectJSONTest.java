@@ -80,9 +80,11 @@ public class JWSObjectJSONTest extends TestCase {
 		
 		assertEquals(PAYLOAD, jwsObject.getPayload());
 		assertTrue(jwsObject.getSignatures().isEmpty());
+		assertEquals(JWSObjectJSON.State.UNSIGNED, jwsObject.getState());
 		
 		JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.ES256K);
 		jwsObject.sign(jwsHeader, null, new ECDSASigner(EC_JWK));
+		assertEquals(JWSObjectJSON.State.SIGNED, jwsObject.getState());
 		
 		JWSObjectJSON.Signature sig = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader, sig.getHeader());
@@ -92,6 +94,8 @@ public class JWSObjectJSONTest extends TestCase {
 		assertTrue(sig.isVerified());
 		
 		assertEquals(1, jwsObject.getSignatures().size());
+		
+		assertEquals(JWSObjectJSON.State.VERIFIED, jwsObject.getState());
 		
 		// Verify signature via compact JWS
 		assertTrue(new JWSObject(sig.getHeader().toBase64URL(), PAYLOAD.toBase64URL(), sig.getSignature()).verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
@@ -128,6 +132,8 @@ public class JWSObjectJSONTest extends TestCase {
 		
 		assertEquals(PAYLOAD.toString(), jwsObject.getPayload().toString());
 		
+		assertEquals(JWSObjectJSON.State.SIGNED, jwsObject.getState());
+		
 		sig = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader.toJSONObject(), sig.getHeader().toJSONObject());
 		assertNull(sig.getUnprotectedHeader());
@@ -136,6 +142,8 @@ public class JWSObjectJSONTest extends TestCase {
 		assertTrue(sig.isVerified());
 		
 		assertEquals(1, jwsObject.getSignatures().size());
+		
+		assertEquals(JWSObjectJSON.State.VERIFIED, jwsObject.getState());
 	}
 	
 	
@@ -147,11 +155,15 @@ public class JWSObjectJSONTest extends TestCase {
 		assertEquals(PAYLOAD, jwsObject.getPayload());
 		assertTrue(jwsObject.getSignatures().isEmpty());
 		
+		assertEquals(JWSObjectJSON.State.UNSIGNED, jwsObject.getState());
+		
 		JWSHeader jwsHeader1 = new JWSHeader(JWSAlgorithm.ES256K);
 		jwsObject.sign(jwsHeader1, null, new ECDSASigner(EC_JWK));
+		assertEquals(JWSObjectJSON.State.SIGNED, jwsObject.getState());
 		
 		JWSHeader jwsHeader2 = new JWSHeader(JWSAlgorithm.EdDSA);
 		jwsObject.sign(jwsHeader2, null, new Ed25519Signer(OKP_JWK));
+		assertEquals(JWSObjectJSON.State.SIGNED, jwsObject.getState());
 		
 		JWSObjectJSON.Signature sig1 = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader1, sig1.getHeader());
@@ -160,12 +172,16 @@ public class JWSObjectJSONTest extends TestCase {
 		assertTrue(sig1.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
 		assertTrue(sig1.isVerified());
 		
+		assertEquals(JWSObjectJSON.State.SIGNED, jwsObject.getState());
+		
 		JWSObjectJSON.Signature sig2 = jwsObject.getSignatures().get(1);
 		assertEquals(jwsHeader2, sig2.getHeader());
 		assertNull(sig2.getUnprotectedHeader());
 		assertFalse(sig2.isVerified());
 		assertTrue(sig2.verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
 		assertTrue(sig2.isVerified());
+		
+		assertEquals(JWSObjectJSON.State.VERIFIED, jwsObject.getState());
 		
 		assertEquals(2, jwsObject.getSignatures().size());
 		
@@ -213,6 +229,8 @@ public class JWSObjectJSONTest extends TestCase {
 		
 		assertEquals(PAYLOAD.toString(), jwsObject.getPayload().toString());
 		
+		assertEquals(JWSObjectJSON.State.SIGNED, jwsObject.getState());
+		
 		sig1 = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader1.toJSONObject(), sig1.getHeader().toJSONObject());
 		assertNull(sig1.getUnprotectedHeader());
@@ -220,12 +238,16 @@ public class JWSObjectJSONTest extends TestCase {
 		assertTrue(sig1.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
 		assertTrue(sig1.isVerified());
 		
+		assertEquals(JWSObjectJSON.State.SIGNED, jwsObject.getState());
+		
 		sig2 = jwsObject.getSignatures().get(1);
 		assertEquals(jwsHeader2.toJSONObject(), sig2.getHeader().toJSONObject());
 		assertNull(sig2.getUnprotectedHeader());
 		assertFalse(sig2.isVerified());
 		assertTrue(sig2.verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
 		assertTrue(sig2.isVerified());
+		
+		assertEquals(JWSObjectJSON.State.VERIFIED, jwsObject.getState());
 		
 		assertEquals(2, jwsObject.getSignatures().size());
 	}

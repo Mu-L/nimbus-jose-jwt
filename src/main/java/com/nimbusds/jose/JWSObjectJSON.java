@@ -213,6 +213,33 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 	
 	
 	/**
+	 * Enumeration of the states of a JSON Web Signature (JWS) secured
+	 * object serialisable to JSON.
+	 */
+	public enum State {
+		
+		
+		/**
+		 * The object is not signed yet.
+		 */
+		UNSIGNED,
+		
+		
+		/**
+		 * The object has one or more signatures; they are not (all)
+		 * verified.
+		 */
+		SIGNED,
+		
+		
+		/**
+		 * All signatures are verified.
+		 */
+		VERIFIED
+	}
+	
+	
+	/**
 	 * The applied signatures.
 	 */
 	private final List<Signature> signatures = new LinkedList<>();
@@ -296,6 +323,27 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 		jwsObject.sign(signer);
 		
 		signatures.add(new Signature(getPayload(), jwsHeader, unprotectedHeader, jwsObject.getSignature()));
+	}
+	
+	
+	/**
+	 * Returns the current signatures state.
+	 *
+	 * @return The state.
+	 */
+	public State getState() {
+		
+		if (getSignatures().isEmpty()) {
+			return State.UNSIGNED;
+		}
+		
+		for (Signature sig: getSignatures()) {
+			if (! sig.isVerified()) {
+				return State.SIGNED;
+			}
+		}
+		
+		return State.VERIFIED;
 	}
 	
 	
