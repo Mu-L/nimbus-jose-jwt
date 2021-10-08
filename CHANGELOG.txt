@@ -1382,3 +1382,5 @@ version 9.15.2 (2021-09-28)
 version 9.16-preview.1 (2021-10-08)
     * JSONObjectUtils.getJSONObject must accept java.util.Map values (iss
       #445).
+    * JSONObjectUtils.getJSONObject verifies java.util.Map<String, Object> keys
+      are String before cast.

@@ -533,9 +533,33 @@ public class JSONObjectUtilsTest extends TestCase {
 		
 		Map<String, Object> value = JSONObjectUtils.newJSONObject();
 		value.put("one", 1);
+		value.put("two", "2");
+		value.put("three", null);
 		jsonObject.put("key", value);
 		
 		assertEquals(value, JSONObjectUtils.getJSONObject(jsonObject, "key"));
+		
+		assertEquals(1, JSONObjectUtils.getJSONObject(jsonObject, "key").get("one"));
+		assertEquals("2", JSONObjectUtils.getJSONObject(jsonObject, "key").get("two"));
+		assertNull(JSONObjectUtils.getJSONObject(jsonObject, "key").get("three"));
+	}
+	
+	
+	public void testGetJSONObject_valueNotMapOfStringObjectPairs() {
+		
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
+		
+		Map<Integer, Object> value = new HashMap<>();
+		value.put(1, 2);
+		value.put(3, 4);
+		jsonObject.put("AAA", value);
+		
+		try {
+			JSONObjectUtils.getJSONObject(jsonObject, "AAA");
+			fail();
+		} catch (ParseException e) {
+			assertEquals("JSON object member with key AAA not a JSON object", e.getMessage());
+		}
 	}
 	
 	

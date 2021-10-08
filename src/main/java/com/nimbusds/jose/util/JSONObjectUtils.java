@@ -445,9 +445,21 @@ public class JSONObjectUtils {
 	public static Map<String, Object> getJSONObject(final Map<String, Object> o, final String key)
 		throws ParseException {
 		
+		Map<?,?> jsonObject = getGeneric(o, key, Map.class);
+		
+		if (jsonObject == null) {
+			return null;
+		}
+		
+		// Verify keys are String
+		for (Object oKey: jsonObject.keySet()) {
+			if (! (oKey instanceof String)) {
+				throw new ParseException("JSON object member with key " + key + " not a JSON object", 0);
+			}
+		}
 		@SuppressWarnings("unchecked")
-		Map<String, Object> jsonObject = getGeneric(o, key, Map.class);
-		return jsonObject;
+		Map<String, Object> castJSONObject = (Map<String, Object>)jsonObject;
+		return castJSONObject;
 	}
 	
 	
