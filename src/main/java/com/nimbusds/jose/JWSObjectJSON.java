@@ -20,7 +20,7 @@ package com.nimbusds.jose;
 
 import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
@@ -39,7 +39,7 @@ import com.nimbusds.jose.util.StandardCharset;
  *
  * @author Alexander Martynov
  * @author Vladimir Dzhuvinov
- * @version 2021-10-05
+ * @version 2021-10-08
  */
 @ThreadSafe
 public class JWSObjectJSON extends JOSEObjectJSON {
@@ -49,28 +49,10 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 	
 	
 	/**
-	 * Individual signature with a JWS protected and / or unprotected
-	 * header in a JWS secured object serialisable to JSON.
+	 * Individual signature in a JWS secured object serialisable to JSON.
 	 */
 	@Immutable
 	public static final class Signature {
-		
-		
-		public enum State {
-			
-			/**
-			 * The JWS secured object is signed but its signature
-			 * is not verified.
-			 */
-			SIGNED,
-			
-			
-			/**
-			 * The JWS secured object is signed and its signature
-			 * was successfully verified.
-			 */
-			VERIFIED
-		}
 		
 		
 		/**
@@ -98,9 +80,9 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 		
 		
 		/**
-		 * The state.
+		 * The signature verified state.
 		 */
-		private final AtomicReference<State> state = new AtomicReference<>();
+		private final AtomicBoolean verified = new AtomicBoolean(false);
 		
 		
 		/**
@@ -128,8 +110,6 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 			
 			Objects.requireNonNull(signature);
 			this.signature = signature;
-			
-			state.set(State.SIGNED);
 		}
 		
 		
@@ -164,13 +144,15 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 		
 		
 		/**
-		 * Returns the state.
+		 * Returns {@code true} if the signature was successfully
+		 * verified with a previous call to {@link #verify}.
 		 *
-		 * @return The state.
+		 * @return {@code true} if the signature was successfully
+		 *         verified, {@code false} if the signature is invalid
+		 *         or {@link #verify} was never called.
 		 */
-		public State getState() {
-			
-			return state.get();
+		public boolean isVerified() {
+			return verified.get();
 		}
 		
 		
@@ -189,9 +171,10 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 			
 			String signingInput = header.toBase64URL().toString() + '.' + payload.toBase64URL().toString();
 			
-			final boolean verified;
 			try {
-				verified = verifier.verify(header, signingInput.getBytes(StandardCharset.UTF_8), getSignature());
+				verified.set(
+					verifier.verify(header, signingInput.getBytes(StandardCharset.UTF_8), getSignature())
+				);
 			} catch (JOSEException e) {
 				throw e;
 			} catch (Exception e) {
@@ -200,11 +183,7 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 				throw new JOSEException(e.getMessage(), e);
 			}
 			
-			if (verified) {
-				state.set(State.VERIFIED);
-			}
-			
-			return verified;
+			return verified.get();
 		}
 	}
 	

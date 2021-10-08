@@ -87,9 +87,9 @@ public class JWSObjectJSONTest extends TestCase {
 		JWSObjectJSON.Signature sig = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader, sig.getHeader());
 		assertNull(sig.getUnprotectedHeader());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig.getState());
+		assertFalse(sig.isVerified());
 		assertTrue(sig.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig.getState());
+		assertTrue(sig.isVerified());
 		
 		assertEquals(1, jwsObject.getSignatures().size());
 		
@@ -131,9 +131,9 @@ public class JWSObjectJSONTest extends TestCase {
 		sig = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader.toJSONObject(), sig.getHeader().toJSONObject());
 		assertNull(sig.getUnprotectedHeader());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig.getState());
+		assertFalse(sig.isVerified());
 		assertTrue(sig.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig.getState());
+		assertTrue(sig.isVerified());
 		
 		assertEquals(1, jwsObject.getSignatures().size());
 	}
@@ -156,16 +156,16 @@ public class JWSObjectJSONTest extends TestCase {
 		JWSObjectJSON.Signature sig1 = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader1, sig1.getHeader());
 		assertNull(sig1.getUnprotectedHeader());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig1.getState());
+		assertFalse(sig1.isVerified());
 		assertTrue(sig1.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig1.getState());
+		assertTrue(sig1.isVerified());
 		
 		JWSObjectJSON.Signature sig2 = jwsObject.getSignatures().get(1);
 		assertEquals(jwsHeader2, sig2.getHeader());
 		assertNull(sig2.getUnprotectedHeader());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig2.getState());
+		assertFalse(sig2.isVerified());
 		assertTrue(sig2.verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig2.getState());
+		assertTrue(sig2.isVerified());
 		
 		assertEquals(2, jwsObject.getSignatures().size());
 		
@@ -216,16 +216,16 @@ public class JWSObjectJSONTest extends TestCase {
 		sig1 = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader1.toJSONObject(), sig1.getHeader().toJSONObject());
 		assertNull(sig1.getUnprotectedHeader());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig1.getState());
+		assertFalse(sig1.isVerified());
 		assertTrue(sig1.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig1.getState());
+		assertTrue(sig1.isVerified());
 		
 		sig2 = jwsObject.getSignatures().get(1);
 		assertEquals(jwsHeader2.toJSONObject(), sig2.getHeader().toJSONObject());
 		assertNull(sig2.getUnprotectedHeader());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig2.getState());
+		assertFalse(sig2.isVerified());
 		assertTrue(sig2.verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig2.getState());
+		assertTrue(sig2.isVerified());
 		
 		assertEquals(2, jwsObject.getSignatures().size());
 	}
@@ -254,16 +254,16 @@ public class JWSObjectJSONTest extends TestCase {
 		JWSObjectJSON.Signature sig1 = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader1, sig1.getHeader());
 		assertEquals(unprotectedHeader1, sig1.getUnprotectedHeader());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig1.getState());
+		assertFalse(sig1.isVerified());
 		assertTrue(sig1.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig1.getState());
+		assertTrue(sig1.isVerified());
 		
 		JWSObjectJSON.Signature sig2 = jwsObject.getSignatures().get(1);
 		assertEquals(jwsHeader2, sig2.getHeader());
 		assertEquals(unprotectedHeader2, sig2.getUnprotectedHeader());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig2.getState());
+		assertFalse(sig2.isVerified());
 		assertTrue(sig2.verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig2.getState());
+		assertTrue(sig2.isVerified());
 		
 		assertEquals(2, jwsObject.getSignatures().size());
 		
@@ -318,16 +318,16 @@ public class JWSObjectJSONTest extends TestCase {
 		sig1 = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader1.toJSONObject(), sig1.getHeader().toJSONObject());
 		assertEquals(unprotectedHeader1.toJSONObject(), sig1.getUnprotectedHeader().toJSONObject());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig1.getState());
+		assertFalse(sig1.isVerified());
 		assertTrue(sig1.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig1.getState());
+		assertTrue(sig1.isVerified());
 		
 		sig2 = jwsObject.getSignatures().get(1);
 		assertEquals(jwsHeader2.toJSONObject(), sig2.getHeader().toJSONObject());
 		assertEquals(unprotectedHeader2.toJSONObject(), sig2.getUnprotectedHeader().toJSONObject());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig2.getState());
+		assertFalse(sig2.isVerified());
 		assertTrue(sig2.verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig2.getState());
+		assertTrue(sig2.isVerified());
 		
 		assertEquals(2, jwsObject.getSignatures().size());
 	}
@@ -347,9 +347,9 @@ public class JWSObjectJSONTest extends TestCase {
 		JWSObjectJSON.Signature sig = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader, sig.getHeader());
 		assertNull(sig.getUnprotectedHeader());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig.getState());
+		assertFalse(sig.isVerified());
 		assertTrue(sig.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig.getState());
+		assertTrue(sig.isVerified());
 		
 		assertEquals(1, jwsObject.getSignatures().size());
 		
@@ -381,9 +381,9 @@ public class JWSObjectJSONTest extends TestCase {
 		sig = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader.toJSONObject(), sig.getHeader().toJSONObject());
 		assertNull(sig.getUnprotectedHeader());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig.getState());
+		assertFalse(sig.isVerified());
 		assertTrue(sig.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig.getState());
+		assertTrue(sig.isVerified());
 		
 		assertEquals(1, jwsObject.getSignatures().size());
 	}
@@ -406,9 +406,9 @@ public class JWSObjectJSONTest extends TestCase {
 		JWSObjectJSON.Signature sig = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader, sig.getHeader());
 		assertEquals(unprotectedHeader, sig.getUnprotectedHeader());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig.getState());
+		assertFalse(sig.isVerified());
 		assertTrue(sig.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig.getState());
+		assertTrue(sig.isVerified());
 		
 		assertEquals(1, jwsObject.getSignatures().size());
 		
@@ -442,9 +442,9 @@ public class JWSObjectJSONTest extends TestCase {
 		sig = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader.toJSONObject(), sig.getHeader().toJSONObject());
 		assertEquals(unprotectedHeader.toJSONObject(), sig.getUnprotectedHeader().toJSONObject());
-		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig.getState());
+		assertFalse(sig.isVerified());
 		assertTrue(sig.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
-		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig.getState());
+		assertTrue(sig.isVerified());
 		
 		assertEquals(1, jwsObject.getSignatures().size());
 	}
@@ -643,12 +643,6 @@ public class JWSObjectJSONTest extends TestCase {
 		);
 		
 		assertTrue(sig.verify(new ECDSAVerifier(key.toECPublicKey())));
-	}
-	
-	
-	public void testSignatureStatesEnum() {
-		
-		assertEquals(2, JWSObjectJSON.Signature.State.values().length);
 	}
 	
 	
