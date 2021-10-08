@@ -153,7 +153,6 @@ public class JSONObjectUtils {
 	 *
 	 * @throws ParseException If the value is not of the expected type.
 	 */
-	@SuppressWarnings("unchecked")
 	private static <T> T getGeneric(final Map<String, Object> o, final String key, final Class<T> clazz)
 		throws ParseException {
 
@@ -166,8 +165,10 @@ public class JSONObjectUtils {
 		if (! clazz.isAssignableFrom(value.getClass())) {
 			throw new ParseException("Unexpected type of JSON object member with key " + key + "", 0);
 		}
-
-		return (T)value;
+		
+		@SuppressWarnings("unchecked")
+		T castValue = (T)value;
+		return castValue;
 	}
 
 
@@ -319,7 +320,7 @@ public class JSONObjectUtils {
 	 * @throws ParseException If the value is not of the expected type.
 	 */
 	public static URI getURI(final Map<String, Object> o, final String key)
-			throws ParseException {
+		throws ParseException {
 
 		String value = getString(o, key);
 		
@@ -348,9 +349,11 @@ public class JSONObjectUtils {
 	 * @throws ParseException If the value is not of the expected type.
 	 */
 	public static List<Object> getJSONArray(final Map<String, Object> o, final String key)
-			throws ParseException {
-
-		return getGeneric(o, key, List.class);
+		throws ParseException {
+		
+		@SuppressWarnings("unchecked")
+		List<Object> jsonArray = getGeneric(o, key, List.class);
+		return jsonArray;
 	}
 
 
@@ -365,7 +368,7 @@ public class JSONObjectUtils {
 	 * @throws ParseException If the value is not of the expected type.
 	 */
 	public static String[] getStringArray(final Map<String, Object> o, final String key)
-			throws ParseException {
+		throws ParseException {
 
 		List<Object> jsonArray = getJSONArray(o, key);
 		
@@ -375,9 +378,7 @@ public class JSONObjectUtils {
 
 		try {
 			return jsonArray.toArray(new String[0]);
-
 		} catch (ArrayStoreException e) {
-
 			throw new ParseException("JSON object member with key \"" + key + "\" is not an array of strings", 0);
 		}
 	}
@@ -393,7 +394,7 @@ public class JSONObjectUtils {
 	 * @throws ParseException If the value is not of the expected type.
 	 */
 	public static Map<String, Object>[] getJSONObjectArray(final Map<String, Object> o, final String key)
-			throws ParseException {
+		throws ParseException {
 
 		List<Object> jsonArray = getJSONArray(o, key);
 
@@ -402,10 +403,8 @@ public class JSONObjectUtils {
 		}
 
 		try {
-
 			return jsonArray.toArray(new HashMap[0]);
 		} catch (ArrayStoreException e) {
-
 			throw new ParseException("JSON object member with key \"" + key + "\" is not an array of JSON objects", 0);
 		}
 	}
