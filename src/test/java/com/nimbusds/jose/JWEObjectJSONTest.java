@@ -784,15 +784,6 @@ public class JWEObjectJSONTest extends TestCase {
         assertEquals("Three is a magic number.", jwe.getPayload().toString());
     }
 
-    public void test_kid_is_not_passed() {
-        try {
-            new UnprotectedHeader.Builder().keyID(null).build();
-            fail();
-        } catch (Exception e) {
-            assertEquals("The \"kid\" should be specified", e.getMessage());
-        }
-    }
-
     public void test_unprotected_header_kid_is_not_found() throws Exception {
         OctetKeyPair bobKeyOKP = generateOKP(Curve.X25519, "2");
 
