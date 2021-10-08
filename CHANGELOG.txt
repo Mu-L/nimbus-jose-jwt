@@ -1378,3 +1378,7 @@ version 9.15.1 (2021-09-26)
 version 9.15.2 (2021-09-28)
     * DefaultJWTClaimsVerifier must report the names of missing required claims
       and prohibited claims in sorted order (iss #444).
+
+version 9.16-preview.1 (2021-10-08)
+    * JSONObjectUtils.getJSONObject must accept java.util.Map values (iss
+      #445).

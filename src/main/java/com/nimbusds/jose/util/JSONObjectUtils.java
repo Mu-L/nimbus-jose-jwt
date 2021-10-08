@@ -34,7 +34,7 @@ import net.minidev.json.parser.JSONParser;
  * JSON object helper methods.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-06-04
+ * @version 2021-10-08
  */
 public class JSONObjectUtils {
 
@@ -443,9 +443,11 @@ public class JSONObjectUtils {
 	 * @throws ParseException If the value is not of the expected type.
 	 */
 	public static Map<String, Object> getJSONObject(final Map<String, Object> o, final String key)
-			throws ParseException {
-
-		return getGeneric(o, key, JSONObject.class);
+		throws ParseException {
+		
+		@SuppressWarnings("unchecked")
+		Map<String, Object> jsonObject = getGeneric(o, key, Map.class);
+		return jsonObject;
 	}
 	
 	

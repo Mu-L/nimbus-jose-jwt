@@ -35,7 +35,7 @@ import com.nimbusds.jose.HeaderParameterNames;
  * Tests the JSON object utilities.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-10-01
+ * @version 2021-10-08
  */
 public class JSONObjectUtilsTest extends TestCase {
 
@@ -524,6 +524,18 @@ public class JSONObjectUtilsTest extends TestCase {
 		assertNull(array[1]);
 		
 		assertEquals(2, array.length);
+	}
+	
+	
+	public void testGetJSONObject() throws ParseException {
+		
+		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
+		
+		Map<String, Object> value = JSONObjectUtils.newJSONObject();
+		value.put("one", 1);
+		jsonObject.put("key", value);
+		
+		assertEquals(value, JSONObjectUtils.getJSONObject(jsonObject, "key"));
 	}
 	
 	
