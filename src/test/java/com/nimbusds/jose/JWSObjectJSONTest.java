@@ -18,6 +18,7 @@
 package com.nimbusds.jose;
 
 
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ import com.nimbusds.jose.util.JSONObjectUtils;
  *
  * @author Alexander Martynov
  * @author Vladimir Dzhuvinov
- * @version 2021-10-05
+ * @version 2021-10-08
  */
 public class JWSObjectJSONTest extends TestCase {
 	
@@ -232,6 +233,108 @@ public class JWSObjectJSONTest extends TestCase {
 	}
 	
 	
+	public void testGeneral_twoSignatures_unprotectedHeader()
+		throws Exception {
+		
+		JWSObjectJSON jwsObject = new JWSObjectJSON(PAYLOAD);
+		
+		assertEquals(PAYLOAD, jwsObject.getPayload());
+		assertTrue(jwsObject.getSignatures().isEmpty());
+		
+		JWSHeader jwsHeader1 = new JWSHeader(JWSAlgorithm.ES256K);
+		UnprotectedHeader unprotectedHeader1 = new UnprotectedHeader.Builder()
+			.keyID(EC_JWK.getKeyID())
+			.build();
+		jwsObject.sign(jwsHeader1, unprotectedHeader1, new ECDSASigner(EC_JWK));
+		
+		JWSHeader jwsHeader2 = new JWSHeader(JWSAlgorithm.EdDSA);
+		UnprotectedHeader unprotectedHeader2 = new UnprotectedHeader.Builder()
+			.keyID(OKP_JWK.getKeyID())
+			.build();
+		jwsObject.sign(jwsHeader2, unprotectedHeader2, new Ed25519Signer(OKP_JWK));
+		
+		JWSObjectJSON.Signature sig1 = jwsObject.getSignatures().get(0);
+		assertEquals(jwsHeader1, sig1.getHeader());
+		assertEquals(unprotectedHeader1, sig1.getUnprotectedHeader());
+		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig1.getState());
+		assertTrue(sig1.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
+		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig1.getState());
+		
+		JWSObjectJSON.Signature sig2 = jwsObject.getSignatures().get(1);
+		assertEquals(jwsHeader2, sig2.getHeader());
+		assertEquals(unprotectedHeader2, sig2.getUnprotectedHeader());
+		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig2.getState());
+		assertTrue(sig2.verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
+		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig2.getState());
+		
+		assertEquals(2, jwsObject.getSignatures().size());
+		
+		// Verify signatures via compact JWS
+		assertTrue(new JWSObject(sig1.getHeader().toBase64URL(), PAYLOAD.toBase64URL(), sig1.getSignature()).verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
+		assertTrue(new JWSObject(sig2.getHeader().toBase64URL(), PAYLOAD.toBase64URL(), sig2.getSignature()).verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
+		
+		// Verify general JSON syntax
+		Map<String, Object> jsonObject = jwsObject.toGeneralJSONObject();
+		
+		assertEquals(PAYLOAD.toBase64URL(), JSONObjectUtils.getBase64URL(jsonObject, "payload"));
+		
+		Map<String, Object>[] signatures = JSONObjectUtils.getJSONObjectArray(jsonObject, "signatures");
+		
+		assertEquals(sig1.getHeader().toBase64URL().toString(), signatures[0].get("protected"));
+		assertEquals(sig1.getUnprotectedHeader().toJSONObject(), signatures[0].get("header"));
+		assertEquals(sig1.getSignature().toString(), signatures[0].get("signature"));
+		assertEquals(3, signatures[0].size());
+		
+		assertEquals(sig2.getHeader().toBase64URL().toString(), signatures[1].get("protected"));
+		assertEquals(sig2.getUnprotectedHeader().toJSONObject(), signatures[1].get("header"));
+		assertEquals(sig2.getSignature().toString(), signatures[1].get("signature"));
+		assertEquals(3, signatures[1].size());
+		
+		assertEquals(2, signatures.length);
+		
+		// Verify general JSON syntax
+		String json = jwsObject.serializeGeneral();
+		jsonObject = JSONObjectUtils.parse(json);
+		
+		assertEquals(PAYLOAD.toBase64URL(), JSONObjectUtils.getBase64URL(jsonObject, "payload"));
+		
+		signatures = JSONObjectUtils.getJSONObjectArray(jsonObject, "signatures");
+		
+		assertEquals(sig1.getHeader().toBase64URL().toString(), signatures[0].get("protected"));
+		assertEquals(sig1.getUnprotectedHeader().toJSONObject(), signatures[0].get("header"));
+		assertEquals(sig1.getSignature().toString(), signatures[0].get("signature"));
+		assertEquals(3, signatures[0].size());
+		
+		assertEquals(sig2.getHeader().toBase64URL().toString(), signatures[1].get("protected"));
+		assertEquals(sig2.getUnprotectedHeader().toJSONObject(), signatures[1].get("header"));
+		assertEquals(sig2.getSignature().toString(), signatures[1].get("signature"));
+		assertEquals(3, signatures[1].size());
+		
+		assertEquals(2, signatures.length);
+		
+		// Parse general JSON syntax
+		jwsObject = JWSObjectJSON.parse(json);
+		
+		assertEquals(PAYLOAD.toString(), jwsObject.getPayload().toString());
+		
+		sig1 = jwsObject.getSignatures().get(0);
+		assertEquals(jwsHeader1.toJSONObject(), sig1.getHeader().toJSONObject());
+		assertEquals(unprotectedHeader1.toJSONObject(), sig1.getUnprotectedHeader().toJSONObject());
+		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig1.getState());
+		assertTrue(sig1.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
+		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig1.getState());
+		
+		sig2 = jwsObject.getSignatures().get(1);
+		assertEquals(jwsHeader2.toJSONObject(), sig2.getHeader().toJSONObject());
+		assertEquals(unprotectedHeader2.toJSONObject(), sig2.getUnprotectedHeader().toJSONObject());
+		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig2.getState());
+		assertTrue(sig2.verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
+		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig2.getState());
+		
+		assertEquals(2, jwsObject.getSignatures().size());
+	}
+	
+	
 	public void testFlattened()
 		throws Exception {
 		
@@ -280,6 +383,67 @@ public class JWSObjectJSONTest extends TestCase {
 		sig = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader.toJSONObject(), sig.getHeader().toJSONObject());
 		assertNull(sig.getUnprotectedHeader());
+		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig.getState());
+		assertTrue(sig.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
+		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig.getState());
+		
+		assertEquals(1, jwsObject.getSignatures().size());
+	}
+	
+	
+	public void testFlattened_unprotectedHeader()
+		throws Exception {
+		
+		JWSObjectJSON jwsObject = new JWSObjectJSON(PAYLOAD);
+		
+		assertEquals(PAYLOAD, jwsObject.getPayload());
+		assertTrue(jwsObject.getSignatures().isEmpty());
+		
+		JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.ES256K);
+		UnprotectedHeader unprotectedHeader = new UnprotectedHeader.Builder()
+			.keyID(EC_JWK.getKeyID())
+			.build();
+		jwsObject.sign(jwsHeader, unprotectedHeader, new ECDSASigner(EC_JWK));
+		
+		JWSObjectJSON.Signature sig = jwsObject.getSignatures().get(0);
+		assertEquals(jwsHeader, sig.getHeader());
+		assertEquals(unprotectedHeader, sig.getUnprotectedHeader());
+		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig.getState());
+		assertTrue(sig.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
+		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig.getState());
+		
+		assertEquals(1, jwsObject.getSignatures().size());
+		
+		// Verify signature via compact JWS
+		assertTrue(new JWSObject(sig.getHeader().toBase64URL(), PAYLOAD.toBase64URL(), sig.getSignature()).verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
+		
+		// Verify flattened JSON syntax
+		Map<String, Object> jsonObject = jwsObject.toFlattenedJSONObject();
+		
+		assertEquals(PAYLOAD.toBase64URL(), JSONObjectUtils.getBase64URL(jsonObject, "payload"));
+		assertEquals(sig.getHeader().toBase64URL(), JSONObjectUtils.getBase64URL(jsonObject, "protected"));
+		assertEquals(sig.getUnprotectedHeader().toJSONObject(), JSONObjectUtils.getJSONObject(jsonObject, "header"));
+		assertEquals(sig.getSignature(), JSONObjectUtils.getBase64URL(jsonObject, "signature"));
+		assertEquals(4, jsonObject.size());
+		
+		// Verify general JSON syntax
+		String json = jwsObject.serializeFlattened();
+		jsonObject = JSONObjectUtils.parse(json);
+
+		assertEquals(PAYLOAD.toBase64URL(), JSONObjectUtils.getBase64URL(jsonObject, "payload"));
+		assertEquals(sig.getHeader().toBase64URL(), JSONObjectUtils.getBase64URL(jsonObject, "protected"));
+		assertEquals(sig.getUnprotectedHeader().toJSONObject(), JSONObjectUtils.getJSONObject(jsonObject, "header"));
+		assertEquals(sig.getSignature(), JSONObjectUtils.getBase64URL(jsonObject, "signature"));
+		assertEquals(4, jsonObject.size());
+		
+		// Parse flattened JSON syntax
+		jwsObject = JWSObjectJSON.parse(json);
+		
+		assertEquals(PAYLOAD.toString(), jwsObject.getPayload().toString());
+		
+		sig = jwsObject.getSignatures().get(0);
+		assertEquals(jwsHeader.toJSONObject(), sig.getHeader().toJSONObject());
+		assertEquals(unprotectedHeader.toJSONObject(), sig.getUnprotectedHeader().toJSONObject());
 		assertEquals(JWSObjectJSON.Signature.State.SIGNED, sig.getState());
 		assertTrue(sig.verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
 		assertEquals(JWSObjectJSON.Signature.State.VERIFIED, sig.getState());
@@ -413,6 +577,64 @@ public class JWSObjectJSONTest extends TestCase {
 			fail();
 		} catch (IllegalStateException e) {
 			assertEquals("The flattened JWS JSON serialization requires exactly one signature", e.getMessage());
+		}
+	}
+	
+	
+	public void testPreventSignWhenHeaderParameterNamesIntersect()
+		throws JOSEException {
+		
+		JWSObjectJSON jwsObject = new JWSObjectJSON(PAYLOAD);
+		
+		assertEquals(PAYLOAD, jwsObject.getPayload());
+		assertTrue(jwsObject.getSignatures().isEmpty());
+		
+		JWSHeader jwsHeader = new JWSHeader.Builder(JWSAlgorithm.ES256K)
+			.keyID(EC_JWK.getKeyID())
+			.build();
+		UnprotectedHeader unprotectedHeader = new UnprotectedHeader.Builder()
+			.keyID(EC_JWK.getKeyID())
+			.build();
+		
+		try {
+			jwsObject.sign(jwsHeader, unprotectedHeader, new ECDSASigner(EC_JWK));
+			fail();
+		} catch (IllegalArgumentException e) {
+			assertEquals("The parameters in the JWS protected header and the unprotected header must be disjoint", e.getMessage());
+		}
+	}
+	
+	
+	public void testParse_headerParameterNamesIntersect()
+		throws JOSEException {
+		
+		JWSObjectJSON jwsObject = new JWSObjectJSON(PAYLOAD);
+		
+		assertEquals(PAYLOAD, jwsObject.getPayload());
+		assertTrue(jwsObject.getSignatures().isEmpty());
+		
+		JWSHeader jwsHeader = new JWSHeader.Builder(JWSAlgorithm.ES256K)
+			.keyID(EC_JWK.getKeyID())
+			.build();
+		
+		jwsObject.sign(jwsHeader, null, new ECDSASigner(EC_JWK));
+		
+		Map<String, Object> jsonObject = jwsObject.toFlattenedJSONObject();
+		
+		// Add unprotected header
+		UnprotectedHeader unprotectedHeader = new UnprotectedHeader.Builder()
+			.keyID(EC_JWK.getKeyID())
+			.build();
+		
+		jsonObject.put("header", unprotectedHeader.toJSONObject());
+		
+		String json = JSONObjectUtils.toJSONString(jsonObject);
+		
+		try {
+			JWSObjectJSON.parse(json);
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The parameters in the JWS protected header and the unprotected header must be disjoint", e.getMessage());
 		}
 	}
 }
