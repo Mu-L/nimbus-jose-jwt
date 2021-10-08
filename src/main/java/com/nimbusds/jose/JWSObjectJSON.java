@@ -144,6 +144,30 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 		
 		
 		/**
+		 * Returns a JSON object representation for use in the general
+		 * and flattened serialisations.
+		 *
+		 * @return The JSON object.
+		 */
+		private Map<String, Object> toJSONObject() {
+			
+			Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
+			
+			if (header != null) {
+				jsonObject.put("protected", header.toBase64URL().toString());
+			}
+			
+			if (unprotectedHeader != null && ! unprotectedHeader.getIncludedParams().isEmpty()) {
+				jsonObject.put("header", unprotectedHeader.toJSONObject());
+			}
+			
+			jsonObject.put("signature", signature.toString());
+			
+			return jsonObject;
+		}
+		
+		
+		/**
 		 * Returns {@code true} if the signature was successfully
 		 * verified with a previous call to {@link #verify}.
 		 *
@@ -288,21 +312,7 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 		List<Object> signaturesJSONArray = JSONArrayUtils.newJSONArray();
 		
 		for (Signature signature: getSignatures()) {
-			
-			Map<String, Object> signatureJSONObject = JSONObjectUtils.newJSONObject();
-			
-			JWSHeader jwsHeader = signature.getHeader();
-			if (jwsHeader != null) {
-				signatureJSONObject.put("protected", jwsHeader.toBase64URL().toString());
-			}
-			
-			UnprotectedHeader unprotectedHeader = signature.getUnprotectedHeader();
-			if (unprotectedHeader != null && ! unprotectedHeader.getIncludedParams().isEmpty()) {
-				signatureJSONObject.put("header", unprotectedHeader.toJSONObject());
-			}
-			
-			signatureJSONObject.put("signature", signature.getSignature().toString());
-			
+			Map<String, Object> signatureJSONObject = signature.toJSONObject();
 			signaturesJSONArray.add(signatureJSONObject);
 		}
 		
@@ -320,21 +330,8 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 		}
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
-		
 		jsonObject.put("payload", getPayload().toBase64URL().toString());
-		
-		JWSHeader jwsHeader = getSignatures().get(0).getHeader();
-		if (jwsHeader != null) {
-			jsonObject.put("protected", jwsHeader.toBase64URL().toString());
-		}
-		
-		UnprotectedHeader unprotectedHeader = getSignatures().get(0).getUnprotectedHeader();
-		if (unprotectedHeader != null && ! unprotectedHeader.getIncludedParams().isEmpty()) {
-			jsonObject.put("header", unprotectedHeader.toJSONObject());
-		}
-		
-		jsonObject.put("signature", getSignatures().get(0).getSignature().toString());
-		
+		jsonObject.putAll(getSignatures().get(0).toJSONObject());
 		return jsonObject;
 	}
 	
