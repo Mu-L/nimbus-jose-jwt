@@ -21,6 +21,7 @@ package com.nimbusds.jose;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Map;
+import java.util.Objects;
 
 import com.nimbusds.jose.util.JSONObjectUtils;
 
@@ -183,7 +184,7 @@ public abstract class JOSEObjectJSON implements Serializable {
 		if (jsonObject.containsKey("signature") || jsonObject.containsKey("signatures")) {
 			return JWSObjectJSON.parse(jsonObject);
 		} else if (jsonObject.containsKey("ciphertext")) {
-			return null; // TODO
+			throw new ParseException("JWE JSON not supported", 0); // TODO
 		} else {
 			throw new ParseException("Invalid JOSE object", 0);
 		}
@@ -203,6 +204,8 @@ public abstract class JOSEObjectJSON implements Serializable {
 	 */
 	public static JOSEObjectJSON parse(final String json)
 		throws ParseException {
+		
+		Objects.requireNonNull(json);
 
 		return parse(JSONObjectUtils.parse(json));
 	}
