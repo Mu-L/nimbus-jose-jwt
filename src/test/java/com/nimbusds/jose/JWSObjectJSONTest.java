@@ -40,7 +40,7 @@ import com.nimbusds.jose.util.JSONObjectUtils;
  *
  * @author Alexander Martynov
  * @author Vladimir Dzhuvinov
- * @version 2021-10-08
+ * @version 2021-10-09
  */
 public class JWSObjectJSONTest extends TestCase {
 	
@@ -83,7 +83,7 @@ public class JWSObjectJSONTest extends TestCase {
 		assertEquals(JWSObjectJSON.State.UNSIGNED, jwsObject.getState());
 		
 		JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.ES256K);
-		jwsObject.sign(jwsHeader, null, new ECDSASigner(EC_JWK));
+		jwsObject.sign(jwsHeader, new ECDSASigner(EC_JWK));
 		assertEquals(JWSObjectJSON.State.SIGNED, jwsObject.getState());
 		
 		JWSObjectJSON.Signature sig = jwsObject.getSignatures().get(0);
@@ -158,11 +158,11 @@ public class JWSObjectJSONTest extends TestCase {
 		assertEquals(JWSObjectJSON.State.UNSIGNED, jwsObject.getState());
 		
 		JWSHeader jwsHeader1 = new JWSHeader(JWSAlgorithm.ES256K);
-		jwsObject.sign(jwsHeader1, null, new ECDSASigner(EC_JWK));
+		jwsObject.sign(jwsHeader1, new ECDSASigner(EC_JWK));
 		assertEquals(JWSObjectJSON.State.SIGNED, jwsObject.getState());
 		
 		JWSHeader jwsHeader2 = new JWSHeader(JWSAlgorithm.EdDSA);
-		jwsObject.sign(jwsHeader2, null, new Ed25519Signer(OKP_JWK));
+		jwsObject.sign(jwsHeader2, new Ed25519Signer(OKP_JWK));
 		assertEquals(JWSObjectJSON.State.SIGNED, jwsObject.getState());
 		
 		JWSObjectJSON.Signature sig1 = jwsObject.getSignatures().get(0);
@@ -364,7 +364,7 @@ public class JWSObjectJSONTest extends TestCase {
 		assertTrue(jwsObject.getSignatures().isEmpty());
 		
 		JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.ES256K);
-		jwsObject.sign(jwsHeader, null, new ECDSASigner(EC_JWK));
+		jwsObject.sign(jwsHeader, new ECDSASigner(EC_JWK));
 		
 		JWSObjectJSON.Signature sig = jwsObject.getSignatures().get(0);
 		assertEquals(jwsHeader, sig.getHeader());
@@ -477,8 +477,8 @@ public class JWSObjectJSONTest extends TestCase {
 		
 		JWSObjectJSON jwsObject = new JWSObjectJSON(PAYLOAD);
 		
-		jwsObject.sign(new JWSHeader(JWSAlgorithm.ES256K), null, new ECDSASigner(EC_JWK));
-		jwsObject.sign(new JWSHeader(JWSAlgorithm.EdDSA), null, new Ed25519Signer(OKP_JWK));
+		jwsObject.sign(new JWSHeader(JWSAlgorithm.ES256K), new ECDSASigner(EC_JWK));
+		jwsObject.sign(new JWSHeader(JWSAlgorithm.EdDSA), new Ed25519Signer(OKP_JWK));
 		
 		assertEquals(2, jwsObject.getSignatures().size());
 		
@@ -751,7 +751,7 @@ public class JWSObjectJSONTest extends TestCase {
 			.keyID(EC_JWK.getKeyID())
 			.build();
 		
-		jwsObject.sign(jwsHeader, null, new ECDSASigner(EC_JWK));
+		jwsObject.sign(jwsHeader, new ECDSASigner(EC_JWK));
 		
 		Map<String, Object> jsonObject = jwsObject.toFlattenedJSONObject();
 		

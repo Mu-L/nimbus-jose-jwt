@@ -39,7 +39,7 @@ import com.nimbusds.jose.util.StandardCharset;
  *
  * @author Alexander Martynov
  * @author Vladimir Dzhuvinov
- * @version 2021-10-08
+ * @version 2021-10-09
  */
 @ThreadSafe
 public class JWSObjectJSON extends JOSEObjectJSON {
@@ -289,6 +289,26 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 	public List<Signature> getSignatures() {
 		
 		return Collections.unmodifiableList(signatures);
+	}
+	
+	
+	/**
+	 * Signs this JWS secured object with the specified JWS signer and
+	 * adds the resulting signature to it. To add multiple
+	 * {@link #getSignatures() signatures} call this method successively.
+	 *
+	 * @param jwsHeader The JWS protected header. The algorithm specified
+	 *                  by the header must be supported by the JWS signer.
+	 *                  Must not be {@code null}.
+	 * @param signer    The JWS signer. Must not be {@code null}.
+	 *
+	 * @throws JOSEException If the JWS object couldn't be signed.
+	 */
+	public synchronized void sign(final JWSHeader jwsHeader,
+				      final JWSSigner signer)
+		throws JOSEException {
+		
+		sign(jwsHeader, null, signer);
 	}
 	
 	
