@@ -108,7 +108,7 @@ public class JWSObjectJSONTest extends TestCase {
 		assertEquals(JWSObjectJSON.State.VERIFIED, jwsObject.getState());
 		
 		// Verify signature via compact JWS
-		assertTrue(new JWSObject(sig.getHeader().toBase64URL(), PAYLOAD.toBase64URL(), sig.getSignature()).verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
+		assertTrue(sig.toJWSObject().verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
 		
 		// Verify general JSON syntax
 		Map<String, Object> jsonObject = jwsObject.toGeneralJSONObject();
@@ -196,8 +196,8 @@ public class JWSObjectJSONTest extends TestCase {
 		assertEquals(2, jwsObject.getSignatures().size());
 		
 		// Verify signatures via compact JWS
-		assertTrue(new JWSObject(sig1.getHeader().toBase64URL(), PAYLOAD.toBase64URL(), sig1.getSignature()).verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
-		assertTrue(new JWSObject(sig2.getHeader().toBase64URL(), PAYLOAD.toBase64URL(), sig2.getSignature()).verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
+		assertTrue(sig1.toJWSObject().verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
+		assertTrue(sig2.toJWSObject().verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
 		
 		// Verify general JSON syntax
 		Map<String, Object> jsonObject = jwsObject.toGeneralJSONObject();
@@ -300,8 +300,8 @@ public class JWSObjectJSONTest extends TestCase {
 		assertEquals(2, jwsObject.getSignatures().size());
 		
 		// Verify signatures via compact JWS
-		assertTrue(new JWSObject(sig1.getHeader().toBase64URL(), PAYLOAD.toBase64URL(), sig1.getSignature()).verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
-		assertTrue(new JWSObject(sig2.getHeader().toBase64URL(), PAYLOAD.toBase64URL(), sig2.getSignature()).verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
+		assertTrue(sig1.toJWSObject().verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
+		assertTrue(sig2.toJWSObject().verify(new Ed25519Verifier(OKP_JWK.toPublicJWK())));
 		
 		// Verify general JSON syntax
 		Map<String, Object> jsonObject = jwsObject.toGeneralJSONObject();
@@ -386,7 +386,7 @@ public class JWSObjectJSONTest extends TestCase {
 		assertEquals(1, jwsObject.getSignatures().size());
 		
 		// Verify signature via compact JWS
-		assertTrue(new JWSObject(sig.getHeader().toBase64URL(), PAYLOAD.toBase64URL(), sig.getSignature()).verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
+		assertTrue(sig.toJWSObject().verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
 		
 		// Verify flattened JSON syntax
 		Map<String, Object> jsonObject = jwsObject.toFlattenedJSONObject();
@@ -445,7 +445,7 @@ public class JWSObjectJSONTest extends TestCase {
 		assertEquals(1, jwsObject.getSignatures().size());
 		
 		// Verify signature via compact JWS
-		assertTrue(new JWSObject(sig.getHeader().toBase64URL(), PAYLOAD.toBase64URL(), sig.getSignature()).verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
+		assertTrue(sig.toJWSObject().verify(new ECDSAVerifier(EC_JWK.toPublicJWK())));
 		
 		// Verify flattened JSON syntax
 		Map<String, Object> jsonObject = jwsObject.toFlattenedJSONObject();

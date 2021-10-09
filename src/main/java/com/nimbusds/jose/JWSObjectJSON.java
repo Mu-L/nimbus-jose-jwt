@@ -28,7 +28,6 @@ import net.jcip.annotations.ThreadSafe;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONArrayUtils;
 import com.nimbusds.jose.util.JSONObjectUtils;
-import com.nimbusds.jose.util.StandardCharset;
 
 
 /**
@@ -168,6 +167,22 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 		
 		
 		/**
+		 * Returns the compact JWS object representation of this
+		 * individual signature.
+		 *
+		 * @return The JWS object serialisable to compact encoding.
+		 */
+		public JWSObject toJWSObject() {
+			
+			try {
+				return new JWSObject(header.toBase64URL(), payload.toBase64URL(), signature);
+			} catch (ParseException e) {
+				throw new IllegalStateException();
+			}
+		}
+		
+		
+		/**
 		 * Returns {@code true} if the signature was successfully
 		 * verified with a previous call to {@link #verify}.
 		 *
@@ -193,12 +208,8 @@ public class JWSObjectJSON extends JOSEObjectJSON {
 		public synchronized boolean verify(final JWSVerifier verifier)
 			throws JOSEException {
 			
-			String signingInput = header.toBase64URL().toString() + '.' + payload.toBase64URL().toString();
-			
 			try {
-				verified.set(
-					verifier.verify(header, signingInput.getBytes(StandardCharset.UTF_8), getSignature())
-				);
+				verified.set(toJWSObject().verify(verifier));
 			} catch (JOSEException e) {
 				throw e;
 			} catch (Exception e) {
