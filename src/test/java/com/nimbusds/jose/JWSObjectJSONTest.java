@@ -73,6 +73,16 @@ public class JWSObjectJSONTest extends TestCase {
 		}
 	}
 	
+	
+	public void testStateEnum() {
+		
+		assertEquals("UNSIGNED", JWSObjectJSON.State.UNSIGNED.name());
+		assertEquals("SIGNED", JWSObjectJSON.State.SIGNED.name());
+		assertEquals("VERIFIED", JWSObjectJSON.State.VERIFIED.name());
+		assertEquals(3, JWSObjectJSON.State.values().length);
+	}
+	
+	
 	public void testGeneral_singleSignature()
 		throws Exception {
 		
