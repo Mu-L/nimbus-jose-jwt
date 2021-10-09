@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
 	<head>
 		<title>Nimbus JOSE + JWT</title>
 	</head>
@@ -6,18 +6,31 @@
 	<body>
 		<h3>Nimbus JOSE + JWT</h3>
 		
-		<p>Create, parse and process JOSE and JWT objects:</p>
+		<p>Create, parse and process:</p>
 		
 		<ul>
-			<li>{@link com.nimbusds.jose.PlainObject Unsecured (alg=none) JOSE objects}.</li>
-			<li>{@link com.nimbusds.jose.JWSObject JSON Web Signature (JWS) objects}.</li>
-			<li>{@link com.nimbusds.jose.JWEObject JSON Web Encryption (JWE) objects}.</li>
-			<li>{@link com.nimbusds.jose.jwk.JWK JSON Web Key (JWK) objects} and 
-			    {@link com.nimbusds.jose.jwk.JWKSet JWK Sets}.</li>
-			<li>{@link com.nimbusds.jwt.PlainJWT Unsecured},
-			    {@link com.nimbusds.jwt.SignedJWT signed} and 
-			    {@link com.nimbusds.jwt.EncryptedJWT encrypted} 
-			    {@link com.nimbusds.jwt.JWT JSON Web Tokens (JWTs)}.</li>
+			<li>JOSE secured objects:
+				<ul>
+					<li>With compact URL-safe serialisation:
+						<ul>
+							<li>{@link com.nimbusds.jose.JWSObject JSON Web Signature (JWS) objects}</li>
+							<li>{@link com.nimbusds.jose.JWEObject JSON Web Encryption (JWE) objects}</li>
+							<li>{@link com.nimbusds.jose.PlainObject Unsecured (alg=none) JOSE objects}</li>
+							<li>{@link com.nimbusds.jwt.SignedJWT Signed},
+								{@link com.nimbusds.jwt.EncryptedJWT encrypted} and
+								{@link com.nimbusds.jwt.PlainJWT unsecured}
+								{@link com.nimbusds.jwt.JWT JSON Web Tokens (JWTs)}</li>
+						</ul>
+					</li>
+					<li>With JSON serialisation:
+						<ul>
+							<li>{@link com.nimbusds.jose.JWSObjectJSON JWS JSON objects} with one or more signatures.</li>
+							<li>{@link com.nimbusds.jose.JWEObjectJSON JWE JSON objects} with one or more recipients.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>{@link com.nimbusds.jose.jwk.JWK JSON Web Key (JWK) objects} and {@link com.nimbusds.jose.jwk.JWKSet JWK sets}</li>
 		</ul>
 
 		<p>A framework for secure application-specific
@@ -32,7 +45,7 @@
 		<ol>
 			<li>HMAC integrity protection: HS256, HS384 and HS512</li>
 			<li>RSA signatures: RS256, RS384, RS512, PS256, PS384 and PS512.</li>
-			<li>EC signatures: ES256, ES256K, ES384 andES512</li>
+			<li>EC signatures: ES256, ES256K, ES384 and ES512</li>
 			<li>EdDSA signatures: EdDSA</li>
 		</ol>
 
@@ -84,8 +97,8 @@
 		<p>Dependencies (see the Maven pom.xml for details):</p>
 		
 		<ol>
-			<li>JSON Smart for highly efficient parsing and serialisation of JSON.</li>
-			<li>JCIP for concurrency annotations.</li>
+			<li>JCIP for concurrency annotations</li>
+			<li>[shadowed] JSON Smart for efficient parsing and serialisation of JSON</li>
 			<li>[optional] BouncyCastle as an alternative JCA provider and for selected key and certificate utilities</li>
 			<li>[optional] Google Tink for OKP key generation, EdDSA with Ed25519, ECDH with X25519 and content encryption with XC20P</li>
 		</ol>

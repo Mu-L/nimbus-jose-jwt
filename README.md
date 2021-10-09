@@ -1,9 +1,9 @@
 # Nimbus JOSE + JWT
 
-* The most popular and robust Java and Android library for JSON Web Tokens 
+* The most popular and robust Java 7+ and Android library for JSON Web Tokens 
   (JWT)
-* Supports all standard signature (JWS) and encryption (JWE) algorithms plus 
-  secp256k1 used in Bitcoin and Ethereum
+* Supports all standard signature (JWS) and encryption (JWE) algorithms, 
+  including recent developments such secp256k1, ECDH-1PU and XC20P
 * Open source Apache 2.0 license
 
 Check out the [library homepage](https://connect2id.com/products/nimbus-jose-jwt) 
@@ -12,15 +12,18 @@ for more info and examples.
 
 ## Full compact JOSE and JWT support
 
-Create, serialise and process compact-encoded:
+Create, parse and process:
 
-* Plain (unsecured) JOSE objects
-* JSON Web Signature (JWS) objects
-* JSON Web Encryption (JWE) objects
+* JOSE secured objects:
+  * With compact URL-safe serialisation:
+    * JSON Web Signature (JWS) objects
+    * JSON Web Encryption (JWE) objects
+    * Unsecured (alg=none) JOSE objects
+    * Signed, encrypted and unsecured JSON Web Tokens (JWTs)
+* With JSON serialisation:
+  * JWS JSON objects with one or more signatures
+  * JWE JSON objects with one or more recipients
 * JSON Web Key (JWK) objects and JWK sets
-* Plain, signed and encrypted JSON Web Tokens (JWTs)
-
-The less frequently used alternative JSON encoding is on the road map.
 
 
 ## Supported JOSE algorithms
