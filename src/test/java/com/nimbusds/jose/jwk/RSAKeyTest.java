@@ -1298,7 +1298,7 @@ public class RSAKeyTest extends TestCase {
 		throws Exception {
 		
 		MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), StandardCharsets.UTF_8);
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), StandardCharset.UTF_8);
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		RSAKey rsaKey = RSAKey.parse(cert);
 		
@@ -1316,7 +1316,7 @@ public class RSAKeyTest extends TestCase {
 	public void testParseFromX509CertWithECPublicKey()
 		throws Exception {
 		
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), StandardCharsets.UTF_8);
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), StandardCharset.UTF_8);
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		
 		try {
@@ -1478,7 +1478,7 @@ public class RSAKeyTest extends TestCase {
 		char[] password = "secret".toCharArray();
 		keyStore.load(null, password);
 		
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), StandardCharsets.UTF_8);
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), StandardCharset.UTF_8);
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		
 		keyStore.setCertificateEntry("1", cert);
@@ -1504,7 +1504,7 @@ public class RSAKeyTest extends TestCase {
 		char[] password = "secret".toCharArray();
 		keyStore.load(null, password);
 		
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), StandardCharsets.UTF_8);
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), StandardCharset.UTF_8);
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		
 		keyStore.setCertificateEntry("1", cert);

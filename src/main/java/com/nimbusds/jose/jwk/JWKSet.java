@@ -425,7 +425,7 @@ public class JWKSet implements Serializable {
 	public static JWKSet load(final InputStream inputStream)
 		throws IOException, ParseException {
 
-		return parse(IOUtils.readInputStreamToString(inputStream, StandardCharsets.UTF_8));
+		return parse(IOUtils.readInputStreamToString(inputStream, StandardCharset.UTF_8));
 	}
 
 
@@ -443,7 +443,7 @@ public class JWKSet implements Serializable {
 	public static JWKSet load(final File file)
 		throws IOException, ParseException {
 
-		return parse(IOUtils.readFileToString(file, StandardCharsets.UTF_8));
+		return parse(IOUtils.readFileToString(file, StandardCharset.UTF_8));
 	}
 
 

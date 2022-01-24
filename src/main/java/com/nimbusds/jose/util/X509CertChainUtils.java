@@ -137,7 +137,7 @@ public class X509CertChainUtils {
 	public static List<X509Certificate> parse(final File pemFile)
 		throws IOException, CertificateException {
 		
-		final String pemString = new String(Files.readAllBytes(pemFile.toPath()), StandardCharsets.UTF_8);
+		final String pemString = new String(Files.readAllBytes(pemFile.toPath()), StandardCharset.UTF_8);
 		return parse(pemString);
 	}
 	

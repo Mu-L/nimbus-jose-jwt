@@ -36,12 +36,12 @@ public class DeflateUtilsTest extends TestCase  {
 		throws Exception {
 
 		final String text = "Hello world!";
-		final byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
+		final byte[] textBytes = text.getBytes(StandardCharset.UTF_8);
 
 		byte[] compressed = DeflateUtils.compress(textBytes);
 
 		byte[] textBytesDecompressed = DeflateUtils.decompress(compressed);
-		String textDecompressed = new String(textBytesDecompressed, StandardCharsets.UTF_8);
+		String textDecompressed = new String(textBytesDecompressed, StandardCharset.UTF_8);
 
 		assertEquals("byte length check", textBytes.length, textBytesDecompressed.length);
 

@@ -21,7 +21,6 @@ package com.nimbusds.jose.jwk.source;
 import java.io.FileNotFoundException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
@@ -44,6 +43,7 @@ import com.nimbusds.jose.RemoteKeySourceException;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.util.DefaultResourceRetriever;
 import com.nimbusds.jose.util.JSONObjectUtils;
+import com.nimbusds.jose.util.StandardCharset;
 
 
 public class RemoteJWKSetTest {
@@ -224,7 +224,7 @@ public class RemoteJWKSetTest {
 						return StubResponse.builder()
 							.status(200)
 							.header("Content-Type", "application/json")
-							.body( JSONObjectUtils.toJSONString(new JWKSet(Arrays.asList(rsaJWK1, (JWK)rsaJWK2)).toJSONObject()), StandardCharsets.UTF_8)
+							.body( JSONObjectUtils.toJSONString(new JWKSet(Arrays.asList(rsaJWK1, (JWK)rsaJWK2)).toJSONObject()), StandardCharset.UTF_8)
 							.build();
 					}
 
@@ -232,7 +232,7 @@ public class RemoteJWKSetTest {
 					return StubResponse.builder()
 						.status(200)
 						.header("Content-Type", "application/json")
-						.body( JSONObjectUtils.toJSONString(new JWKSet(Arrays.asList(rsaJWK1, rsaJWK2, (JWK)rsaJWK3)).toJSONObject()), StandardCharsets.UTF_8)
+						.body( JSONObjectUtils.toJSONString(new JWKSet(Arrays.asList(rsaJWK1, rsaJWK2, (JWK)rsaJWK3)).toJSONObject()), StandardCharset.UTF_8)
 						.build();
 				}
 			});

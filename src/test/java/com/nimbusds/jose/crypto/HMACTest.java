@@ -18,7 +18,6 @@
 package com.nimbusds.jose.crypto;
 
 
-import java.nio.charset.StandardCharsets;
 import java.security.Provider;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -30,6 +29,7 @@ import org.junit.Assert;
 import com.nimbusds.jose.crypto.impl.HMAC;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.ByteUtils;
+import com.nimbusds.jose.util.StandardCharset;
 
 
 /**
@@ -46,9 +46,9 @@ public class HMACTest extends TestCase {
 
 		// Vectors from http://openidtest.uninett.no/jwt#
 
-		byte[] msg = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJodHRwczovL2V4YW1wbGUub3JnIiwidHlwIjoiSldUIn0".getBytes(StandardCharsets.UTF_8);
+		byte[] msg = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJodHRwczovL2V4YW1wbGUub3JnIiwidHlwIjoiSldUIn0".getBytes(StandardCharset.UTF_8);
 		byte[] mac = new Base64URL("eagkgLML8Ccrn4eIvidX4a10JBE4Q3eaOAf4Blj9P4c").decode();
-		byte[] key = "1879197b29d8ec57".getBytes(StandardCharsets.UTF_8);
+		byte[] key = "1879197b29d8ec57".getBytes(StandardCharset.UTF_8);
 		
 		assertEquals(16, key.length);
 
@@ -65,9 +65,9 @@ public class HMACTest extends TestCase {
 
 		// Vectors from http://openidtest.uninett.no/jwt#
 
-		byte[] msg = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJodHRwczovL2V4YW1wbGUub3JnIiwidHlwIjoiSldUIn0".getBytes(StandardCharsets.UTF_8);
+		byte[] msg = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJodHRwczovL2V4YW1wbGUub3JnIiwidHlwIjoiSldUIn0".getBytes(StandardCharset.UTF_8);
 		byte[] mac = new Base64URL("eagkgLML8Ccrn4eIvidX4a10JBE4Q3eaOAf4Blj9P4c").decode();
-		byte[] key = "1879197b29d8ec57".getBytes(StandardCharsets.UTF_8);
+		byte[] key = "1879197b29d8ec57".getBytes(StandardCharset.UTF_8);
 		
 		assertEquals(16, key.length);
 
@@ -85,9 +85,9 @@ public class HMACTest extends TestCase {
 		byte[] secret = new byte[32];
 		new SecureRandom().nextBytes(secret);
 		
-		byte[] computedHmac = HMAC.compute("HMACSHA256", secret, "Hello, world!".getBytes(StandardCharsets.UTF_8), null);
+		byte[] computedHmac = HMAC.compute("HMACSHA256", secret, "Hello, world!".getBytes(StandardCharset.UTF_8), null);
 		
-		byte[] secondHmac = HMAC.compute("HMACSHA256", ByteUtils.concat(secret, secret), "Hello, world!".getBytes(StandardCharsets.UTF_8), null);
+		byte[] secondHmac = HMAC.compute("HMACSHA256", ByteUtils.concat(secret, secret), "Hello, world!".getBytes(StandardCharset.UTF_8), null);
 		
 		assertFalse(Arrays.equals(computedHmac, secondHmac));
 	}

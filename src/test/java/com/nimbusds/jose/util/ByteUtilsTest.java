@@ -60,7 +60,7 @@ public class ByteUtilsTest extends TestCase {
 	public void testHashTruncation()
 		throws Exception {
 		
-		byte[] hash = MessageDigest.getInstance("SHA-256").digest("Hello, world!".getBytes(StandardCharsets.UTF_8));
+		byte[] hash = MessageDigest.getInstance("SHA-256").digest("Hello, world!".getBytes(StandardCharset.UTF_8));
 		
 		byte[] firstHalf  = ByteUtils.subArray(hash, ByteUtils.byteLength(0),   ByteUtils.byteLength(128));
 		byte[] secondHalf = ByteUtils.subArray(hash, ByteUtils.byteLength(128), ByteUtils.byteLength(128));

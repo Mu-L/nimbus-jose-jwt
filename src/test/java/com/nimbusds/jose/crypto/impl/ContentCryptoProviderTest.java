@@ -18,7 +18,6 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -32,6 +31,7 @@ import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.jca.JWEJCAContext;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.ByteUtils;
+import com.nimbusds.jose.util.StandardCharset;
 
 
 /**
@@ -78,7 +78,7 @@ public class ContentCryptoProviderTest extends TestCase {
 		throws Exception {
 
 		final JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256CBC_HS512);
-		final byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
+		final byte[] clearText = "Hello world!".getBytes(StandardCharset.UTF_8);
 		byte[] cekBytes = new byte[64];
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
@@ -107,7 +107,7 @@ public class ContentCryptoProviderTest extends TestCase {
 		throws Exception {
 
 		final JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256CBC_HS512);
-		final byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
+		final byte[] clearText = "Hello world!".getBytes(StandardCharset.UTF_8);
 		byte[] cekBytes = new byte[32];
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
@@ -136,7 +136,7 @@ public class ContentCryptoProviderTest extends TestCase {
 		throws Exception {
 
 		final JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256GCM);
-		final byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
+		final byte[] clearText = "Hello world!".getBytes(StandardCharset.UTF_8);
 		byte[] cekBytes = new byte[16];
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");

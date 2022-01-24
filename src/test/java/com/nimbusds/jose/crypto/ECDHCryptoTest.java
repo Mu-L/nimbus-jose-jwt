@@ -18,7 +18,6 @@
 package com.nimbusds.jose.crypto;
 
 
-import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.ECPrivateKey;
@@ -44,6 +43,7 @@ import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.ByteUtils;
 import com.nimbusds.jose.util.Container;
+import com.nimbusds.jose.util.StandardCharset;
 
 
 /**
@@ -509,7 +509,7 @@ public class ECDHCryptoTest extends TestCase {
 		final AuthenticatedCipherText authCipherText = AESCBC.encryptAuthenticated(
 			derivedKey,
 			iv.decode(),
-			plainText.getBytes(StandardCharsets.UTF_8),
+			plainText.getBytes(StandardCharset.UTF_8),
 			aad,
 			null,
 			null);
@@ -601,7 +601,7 @@ public class ECDHCryptoTest extends TestCase {
 		final AuthenticatedCipherText authCipherText = AESGCM.encrypt(
 			cek,
 			new Container<>(iv.decode()),
-			plainText.getBytes(StandardCharsets.UTF_8),
+			plainText.getBytes(StandardCharset.UTF_8),
 			aad,
 			BouncyCastleProviderSingleton.getInstance()); // Provider
 

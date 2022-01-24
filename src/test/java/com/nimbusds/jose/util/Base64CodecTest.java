@@ -113,48 +113,48 @@ public class Base64CodecTest extends TestCase {
 
 	public void testEncode() {
 
-		assertEquals("YWE+", Base64Codec.encodeToString("aa>".getBytes(StandardCharsets.UTF_8), false));
-		assertEquals("YmI/", Base64Codec.encodeToString("bb?".getBytes(StandardCharsets.UTF_8), false));
+		assertEquals("YWE+", Base64Codec.encodeToString("aa>".getBytes(StandardCharset.UTF_8), false));
+		assertEquals("YmI/", Base64Codec.encodeToString("bb?".getBytes(StandardCharset.UTF_8), false));
 
 		// Test vectors from rfc4648#section-10
-		assertEquals("", Base64Codec.encodeToString("".getBytes(StandardCharsets.UTF_8), false));
-		assertEquals("Zg==", Base64Codec.encodeToString("f".getBytes(StandardCharsets.UTF_8), false));
-		assertEquals("Zm8=", Base64Codec.encodeToString("fo".getBytes(StandardCharsets.UTF_8), false));
-		assertEquals("Zm9v", Base64Codec.encodeToString("foo".getBytes(StandardCharsets.UTF_8), false));
-		assertEquals("Zm9vYg==", Base64Codec.encodeToString("foob".getBytes(StandardCharsets.UTF_8), false));
-		assertEquals("Zm9vYmE=", Base64Codec.encodeToString("fooba".getBytes(StandardCharsets.UTF_8), false));
-		assertEquals("Zm9vYmFy", Base64Codec.encodeToString("foobar".getBytes(StandardCharsets.UTF_8), false));
+		assertEquals("", Base64Codec.encodeToString("".getBytes(StandardCharset.UTF_8), false));
+		assertEquals("Zg==", Base64Codec.encodeToString("f".getBytes(StandardCharset.UTF_8), false));
+		assertEquals("Zm8=", Base64Codec.encodeToString("fo".getBytes(StandardCharset.UTF_8), false));
+		assertEquals("Zm9v", Base64Codec.encodeToString("foo".getBytes(StandardCharset.UTF_8), false));
+		assertEquals("Zm9vYg==", Base64Codec.encodeToString("foob".getBytes(StandardCharset.UTF_8), false));
+		assertEquals("Zm9vYmE=", Base64Codec.encodeToString("fooba".getBytes(StandardCharset.UTF_8), false));
+		assertEquals("Zm9vYmFy", Base64Codec.encodeToString("foobar".getBytes(StandardCharset.UTF_8), false));
 	}
 
 
 	public void testEncodeUrlSafe() {
 
-		assertEquals("YWE-", Base64Codec.encodeToString("aa>".getBytes(StandardCharsets.UTF_8), true));
-		assertEquals("YmI_", Base64Codec.encodeToString("bb?".getBytes(StandardCharsets.UTF_8), true));
+		assertEquals("YWE-", Base64Codec.encodeToString("aa>".getBytes(StandardCharset.UTF_8), true));
+		assertEquals("YmI_", Base64Codec.encodeToString("bb?".getBytes(StandardCharset.UTF_8), true));
 
 		// Test vectors from rfc4648#section-10 with stripped padding
-		assertEquals("", Base64Codec.encodeToString("".getBytes(StandardCharsets.UTF_8), true));
-		assertEquals("Zg", Base64Codec.encodeToString("f".getBytes(StandardCharsets.UTF_8), true));
-		assertEquals("Zm8", Base64Codec.encodeToString("fo".getBytes(StandardCharsets.UTF_8), true));
-		assertEquals("Zm9v", Base64Codec.encodeToString("foo".getBytes(StandardCharsets.UTF_8), true));
-		assertEquals("Zm9vYg", Base64Codec.encodeToString("foob".getBytes(StandardCharsets.UTF_8), true));
-		assertEquals("Zm9vYmE", Base64Codec.encodeToString("fooba".getBytes(StandardCharsets.UTF_8), true));
-		assertEquals("Zm9vYmFy", Base64Codec.encodeToString("foobar".getBytes(StandardCharsets.UTF_8), true));
+		assertEquals("", Base64Codec.encodeToString("".getBytes(StandardCharset.UTF_8), true));
+		assertEquals("Zg", Base64Codec.encodeToString("f".getBytes(StandardCharset.UTF_8), true));
+		assertEquals("Zm8", Base64Codec.encodeToString("fo".getBytes(StandardCharset.UTF_8), true));
+		assertEquals("Zm9v", Base64Codec.encodeToString("foo".getBytes(StandardCharset.UTF_8), true));
+		assertEquals("Zm9vYg", Base64Codec.encodeToString("foob".getBytes(StandardCharset.UTF_8), true));
+		assertEquals("Zm9vYmE", Base64Codec.encodeToString("fooba".getBytes(StandardCharset.UTF_8), true));
+		assertEquals("Zm9vYmFy", Base64Codec.encodeToString("foobar".getBytes(StandardCharset.UTF_8), true));
 	}
 
 
 	public void testDecode() {
 
-		assertEquals("aa>", new String(Base64Codec.decode("YWE+"), StandardCharsets.UTF_8));
-		assertEquals("bb?", new String(Base64Codec.decode("YmI/"), StandardCharsets.UTF_8));
+		assertEquals("aa>", new String(Base64Codec.decode("YWE+"), StandardCharset.UTF_8));
+		assertEquals("bb?", new String(Base64Codec.decode("YmI/"), StandardCharset.UTF_8));
 
-		assertEquals("", new String(Base64Codec.decode(""), StandardCharsets.UTF_8));
-		assertEquals("f", new String(Base64Codec.decode("Zg=="), StandardCharsets.UTF_8));
-		assertEquals("fo", new String(Base64Codec.decode("Zm8="), StandardCharsets.UTF_8));
-		assertEquals("foo", new String(Base64Codec.decode("Zm9v"), StandardCharsets.UTF_8));
-		assertEquals("foob", new String(Base64Codec.decode("Zm9vYg=="), StandardCharsets.UTF_8));
-		assertEquals("fooba", new String(Base64Codec.decode("Zm9vYmE="), StandardCharsets.UTF_8));
-		assertEquals("foobar", new String(Base64Codec.decode("Zm9vYmFy"), StandardCharsets.UTF_8));
+		assertEquals("", new String(Base64Codec.decode(""), StandardCharset.UTF_8));
+		assertEquals("f", new String(Base64Codec.decode("Zg=="), StandardCharset.UTF_8));
+		assertEquals("fo", new String(Base64Codec.decode("Zm8="), StandardCharset.UTF_8));
+		assertEquals("foo", new String(Base64Codec.decode("Zm9v"), StandardCharset.UTF_8));
+		assertEquals("foob", new String(Base64Codec.decode("Zm9vYg=="), StandardCharset.UTF_8));
+		assertEquals("fooba", new String(Base64Codec.decode("Zm9vYmE="), StandardCharset.UTF_8));
+		assertEquals("foobar", new String(Base64Codec.decode("Zm9vYmFy"), StandardCharset.UTF_8));
 	}
 
 	// TODO Disable to pass test in low memory SonarCube containers
@@ -164,39 +164,39 @@ public class Base64CodecTest extends TestCase {
 
 	public void testDecodeWithIllegalChars() {
 
-		assertEquals("", new String(Base64Codec.decode("\n"), StandardCharsets.UTF_8));
-		assertEquals("f", new String(Base64Codec.decode("Zg==\n"), StandardCharsets.UTF_8));
-		assertEquals("fo", new String(Base64Codec.decode("Zm8=\n"), StandardCharsets.UTF_8));
-		assertEquals("foo", new String(Base64Codec.decode("Zm9v\n"), StandardCharsets.UTF_8));
-		assertEquals("foob", new String(Base64Codec.decode("Zm9vYg==\n"), StandardCharsets.UTF_8));
-		assertEquals("fooba", new String(Base64Codec.decode("Zm9vYmE=\n"), StandardCharsets.UTF_8));
-		assertEquals("foobar", new String(Base64Codec.decode("Zm9vYmFy\n"), StandardCharsets.UTF_8));
+		assertEquals("", new String(Base64Codec.decode("\n"), StandardCharset.UTF_8));
+		assertEquals("f", new String(Base64Codec.decode("Zg==\n"), StandardCharset.UTF_8));
+		assertEquals("fo", new String(Base64Codec.decode("Zm8=\n"), StandardCharset.UTF_8));
+		assertEquals("foo", new String(Base64Codec.decode("Zm9v\n"), StandardCharset.UTF_8));
+		assertEquals("foob", new String(Base64Codec.decode("Zm9vYg==\n"), StandardCharset.UTF_8));
+		assertEquals("fooba", new String(Base64Codec.decode("Zm9vYmE=\n"), StandardCharset.UTF_8));
+		assertEquals("foobar", new String(Base64Codec.decode("Zm9vYmFy\n"), StandardCharset.UTF_8));
 	}
 
 
 	public void testDecodeUrlSafe() {
 
-		assertEquals("aa>", new String(Base64Codec.decode("YWE-"), StandardCharsets.UTF_8));
-		assertEquals("bb?", new String(Base64Codec.decode("YmI_"), StandardCharsets.UTF_8));
+		assertEquals("aa>", new String(Base64Codec.decode("YWE-"), StandardCharset.UTF_8));
+		assertEquals("bb?", new String(Base64Codec.decode("YmI_"), StandardCharset.UTF_8));
 
-		assertEquals("", new String(Base64Codec.decode(""), StandardCharsets.UTF_8));
-		assertEquals("f", new String(Base64Codec.decode("Zg"), StandardCharsets.UTF_8));
-		assertEquals("fo", new String(Base64Codec.decode("Zm8"), StandardCharsets.UTF_8));
-		assertEquals("foo", new String(Base64Codec.decode("Zm9v"), StandardCharsets.UTF_8));
-		assertEquals("foob", new String(Base64Codec.decode("Zm9vYg"), StandardCharsets.UTF_8));
-		assertEquals("fooba", new String(Base64Codec.decode("Zm9vYmE"), StandardCharsets.UTF_8));
-		assertEquals("foobar", new String(Base64Codec.decode("Zm9vYmFy"), StandardCharsets.UTF_8));
+		assertEquals("", new String(Base64Codec.decode(""), StandardCharset.UTF_8));
+		assertEquals("f", new String(Base64Codec.decode("Zg"), StandardCharset.UTF_8));
+		assertEquals("fo", new String(Base64Codec.decode("Zm8"), StandardCharset.UTF_8));
+		assertEquals("foo", new String(Base64Codec.decode("Zm9v"), StandardCharset.UTF_8));
+		assertEquals("foob", new String(Base64Codec.decode("Zm9vYg"), StandardCharset.UTF_8));
+		assertEquals("fooba", new String(Base64Codec.decode("Zm9vYmE"), StandardCharset.UTF_8));
+		assertEquals("foobar", new String(Base64Codec.decode("Zm9vYmFy"), StandardCharset.UTF_8));
 	}
 
 
 	public void testDecodeUrlSafeWithIllegalChars() {
 
-		assertEquals("", new String(Base64Codec.decode("\n"), StandardCharsets.UTF_8));
-		assertEquals("f", new String(Base64Codec.decode("Zg\n"), StandardCharsets.UTF_8));
-		assertEquals("fo", new String(Base64Codec.decode("Zm8\n"), StandardCharsets.UTF_8));
-		assertEquals("foo", new String(Base64Codec.decode("Zm9v\n"), StandardCharsets.UTF_8));
-		assertEquals("foob", new String(Base64Codec.decode("Zm9vYg\n"), StandardCharsets.UTF_8));
-		assertEquals("fooba", new String(Base64Codec.decode("Zm9vYmE\n"), StandardCharsets.UTF_8));
-		assertEquals("foobar", new String(Base64Codec.decode("Zm9vYmFy\n"), StandardCharsets.UTF_8));
+		assertEquals("", new String(Base64Codec.decode("\n"), StandardCharset.UTF_8));
+		assertEquals("f", new String(Base64Codec.decode("Zg\n"), StandardCharset.UTF_8));
+		assertEquals("fo", new String(Base64Codec.decode("Zm8\n"), StandardCharset.UTF_8));
+		assertEquals("foo", new String(Base64Codec.decode("Zm9v\n"), StandardCharset.UTF_8));
+		assertEquals("foob", new String(Base64Codec.decode("Zm9vYg\n"), StandardCharset.UTF_8));
+		assertEquals("fooba", new String(Base64Codec.decode("Zm9vYmE\n"), StandardCharset.UTF_8));
+		assertEquals("foobar", new String(Base64Codec.decode("Zm9vYmFy\n"), StandardCharset.UTF_8));
 	}
 }

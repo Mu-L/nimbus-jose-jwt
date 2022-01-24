@@ -18,21 +18,20 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import static org.junit.Assert.assertArrayEquals;
+
+import junit.framework.TestCase;
 
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.util.ByteUtils;
 import com.nimbusds.jose.util.Container;
-
-import junit.framework.TestCase;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
-import static org.junit.Assert.assertArrayEquals;
+import com.nimbusds.jose.util.StandardCharset;
 
 
 /**
@@ -104,7 +103,7 @@ public class XC20PTest extends TestCase {
 		AuthenticatedCipherText authenticatedCipherText = XC20P.encryptAuthenticated(
 			key,
 			ivContainer,
-			plainText.getBytes(StandardCharsets.UTF_8),
+			plainText.getBytes(StandardCharset.UTF_8),
 			aad
 		);
 		
@@ -116,7 +115,7 @@ public class XC20PTest extends TestCase {
 			authenticatedCipherText.getAuthenticationTag()
 		);
 		
-		String clearText = new String(decrypted, StandardCharsets.UTF_8);
+		String clearText = new String(decrypted, StandardCharset.UTF_8);
 		assertEquals(plainText, clearText);
 	}
 	
@@ -140,7 +139,7 @@ public class XC20PTest extends TestCase {
 		AuthenticatedCipherText authenticatedCipherText = XC20P.encryptAuthenticated(
 			key,
 			ivContainer,
-			plainText.getBytes(StandardCharsets.UTF_8),
+			plainText.getBytes(StandardCharset.UTF_8),
 			aad
 		);
 		
@@ -182,7 +181,7 @@ public class XC20PTest extends TestCase {
 		AuthenticatedCipherText authenticatedCipherText = XC20P.encryptAuthenticated(
 			key,
 			ivContainer,
-			plainText.getBytes(StandardCharsets.UTF_8),
+			plainText.getBytes(StandardCharset.UTF_8),
 			aad
 		);
 		
@@ -226,7 +225,7 @@ public class XC20PTest extends TestCase {
 		AuthenticatedCipherText authenticatedCipherText = XC20P.encryptAuthenticated(
 			key,
 			ivContainer,
-			plainText.getBytes(StandardCharsets.UTF_8),
+			plainText.getBytes(StandardCharset.UTF_8),
 			aad
 		);
 		

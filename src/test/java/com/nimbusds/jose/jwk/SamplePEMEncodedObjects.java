@@ -16,13 +16,16 @@
  */
 package com.nimbusds.jose.jwk;
 
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.FileUtils;
+
+import com.nimbusds.jose.util.StandardCharset;
+
 
 public final class SamplePEMEncodedObjects {
     
@@ -54,7 +57,7 @@ public final class SamplePEMEncodedObjects {
 
     private static String loadUrl(final URL url) {
         try {
-            return FileUtils.readFileToString(new File(url.toURI()), StandardCharsets.UTF_8);
+            return FileUtils.readFileToString(new File(url.toURI()), StandardCharset.UTF_8);
         } catch (IOException | URISyntaxException e) {
             throw new IllegalArgumentException("Couldn't read URL " + url, e);
         }

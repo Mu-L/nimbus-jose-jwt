@@ -18,7 +18,6 @@
 package com.nimbusds.jose.proc;
 
 
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -35,6 +34,7 @@ import com.nimbusds.jose.crypto.*;
 import com.nimbusds.jose.crypto.factories.DefaultJWEDecrypterFactory;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.util.ByteUtils;
+import com.nimbusds.jose.util.StandardCharset;
 
 
 /**
@@ -197,7 +197,7 @@ public class DefaultJWEDecrypterFactoryTest extends TestCase {
 		throws Exception {
 
 		JWEHeader header = new JWEHeader(JWEAlgorithm.PBES2_HS256_A128KW, EncryptionMethod.A128CBC_HS256);
-		Key key = new SecretKeySpec("secret".getBytes(StandardCharsets.UTF_8), "AES");
+		Key key = new SecretKeySpec("secret".getBytes(StandardCharset.UTF_8), "AES");
 
 		JWEDecrypterFactory factory = new DefaultJWEDecrypterFactory();
 

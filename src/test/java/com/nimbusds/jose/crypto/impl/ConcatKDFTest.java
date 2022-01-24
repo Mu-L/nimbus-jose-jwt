@@ -18,7 +18,6 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import java.nio.charset.StandardCharsets;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -30,6 +29,7 @@ import junit.framework.TestCase;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.ByteUtils;
 import com.nimbusds.jose.util.IntegerUtils;
+import com.nimbusds.jose.util.StandardCharset;
 
 
 /**
@@ -186,7 +186,7 @@ public class ConcatKDFTest extends TestCase {
 		assertArrayEquals(IntegerUtils.toBytes("Hello world!".length()), length);
 		
 		byte[] chars = ByteUtils.subArray(out, 4, out.length - 4);
-		assertArrayEquals("Hello world!".getBytes(StandardCharsets.UTF_8), chars);
+		assertArrayEquals("Hello world!".getBytes(StandardCharset.UTF_8), chars);
 	}
 	
 	

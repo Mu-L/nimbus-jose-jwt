@@ -73,7 +73,7 @@ public class Base64URLTest extends TestCase {
 
 	public void testEncodeAndDecode() {
 
-		byte[] bytes = STRING.getBytes(StandardCharsets.UTF_8);
+		byte[] bytes = STRING.getBytes(StandardCharset.UTF_8);
 
 		Base64URL b64url = Base64URL.encode(bytes);
 

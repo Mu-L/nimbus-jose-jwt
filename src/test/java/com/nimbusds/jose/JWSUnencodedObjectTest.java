@@ -153,7 +153,7 @@ public class JWSUnencodedObjectTest extends TestCase {
 		
 		JWSVerifier verifier = new MACVerifier(HMAC_JWK);
 		byte[] payloadBytes = detachedPayload.toBytes();
-		byte[] headerBytes = (header.toBase64URL().toString() + '.').getBytes(StandardCharsets.UTF_8);
+		byte[] headerBytes = (header.toBase64URL().toString() + '.').getBytes(StandardCharset.UTF_8);
 		byte[] signingInput = new byte[headerBytes.length + payloadBytes.length];
 		System.arraycopy(headerBytes, 0, signingInput, 0, headerBytes.length);
 		System.arraycopy(payloadBytes, 0, signingInput, headerBytes.length, payloadBytes.length);

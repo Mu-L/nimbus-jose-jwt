@@ -18,8 +18,6 @@
 package com.nimbusds.jose.crypto;
 
 
-import java.nio.charset.StandardCharsets;
-
 import static org.junit.Assert.assertArrayEquals;
 
 import junit.framework.TestCase;
@@ -28,6 +26,7 @@ import net.minidev.json.JSONObject;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.StandardCharset;
 
 
 /**
@@ -133,7 +132,7 @@ public class PBES2Test extends TestCase {
 
 	public void testPasswordByteConstructors() {
 
-		byte[] password = "secret".getBytes(StandardCharsets.UTF_8);
+		byte[] password = "secret".getBytes(StandardCharset.UTF_8);
 
 		PasswordBasedEncrypter encrypter = new PasswordBasedEncrypter(password, 8, 1000);
 		

@@ -18,7 +18,6 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
@@ -32,6 +31,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.ByteUtils;
+import com.nimbusds.jose.util.StandardCharset;
 
 
 /**
@@ -40,7 +40,7 @@ import com.nimbusds.jose.util.ByteUtils;
 public class PBKDF2Test extends TestCase {
 	
 	
-	public static final byte[] PASSWORD_BYTES = "Thus from my lips, by yours, my sin is purged.".getBytes(StandardCharsets.UTF_8);
+	public static final byte[] PASSWORD_BYTES = "Thus from my lips, by yours, my sin is purged.".getBytes(StandardCharset.UTF_8);
 	
 	
 	public static final byte[] RAW_SALT_BYTES = new byte[] {
@@ -88,7 +88,7 @@ public class PBKDF2Test extends TestCase {
 		byte[] formattedSalt = PBKDF2.formatSalt(alg, salt);
 
 		byte[] expectedFormattedSalt = ByteUtils.concat(
-			alg.toString().getBytes(StandardCharsets.UTF_8),
+			alg.toString().getBytes(StandardCharset.UTF_8),
 			PBKDF2.ZERO_BYTE,
 			salt);
 		

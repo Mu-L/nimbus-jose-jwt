@@ -255,7 +255,7 @@ public class DefaultResourceRetriever extends AbstractRestrictedResourceRetrieve
 
 			final String content;
 			try (InputStream inputStream = getInputStream(con, getSizeLimit())) {
-				content = IOUtils.readInputStreamToString(inputStream, StandardCharsets.UTF_8);
+				content = IOUtils.readInputStreamToString(inputStream, StandardCharset.UTF_8);
 			}
 
 			// Check HTTP code + message

@@ -19,7 +19,6 @@ package com.nimbusds.jose.jwk;
 
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
@@ -40,6 +39,7 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
+import com.nimbusds.jose.util.StandardCharset;
 
 
 /**
@@ -399,7 +399,7 @@ public class OctetSequenceKeyTest extends TestCase {
 
 		String orderedJSON = "{\"k\":\"GawgguFyGrWKav7AX4VKUg\",\"kty\":\"oct\"}";
 
-		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(StandardCharsets.UTF_8)));
+		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(StandardCharset.UTF_8)));
 
 		assertEquals(expected, thumbprint);
 	}
@@ -431,7 +431,7 @@ public class OctetSequenceKeyTest extends TestCase {
 
 		String orderedJSON = JSONObjectUtils.toJSONString(jwk.getRequiredParams());
 
-		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(StandardCharsets.UTF_8)));
+		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(StandardCharset.UTF_8)));
 
 		assertEquals(expected, thumbprint);
 	}

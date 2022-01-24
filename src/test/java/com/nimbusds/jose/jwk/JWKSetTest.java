@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -59,10 +58,7 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
-import com.nimbusds.jose.util.Base64URL;
-import com.nimbusds.jose.util.JSONArrayUtils;
-import com.nimbusds.jose.util.JSONObjectUtils;
-import com.nimbusds.jose.util.X509CertUtils;
+import com.nimbusds.jose.util.*;
 
 
 /**
@@ -813,7 +809,7 @@ public class JWKSetTest extends TestCase {
 			.respond()
 			.withStatus(200)
 			.withBody(s)
-			.withEncoding(StandardCharsets.UTF_8)
+			.withEncoding(StandardCharset.UTF_8)
 			.withContentType("application/json");
 
 		JWKSet keySet = JWKSet.load(new URL("http://localhost:" + port()));
