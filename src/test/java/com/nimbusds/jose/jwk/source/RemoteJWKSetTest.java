@@ -59,6 +59,10 @@ public class RemoteJWKSetTest {
 	@After
 	public void tearDown() {
 		closeJadler();
+		
+		System.clearProperty("com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpConnectTimeout");
+		System.clearProperty("com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpReadTimeout");
+		System.clearProperty("com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpSizeLimit");
 	}
 
 
@@ -102,7 +106,7 @@ public class RemoteJWKSetTest {
 			.withHeader("Content-Type", "application/json")
 			.withBody( JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true)));
 
-		RemoteJWKSet jwkSetSource = new RemoteJWKSet(jwkSetURL, null);
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, null);
 
 		assertTrue(jwkSetSource.getResourceRetriever() instanceof DefaultResourceRetriever);
 
@@ -161,7 +165,7 @@ public class RemoteJWKSetTest {
 			.withHeader("Content-Type", "application/json")
 			.withBody(JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true)));
 
-		RemoteJWKSet jwkSetSource = new RemoteJWKSet(jwkSetURL, null);
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, null);
 
 		assertEquals(jwkSetURL, jwkSetSource.getJWKSetURL());
 		assertNotNull(jwkSetSource.getResourceRetriever());
@@ -237,7 +241,7 @@ public class RemoteJWKSetTest {
 				}
 			});
 
-		RemoteJWKSet jwkSetSource = new RemoteJWKSet(jwkSetURL, null);
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, null);
 
 		assertEquals(jwkSetURL, jwkSetSource.getJWKSetURL());
 		assertNotNull(jwkSetSource.getResourceRetriever());
@@ -269,14 +273,6 @@ public class RemoteJWKSetTest {
 		assertEquals("3", m1.getKeyID());
 
 		assertEquals(1, matches.size());
-	}
-
-
-	private static Thread getThreadByName(String threadName) {
-		for (Thread t : Thread.getAllStackTraces().keySet()) {
-			if (t.getName().equals(threadName)) return t;
-		}
-		return null;
 	}
 
 
@@ -312,7 +308,7 @@ public class RemoteJWKSetTest {
 			.withHeader("Content-Type", "application/json")
 			.withBody(JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true)));
 
-		RemoteJWKSet jwkSetSource = new RemoteJWKSet(jwkSetURL, null);
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, null);
 
 		assertEquals(jwkSetURL, jwkSetSource.getJWKSetURL());
 
@@ -336,7 +332,7 @@ public class RemoteJWKSetTest {
 
 		onRequest().respond().withDelay(800, TimeUnit.MILLISECONDS);
 
-		RemoteJWKSet jwkSetSource = new RemoteJWKSet(jwkSetURL, null);
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL);
 
 		try {
 			jwkSetSource.get(new JWKSelector(new JWKMatcher.Builder().build()), null);
@@ -346,5 +342,74 @@ public class RemoteJWKSetTest {
 			assertTrue(e.getCause() instanceof SocketTimeoutException);
 			assertEquals("Read timed out", e.getCause().getMessage());
 		}
+	}
+
+
+	@Test
+	public void testResolveDefaults() {
+		
+		assertEquals(RemoteJWKSet.DEFAULT_HTTP_CONNECT_TIMEOUT, RemoteJWKSet.resolveDefaultHTTPConnectTimeout());
+		assertEquals(RemoteJWKSet.DEFAULT_HTTP_READ_TIMEOUT, RemoteJWKSet.resolveDefaultHTTPReadTimeout());
+		assertEquals(RemoteJWKSet.DEFAULT_HTTP_SIZE_LIMIT, RemoteJWKSet.resolveDefaultHTTPSizeLimit());
+	}
+
+
+	@Test
+	public void testResolveDefaults_systemPropertyOverride() {
+		
+		System.setProperty("com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpConnectTimeout", "250");
+		System.setProperty("com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpReadTimeout", "100");
+		System.setProperty("com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpSizeLimit", "10000");
+		
+		assertEquals(250, RemoteJWKSet.resolveDefaultHTTPConnectTimeout());
+		assertEquals(100, RemoteJWKSet.resolveDefaultHTTPReadTimeout());
+		assertEquals(10_000, RemoteJWKSet.resolveDefaultHTTPSizeLimit());
+	}
+
+
+	@Test
+	public void testDefaultsSetBySystemProperties_readTimeout()
+		throws Exception {
+
+		System.setProperty("com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpConnectTimeout", "250");
+		System.setProperty("com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpReadTimeout", "100");
+		System.setProperty("com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpSizeLimit", "10000");
+		
+		URL jwkSetURL = new URL("http://localhost:" + port() + "/jwks.json");
+
+		onRequest().respond().withDelay(350, TimeUnit.MILLISECONDS);
+
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL);
+		
+		assertEquals(250, ((DefaultResourceRetriever)jwkSetSource.getResourceRetriever()).getConnectTimeout());
+		assertEquals(100, ((DefaultResourceRetriever)jwkSetSource.getResourceRetriever()).getReadTimeout());
+		assertEquals(10_000, ((DefaultResourceRetriever)jwkSetSource.getResourceRetriever()).getSizeLimit());
+
+		try {
+			jwkSetSource.get(new JWKSelector(new JWKMatcher.Builder().build()), null);
+			fail();
+		} catch (RemoteKeySourceException e) {
+			assertEquals("Couldn't retrieve remote JWK set: Read timed out", e.getMessage());
+			assertTrue(e.getCause() instanceof SocketTimeoutException);
+			assertEquals("Read timed out", e.getCause().getMessage());
+		}
+	}
+
+
+	@Test
+	public void testDefaultsSetBySystemProperties_ignoreNumberFormatExceptions()
+		throws Exception {
+
+		System.setProperty("com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpConnectTimeout", "aaa");
+		System.setProperty("com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpReadTimeout", "bbb");
+		System.setProperty("com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpSizeLimit", "ccc");
+		
+		URL jwkSetURL = new URL("https://example.com/jwks.json");
+
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL);
+		
+		assertEquals(RemoteJWKSet.DEFAULT_HTTP_CONNECT_TIMEOUT, ((DefaultResourceRetriever)jwkSetSource.getResourceRetriever()).getConnectTimeout());
+		assertEquals(RemoteJWKSet.DEFAULT_HTTP_READ_TIMEOUT, ((DefaultResourceRetriever)jwkSetSource.getResourceRetriever()).getReadTimeout());
+		assertEquals(RemoteJWKSet.DEFAULT_HTTP_SIZE_LIMIT, ((DefaultResourceRetriever)jwkSetSource.getResourceRetriever()).getSizeLimit());
 	}
 }

@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import net.jcip.annotations.ThreadSafe;
+
 import com.nimbusds.jose.RemoteKeySourceException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKMatcher;
@@ -33,7 +35,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jose.util.DefaultResourceRetriever;
 import com.nimbusds.jose.util.Resource;
 import com.nimbusds.jose.util.ResourceRetriever;
-import net.jcip.annotations.ThreadSafe;
 
 
 /**
@@ -41,8 +42,30 @@ import net.jcip.annotations.ThreadSafe;
  * JWK set is cached to minimise network calls. The cache is updated whenever
  * the key selector tries to get a key with an unknown ID.
  *
+ * <p>If no {@link ResourceRetriever} is specified when creating a remote JWK
+ * set source the {@link DefaultResourceRetriever default one} will be used,
+ * with the following HTTP timeouts and limits:
+ *
+ * <ul>
+ *     <li>HTTP connect timeout, in milliseconds: Determined by the
+ *         {@link #DEFAULT_HTTP_CONNECT_TIMEOUT} constant which can be
+ *         overridden by setting the
+ *         {@code com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpConnectTimeout}
+ * 	   Java system property.
+ *     <li>HTTP read timeout, in milliseconds: Determined by the
+ *         {@link #DEFAULT_HTTP_READ_TIMEOUT} constant which can be
+ *         overridden by setting the
+ *         {@code com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpReadTimeout}
+ * 	   Java system property.
+ *     <li>HTTP entity size limit: Determined by the
+ *         {@link #DEFAULT_HTTP_SIZE_LIMIT} constant which can be
+ *         overridden by setting the
+ *         {@code com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpSizeLimit}
+ * 	   Java system property.
+ * </ul>
+ *
  * @author Vladimir Dzhuvinov
- * @version 2018-10-28
+ * @version 2022-01-24
  */
 @ThreadSafe
 public class RemoteJWKSet<C extends SecurityContext> implements JWKSource<C> {
@@ -67,6 +90,65 @@ public class RemoteJWKSet<C extends SecurityContext> implements JWKSource<C> {
 	 * Set to 50 KBytes.
 	 */
 	public static final int DEFAULT_HTTP_SIZE_LIMIT = 50 * 1024;
+	
+	
+	/**
+	 * Resolves the default HTTP connect timeout for JWK set retrieval, in
+	 * milliseconds.
+	 *
+	 * @return The {@link #DEFAULT_HTTP_CONNECT_TIMEOUT static constant},
+	 *         overridden by setting the
+	 *         {@code com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpConnectTimeout}
+	 *         Java system property.
+	 */
+	public static int resolveDefaultHTTPConnectTimeout() {
+		return resolveDefault(RemoteJWKSet.class.getName() + ".defaultHttpConnectTimeout", DEFAULT_HTTP_CONNECT_TIMEOUT);
+	}
+	
+	
+	/**
+	 * Resolves the default HTTP read timeout for JWK set retrieval, in
+	 * milliseconds.
+	 *
+	 * @return The {@link #DEFAULT_HTTP_READ_TIMEOUT static constant},
+	 *         overridden by setting the
+	 *         {@code com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpReadTimeout}
+	 *         Java system property.
+	 */
+	public static int resolveDefaultHTTPReadTimeout() {
+		return resolveDefault(RemoteJWKSet.class.getName() + ".defaultHttpReadTimeout", DEFAULT_HTTP_READ_TIMEOUT);
+	}
+	
+	
+	/**
+	 * Resolves default HTTP entity size limit for JWK set retrieval, in
+	 * bytes.
+	 *
+	 * @return The {@link #DEFAULT_HTTP_SIZE_LIMIT static constant},
+	 *         overridden by setting the
+	 *         {@code com.nimbusds.jose.jwk.source.RemoteJWKSet.defaultHttpSizeLimit}
+	 *         Java system property.
+	 */
+	public static int resolveDefaultHTTPSizeLimit() {
+		return resolveDefault(RemoteJWKSet.class.getName() + ".defaultHttpSizeLimit", DEFAULT_HTTP_SIZE_LIMIT);
+	}
+	
+	
+	private static int resolveDefault(final String sysPropertyName, final int defaultValue) {
+		
+		String value = System.getProperty(sysPropertyName);
+		
+		if (value == null) {
+			return defaultValue;
+		}
+		
+		try {
+			return Integer.parseInt(value);
+		} catch (NumberFormatException e) {
+			// Illegal value
+			return defaultValue;
+		}
+	}
 
 
 	/**
@@ -89,9 +171,8 @@ public class RemoteJWKSet<C extends SecurityContext> implements JWKSource<C> {
 
 	/**
 	 * Creates a new remote JWK set using the
-	 * {@link DefaultResourceRetriever default HTTP resource retriever},
-	 * with a HTTP connect timeout set to 250 ms, HTTP read timeout set to
-	 * 250 ms and a 50 KByte size limit.
+	 * {@link DefaultResourceRetriever default HTTP resource retriever}
+	 * with the default HTTP timeouts and entity size limit.
 	 *
 	 * @param jwkSetURL The JWK set URL. Must not be {@code null}.
 	 */
@@ -107,7 +188,8 @@ public class RemoteJWKSet<C extends SecurityContext> implements JWKSource<C> {
 	 * @param resourceRetriever The HTTP resource retriever to use,
 	 *                          {@code null} to use the
 	 *                          {@link DefaultResourceRetriever default
-	 *                          one}.
+	 *                          one} with the default HTTP timeouts and
+	 *                          entity size limit.
 	 */
 	public RemoteJWKSet(final URL jwkSetURL,
 			    final ResourceRetriever resourceRetriever) {
@@ -123,7 +205,8 @@ public class RemoteJWKSet<C extends SecurityContext> implements JWKSource<C> {
 	 * @param resourceRetriever The HTTP resource retriever to use,
 	 *                          {@code null} to use the
 	 *                          {@link DefaultResourceRetriever default
-	 *                          one}.
+	 *                          one} with the default HTTP timeouts and
+	 *                          entity size limit.
 	 * @param jwkSetCache       The JWK set cache to use, {@code null} to
 	 *                          use the {@link DefaultJWKSetCache default
 	 *                          one}.
@@ -140,7 +223,10 @@ public class RemoteJWKSet<C extends SecurityContext> implements JWKSource<C> {
 		if (resourceRetriever != null) {
 			jwkSetRetriever = resourceRetriever;
 		} else {
-			jwkSetRetriever = new DefaultResourceRetriever(DEFAULT_HTTP_CONNECT_TIMEOUT, DEFAULT_HTTP_READ_TIMEOUT, DEFAULT_HTTP_SIZE_LIMIT);
+			jwkSetRetriever = new DefaultResourceRetriever(
+				resolveDefaultHTTPConnectTimeout(),
+				resolveDefaultHTTPReadTimeout(),
+				resolveDefaultHTTPSizeLimit());
 		}
 		
 		if (jwkSetCache != null) {
