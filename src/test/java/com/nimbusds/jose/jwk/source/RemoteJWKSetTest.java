@@ -19,15 +19,19 @@ package com.nimbusds.jose.jwk.source;
 
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.jadler.Jadler.*;
 import static org.junit.Assert.*;
@@ -41,9 +45,9 @@ import org.junit.Test;
 
 import com.nimbusds.jose.RemoteKeySourceException;
 import com.nimbusds.jose.jwk.*;
-import com.nimbusds.jose.util.DefaultResourceRetriever;
-import com.nimbusds.jose.util.JSONObjectUtils;
-import com.nimbusds.jose.util.StandardCharset;
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
+import com.nimbusds.jose.proc.SecurityContext;
+import com.nimbusds.jose.util.*;
 
 
 public class RemoteJWKSetTest {
@@ -477,5 +481,150 @@ public class RemoteJWKSetTest {
 		assertEquals(RemoteJWKSet.DEFAULT_HTTP_CONNECT_TIMEOUT, ((DefaultResourceRetriever)jwkSetSource.getResourceRetriever()).getConnectTimeout());
 		assertEquals(RemoteJWKSet.DEFAULT_HTTP_READ_TIMEOUT, ((DefaultResourceRetriever)jwkSetSource.getResourceRetriever()).getReadTimeout());
 		assertEquals(RemoteJWKSet.DEFAULT_HTTP_SIZE_LIMIT, ((DefaultResourceRetriever)jwkSetSource.getResourceRetriever()).getSizeLimit());
+	}
+	
+	
+	@Test
+	public void testCacheUpdateIsOnlyExecutedOnce()
+		throws Exception {
+		
+		final RSAKey rsaJWK = new RSAKeyGenerator(2048)
+			.keyID("1")
+			.generate();
+		
+		final JWKSet jwkSet = new JWKSet(Collections.singletonList((JWK) rsaJWK));
+		
+		int numberOfThreads = 10;
+		final CountDownLatch latch = new CountDownLatch(numberOfThreads);
+		
+		final URL jwkSetURL = new URL("http://localhost/jwks.json");
+		DefaultJWKSetCache cache = new DefaultJWKSetCache();
+		final AtomicInteger invocationCounter = new AtomicInteger(0);
+		ResourceRetriever retriever = new ResourceRetriever() {
+			@Override
+			public Resource retrieveResource(URL url) {
+				invocationCounter.incrementAndGet();
+				final String content = JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true));
+				return new Resource(content, "application/json");
+			}
+		};
+		final RemoteJWKSet<SecurityContext> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, retriever, cache);
+		
+		ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+		List<Future<List<JWK>>> futures = new ArrayList<>();
+		
+		for (int i = 0; i < numberOfThreads; i++) {
+			Future<List<JWK>> future = executorService.submit(new Callable<List<JWK>>() {
+				@Override
+				public List<JWK> call() {
+					try {
+						// the latch will be released when all threads have been started to increase likelihood of concurrency issues
+						latch.countDown();
+						latch.await(1, TimeUnit.MINUTES);
+						return jwkSetSource.get(new JWKSelector(new JWKMatcher.Builder().build()), null);
+						
+					} catch (RemoteKeySourceException e) {
+						throw new RuntimeException(e);
+						
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+						throw new RuntimeException(e);
+					}
+				}
+			});
+			
+			futures.add(future);
+		}
+		
+		for (Future<List<JWK>> future : futures) {
+			List<JWK> result = future.get(1, TimeUnit.MINUTES);
+			assertEquals(1, result.size());
+			assertEquals(rsaJWK.getKeyID(), result.get(0).getKeyID());
+		}
+		
+		executorService.shutdown();
+		executorService.awaitTermination(1, TimeUnit.SECONDS);
+		
+		assertEquals("Retriever must be called exactly once", 1, invocationCounter.intValue());
+	}
+	
+	
+	@Test
+	public void testCacheRefreshIfKeyIsNotFoundIsOnlyExecutedOnce()
+		throws Exception {
+		
+		final RSAKey rsaJWKOld = new RSAKeyGenerator(2048)
+			.keyID("oldKeyID")
+			.generate();
+		
+		final RSAKey rsaJWKNew = new RSAKeyGenerator(2048)
+			.keyID("newKeyID")
+			.generate();
+		
+		final JWKSet jwkSetOld = new JWKSet(Collections.singletonList((JWK) rsaJWKOld));
+		final JWKSet jwkSetNew = new JWKSet(Collections.singletonList((JWK) rsaJWKNew));
+		
+		int numberOfThreads = 20;
+		final CountDownLatch latch = new CountDownLatch(numberOfThreads);
+		
+		final URL jwkSetURL = new URL("http://localhost/jwks.json");
+		
+		DefaultJWKSetCache cache = new DefaultJWKSetCache();
+		cache.put(jwkSetOld);
+		
+		final AtomicInteger invocationCounter = new AtomicInteger(0);
+		
+		ResourceRetriever retriever = new ResourceRetriever() {
+			
+			@Override
+			public Resource retrieveResource(URL url) throws IOException {
+				invocationCounter.incrementAndGet();
+				final String content = JSONObjectUtils.toJSONString(jwkSetNew.toJSONObject(true));
+				return new Resource(content, "application/json");
+			}
+			
+		};
+		
+		final RemoteJWKSet<SecurityContext> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, retriever, cache);
+		
+		ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+		List<Future<List<JWK>>> futures = new ArrayList<>();
+		
+		for (int i = 0; i < numberOfThreads; i++) {
+			
+			Future<List<JWK>> future = executorService.submit(new Callable<List<JWK>>() {
+				@Override
+				public List<JWK> call() {
+					try {
+						// the latch will be released when all threads have been started to increase likelihood of concurrency issues
+						latch.countDown();
+						latch.await(1, TimeUnit.MINUTES);
+						return jwkSetSource.get(new JWKSelector(new JWKMatcher.Builder().keyID(rsaJWKNew.getKeyID()).build()), null);
+					} catch (RemoteKeySourceException e) {
+						throw new RuntimeException(e);
+						
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+						throw new RuntimeException(e);
+					}
+				}
+			});
+			
+			futures.add(future);
+		}
+		
+		
+		
+		for (Future<List<JWK>> future : futures) {
+			List<JWK> result = future.get(1, TimeUnit.MINUTES);
+			assertEquals( 1, result.size());
+			assertEquals(rsaJWKNew.getKeyID(), result.get(0).getKeyID());
+			
+		}
+		
+		executorService.shutdown();
+		executorService.awaitTermination(1, TimeUnit.SECONDS);
+		
+		assertEquals("Retriever must be called exactly once", 1, invocationCounter.intValue());
 	}
 }

@@ -65,6 +65,7 @@ import com.nimbusds.jose.util.ResourceRetriever;
  * </ul>
  *
  * @author Vladimir Dzhuvinov
+ * @author Andreas Huber
  * @version 2022-01-24
  */
 @ThreadSafe
@@ -338,15 +339,22 @@ public class RemoteJWKSet<C extends SecurityContext> implements JWKSource<C> {
 	public List<JWK> get(final JWKSelector jwkSelector, final C context)
 		throws RemoteKeySourceException {
 
-		// Get the JWK set, may necessitate a cache update
+		// Get the JWK set, may necessitate a cache update.
 		JWKSet jwkSet = jwkSetCache.get();
 		if (jwkSetCache.requiresRefresh() || jwkSet == null) {
 			try {
-				// retrieve jwkSet by calling JWK set URL
-				jwkSet = updateJWKSetFromURL();
+				// Prevent multiple cache updates in case of concurrent requests
+				// (with double-checked locking / locking on update required only)
+				synchronized (this) {
+					jwkSet = jwkSetCache.get();
+					if (jwkSetCache.requiresRefresh() || jwkSet == null) {
+						// Retrieve jwkSet by calling JWK set URL
+						jwkSet = updateJWKSetFromURL();
+					}
+				}
 			} catch (Exception ex) {
 				if (jwkSet == null) {
-					// throw the received exception if expired.
+					// Rethrow the received exception if expired
 					throw  ex;
 				}
 			}
@@ -374,9 +382,20 @@ public class RemoteJWKSet<C extends SecurityContext> implements JWKSource<C> {
 			// failed for some other reason, return no matches
 			return Collections.emptyList();
 		}
-
-		// Make new HTTP GET to the JWK set URL
-		jwkSet = updateJWKSetFromURL();
+		
+		// If the jwkSet in the cache is not the same instance that was
+		// in the cache at the beginning of this method, then we know
+		// the cache was updated
+		synchronized (this) {
+			if (jwkSet == jwkSetCache.get()) {
+				// Make new HTTP GET to the JWK set URL
+				jwkSet = updateJWKSetFromURL();
+			} else {
+				// Cache was updated recently, the cached value is up-to-date
+				jwkSet = jwkSetCache.get();
+			}
+		}
+		
 		if (jwkSet == null) {
 			// Retrieval has failed
 			return Collections.emptyList();
