@@ -172,8 +172,7 @@ public abstract class JOSEObjectJSON implements Serializable {
 	 * @param jsonObject The JSON object to parse. Must not be
 	 *                   {@code null}.
 	 *
-	 * @return The corresponding {@link JWSObjectJSON} or
-	 *         {@link JWEObjectJSON}.
+	 * @return The corresponding {@link JWSObjectJSON}.
 	 *
 	 * @throws ParseException If the JSON object couldn't be parsed to a
 	 *                        valid JWS or JWE secured object.
@@ -184,7 +183,7 @@ public abstract class JOSEObjectJSON implements Serializable {
 		if (jsonObject.containsKey("signature") || jsonObject.containsKey("signatures")) {
 			return JWSObjectJSON.parse(jsonObject);
 		} else if (jsonObject.containsKey("ciphertext")) {
-			throw new ParseException("JWE JSON not supported", 0); // TODO
+			throw new ParseException("JWE JSON not supported", 0); // TODO not supported yet
 		} else {
 			throw new ParseException("Invalid JOSE object", 0);
 		}
@@ -196,8 +195,7 @@ public abstract class JOSEObjectJSON implements Serializable {
 	 *
 	 * @param json The JSON string to parse. Must not be {@code null}.
 	 *
-	 * @return The corresponding {@link JWSObjectJSON} or
-	 *         {@link JWEObjectJSON}.
+	 * @return The corresponding {@link JWSObjectJSON}.
 	 *
 	 * @throws ParseException If the string couldn't be parsed to a valid 
 	 *                        JWS or JWE secured object.

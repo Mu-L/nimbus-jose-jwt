@@ -38,8 +38,6 @@ public class ECDHEncrypterTest extends TestCase {
 
 	/**
 	 * Test ECDH Encrypter with wrong provided CEK algorithm.
-	 * 
-	 * @throws Exception
 	 */
 	public void testConstructorWithCEK_algNotAES() throws Exception {
 		

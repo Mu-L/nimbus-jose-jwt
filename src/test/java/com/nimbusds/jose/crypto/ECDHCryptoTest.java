@@ -155,9 +155,8 @@ public class ECDHCryptoTest extends TestCase {
 	}
 	
 	/**
-	 * Test ECDH Encrypter with provided CEK encryption and decryption cycle.
-	 * 
-	 * @throws Exception
+	 * Test ECDH Encrypter with provided CEK encryption and decryption
+	 * cycle.
 	 */
 	public void testCycle_ECDH_ES_Curve_P256_A128KW_WithCekSpecified() throws Exception {
 		ECKey ecJWK = generateECJWK(Curve.P_256);

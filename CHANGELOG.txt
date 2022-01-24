@@ -1379,11 +1379,11 @@ version 9.15.2 (2021-09-28)
     * DefaultJWTClaimsVerifier must report the names of missing required claims
       and prohibited claims in sorted order (iss #444).
 
-version 9.16-preview.1 (2021-10-09)
+version 9.16-preview.1 (2022-01-24)
+    * New base JOSEObjectJSON class for representing JOSE secured objects
+      serialisable to general or flattened JSON format.
     * New JWSObjectJSON class for representing JWS secured objects serialisable
       to general or flattened JSON, with one or more signatures.
-    * New JWEObjectJSON class for representing JWE secured objects serialisable
-      to general or flattened JSON, with one or more recipients.
     * JSONObjectUtils.getJSONObject must accept java.util.Map values (iss
       #445).
     * JSONObjectUtils.getJSONObject verifies java.util.Map<String, Object> keys
