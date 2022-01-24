@@ -1388,3 +1388,5 @@ version 9.16-preview.1 (2022-01-24)
       #445).
     * JSONObjectUtils.getJSONObject verifies java.util.Map<String, Object> keys
       are String before cast.
+    * Updates BouncyCastle to 1.70.
+    * Upgrades to Google Tink 1.6.1.

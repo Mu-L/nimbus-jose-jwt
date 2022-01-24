@@ -18,16 +18,15 @@
 package com.nimbusds.jose.crypto.impl;
 
 
+import java.security.GeneralSecurityException;
+import javax.crypto.SecretKey;
+
 import com.google.crypto.tink.subtle.XChaCha20Poly1305;
+import net.jcip.annotations.ThreadSafe;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.util.ByteUtils;
 import com.nimbusds.jose.util.Container;
-
-import net.jcip.annotations.ThreadSafe;
-
-import javax.crypto.*;
-import java.security.*;
 
 
 /**
@@ -42,7 +41,7 @@ import java.security.*;
  * <p>This class is thread-safe.
  *
  * @author Alexander Martynov
- * @version 2021-08-04
+ * @version 2022-02-24
  * @see <a href="https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-xchacha-03">XChaCha:
  * eXtended-nonce ChaCha and AEAD_XChaCha20_Poly1305</a>
  */
@@ -87,7 +86,7 @@ public class XC20P {
 		try {
 			aead = new XChaCha20Poly1305(secretKey.getEncoded());
 			
-		} catch (InvalidKeyException e) {
+		} catch (GeneralSecurityException e) {
 			throw new JOSEException("Invalid XChaCha20Poly1305 key: " + e.getMessage(), e);
 		}
 		
@@ -140,7 +139,7 @@ public class XC20P {
 		try {
 			aead = new XChaCha20Poly1305(secretKey.getEncoded());
 			
-		} catch (InvalidKeyException e) {
+		} catch (GeneralSecurityException e) {
 			throw new JOSEException("Invalid XChaCha20Poly1305 key: " + e.getMessage(), e);
 		}
 		
