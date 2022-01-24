@@ -35,7 +35,7 @@ public class JWKSecurityContextJWKSetTest {
 	private static final JWKSelector SELECT_NONE = new JWKSelector(new JWKMatcher.Builder().maxKeySize(1).build());
 
 	private JWK jwk;
-	private JWKSecurityContextJWKSet jwkSource = new JWKSecurityContextJWKSet();
+	private final JWKSecurityContextJWKSet jwkSource = new JWKSecurityContextJWKSet();
 
 	@Before
 	public void lookupJwk() throws Exception {

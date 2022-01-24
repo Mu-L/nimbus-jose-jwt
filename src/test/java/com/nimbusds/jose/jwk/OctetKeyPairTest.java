@@ -341,7 +341,7 @@ public class OctetKeyPairTest extends TestCase {
 		assertTrue(key.isPrivate());
 		
 		
-		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject());
 		
 		key = OctetKeyPair.parse(jwkString);
 		

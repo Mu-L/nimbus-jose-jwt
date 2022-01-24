@@ -18,25 +18,25 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.nimbusds.jose.crypto.impl.ConcatKDF;
-import com.nimbusds.jose.util.Base64;
+import static org.junit.Assert.assertArrayEquals;
+
+import junit.framework.TestCase;
+
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.ByteUtils;
 import com.nimbusds.jose.util.IntegerUtils;
-import junit.framework.TestCase;
 
 
 /**
  * Tests the Concatenation KDF.
  *
  * @author Vladimir Dzhuvinov
- * @version 2017-05-05
+ * @version 2022-01-24
  */
 public class ConcatKDFTest extends TestCase {
 	
@@ -64,7 +64,7 @@ public class ConcatKDFTest extends TestCase {
 			(byte) 66, (byte) 111, (byte) 98, (byte) 0, (byte) 0, (byte) 0, (byte) 128
 		};
 		
-		assertTrue(Arrays.equals(expected, otherInfo));
+		assertArrayEquals(expected, otherInfo);
 	}
 
 	public void testComposeOtherInfoWithTag() {
@@ -99,8 +99,8 @@ public class ConcatKDFTest extends TestCase {
 				(byte) -52, (byte) -30, (byte) 24, (byte) 85, (byte) 71, (byte) 7, (byte) 69,
 				(byte) -2, (byte) 17, (byte) -101, (byte) -35, (byte) 100
 		};
-
-		assertTrue(Arrays.equals(expected, otherInfo));
+		
+		assertArrayEquals(expected, otherInfo);
 	}
 	
 	public void testECDHVector()
@@ -140,7 +140,7 @@ public class ConcatKDFTest extends TestCase {
 			(byte) 86, (byte) 170, (byte) 141, (byte) 234, (byte) 248, (byte) 35, (byte) 109, (byte) 32,
 			(byte) 92, (byte) 34, (byte) 40, (byte) 205, (byte) 113, (byte) 167, (byte) 16, (byte) 26};
 		
-		assertTrue(Arrays.equals(expectedDerivedKey, derivedKey.getEncoded()));
+		assertArrayEquals(expectedDerivedKey, derivedKey.getEncoded());
 	}
 	
 	
@@ -174,7 +174,7 @@ public class ConcatKDFTest extends TestCase {
 		
 		byte[] out = ConcatKDF.encodeIntData(1);
 		
-		assertTrue(Arrays.equals(new byte[]{0, 0, 0, 1}, out));
+		assertArrayEquals(new byte[]{0, 0, 0, 1}, out);
 	}
 	
 	
@@ -183,10 +183,10 @@ public class ConcatKDFTest extends TestCase {
 		byte[] out = ConcatKDF.encodeStringData("Hello world!");
 		
 		byte[] length = ByteUtils.subArray(out, 0, 4);
-		assertTrue(Arrays.equals(IntegerUtils.toBytes("Hello world!".length()), length));
+		assertArrayEquals(IntegerUtils.toBytes("Hello world!".length()), length);
 		
 		byte[] chars = ByteUtils.subArray(out, 4, out.length - 4);
-		assertTrue(Arrays.equals("Hello world!".getBytes(Charset.forName("UTF-8")), chars));
+		assertArrayEquals("Hello world!".getBytes(StandardCharsets.UTF_8), chars);
 	}
 	
 	
@@ -195,10 +195,10 @@ public class ConcatKDFTest extends TestCase {
 		byte[] out = ConcatKDF.encodeDataWithLength(new byte[]{0, 1, 2, 3});
 		
 		byte[] length = ByteUtils.subArray(out, 0, 4);
-		assertTrue(Arrays.equals(IntegerUtils.toBytes(4), length));
+		assertArrayEquals(IntegerUtils.toBytes(4), length);
 		
 		byte[] data = ByteUtils.subArray(out, 4, out.length - 4);
-		assertTrue(Arrays.equals(new byte[]{0, 1, 2, 3}, data));
+		assertArrayEquals(new byte[]{0, 1, 2, 3}, data);
 	}
 	
 	
@@ -207,10 +207,10 @@ public class ConcatKDFTest extends TestCase {
 		byte[] out = ConcatKDF.encodeDataWithLength(Base64URL.encode(new byte[]{0, 1, 2, 3}));
 		
 		byte[] length = ByteUtils.subArray(out, 0, 4);
-		assertTrue(Arrays.equals(IntegerUtils.toBytes(4), length));
+		assertArrayEquals(IntegerUtils.toBytes(4), length);
 		
 		byte[] data = ByteUtils.subArray(out, 4, out.length - 4);
-		assertTrue(Arrays.equals(new byte[]{0, 1, 2, 3}, data));
+		assertArrayEquals(new byte[]{0, 1, 2, 3}, data);
 	}
 	
 	

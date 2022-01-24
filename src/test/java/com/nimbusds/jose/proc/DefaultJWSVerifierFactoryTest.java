@@ -24,9 +24,12 @@ import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Arrays;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+
+import static org.junit.Assert.assertArrayEquals;
+
+import junit.framework.TestCase;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.ECDSAVerifier;
@@ -35,13 +38,12 @@ import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.crypto.factories.DefaultJWSVerifierFactory;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.util.ByteUtils;
-import junit.framework.TestCase;
 
 
 /**
  * Tests the default JWS verifier factory.
  *
- * @version 2015-06-29
+ * @version 2022-01-24
  */
 public class DefaultJWSVerifierFactoryTest extends TestCase {
 
@@ -66,7 +68,7 @@ public class DefaultJWSVerifierFactoryTest extends TestCase {
 		assertTrue(verifier.supportedJWSAlgorithms().contains(header.getAlgorithm()));
 
 		MACVerifier macVerifier = (MACVerifier)verifier;
-		assertTrue(Arrays.equals(key.getEncoded(), macVerifier.getSecret()));
+		assertArrayEquals(key.getEncoded(), macVerifier.getSecret());
 	}
 
 
@@ -82,7 +84,7 @@ public class DefaultJWSVerifierFactoryTest extends TestCase {
 		assertTrue(verifier.supportedJWSAlgorithms().contains(header.getAlgorithm()));
 
 		MACVerifier macVerifier = (MACVerifier)verifier;
-		assertTrue(Arrays.equals(key.getEncoded(), macVerifier.getSecret()));
+		assertArrayEquals(key.getEncoded(), macVerifier.getSecret());
 	}
 
 
@@ -98,7 +100,7 @@ public class DefaultJWSVerifierFactoryTest extends TestCase {
 		assertTrue(verifier.supportedJWSAlgorithms().contains(header.getAlgorithm()));
 
 		MACVerifier macVerifier = (MACVerifier)verifier;
-		assertTrue(Arrays.equals(key.getEncoded(), macVerifier.getSecret()));
+		assertArrayEquals(key.getEncoded(), macVerifier.getSecret());
 	}
 
 

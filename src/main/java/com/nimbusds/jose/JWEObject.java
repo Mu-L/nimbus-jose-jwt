@@ -33,7 +33,7 @@ import com.nimbusds.jose.util.Base64URL;
  * <p>This class is thread-safe.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-10-03
+ * @version 2022-01-24
  */
 @ThreadSafe
 public class JWEObject extends JOSEObject {
@@ -464,26 +464,21 @@ public class JWEObject extends JOSEObject {
 		sb.append('.');
 
 		if (encryptedKey != null) {
-			
-			sb.append(encryptedKey.toString());
+			sb.append(encryptedKey);
 		}
 
 		sb.append('.');
 
 		if (iv != null) {
-
-			sb.append(iv.toString());
+			sb.append(iv);
 		}
 
 		sb.append('.');
-
-		sb.append(cipherText.toString());
-
+		sb.append(cipherText);
 		sb.append('.');
 
 		if (authTag != null) {
-
-			sb.append(authTag.toString());
+			sb.append(authTag);
 		}
 
 		return sb.toString();

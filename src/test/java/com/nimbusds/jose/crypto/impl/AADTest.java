@@ -18,23 +18,24 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+
+import static org.junit.Assert.assertArrayEquals;
+
+import junit.framework.TestCase;
 
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWEHeader;
-import com.nimbusds.jose.crypto.impl.AAD;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.IntegerOverflowException;
-import junit.framework.TestCase;
 
 
 /**
  * Tests the Additional Authenticated Data (AAD) functions.
  *
  * @author Vladimir Dzhuvinov
- * @version 2017-06-01
+ * @version 2022-01-24
  */
 public class AADTest extends TestCase {
 
@@ -43,9 +44,9 @@ public class AADTest extends TestCase {
 
 		JWEHeader jweHeader = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A128GCM);
 
-		byte[] expected = jweHeader.toBase64URL().toString().getBytes(Charset.forName("ASCII"));
-
-		assertTrue(Arrays.equals(expected, AAD.compute(jweHeader)));
+		byte[] expected = jweHeader.toBase64URL().toString().getBytes(StandardCharsets.US_ASCII);
+		
+		assertArrayEquals(expected, AAD.compute(jweHeader));
 	}
 
 
@@ -53,9 +54,9 @@ public class AADTest extends TestCase {
 
 		Base64URL base64URL = Base64URL.encode("Hello world!");
 
-		byte[] expected = base64URL.toString().getBytes(Charset.forName("ASCII"));
-
-		assertTrue(Arrays.equals(expected, AAD.compute(base64URL)));
+		byte[] expected = base64URL.toString().getBytes(StandardCharsets.US_ASCII);
+		
+		assertArrayEquals(expected, AAD.compute(base64URL));
 	}
 
 
@@ -65,7 +66,7 @@ public class AADTest extends TestCase {
 		byte[] aad = new byte[]{0, 1, 2, 3}; // 32 bits
 
 		byte[] expectedBitLength = new byte[]{0, 0, 0, 0, 0, 0, 0, 32};
-
-		assertTrue(Arrays.equals(expectedBitLength, AAD.computeLength(aad)));
+		
+		assertArrayEquals(expectedBitLength, AAD.computeLength(aad));
 	}
 }

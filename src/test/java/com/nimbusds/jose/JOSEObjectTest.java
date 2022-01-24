@@ -181,9 +181,9 @@ public class JOSEObjectTest extends TestCase {
 	
 	public void testEquality_case() {
 		
-		assertTrue(new JOSEObjectType("at+jwt").equals(new JOSEObjectType("at+jwt")));
-		assertTrue(new JOSEObjectType("at+jwt").equals(new JOSEObjectType("AT+JWT")));
-		assertTrue(new JOSEObjectType("AT+JWT").equals(new JOSEObjectType("AT+JWT")));
+		assertEquals(new JOSEObjectType("at+jwt"), new JOSEObjectType("at+jwt"));
+		assertEquals(new JOSEObjectType("at+jwt"), new JOSEObjectType("AT+JWT"));
+		assertEquals(new JOSEObjectType("AT+JWT"), new JOSEObjectType("AT+JWT"));
 	}
 	
 	

@@ -444,7 +444,7 @@ public class JSONObjectUtilsTest extends TestCase {
 		Map<String, Object> o2 = JSONObjectUtils.newJSONObject();
 		o2.put("o2-key-1", "o2-val-1");
 		
-		List<Object> jsonArray = Arrays.asList((Object) o1, (Object) o2);
+		List<Object> jsonArray = Arrays.asList(o1, (Object) o2);
 		
 		Map<String, Object> jsonObject = JSONObjectUtils.newJSONObject();
 		jsonObject.put("key", jsonArray);

@@ -77,7 +77,7 @@ public class JWECryptoPartsTest extends TestCase {
 		assertEquals("ghi", p.getCipherText().toString());
 		assertEquals("jkl", p.getAuthenticationTag().toString());
 
-		p = new JWECryptoParts(null, (Base64URL) null, null, new Base64URL("abc"), null);
+		p = new JWECryptoParts(null, null, null, new Base64URL("abc"), null);
 
 		assertNull(p.getHeader());
 		assertNull(p.getEncryptedKey());

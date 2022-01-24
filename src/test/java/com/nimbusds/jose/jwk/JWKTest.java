@@ -29,11 +29,12 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+
+import static org.junit.Assert.assertArrayEquals;
 
 import junit.framework.TestCase;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -270,7 +271,7 @@ public class JWKTest extends TestCase {
 		OctetSequenceKey octJWK = (OctetSequenceKey)JWK.load(keyStore, "1", "1234".toCharArray());
 		assertNotNull(octJWK);
 		assertEquals("1", octJWK.getKeyID());
-		assertTrue(Arrays.equals(secretKey.getEncoded(), octJWK.toByteArray()));
+		assertArrayEquals(secretKey.getEncoded(), octJWK.toByteArray());
 	}
 	
 	

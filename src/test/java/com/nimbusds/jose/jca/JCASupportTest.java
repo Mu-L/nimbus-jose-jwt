@@ -41,7 +41,7 @@ public class JCASupportTest {
 
 
 	@Test
-	public void testUnlimitedCrypto() {
+	public void unlimitedCrypto() {
 
 		String msg = "Unlimited JCE cryptography strength not supported, go to http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html";
 
@@ -50,7 +50,7 @@ public class JCASupportTest {
 
 
 	@Test
-	public void testJWSSupport_Default_Java_7() {
+	public void jwsSupport_Default_Java_7() {
 
 		if (! System.getProperty("java.version").startsWith("1.7")) {
 			return;
@@ -72,7 +72,7 @@ public class JCASupportTest {
 	
 	
 	@Test
-	public void testJWSSupport_SUN_Java_7() {
+	public void jwsSupport_SUN_Java_7() {
 
 		if (! System.getProperty("java.version").startsWith("1.7")) {
 			return;
@@ -98,7 +98,7 @@ public class JCASupportTest {
 	
 	
 	@Test
-	public void testJWSSupport_Default_Java_8() {
+	public void jwsSupport_Default_Java_8() {
 
 		if (! System.getProperty("java.version").startsWith("1.8")) {
 			return;
@@ -120,7 +120,7 @@ public class JCASupportTest {
 	
 	
 	@Test
-	public void testJWSSupport_SUN_Java_8() {
+	public void jwsSupport_SUN_Java_8() {
 
 		if (! System.getProperty("java.version").startsWith("1.8")) {
 			return;
@@ -146,7 +146,7 @@ public class JCASupportTest {
 	
 	
 	@Test
-	public void testJWSSupport_BC() {
+	public void jwsSupport_BC() {
 
 		Provider bc = BouncyCastleProviderSingleton.getInstance();
 
@@ -168,7 +168,7 @@ public class JCASupportTest {
 	// To run the test without class loading clashes disable the optional
 	// plain BC provider in pom.xml
 //	@Test
-	public void testJWSSupport_BC_FIPS() {
+	public void jwsSupport_BC_FIPS() {
 
 		Provider bc = BouncyCastleFIPSProviderSingleton.getInstance();
 
@@ -188,7 +188,7 @@ public class JCASupportTest {
 	
 	
 	@Test
-	public void testJWESupport_Default_Java_7() {
+	public void jweSupport_Default_Java_7() {
 
 		if (! System.getProperty("java.version").startsWith("1.7")) {
 			return;
@@ -220,7 +220,7 @@ public class JCASupportTest {
 	
 	
 	@Test
-	public void testJWESupport_SUN_Java_7() {
+	public void jweSupport_SUN_Java_7() {
 
 		if (! System.getProperty("java.version").startsWith("1.7")) {
 			return;
@@ -255,7 +255,7 @@ public class JCASupportTest {
 	
 	
 	@Test
-	public void testJWESupport_BC() {
+	public void jweSupport_BC() {
 
 		Provider bc = BouncyCastleProviderSingleton.getInstance();
 
@@ -279,7 +279,7 @@ public class JCASupportTest {
 	
 	
 	@Test
-	public void testEncryptionMethodSupport_Default_Java_7() {
+	public void encryptionMethodSupport_Default_Java_7() {
 
 		if (! System.getProperty("java.version").startsWith("1.7")) {
 			return;
@@ -296,7 +296,7 @@ public class JCASupportTest {
 	
 	
 	@Test
-	public void testEncryptionMethodSupport_SUN_Java_7() {
+	public void encryptionMethodSupport_SUN_Java_7() {
 
 		if (! System.getProperty("java.version").startsWith("1.7")) {
 			return;
@@ -313,7 +313,7 @@ public class JCASupportTest {
 	
 	
 	@Test
-	public void testEncryptionMethodSupport_BC() {
+	public void encryptionMethodSupport_BC() {
 
 		Provider bc = BouncyCastleProviderSingleton.getInstance();
 
@@ -328,14 +328,14 @@ public class JCASupportTest {
 	
 	
 	@Test
-	public void testAlgNoneAlwaysSupported() {
+	public void algNoneAlwaysSupported() {
 		
 		assertTrue(JCASupport.isSupported(new JWSAlgorithm("none")));
 	}
 	
 	
 	@Test
-	public void testJOSEAlgorithmSupport_Default_Java_8() {
+	public void joseAlgorithmSupport_Default_Java_8() {
 		
 		if (! System.getProperty("java.version").startsWith("1.8")) {
 			return;
@@ -390,7 +390,7 @@ public class JCASupportTest {
 	
 	
 	@Test
-	public void testJOSEAlgorithmSupport_SUN_Java8() {
+	public void joseAlgorithmSupport_SUN_Java8() {
 		
 		if (! System.getProperty("java.version").startsWith("1.8")) {
 			return;

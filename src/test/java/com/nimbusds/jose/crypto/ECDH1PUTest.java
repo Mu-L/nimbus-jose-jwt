@@ -47,7 +47,7 @@ import static org.junit.Assert.assertArrayEquals;
 /**
  * Tests the ECDH-1PU key agreement derivation.
  *
- * @version 2021-08-05
+ * @version 2022-01-24
  * @author Alexander Martynov
  */
 public class ECDH1PUTest extends TestCase{
@@ -73,15 +73,15 @@ public class ECDH1PUTest extends TestCase{
     }
 
     private static class TestVector {
-        public JWEAlgorithm algorithm;
-        public EncryptionMethod encryptionMethod;
-        public byte[] Ze;
-        public byte[] Zs;
-        public byte[] expectedZ;
-        public byte[] expectedSharedKey;
-        public Base64URL tag;
-        public String apu;
-        public String apv;
+        public final JWEAlgorithm algorithm;
+        public final EncryptionMethod encryptionMethod;
+        public final byte[] Ze;
+        public final byte[] Zs;
+        public final byte[] expectedZ;
+        public final byte[] expectedSharedKey;
+        public final Base64URL tag;
+        public final String apu;
+        public final String apv;
 
         public TestVector(
                 JWEAlgorithm algorithm,

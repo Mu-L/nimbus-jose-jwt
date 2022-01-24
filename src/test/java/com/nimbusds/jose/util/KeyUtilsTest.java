@@ -18,10 +18,11 @@
 package com.nimbusds.jose.util;
 
 
-import java.util.Arrays;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+
+import static org.junit.Assert.assertArrayEquals;
 
 import junit.framework.TestCase;
 
@@ -45,7 +46,7 @@ public class KeyUtilsTest extends TestCase {
 		
 		SecretKey aesKey = KeyUtils.toAESKey(key);
 		assertEquals(128, ByteUtils.bitLength(key.getEncoded()));
-		assertTrue(Arrays.equals(key.getEncoded(), aesKey.getEncoded()));
+		assertArrayEquals(key.getEncoded(), aesKey.getEncoded());
 		assertEquals("AES", aesKey.getAlgorithm());
 	}
 	

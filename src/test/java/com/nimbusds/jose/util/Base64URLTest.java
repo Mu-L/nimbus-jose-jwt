@@ -19,7 +19,7 @@ package com.nimbusds.jose.util;
 
 
 import java.math.BigInteger;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import junit.framework.TestCase;
 
@@ -28,7 +28,7 @@ import junit.framework.TestCase;
  * Tests the Base64URL class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-07-02
+ * @version 2022-01-24
  */
 public class Base64URLTest extends TestCase {
 
@@ -73,7 +73,7 @@ public class Base64URLTest extends TestCase {
 
 	public void testEncodeAndDecode() {
 
-		byte[] bytes = STRING.getBytes(Charset.forName("utf-8"));
+		byte[] bytes = STRING.getBytes(StandardCharsets.UTF_8);
 
 		Base64URL b64url = Base64URL.encode(bytes);
 

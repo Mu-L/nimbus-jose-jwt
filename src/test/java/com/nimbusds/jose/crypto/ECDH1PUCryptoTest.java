@@ -41,7 +41,7 @@ import java.util.HashSet;
  * Tests ECDH-1PU encryption and decryption.
  *
  * @author Alexander Martynov
- * @version 2021-08-04
+ * @version 2022-01-24
  */
 public class ECDH1PUCryptoTest extends TestCase {
 
@@ -60,9 +60,9 @@ public class ECDH1PUCryptoTest extends TestCase {
     }
 
     private static class CycleTest {
-        public Curve curve;
-        public JWEAlgorithm algorithm;
-        public EncryptionMethod encryptionMethod;
+        public final Curve curve;
+        public final JWEAlgorithm algorithm;
+        public final EncryptionMethod encryptionMethod;
 
         public CycleTest(JWEAlgorithm algorithm, Curve curve, EncryptionMethod encryptionMethod) {
             this.curve = curve;

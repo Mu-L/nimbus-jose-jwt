@@ -19,7 +19,7 @@ package com.nimbusds.jose.jwk;
 
 
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
@@ -30,6 +30,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import junit.framework.TestCase;
@@ -45,7 +46,7 @@ import com.nimbusds.jose.util.JSONObjectUtils;
  * Tests the Octet Sequence JWK class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-06-03
+ * @version 2022-01-24
  */
 public class OctetSequenceKeyTest extends TestCase {
 
@@ -92,7 +93,7 @@ public class OctetSequenceKeyTest extends TestCase {
 
 		assertTrue(key.isPrivate());
 
-		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject());
 
 		key = OctetSequenceKey.parse(jwkString);
 
@@ -159,7 +160,7 @@ public class OctetSequenceKeyTest extends TestCase {
 
 		assertTrue(key.isPrivate());
 
-		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject());
 
 		key = OctetSequenceKey.parse(jwkString);
 
@@ -262,7 +263,7 @@ public class OctetSequenceKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject());
 
 		key = OctetSequenceKey.parse(jwkString);
 
@@ -293,8 +294,7 @@ public class OctetSequenceKeyTest extends TestCase {
 	}
 
 
-	public void testBuilderWithByteArray()
-		throws Exception {
+	public void testBuilderWithByteArray() {
 
 		byte[] key = new byte[32];
 		new SecureRandom().nextBytes(key);
@@ -305,8 +305,7 @@ public class OctetSequenceKeyTest extends TestCase {
 	}
 
 
-	public void testBuilderWithSecretKey()
-		throws Exception {
+	public void testBuilderWithSecretKey() {
 
 		byte[] key = new byte[32];
 		new SecureRandom().nextBytes(key);
@@ -314,7 +313,7 @@ public class OctetSequenceKeyTest extends TestCase {
 		OctetSequenceKey oct = new OctetSequenceKey.Builder(new SecretKeySpec(key, "MAC")).keyUse(KeyUse.SIGNATURE).build();
 
 		SecretKey secretKey = oct.toSecretKey();
-		assertTrue(Arrays.equals(key, secretKey.getEncoded()));
+		assertArrayEquals(key, secretKey.getEncoded());
 		assertEquals("NONE", secretKey.getAlgorithm());
 	}
 
@@ -370,8 +369,8 @@ public class OctetSequenceKeyTest extends TestCase {
 		Base64URL k = new Base64URL("GawgguFyGrWKav7AX4VKUg");
 
 		OctetSequenceKey jwk = new OctetSequenceKey.Builder(k).build();
-
-		assertTrue(Arrays.equals(k.decode(), jwk.toSecretKey().getEncoded()));
+		
+		assertArrayEquals(k.decode(), jwk.toSecretKey().getEncoded());
 		assertEquals("NONE", jwk.toSecretKey().getAlgorithm());
 	}
 
@@ -381,8 +380,8 @@ public class OctetSequenceKeyTest extends TestCase {
 		Base64URL k = new Base64URL("GawgguFyGrWKav7AX4VKUg");
 
 		OctetSequenceKey jwk = new OctetSequenceKey.Builder(k).build();
-
-		assertTrue(Arrays.equals(k.decode(), jwk.toSecretKey("AES").getEncoded()));
+		
+		assertArrayEquals(k.decode(), jwk.toSecretKey("AES").getEncoded());
 		assertEquals("AES", jwk.toSecretKey("AES").getAlgorithm());
 	}
 
@@ -400,7 +399,7 @@ public class OctetSequenceKeyTest extends TestCase {
 
 		String orderedJSON = "{\"k\":\"GawgguFyGrWKav7AX4VKUg\",\"kty\":\"oct\"}";
 
-		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(Charset.forName("UTF-8"))));
+		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(StandardCharsets.UTF_8)));
 
 		assertEquals(expected, thumbprint);
 	}
@@ -432,7 +431,7 @@ public class OctetSequenceKeyTest extends TestCase {
 
 		String orderedJSON = JSONObjectUtils.toJSONString(jwk.getRequiredParams());
 
-		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(Charset.forName("UTF-8"))));
+		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(StandardCharsets.UTF_8)));
 
 		assertEquals(expected, thumbprint);
 	}
@@ -489,7 +488,7 @@ public class OctetSequenceKeyTest extends TestCase {
 		OctetSequenceKey octJWK = OctetSequenceKey.load(keyStore, "1", "1234".toCharArray());
 		assertNotNull(octJWK);
 		assertEquals("1", octJWK.getKeyID());
-		assertTrue(Arrays.equals(secretKey.getEncoded(), octJWK.toByteArray()));
+		assertArrayEquals(secretKey.getEncoded(), octJWK.toByteArray());
 		assertEquals(keyStore, octJWK.getKeyStore());
 	}
 	
@@ -511,7 +510,7 @@ public class OctetSequenceKeyTest extends TestCase {
 		OctetSequenceKey octJWK = OctetSequenceKey.load(keyStore, "1", "".toCharArray());
 		assertNotNull(octJWK);
 		assertEquals("1", octJWK.getKeyID());
-		assertTrue(Arrays.equals(secretKey.getEncoded(), octJWK.toByteArray()));
+		assertArrayEquals(secretKey.getEncoded(), octJWK.toByteArray());
 		assertEquals(keyStore, octJWK.getKeyStore());
 	}
 	

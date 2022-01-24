@@ -27,19 +27,16 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.Date;
 
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
 import junit.framework.TestCase;
 
 import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.util.Base64URL;
 
 
-/**
- * Tests signed JWTs.
- */
 public class SignedJWTTest extends TestCase {
 
 
@@ -123,7 +120,7 @@ public class SignedJWTTest extends TestCase {
 
 		assertEquals(JWSObject.State.SIGNED, signedJWT.getState());
 		assertNotNull(signedJWT.getSignature());
-		assertTrue(sigInput.equals(Base64URL.encode(signedJWT.getSigningInput())));
+		assertEquals(sigInput, Base64URL.encode(signedJWT.getSigningInput()));
 
 		JWSVerifier verifier = new RSASSAVerifier(publicKey);
 		assertTrue(signedJWT.verify(verifier));

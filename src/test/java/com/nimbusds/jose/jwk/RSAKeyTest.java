@@ -21,7 +21,7 @@ package com.nimbusds.jose.jwk;
 import java.io.File;
 import java.math.BigInteger;
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -53,7 +53,7 @@ import com.nimbusds.jose.util.*;
  * Tests the RSA JWK class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-06-03
+ * @version 2022-01-24
  */
 public class RSAKeyTest extends TestCase {
 
@@ -168,7 +168,7 @@ public class RSAKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject());
 
 		key = RSAKey.parse(jwkString);
 
@@ -272,7 +272,7 @@ public class RSAKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject());
 
 		key = RSAKey.parse(jwkString);
 
@@ -386,7 +386,7 @@ public class RSAKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject());
 
 		key = RSAKey.parse(jwkString);
 
@@ -464,18 +464,18 @@ public class RSAKeyTest extends TestCase {
 		assertNull(key.getX509CertChain());
 		assertNull(key.getParsedX509CertChain());
 		assertEquals(keyStore, key.getKeyStore());
-
-		assertTrue(publicKey.getModulus().equals(key.getModulus().decodeToBigInteger()));
-		assertTrue(publicKey.getPublicExponent().equals(key.getPublicExponent().decodeToBigInteger()));
-
-		assertTrue(privateKey.getPrivateExponent().equals(key.getPrivateExponent().decodeToBigInteger()));
+		
+		assertEquals(publicKey.getModulus(), key.getModulus().decodeToBigInteger());
+		assertEquals(publicKey.getPublicExponent(), key.getPublicExponent().decodeToBigInteger());
+		
+		assertEquals(privateKey.getPrivateExponent(), key.getPrivateExponent().decodeToBigInteger());
 
 		assertTrue(key.getOtherPrimes().isEmpty());
 
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject());
 
 		key = RSAKey.parse(jwkString);
 
@@ -492,11 +492,11 @@ public class RSAKeyTest extends TestCase {
 		assertNull(key.getX509CertChain());
 		assertNull(key.getParsedX509CertChain());
 		assertNull(key.getKeyStore());
-
-		assertTrue(publicKey.getModulus().equals(key.getModulus().decodeToBigInteger()));
-		assertTrue(publicKey.getPublicExponent().equals(key.getPublicExponent().decodeToBigInteger()));
-
-		assertTrue(privateKey.getPrivateExponent().equals(key.getPrivateExponent().decodeToBigInteger()));
+		
+		assertEquals(publicKey.getModulus(), key.getModulus().decodeToBigInteger());
+		assertEquals(publicKey.getPublicExponent(), key.getPublicExponent().decodeToBigInteger());
+		
+		assertEquals(privateKey.getPrivateExponent(), key.getPrivateExponent().decodeToBigInteger());
 
 		assertTrue(key.getOtherPrimes().isEmpty());
 
@@ -1298,7 +1298,7 @@ public class RSAKeyTest extends TestCase {
 		throws Exception {
 		
 		MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), Charset.forName("UTF-8"));
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), StandardCharsets.UTF_8);
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		RSAKey rsaKey = RSAKey.parse(cert);
 		
@@ -1316,7 +1316,7 @@ public class RSAKeyTest extends TestCase {
 	public void testParseFromX509CertWithECPublicKey()
 		throws Exception {
 		
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), Charset.forName("UTF-8"));
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), StandardCharsets.UTF_8);
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		
 		try {
@@ -1478,7 +1478,7 @@ public class RSAKeyTest extends TestCase {
 		char[] password = "secret".toCharArray();
 		keyStore.load(null, password);
 		
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), Charset.forName("UTF-8"));
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), StandardCharsets.UTF_8);
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		
 		keyStore.setCertificateEntry("1", cert);
@@ -1504,7 +1504,7 @@ public class RSAKeyTest extends TestCase {
 		char[] password = "secret".toCharArray();
 		keyStore.load(null, password);
 		
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), Charset.forName("UTF-8"));
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), StandardCharsets.UTF_8);
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		
 		keyStore.setCertificateEntry("1", cert);

@@ -18,6 +18,8 @@
 package com.nimbusds.jose;
 
 
+import static org.junit.Assert.assertNotEquals;
+
 import junit.framework.TestCase;
 
 
@@ -25,7 +27,7 @@ import junit.framework.TestCase;
  * Tests the base Algorithm class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-06-03
+ * @version 2022-01-24
  */
 public class AlgorithmTest extends TestCase {
 
@@ -65,8 +67,8 @@ public class AlgorithmTest extends TestCase {
 
 		Algorithm alg1 = new Algorithm("my-alg");
 		Algorithm alg2 = new Algorithm("my-alg");
-
-		assertTrue(alg1.equals(alg2));
+		
+		assertEquals(alg1, alg2);
 	}
 
 
@@ -74,8 +76,8 @@ public class AlgorithmTest extends TestCase {
 
 		Algorithm alg1 = new Algorithm("my-alg", Requirement.REQUIRED);
 		Algorithm alg2 = new Algorithm("my-alg", Requirement.OPTIONAL);
-
-		assertTrue(alg1.equals(alg2));
+		
+		assertEquals(alg1, alg2);
 	}
 
 
@@ -83,8 +85,8 @@ public class AlgorithmTest extends TestCase {
 
 		Algorithm alg1 = new Algorithm("my-alg");
 		Algorithm alg2 = new Algorithm("your-alg");
-
-		assertFalse(alg1.equals(alg2));
+		
+		assertNotEquals(alg1, alg2);
 	}
 
 

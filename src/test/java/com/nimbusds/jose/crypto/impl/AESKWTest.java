@@ -18,11 +18,11 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import java.util.Arrays;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.nimbusds.jose.crypto.impl.AESKW;
+import static org.junit.Assert.assertArrayEquals;
+
 import junit.framework.TestCase;
 
 
@@ -54,8 +54,8 @@ public class AESKWTest extends TestCase {
 			(byte) 66, (byte)125, (byte) 36, (byte)200, (byte)222, (byte)124, (byte)  5, (byte)103,
 			(byte)249, (byte) 52, (byte)117, (byte)184, (byte)140, (byte) 81, (byte)246, (byte)158,
 			(byte)161, (byte)177, (byte) 20, (byte) 33, (byte)245, (byte) 57, (byte)59,  (byte)4 };
-
-		assertTrue(Arrays.equals(expectedEncryptedCEK, encryptedCEK));
+		
+		assertArrayEquals(expectedEncryptedCEK, encryptedCEK);
 	}
 
 
@@ -80,8 +80,8 @@ public class AESKWTest extends TestCase {
 			(byte) 92, (byte)176, (byte) 56, (byte)240, (byte) 65, (byte)208, (byte) 82, (byte)112,
 			(byte)161, (byte)131, (byte) 36, (byte) 55, (byte)202, (byte)236, (byte)185, (byte)172,
 			(byte)129, (byte) 23, (byte)153, (byte)194, (byte)195, (byte) 48, (byte)253, (byte)182 };
-
-		assertTrue(Arrays.equals(expectedCEK, cek.getEncoded()));
+		
+		assertArrayEquals(expectedCEK, cek.getEncoded());
 		assertEquals("AES", cek.getAlgorithm());
 	}
 	
@@ -108,7 +108,7 @@ public class AESKWTest extends TestCase {
 			(byte)161, (byte)131, (byte) 36, (byte) 55, (byte)202, (byte)236, (byte)185, (byte)172,
 			(byte)129, (byte) 23, (byte)153, (byte)194, (byte)195, (byte) 48, (byte)253, (byte)182 };
 		
-		assertTrue(Arrays.equals(expectedCEK, cek.getEncoded()));
+		assertArrayEquals(expectedCEK, cek.getEncoded());
 		assertEquals("AES", cek.getAlgorithm());
 	}
 }

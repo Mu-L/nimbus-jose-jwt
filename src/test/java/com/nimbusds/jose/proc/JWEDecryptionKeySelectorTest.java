@@ -86,7 +86,7 @@ public class JWEDecryptionKeySelectorTest extends TestCase {
 		JWEDecryptionKeySelector keySelector = new JWEDecryptionKeySelector(
 			JWEAlgorithm.RSA_OAEP,
 			EncryptionMethod.A128CBC_HS256,
-			new ImmutableJWKSet(new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2))));
+			new ImmutableJWKSet(new JWKSet(Arrays.asList(rsaJWK1, (JWK)rsaJWK2))));
 
 		assertEquals(JWEAlgorithm.RSA_OAEP, keySelector.getExpectedJWEAlgorithm());
 		assertEquals(EncryptionMethod.A128CBC_HS256, keySelector.getExpectedJWEEncryptionMethod());

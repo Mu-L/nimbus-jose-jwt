@@ -37,7 +37,7 @@ import com.nimbusds.jwt.SignedJWT;
 /**
  * Tests JWS Unencoded Payload Option, https://tools.ietf.org/html/rfc7797
  *
- * @version 2020-04-17
+ * @version 2022-01-24
  */
 public class JWSUnencodedObjectTest extends TestCase {
 	
@@ -86,7 +86,7 @@ public class JWSUnencodedObjectTest extends TestCase {
 		JWSObject jwsObject = new JWSObject(header, detachedPayload);
 		
 		byte[] origSigningInput = jwsObject.getSigningInput();
-		Assert.assertArrayEquals((header.toBase64URL() + "." + detachedPayload.toString()).getBytes(StandardCharset.UTF_8), origSigningInput);
+		Assert.assertArrayEquals((header.toBase64URL() + "." + detachedPayload).getBytes(StandardCharset.UTF_8), origSigningInput);
 		
 		jwsObject.sign(new MACSigner(HMAC_JWK));
 		

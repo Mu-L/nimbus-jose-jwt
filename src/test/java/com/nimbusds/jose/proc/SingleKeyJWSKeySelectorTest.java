@@ -1,13 +1,14 @@
 package com.nimbusds.jose.proc;
 
+
 import java.security.Key;
 import java.util.List;
 import javax.crypto.spec.SecretKeySpec;
 
+import junit.framework.TestCase;
+
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
-import junit.framework.TestCase;
-import org.junit.Test;
 
 public class SingleKeyJWSKeySelectorTest extends TestCase {
 	private final Key key = new SecretKeySpec(new byte[] { 0 }, "mock");

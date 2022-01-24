@@ -19,24 +19,26 @@ package com.nimbusds.jose.crypto;
 
 
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.Assert.assertArrayEquals;
+
+import junit.framework.TestCase;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.impl.MACProvider;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimNames;
-import junit.framework.TestCase;
 
 
 /**
  * Tests HMAC JWS signing and verification. Uses test vectors from JWS spec.
  *
  * @author Vladimir Dzhuvinov
- * @version 2016-04-13
+ * @version 2022-01-24
  */
 public class MACTest extends TestCase {
 
@@ -128,8 +130,7 @@ public class MACTest extends TestCase {
 	}
 
 
-	public void testDetermineCompatibleAlgorithmForSecretSize()
-		throws Exception {
+	public void testDetermineCompatibleAlgorithmForSecretSize() {
 
 		Set<JWSAlgorithm> algs = MACSigner.getCompatibleAlgorithms(0);
 		assertEquals(0, algs.size());
@@ -201,15 +202,15 @@ public class MACTest extends TestCase {
 
 		// Create HMAC signer
 		MACSigner signer = new MACSigner(sharedSecret);
-		assertTrue(Arrays.equals(sharedSecret, signer.getSecretKey().getEncoded()));
+		assertArrayEquals(sharedSecret, signer.getSecretKey().getEncoded());
 
 		// Prepare JWS object with "Hello, world!" payload
 		JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), new Payload("Hello, world!"));
 
 		// Apply the HMAC
 		jwsObject.sign(signer);
-
-		assertTrue(jwsObject.getState().equals(JWSObject.State.SIGNED));
+		
+		assertEquals(jwsObject.getState(), JWSObject.State.SIGNED);
 
 		// To serialize to compact form, produces something like
 		// eyJhbGciOiJIUzI1NiJ9.SGVsbG8sIHdvcmxkIQ.onO9Ihudz3WkiauDO2Uhyuz0Y18UASXlSc1eS0NkWyA
@@ -219,7 +220,7 @@ public class MACTest extends TestCase {
 		jwsObject = JWSObject.parse(s);
 
 		MACVerifier verifier = new MACVerifier(sharedSecret);
-		assertTrue(Arrays.equals(sharedSecret, verifier.getSecretKey().getEncoded()));
+		assertArrayEquals(sharedSecret, verifier.getSecretKey().getEncoded());
 
 		assertTrue(jwsObject.verify(verifier));
 
@@ -292,7 +293,7 @@ public class MACTest extends TestCase {
 	public void testParseAndVerify()
 		throws Exception {
 
-		String s = b64header.toString() + "." + payload.toBase64URL().toString() + "." + b64sig.toString();
+		String s = b64header + "." + payload.toBase64URL() + "." + b64sig;
 
 		JWSObject jwsObject = JWSObject.parse(s);
 
@@ -408,8 +409,7 @@ public class MACTest extends TestCase {
 	}
 
 
-	public void testRejectShortSecret()
-		throws Exception {
+	public void testRejectShortSecret() {
 
 		byte[] secret = new byte[31];
 		new SecureRandom().nextBytes(secret);

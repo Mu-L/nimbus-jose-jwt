@@ -44,7 +44,7 @@ import com.nimbusds.jose.*;
  * <p>Matching by X.509 certificate URL, thumbprint and chain is not supported.
  *
  * @author Vladimir Dzhuvinov
- * @version 2015-04-22
+ * @version 2022-01-24
  */
 public class JOSEMatcher {
 
@@ -465,6 +465,7 @@ public class JOSEMatcher {
 			for (Class<? extends JOSEObject> c: classes) {
 				if (c != null && c.isInstance(joseObject)) {
 					pass = true;
+					break;
 				}
 			}
 

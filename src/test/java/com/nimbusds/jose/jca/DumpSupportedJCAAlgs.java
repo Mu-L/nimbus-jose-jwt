@@ -31,7 +31,7 @@ public class DumpSupportedJCAAlgs {
 	
 
 	@Test
-	public void testDumpAlgs() {
+	public void dumpAlgs() {
 
 		for (Provider provider: Security.getProviders()) {
 			System.out.println("Name: " + provider.getName());
@@ -44,7 +44,7 @@ public class DumpSupportedJCAAlgs {
 	
 
 	@Test
-	public void testDumpBouncyCastle() {
+	public void dumpBouncyCastle() {
 
 		Provider provider = BouncyCastleProviderSingleton.getInstance();
 
@@ -55,7 +55,7 @@ public class DumpSupportedJCAAlgs {
 	// To run the test without class loading clashes disable the optional
 	// plain BC provider in pom.xml
 //	@Test
-	public void testDumpBouncyCastleFIPS() {
+	public void dumpBouncyCastleFIPS() {
 
 		Provider provider = BouncyCastleFIPSProviderSingleton.getInstance();
 

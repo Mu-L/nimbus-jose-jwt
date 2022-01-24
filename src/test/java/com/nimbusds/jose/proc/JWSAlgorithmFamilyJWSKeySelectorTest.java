@@ -17,33 +17,27 @@
 
 package com.nimbusds.jose.proc;
 
+
 import java.net.URL;
 import java.util.Arrays;
 
+import static net.jadler.Jadler.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.jwk.Curve;
-import com.nimbusds.jose.jwk.ECKey;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.KeyUse;
-import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.util.JSONObjectUtils;
 
-import junit.framework.TestCase;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import static net.jadler.Jadler.closeJadler;
-import static net.jadler.Jadler.initJadler;
-import static net.jadler.Jadler.onRequest;
-import static net.jadler.Jadler.port;
-
-public class JWSAlgorithmFamilyJWSKeySelectorTest extends TestCase {
+public class JWSAlgorithmFamilyJWSKeySelectorTest {
 	@Before
 	public void setUp() {
 		initJadler();

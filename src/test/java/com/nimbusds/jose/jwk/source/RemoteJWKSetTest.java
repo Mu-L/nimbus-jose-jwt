@@ -21,7 +21,7 @@ package com.nimbusds.jose.jwk.source;
 import java.io.FileNotFoundException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
@@ -33,15 +33,17 @@ import java.util.concurrent.TimeUnit;
 import static net.jadler.Jadler.*;
 import static org.junit.Assert.*;
 
-import com.nimbusds.jose.RemoteKeySourceException;
-import com.nimbusds.jose.jwk.*;
-import com.nimbusds.jose.util.*;
 import net.jadler.Request;
 import net.jadler.stubbing.Responder;
 import net.jadler.stubbing.StubResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.nimbusds.jose.RemoteKeySourceException;
+import com.nimbusds.jose.jwk.*;
+import com.nimbusds.jose.util.DefaultResourceRetriever;
+import com.nimbusds.jose.util.JSONObjectUtils;
 
 
 public class RemoteJWKSetTest {
@@ -88,7 +90,7 @@ public class RemoteJWKSetTest {
 			.keyID("2")
 			.build();
 
-		JWKSet jwkSet = new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2));
+		JWKSet jwkSet = new JWKSet(Arrays.asList(rsaJWK1, (JWK)rsaJWK2));
 
 		URL jwkSetURL = new URL("http://localhost:" + port() + "/jwks.json");
 
@@ -147,7 +149,7 @@ public class RemoteJWKSetTest {
 			.keyID("2")
 			.build();
 
-		JWKSet jwkSet = new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2));
+		JWKSet jwkSet = new JWKSet(Arrays.asList(rsaJWK1, (JWK)rsaJWK2));
 
 		URL jwkSetURL = new URL("http://localhost:" + port() + "/jwks.json");
 
@@ -222,7 +224,7 @@ public class RemoteJWKSetTest {
 						return StubResponse.builder()
 							.status(200)
 							.header("Content-Type", "application/json")
-							.body( JSONObjectUtils.toJSONString(new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2)).toJSONObject()), Charset.forName("UTF-8"))
+							.body( JSONObjectUtils.toJSONString(new JWKSet(Arrays.asList(rsaJWK1, (JWK)rsaJWK2)).toJSONObject()), StandardCharsets.UTF_8)
 							.build();
 					}
 
@@ -230,7 +232,7 @@ public class RemoteJWKSetTest {
 					return StubResponse.builder()
 						.status(200)
 						.header("Content-Type", "application/json")
-						.body( JSONObjectUtils.toJSONString(new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2, (JWK)rsaJWK3)).toJSONObject()), Charset.forName("UTF-8"))
+						.body( JSONObjectUtils.toJSONString(new JWKSet(Arrays.asList(rsaJWK1, rsaJWK2, (JWK)rsaJWK3)).toJSONObject()), StandardCharsets.UTF_8)
 						.build();
 				}
 			});
@@ -298,7 +300,7 @@ public class RemoteJWKSetTest {
 			.keyID("2")
 			.build();
 
-		JWKSet jwkSet = new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2));
+		JWKSet jwkSet = new JWKSet(Arrays.asList(rsaJWK1, (JWK)rsaJWK2));
 
 		URL jwkSetURL = new URL("http://localhost:" + port() + "/invalid-path");
 

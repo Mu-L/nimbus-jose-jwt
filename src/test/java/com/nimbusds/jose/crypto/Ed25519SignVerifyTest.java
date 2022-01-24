@@ -179,7 +179,7 @@ public class Ed25519SignVerifyTest extends TestCase {
 			65, 66, 67, 68, 69, 70, 71, 72,
 		};
 
-		Set<Base64URL> sigSet = new HashSet<Base64URL>();
+		Set<Base64URL> sigSet = new HashSet<>();
 
 		for (int i=0; i<keyCount; i++) {
 

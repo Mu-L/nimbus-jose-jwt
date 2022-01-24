@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -43,6 +43,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import static net.jadler.Jadler.*;
+import static org.junit.Assert.assertArrayEquals;
 
 import junit.framework.TestCase;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -69,7 +70,7 @@ import com.nimbusds.jose.util.X509CertUtils;
  *
  * @author Vladimir Dzhuvinov
  * @author Vedran Pavic
- * @version 2021-02-01
+ * @version 2022-01-24
  */
 public class JWKSetTest extends TestCase {
 	
@@ -186,7 +187,7 @@ public class JWKSetTest extends TestCase {
 		Map<String, Object> additionalMembers = new HashMap<>();
 		additionalMembers.put("setID", "xyz123");
 		
-		JWKSet keySet = new JWKSet(Arrays.asList((JWK)ecKey, (JWK) rsaKey), additionalMembers);
+		JWKSet keySet = new JWKSet(Arrays.asList(ecKey, (JWK) rsaKey), additionalMembers);
 		assertEquals(2, keySet.getKeys().size());
 		assertEquals(1, keySet.getAdditionalMembers().size());
 		
@@ -266,8 +267,7 @@ public class JWKSetTest extends TestCase {
 	}
 
 
-	public void testParsePrivateJWKSet()
-		throws Exception {
+	public void testParsePrivateJWKSet() {
 
 		// The string is from the JPSK spec
 		String s = "{\"keys\":" +
@@ -599,8 +599,7 @@ public class JWKSetTest extends TestCase {
 	}
 
 
-	public void testOctJWKSetToPublic()
-		throws Exception {
+	public void testOctJWKSetToPublic() {
 
 		OctetSequenceKey oct1 = new OctetSequenceKey.Builder(new Base64URL("abc")).build();
 		assertEquals("abc", oct1.getKeyValue().toString());
@@ -814,7 +813,7 @@ public class JWKSetTest extends TestCase {
 			.respond()
 			.withStatus(200)
 			.withBody(s)
-			.withEncoding(Charset.forName("UTF-8"))
+			.withEncoding(StandardCharsets.UTF_8)
 			.withContentType("application/json");
 
 		JWKSet keySet = JWKSet.load(new URL("http://localhost:" + port()));
@@ -949,7 +948,7 @@ public class JWKSetTest extends TestCase {
 		OctetSequenceKey octJWK = (OctetSequenceKey) jwkSet.getKeyByKeyId("1");
 		assertNotNull(octJWK);
 		assertEquals("1", octJWK.getKeyID());
-		assertTrue(Arrays.equals(secretKey.getEncoded(), octJWK.toByteArray()));
+		assertArrayEquals(secretKey.getEncoded(), octJWK.toByteArray());
 		assertEquals(keyStore, octJWK.getKeyStore());
 		
 		RSAKey rsaKey = (RSAKey) jwkSet.getKeyByKeyId("2");

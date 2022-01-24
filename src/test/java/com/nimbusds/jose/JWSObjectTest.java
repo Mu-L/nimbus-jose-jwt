@@ -33,7 +33,7 @@ import com.nimbusds.jose.util.Base64URL;
  * Tests JWS object methods.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-06-26
+ * @version 2022-01-24
  */
 public class JWSObjectTest extends TestCase {
 
@@ -53,8 +53,8 @@ public class JWSObjectTest extends TestCase {
 		assertEquals(secondPart, jws.getPayload().toBase64URL());
 		assertEquals(thirdPart, jws.getSignature());
 
-		assertEquals(firstPart.toString() + ".abc.def", jws.serialize());
-		assertEquals(firstPart.toString() + ".abc.def", jws.getParsedString());
+		assertEquals(firstPart + ".abc.def", jws.serialize());
+		assertEquals(firstPart + ".abc.def", jws.getParsedString());
 
 		assertEquals(JWSObject.State.SIGNED, jws.getState());
 	}
@@ -68,8 +68,8 @@ public class JWSObjectTest extends TestCase {
 		JWSObject jwsObject = new JWSObject(header, new Payload("Hello world!"));
 
 		Base64URL signingInput = Base64URL.encode(jwsObject.getSigningInput());
-
-		assertTrue(signingInput.equals(Base64URL.encode(jwsObject.getSigningInput())));
+		
+		assertEquals(signingInput, Base64URL.encode(jwsObject.getSigningInput()));
 
 		jwsObject.sign(new MACSigner("12345678901234567890123456789012"));
 

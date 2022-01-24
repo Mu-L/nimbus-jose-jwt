@@ -18,6 +18,12 @@
 package com.nimbusds.jose.crypto;
 
 
+import java.security.SecureRandom;
+import java.util.Collections;
+import javax.crypto.SecretKey;
+
+import junit.framework.TestCase;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.crypto.impl.ContentCryptoProvider;
@@ -26,18 +32,13 @@ import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimNames;
-import junit.framework.TestCase;
-
-import javax.crypto.SecretKey;
-import java.security.SecureRandom;
-import java.util.Collections;
 
 
 /**
  * Tests X25519 ECDH-1PU encryption and decryption.
  *
  * @author Alexander Martynov
- * @version 2021-08-04
+ * @version 2022-01-24
  */
 public class ECDH1PUX25519CryptoTest extends TestCase {
 
@@ -52,9 +53,9 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
     }
 
     private static class CycleTest {
-        public Curve curve;
-        public JWEAlgorithm algorithm;
-        public EncryptionMethod encryptionMethod;
+        public final Curve curve;
+        public final JWEAlgorithm algorithm;
+        public final EncryptionMethod encryptionMethod;
 
         public CycleTest(JWEAlgorithm algorithm, Curve curve, EncryptionMethod encryptionMethod) {
             this.curve = curve;
@@ -64,11 +65,11 @@ public class ECDH1PUX25519CryptoTest extends TestCase {
     }
 
     private static class CurveTest {
-        public OctetKeyPair aliceKey;
-        public OctetKeyPair bobKey;
-        public OctetKeyPair aliceWrongKey;
-        public OctetKeyPair bobWrongKey;
-        public String expectedMessage;
+        public final OctetKeyPair aliceKey;
+        public final OctetKeyPair bobKey;
+        public final OctetKeyPair aliceWrongKey;
+        public final OctetKeyPair bobWrongKey;
+        public final String expectedMessage;
 
         public CurveTest(OctetKeyPair aliceKey,
                          OctetKeyPair bobKey,

@@ -30,7 +30,7 @@ import java.util.UUID;
  *
  *  @author Vladimir Dzhuvinov
  *  @author Simon Kissane
- *  @version 2020-10-20
+ *  @version 2022-01-24
  */
 public class X509CertUtils {
 
@@ -233,7 +233,7 @@ public class X509CertUtils {
 			sb.append('\n');
 		
 		try {
-			sb.append(Base64.encode(cert.getEncoded()).toString());
+			sb.append(Base64.encode(cert.getEncoded()));
 		} catch (CertificateEncodingException e) {
 			return null;
 		}

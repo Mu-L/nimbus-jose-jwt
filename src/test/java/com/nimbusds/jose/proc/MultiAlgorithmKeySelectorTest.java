@@ -84,7 +84,7 @@ public class MultiAlgorithmKeySelectorTest {
 		candidates = keySelector.selectJWSKeys(new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(kid2).build(), null);
 		
 		assertEquals(1, candidates.size());
-		assertEquals(signingES256Jwk.toECPublicKey().getAlgorithm(), ((ECPublicKey)candidates.get(0)).getAlgorithm());
+		assertEquals(signingES256Jwk.toECPublicKey().getAlgorithm(), candidates.get(0).getAlgorithm());
 		assertEquals(signingES256Jwk.toECPublicKey().getParams(), ((ECPublicKey)candidates.get(0)).getParams());
 	}
 

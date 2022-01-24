@@ -57,7 +57,7 @@ public class ECDHCurveCheckTest extends TestCase {
 		
 		ECPrivateKey pk = new ECPrivateKey() {
 			
-			BigInteger bi = new BigInteger(
+			final BigInteger bi = new BigInteger(
 				"38124166010662753100689735609285807169841714722622367731519061366402702420444");
 			
 			@Override

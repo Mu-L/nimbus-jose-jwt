@@ -18,6 +18,8 @@
 package com.nimbusds.jose;
 
 
+import java.nio.charset.StandardCharsets;
+
 import junit.framework.TestCase;
 
 import com.nimbusds.jwt.SignedJWT;
@@ -48,7 +50,7 @@ public class PayloadTest extends TestCase {
 		assertEquals(Payload.Origin.JWS_OBJECT, payload.getOrigin());
 		assertEquals(jwsObject, payload.toJWSObject());
 		assertEquals(s, payload.toString());
-		assertEquals(s, new String(payload.toBytes(), "UTF-8"));
+		assertEquals(s, new String(payload.toBytes(), StandardCharsets.UTF_8));
 	}
 
 
@@ -69,7 +71,7 @@ public class PayloadTest extends TestCase {
 		assertEquals(JWSAlgorithm.HS256, payload.toJWSObject().getHeader().getAlgorithm());
 
 		assertEquals(s, payload.toString());
-		assertEquals(s, new String(payload.toBytes(), "UTF-8"));
+		assertEquals(s, new String(payload.toBytes(), StandardCharsets.UTF_8));
 	}
 
 
@@ -94,7 +96,7 @@ public class PayloadTest extends TestCase {
 		assertNotNull(payload.toJWSObject());
 
 		assertEquals(s, payload.toString());
-		assertEquals(s, new String(payload.toBytes(), "UTF-8"));
+		assertEquals(s, new String(payload.toBytes(), StandardCharsets.UTF_8));
 	}
 
 
@@ -118,7 +120,7 @@ public class PayloadTest extends TestCase {
 		assertNotNull(payload.toJWSObject());
 
 		assertEquals(s, payload.toString());
-		assertEquals(s, new String(payload.toBytes(), "UTF-8"));
+		assertEquals(s, new String(payload.toBytes(), StandardCharsets.UTF_8));
 	}
 
 

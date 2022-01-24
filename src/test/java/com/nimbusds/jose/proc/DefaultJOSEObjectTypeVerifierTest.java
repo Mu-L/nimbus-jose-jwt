@@ -121,7 +121,7 @@ public class DefaultJOSEObjectTypeVerifierTest extends TestCase {
 	
 	public void testVarargConstructor_noneAndJWTAllowed() throws BadJOSEException {
 		
-		DefaultJOSEObjectTypeVerifier verifier = new DefaultJOSEObjectTypeVerifier((JOSEObjectType)null, JOSEObjectType.JWT);
+		DefaultJOSEObjectTypeVerifier verifier = new DefaultJOSEObjectTypeVerifier(null, JOSEObjectType.JWT);
 		
 		assertEquals(new HashSet<>(Arrays.asList(null, JOSEObjectType.JWT)), verifier.getAllowedTypes());
 		assertTrue(verifier.getAllowedTypes().contains(null));

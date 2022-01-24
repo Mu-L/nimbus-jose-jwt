@@ -30,14 +30,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.nimbusds.jose.util.Base64;
-import com.nimbusds.jose.util.X509CertUtils;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+
+import com.nimbusds.jose.util.Base64;
+import com.nimbusds.jose.util.X509CertUtils;
 
 
 public class SampleCertificates {
@@ -181,7 +182,7 @@ public class SampleCertificates {
 			JcaContentSignerBuilder signerBuilder = new JcaContentSignerBuilder("SHA256withECDSA");
 			X509CertificateHolder certHolder = x509certBuilder.build(signerBuilder.build(privateKey));
 			X509Certificate cert = X509CertUtils.parse(certHolder.getEncoded());
-			SAMPLE_X5C_EC = Collections.unmodifiableList(Collections.singletonList(Base64.encode(cert.getEncoded())));
+			SAMPLE_X5C_EC = Collections.singletonList(Base64.encode(cert.getEncoded()));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

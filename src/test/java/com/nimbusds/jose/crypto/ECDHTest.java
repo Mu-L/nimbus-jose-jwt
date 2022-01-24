@@ -18,8 +18,11 @@
 package com.nimbusds.jose.crypto;
 
 
-import java.util.Arrays;
 import javax.crypto.SecretKey;
+
+import static org.junit.Assert.assertArrayEquals;
+
+import junit.framework.TestCase;
 
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.crypto.impl.ECDH;
@@ -27,14 +30,12 @@ import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
-import junit.framework.TestCase;
-import org.junit.Assert;
 
 
 /**
  * Tests the ECDH key agreement derivation.
  *
- * @version 2018-08-23
+ * @version 2022-01-24
  */
 public class ECDHTest extends TestCase{
 
@@ -59,7 +60,7 @@ public class ECDHTest extends TestCase{
 			BouncyCastleProviderSingleton.getInstance());
 
 		// The algorithm is deterministic, the two outputs must be identical
-		assertTrue(Arrays.equals(sharedSecret.getEncoded(), sharedSecretCopy.getEncoded()));
+		assertArrayEquals(sharedSecret.getEncoded(), sharedSecretCopy.getEncoded());
 	}
 
 
@@ -117,7 +118,7 @@ public class ECDHTest extends TestCase{
 		SecretKey sharedSecret = ECDH.deriveSharedSecret(receiverKey, ephemeralKey);
 
 		byte[] expected = new Base64URL("Sl2dW6TOLeFyjjv0gDUPJeB-IclH0Z4zdvCbPB4WF0I").decode();
-		Assert.assertArrayEquals(sharedSecret.getEncoded(), expected);
+		assertArrayEquals(sharedSecret.getEncoded(), expected);
 	}
 
 
@@ -146,7 +147,7 @@ public class ECDHTest extends TestCase{
 			(byte)114, (byte)131, (byte) 66, (byte)131, (byte)191, (byte)132, (byte) 38, (byte)156,
 			(byte)251, (byte) 49, (byte)110, (byte)163, (byte)218, (byte)128, (byte)106, (byte) 72,
 			(byte)246, (byte)218, (byte)167, (byte)121, (byte)140, (byte)254, (byte)144, (byte)196 };
-
-		assertTrue(Arrays.equals(expected, sharedSecret.getEncoded()));
+		
+		assertArrayEquals(expected, sharedSecret.getEncoded());
 	}
 }

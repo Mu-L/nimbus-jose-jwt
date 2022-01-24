@@ -34,7 +34,7 @@ import junit.framework.TestCase;
  *
  * @author Vladimir Dzhuvinov
  * @author Justin Richer
- * @version 2021-02-22
+ * @version 2022-01-24
  */
 public class JWTClaimsSetTest extends TestCase {
 
@@ -180,9 +180,9 @@ public class JWTClaimsSetTest extends TestCase {
 
 		Map<String, Object> json = cs.toJSONObject();
 
-		assertEquals(new Long(60L), json.get(JWTClaimNames.ISSUED_AT));
-		assertEquals(new Long(60L), json.get(JWTClaimNames.NOT_BEFORE));
-		assertEquals(new Long(60L), json.get(JWTClaimNames.EXPIRATION_TIME));
+		assertEquals(60L, json.get(JWTClaimNames.ISSUED_AT));
+		assertEquals(60L, json.get(JWTClaimNames.NOT_BEFORE));
+		assertEquals(60L, json.get(JWTClaimNames.EXPIRATION_TIME));
 	}
 	
 	
@@ -298,10 +298,10 @@ public class JWTClaimsSetTest extends TestCase {
 		assertEquals(new Date(999000L), builder.build().getDateClaim("date-long"));
 		
 		builder.claim("float", 3.14f);
-		assertEquals(3.14f, builder.build().getFloatClaim("float").floatValue());
+		assertEquals(3.14f, builder.build().getFloatClaim("float"));
 		
 		builder.claim("double", 3.14d);
-		assertEquals(3.14d, builder.build().getDoubleClaim("double").doubleValue());
+		assertEquals(3.14d, builder.build().getDoubleClaim("double"));
 	}
 	
 	

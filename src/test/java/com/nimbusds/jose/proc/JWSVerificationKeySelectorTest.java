@@ -119,7 +119,7 @@ public class JWSVerificationKeySelectorTest extends TestCase {
 
 		JWSVerificationKeySelector keySelector = new JWSVerificationKeySelector(
 			JWSAlgorithm.RS256,
-			new ImmutableJWKSet(new JWKSet(Arrays.asList((JWK)rsaJWK1, (JWK)rsaJWK2))));
+			new ImmutableJWKSet(new JWKSet(Arrays.asList(rsaJWK1, (JWK)rsaJWK2))));
 
 		assertTrue(keySelector.isAllowed(JWSAlgorithm.RS256));
 		assertEquals(JWSAlgorithm.RS256, keySelector.getExpectedJWSAlgorithm());

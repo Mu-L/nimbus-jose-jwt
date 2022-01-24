@@ -49,7 +49,7 @@ import com.nimbusds.jwt.util.DateUtils;
  * from the JWS spec.
  *
  * @author Vladimir Dzhuvinov
- * @version 2021-02-20
+ * @version 2022-01-24
  */
 public class RSASSATest {
 
@@ -307,7 +307,7 @@ public class RSASSATest {
 	public void testParseAndVerify()
 		throws Exception {
 
-		String s = B64_HEADER.toString() + "." + PAYLOAD.toBase64URL().toString() + "." + B64_SIG.toString();
+		String s = B64_HEADER + "." + PAYLOAD.toBase64URL() + "." + B64_SIG;
 
 		JWSObject jwsObject = JWSObject.parse(s);
 
@@ -329,7 +329,7 @@ public class RSASSATest {
 	public void testVerifyTruncatedSignature()
 		throws Exception {
 
-		String s = B64_HEADER.toString() + "." + PAYLOAD.toBase64URL().toString() + "." + B64_SIG.toString().substring(0, 100);
+		String s = B64_HEADER + "." + PAYLOAD.toBase64URL() + "." + B64_SIG.toString().substring(0, 100);
 
 		JWSObject jwsObject = JWSObject.parse(s);
 
@@ -349,7 +349,7 @@ public class RSASSATest {
 	public void testVerifyAppendedSignature()
 		throws Exception {
 
-		String s = B64_HEADER.toString() + "." + PAYLOAD.toBase64URL().toString() + "." + B64_SIG + "abc";
+		String s = B64_HEADER + "." + PAYLOAD.toBase64URL() + "." + B64_SIG + "abc";
 
 		JWSObject jwsObject = JWSObject.parse(s);
 
@@ -367,7 +367,7 @@ public class RSASSATest {
 
 	private static String transpose(String s) {
 		int L = s.length();
-		return (L < 2) ? s : s.substring(0, 1) + s.substring(L-1, L) + transpose(s.substring(1, L-1));
+		return (L < 2) ? s : s.charAt(0) + s.charAt(L-1) + transpose(s.substring(1, L-1));
 	}
 	
 	
@@ -375,7 +375,7 @@ public class RSASSATest {
 	public void testVerifyBadSignatureOfExpectedLength()
 		throws Exception {
 
-		String s = B64_HEADER.toString() + "." + PAYLOAD.toBase64URL().toString() + "." + transpose(B64_SIG.toString());
+		String s = B64_HEADER + "." + PAYLOAD.toBase64URL() + "." + transpose(B64_SIG.toString());
 
 		JWSObject jwsObject = JWSObject.parse(s);
 

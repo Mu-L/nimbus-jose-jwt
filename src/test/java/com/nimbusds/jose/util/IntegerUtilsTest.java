@@ -18,9 +18,8 @@
 package com.nimbusds.jose.util;
 
 
-import java.util.Arrays;
+import static org.junit.Assert.assertArrayEquals;
 
-import com.nimbusds.jose.util.IntegerUtils;
 import junit.framework.TestCase;
 
 
@@ -31,13 +30,13 @@ public class IntegerUtilsTest extends TestCase {
 
 
 	public void testGetBytesFromZeroInteger() {
-
-		assertTrue(Arrays.equals(new byte[]{0, 0, 0, 0}, IntegerUtils.toBytes(0)));
+		
+		assertArrayEquals(new byte[]{0, 0, 0, 0}, IntegerUtils.toBytes(0));
 	}
 
 
 	public void testGetBytesFromOneInteger() {
-
-		assertTrue(Arrays.equals(new byte[]{0, 0, 0, 1}, IntegerUtils.toBytes(1)));
+		
+		assertArrayEquals(new byte[]{0, 0, 0, 1}, IntegerUtils.toBytes(1));
 	}
 }

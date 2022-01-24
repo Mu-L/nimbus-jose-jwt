@@ -106,7 +106,7 @@ public class BoundedInputStreamTest extends TestCase {
 		assertEquals(limit, bis.getLimitBytes());
 		
 		for (int i=0; i<limit; i++) {
-			assertTrue(bis.read() == 1);
+			assertEquals(1, bis.read());
 		}
 		
 		try {
@@ -133,7 +133,7 @@ public class BoundedInputStreamTest extends TestCase {
 		assertEquals(limit, bis.getLimitBytes());
 		
 		for (int i=0; i< limit -1 ; i++) {
-			assertTrue(bis.read() == 1);
+			assertEquals(1, bis.read());
 		}
 		assertEquals(-1L, bis.read());
 		assertEquals(0, bis.available());
@@ -151,7 +151,7 @@ public class BoundedInputStreamTest extends TestCase {
 		assertEquals(-1L, bis.getLimitBytes());
 		
 		for (int i=0; i< data.length ; i++) {
-			assertTrue(bis.read() == 1);
+			assertEquals(1, bis.read());
 		}
 		assertEquals(-1L, bis.read());
 		assertEquals(0, bis.available());

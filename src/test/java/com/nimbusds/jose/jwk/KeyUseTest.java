@@ -21,7 +21,7 @@ package com.nimbusds.jose.jwk;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
@@ -29,21 +29,22 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
 
-import com.nimbusds.jose.HeaderParameterNames;
-import com.nimbusds.jose.util.IOUtils;
-import com.nimbusds.jose.util.X509CertUtils;
 import junit.framework.TestCase;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
+import com.nimbusds.jose.HeaderParameterNames;
+import com.nimbusds.jose.util.IOUtils;
+import com.nimbusds.jose.util.X509CertUtils;
+
 
 /**
  * Tests the key use enumeration.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-02-06
+ * @version 2022-01-24
  */
 public class KeyUseTest extends TestCase {
 
@@ -69,7 +70,7 @@ public class KeyUseTest extends TestCase {
 		assertEquals("tls", tls.toString());
 		
 		assertEquals("tls", KeyUse.parse("tls").identifier());
-		assertTrue(tls.equals(new KeyUse("tls")));
+		assertEquals(tls, new KeyUse("tls"));
 	}
 
 
@@ -117,7 +118,7 @@ public class KeyUseTest extends TestCase {
 	public void testInferKeyUseFromX509Cert_RSAENC()
 		throws IOException {
 		
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), Charset.forName("UTF-8"));
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), StandardCharsets.UTF_8);
 		X509Certificate x509Cert = X509CertUtils.parse(pemEncodedCert);
 		assertEquals(KeyUse.ENCRYPTION, KeyUse.from(x509Cert));
 	}
@@ -126,7 +127,7 @@ public class KeyUseTest extends TestCase {
 	public void testInferKeyUseFromX509Cert_ECDH()
 		throws IOException {
 		
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), Charset.forName("UTF-8"));
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), StandardCharsets.UTF_8);
 		X509Certificate x509Cert = X509CertUtils.parse(pemEncodedCert);
 		assertEquals(KeyUse.ENCRYPTION, KeyUse.from(x509Cert));
 	}

@@ -18,7 +18,7 @@
 package com.nimbusds.jose.proc;
 
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -28,18 +28,19 @@ import java.security.interfaces.RSAPrivateKey;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import junit.framework.TestCase;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.*;
 import com.nimbusds.jose.crypto.factories.DefaultJWEDecrypterFactory;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.util.ByteUtils;
-import junit.framework.TestCase;
 
 
 /**
  * Tests the default JWE decrypter factory.
  *
- * @version 2015-06-29
+ * @version 2022-01-24
  */
 public class DefaultJWEDecrypterFactoryTest extends TestCase {
 
@@ -142,8 +143,7 @@ public class DefaultJWEDecrypterFactoryTest extends TestCase {
 	}
 
 
-	public void testCreateDirectDecrypterWithIncompatibleKeyLength()
-		throws Exception {
+	public void testCreateDirectDecrypterWithIncompatibleKeyLength() {
 
 		JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A128GCM);
 		Key key = generateSharedKey(256);
@@ -177,8 +177,7 @@ public class DefaultJWEDecrypterFactoryTest extends TestCase {
 	}
 
 
-	public void testCreateAESDecrypterWithIncompatibleKeyLength()
-		throws Exception {
+	public void testCreateAESDecrypterWithIncompatibleKeyLength() {
 
 		JWEHeader header = new JWEHeader(JWEAlgorithm.A128KW, EncryptionMethod.A128CBC_HS256);
 		Key key = generateSharedKey(256);
@@ -198,7 +197,7 @@ public class DefaultJWEDecrypterFactoryTest extends TestCase {
 		throws Exception {
 
 		JWEHeader header = new JWEHeader(JWEAlgorithm.PBES2_HS256_A128KW, EncryptionMethod.A128CBC_HS256);
-		Key key = new SecretKeySpec("secret".getBytes(Charset.forName("UTF-8")), "AES");
+		Key key = new SecretKeySpec("secret".getBytes(StandardCharsets.UTF_8), "AES");
 
 		JWEDecrypterFactory factory = new DefaultJWEDecrypterFactory();
 

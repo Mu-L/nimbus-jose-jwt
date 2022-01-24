@@ -18,7 +18,7 @@
 package com.nimbusds.jose.crypto;
 
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.ECPrivateKey;
@@ -26,44 +26,31 @@ import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.util.Collections;
 import java.util.HashSet;
-
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import junit.framework.TestCase;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
 import org.jose4j.jwe.JsonWebEncryption;
 
-import com.nimbusds.jose.EncryptionMethod;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWEAlgorithm;
-import com.nimbusds.jose.JWEHeader;
-import com.nimbusds.jose.JWEObject;
-import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
-import com.nimbusds.jose.crypto.impl.AAD;
-import com.nimbusds.jose.crypto.impl.AESCBC;
-import com.nimbusds.jose.crypto.impl.AESGCM;
-import com.nimbusds.jose.crypto.impl.AESKW;
-import com.nimbusds.jose.crypto.impl.AuthenticatedCipherText;
-import com.nimbusds.jose.crypto.impl.ConcatKDF;
-import com.nimbusds.jose.crypto.impl.ECDH;
+import com.nimbusds.jose.crypto.impl.*;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.ByteUtils;
 import com.nimbusds.jose.util.Container;
 
-import junit.framework.TestCase;
-
 
 /**
  * Tests ECDH encryption and decryption.
  *
  * @author Vladimir Dzhuvinov
- * @version 2019-01-24
+ * @version 2022-01-24
  */
 public class ECDHCryptoTest extends TestCase {
 
@@ -522,7 +509,7 @@ public class ECDHCryptoTest extends TestCase {
 		final AuthenticatedCipherText authCipherText = AESCBC.encryptAuthenticated(
 			derivedKey,
 			iv.decode(),
-			plainText.getBytes(Charset.forName("UTF-8")),
+			plainText.getBytes(StandardCharsets.UTF_8),
 			aad,
 			null,
 			null);
@@ -614,7 +601,7 @@ public class ECDHCryptoTest extends TestCase {
 		final AuthenticatedCipherText authCipherText = AESGCM.encrypt(
 			cek,
 			new Container<>(iv.decode()),
-			plainText.getBytes(Charset.forName("UTF-8")),
+			plainText.getBytes(StandardCharsets.UTF_8),
 			aad,
 			BouncyCastleProviderSingleton.getInstance()); // Provider
 

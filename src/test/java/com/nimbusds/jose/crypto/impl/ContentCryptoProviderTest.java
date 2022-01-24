@@ -18,14 +18,13 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.util.Arrays;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.nimbusds.jose.crypto.impl.ContentCryptoProvider;
+import static org.junit.Assert.assertArrayEquals;
+
 import junit.framework.TestCase;
 
 import com.nimbusds.jose.*;
@@ -39,7 +38,7 @@ import com.nimbusds.jose.util.ByteUtils;
  * Tests the content encryption / decryption provider.
  *
  * @author Vladimir Dzhuvinov
- * @version 2015-06-29
+ * @version 2022-01-24
  */
 public class ContentCryptoProviderTest extends TestCase {
 
@@ -79,7 +78,7 @@ public class ContentCryptoProviderTest extends TestCase {
 		throws Exception {
 
 		final JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256CBC_HS512);
-		final byte[] clearText = "Hello world!".getBytes(Charset.forName("UTF-8"));
+		final byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
 		byte[] cekBytes = new byte[64];
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
@@ -93,22 +92,22 @@ public class ContentCryptoProviderTest extends TestCase {
 			cek,
 			encryptedKey,
 			jcaProvider);
-
-		assertTrue(Arrays.equals(clearText, ContentCryptoProvider.decrypt(
+		
+		assertArrayEquals(clearText, ContentCryptoProvider.decrypt(
 			header,
 			encryptedKey,
 			jweParts.getInitializationVector(),
 			jweParts.getCipherText(),
 			jweParts.getAuthenticationTag(),
 			cek,
-			jcaProvider)));
+			jcaProvider));
 	}
 
 	public void test_A256CBC_HS512_cekTooShort()
 		throws Exception {
 
 		final JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256CBC_HS512);
-		final byte[] clearText = "Hello world!".getBytes(Charset.forName("UTF-8"));
+		final byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
 		byte[] cekBytes = new byte[32];
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");
@@ -137,7 +136,7 @@ public class ContentCryptoProviderTest extends TestCase {
 		throws Exception {
 
 		final JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256GCM);
-		final byte[] clearText = "Hello world!".getBytes(Charset.forName("UTF-8"));
+		final byte[] clearText = "Hello world!".getBytes(StandardCharsets.UTF_8);
 		byte[] cekBytes = new byte[16];
 		new SecureRandom().nextBytes(cekBytes);
 		SecretKey cek = new SecretKeySpec(cekBytes, "AES");

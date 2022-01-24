@@ -21,7 +21,7 @@ package com.nimbusds.jose.jwk;
 import java.io.File;
 import java.math.BigInteger;
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
@@ -54,7 +54,7 @@ import com.nimbusds.jose.util.*;
  * Tests the EC JWK class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-06-03
+ * @version 2022-01-24
  */
 public class ECKeyTest extends TestCase {
 
@@ -295,7 +295,7 @@ public class ECKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject());
 
 		key = ECKey.parse(jwkString);
 
@@ -380,7 +380,7 @@ public class ECKeyTest extends TestCase {
 		assertTrue(key.isPrivate());
 
 
-		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject()).toString();
+		String jwkString = JSONObjectUtils.toJSONString( key.toJSONObject());
 
 		key = ECKey.parse(jwkString);
 
@@ -660,7 +660,7 @@ public class ECKeyTest extends TestCase {
 
 		String orderedJSON = "{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\",\"y\":\"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\"}";
 
-		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(Charset.forName("UTF-8"))));
+		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(StandardCharsets.UTF_8)));
 
 		assertEquals(expected, thumbprint);
 	}
@@ -690,7 +690,7 @@ public class ECKeyTest extends TestCase {
 
 		String orderedJSON = JSONObjectUtils.toJSONString(ecKey.getRequiredParams());
 
-		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(Charset.forName("UTF-8"))));
+		Base64URL expected = Base64URL.encode(MessageDigest.getInstance("SHA-256").digest(orderedJSON.getBytes(StandardCharsets.UTF_8)));
 
 		assertEquals(expected, thumbprint);
 	}
@@ -866,7 +866,7 @@ public class ECKeyTest extends TestCase {
 		throws Exception {
 		
 		MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), Charset.forName("UTF-8"));
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), StandardCharsets.UTF_8);
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		ECKey ecKey = ECKey.parse(cert);
 		
@@ -885,7 +885,7 @@ public class ECKeyTest extends TestCase {
 	public void testParseFromX509CertWithRSAPublicKey()
 		throws Exception {
 		
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), Charset.forName("UTF-8"));
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), StandardCharsets.UTF_8);
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		
 		try {
@@ -967,7 +967,7 @@ public class ECKeyTest extends TestCase {
 		char[] password = "secret".toCharArray();
 		keyStore.load(null, password);
 		
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), Charset.forName("UTF-8"));
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), StandardCharsets.UTF_8);
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		
 		keyStore.setCertificateEntry("1", cert);
@@ -993,7 +993,7 @@ public class ECKeyTest extends TestCase {
 		char[] password = "secret".toCharArray();
 		keyStore.load(null, password);
 		
-		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), Charset.forName("UTF-8"));
+		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), StandardCharsets.UTF_8);
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		
 		keyStore.setCertificateEntry("1", cert);

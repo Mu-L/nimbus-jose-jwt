@@ -41,7 +41,7 @@ import static org.junit.Assert.assertArrayEquals;
  *
  * @author Alexander Martynov
  * @author Vladimir Dzhuvinov
- * @version 2021-09-26
+ * @version 2022-01-24
  */
 public class XC20PTest extends TestCase {
 	
@@ -57,17 +57,17 @@ public class XC20PTest extends TestCase {
 	
 	private static class TestVector {
 		
-		public byte[] iv;
+		public final byte[] iv;
 		
-		public byte[] key;
+		public final byte[] key;
 		
-		public byte[] tag;
+		public final byte[] tag;
 		
-		public byte[] aad;
+		public final byte[] aad;
 		
-		public byte[] plaintext;
+		public final byte[] plaintext;
 		
-		public byte[] ciphertext;
+		public final byte[] ciphertext;
 		
 		public TestVector(byte[] iv,
 				  byte[] key,

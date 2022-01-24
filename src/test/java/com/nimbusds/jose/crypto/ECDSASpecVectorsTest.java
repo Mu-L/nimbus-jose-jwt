@@ -18,14 +18,10 @@
 package com.nimbusds.jose.crypto;
 
 
-import com.nimbusds.jose.jwk.Curve;
 import junit.framework.TestCase;
 
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.JWSVerifier;
-import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64URL;
 
@@ -34,7 +30,7 @@ import com.nimbusds.jose.util.Base64URL;
  * Tests ES256 JWS signing and verification. Uses test vectors from JWS spec.
  *
  * @author Vladimir Dzhuvinov
- * @version 2018-08-23
+ * @version 2022-01-24
  */
 public class ECDSASpecVectorsTest extends TestCase {
 
@@ -169,7 +165,7 @@ public class ECDSASpecVectorsTest extends TestCase {
 	public void testParseAndVerify()
 		throws Exception {
 
-		String s = b64header.toString() + "." + payload.toBase64URL().toString() + "." + b64sig.toString();
+		String s = b64header + "." + payload.toBase64URL() + "." + b64sig;
 
 		JWSObject jwsObject = JWSObject.parse(s);
 

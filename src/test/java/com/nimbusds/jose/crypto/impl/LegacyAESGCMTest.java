@@ -18,14 +18,11 @@
 package com.nimbusds.jose.crypto.impl;
 
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import com.nimbusds.jose.crypto.impl.AESGCM;
-import com.nimbusds.jose.crypto.impl.AuthenticatedCipherText;
-import com.nimbusds.jose.crypto.impl.LegacyAESGCM;
 import junit.framework.TestCase;
 
 
@@ -43,14 +40,14 @@ public class LegacyAESGCMTest extends TestCase {
 		SecretKey secretKey = keyGen.generateKey();
 
 		byte[] iv = AESGCM.generateIV(new SecureRandom());
-		byte[] plainText = "Hello world!".getBytes(Charset.forName("UTF-8"));
-		byte[] authData = "abc".getBytes(Charset.forName("UTF-8"));
+		byte[] plainText = "Hello world!".getBytes(StandardCharsets.UTF_8);
+		byte[] authData = "abc".getBytes(StandardCharsets.UTF_8);
 
 		AuthenticatedCipherText cipherText = LegacyAESGCM.encrypt(secretKey, iv, plainText, authData);
 
 		byte[] decryptedPlainText = LegacyAESGCM.decrypt(secretKey, iv, cipherText.getCipherText(), authData, cipherText.getAuthenticationTag());
 
-		assertEquals("Hello world!", new String(decryptedPlainText, Charset.forName("UTF-8")));
+		assertEquals("Hello world!", new String(decryptedPlainText, StandardCharsets.UTF_8));
 	}
 }
 

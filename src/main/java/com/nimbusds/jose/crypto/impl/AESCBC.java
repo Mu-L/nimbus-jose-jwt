@@ -48,7 +48,7 @@ import com.nimbusds.jose.util.StandardCharset;
  *
  * @author Vladimir Dzhuvinov
  * @author Axel Nennker
- * @version 2018-01-04
+ * @version 2022-01-24
  */
 @ThreadSafe
 public class AESCBC {
@@ -257,9 +257,9 @@ public class AESCBC {
 		// Generate content integrity key for HMAC
 		SecretKey cik = LegacyConcatKDF.generateCIK(secretKey, header.getEncryptionMethod(), epu, epv);
 
-		String macInput = header.toBase64URL().toString() + "." +
-			encryptedKey.toString() + "." +
-			Base64URL.encode(iv).toString() + "." +
+		String macInput = header.toBase64URL() + "." +
+			encryptedKey + "." +
+			Base64URL.encode(iv) + "." +
 			Base64URL.encode(cipherText);
 
 		byte[] mac = HMAC.compute(cik, macInput.getBytes(StandardCharset.UTF_8), macProvider);
