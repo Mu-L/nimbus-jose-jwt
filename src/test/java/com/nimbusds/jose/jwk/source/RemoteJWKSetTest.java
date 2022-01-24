@@ -106,9 +106,75 @@ public class RemoteJWKSetTest {
 			.withHeader("Content-Type", "application/json")
 			.withBody( JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true)));
 
-		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, null);
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL);
 
 		assertTrue(jwkSetSource.getResourceRetriever() instanceof DefaultResourceRetriever);
+
+		assertEquals(jwkSetURL, jwkSetSource.getJWKSetURL());
+		assertNotNull(jwkSetSource.getResourceRetriever());
+		assertTrue(jwkSetSource.getJWKSetCache() instanceof DefaultJWKSetCache);
+		assertNull(jwkSetSource.getCachedJWKSet());
+
+		List<JWK> matches = jwkSetSource.get(new JWKSelector(new JWKMatcher.Builder().keyID("1").build()), null);
+
+		RSAKey m1 = (RSAKey) matches.get(0);
+		assertEquals(rsaJWK1.getPublicExponent(), m1.getPublicExponent());
+		assertEquals(rsaJWK1.getModulus(), m1.getModulus());
+		assertEquals("1", m1.getKeyID());
+
+		assertEquals(1, matches.size());
+
+		JWKSet out = jwkSetSource.getCachedJWKSet();
+		assertTrue(out.getKeys().get(0) instanceof RSAKey);
+		assertTrue(out.getKeys().get(1) instanceof RSAKey);
+		assertEquals("1", out.getKeys().get(0).getKeyID());
+		assertEquals("2", out.getKeys().get(1).getKeyID());
+		assertEquals(2, out.getKeys().size());
+	}
+
+
+	@Test
+	public void testWithExplicitRetriever()
+		throws Exception {
+
+		KeyPairGenerator pairGen = KeyPairGenerator.getInstance("RSA");
+		pairGen.initialize(1024);
+		KeyPair keyPair = pairGen.generateKeyPair();
+
+		RSAKey rsaJWK1 = new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
+			.privateKey((RSAPrivateKey) keyPair.getPrivate())
+			.keyID("1")
+			.build();
+
+		keyPair = pairGen.generateKeyPair();
+
+		RSAKey rsaJWK2 = new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
+			.privateKey((RSAPrivateKey) keyPair.getPrivate())
+			.keyID("2")
+			.build();
+
+		JWKSet jwkSet = new JWKSet(Arrays.asList(rsaJWK1, (JWK)rsaJWK2));
+
+		URL jwkSetURL = new URL("http://localhost:" + port() + "/jwks.json");
+
+		onRequest()
+			.havingMethodEqualTo("GET")
+			.havingPathEqualTo("/jwks.json")
+			.respond()
+			.withStatus(200)
+			.withHeader("Content-Type", "application/json")
+			.withBody( JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true)));
+
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(
+			jwkSetURL,
+			new DefaultResourceRetriever(
+				5_000, 2_500, 100_000
+			)
+		);
+
+		assertEquals(5_000, ((DefaultResourceRetriever)jwkSetSource.getResourceRetriever()).getConnectTimeout());
+		assertEquals(2_500, ((DefaultResourceRetriever)jwkSetSource.getResourceRetriever()).getReadTimeout());
+		assertEquals(100_000, ((DefaultResourceRetriever)jwkSetSource.getResourceRetriever()).getSizeLimit());
 
 		assertEquals(jwkSetURL, jwkSetSource.getJWKSetURL());
 		assertNotNull(jwkSetSource.getResourceRetriever());
@@ -241,7 +307,7 @@ public class RemoteJWKSetTest {
 				}
 			});
 
-		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, null);
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL);
 
 		assertEquals(jwkSetURL, jwkSetSource.getJWKSetURL());
 		assertNotNull(jwkSetSource.getResourceRetriever());
@@ -308,7 +374,7 @@ public class RemoteJWKSetTest {
 			.withHeader("Content-Type", "application/json")
 			.withBody(JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true)));
 
-		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, null);
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL);
 
 		assertEquals(jwkSetURL, jwkSetSource.getJWKSetURL());
 
