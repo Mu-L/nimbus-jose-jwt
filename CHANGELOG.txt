@@ -1396,3 +1396,7 @@ version 9.16 (2022-01-24)
       are String before cast.
     * Updates BouncyCastle to 1.70.
     * Upgrades to Google Tink 1.6.1.
+
+version 9.16.1 (2022-01-25)
+    * Updates RemoteJWKSet for efficient cache updates when the
+      RemoteJWKSet.get method is called from multiple threads (iss #457).
