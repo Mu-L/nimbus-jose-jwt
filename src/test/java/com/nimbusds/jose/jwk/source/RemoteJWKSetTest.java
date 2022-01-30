@@ -40,6 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.KeySourceException;
 import com.nimbusds.jose.RemoteKeySourceException;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
@@ -204,7 +205,7 @@ public class RemoteJWKSetTest {
 			.withHeader("Content-Type", "application/json")
 			.withBody(JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true)));
 
-		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, null);
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL);
 
 		assertEquals(jwkSetURL, jwkSetSource.getJWKSetURL());
 		assertNotNull(jwkSetSource.getResourceRetriever());
@@ -293,20 +294,137 @@ public class RemoteJWKSetTest {
 
 
 	@Test
-	public void testInvalidJWKSetURL()
+	public void testWithFailoverJWKSource_immutableJWKSet()
 		throws Exception {
 
-		JWKSet jwkSet = new JWKSet(Arrays.asList(RSA_JWK_1, (JWK)RSA_JWK_2));
-
-		URL jwkSetURL = new URL("http://localhost:" + port() + "/invalid-path");
+		URL jwkSetURL = new URL("http://localhost:" + port() + "/jwks.json");
 
 		onRequest()
 			.havingMethodEqualTo("GET")
 			.havingPathEqualTo("/jwks.json")
 			.respond()
+			.withStatus(404);
+		
+		JWKSource<?> failover = new ImmutableJWKSet<>(new JWKSet(Arrays.asList((JWK)RSA_JWK_1, (JWK)RSA_JWK_2)));
+		
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, failover);
+
+		assertEquals(jwkSetURL, jwkSetSource.getJWKSetURL());
+		assertEquals(failover, jwkSetSource.getFailoverJWKSource());
+		assertNull(jwkSetSource.getCachedJWKSet());
+
+		List<JWK> matches = jwkSetSource.get(new JWKSelector(new JWKMatcher.Builder().keyID("1").build()), null);
+		
+		RSAKey m1 = (RSAKey) matches.get(0);
+		assertEquals(RSA_JWK_1.getPublicExponent(), m1.getPublicExponent());
+		assertEquals(RSA_JWK_1.getModulus(), m1.getModulus());
+		assertEquals("1", m1.getKeyID());
+		
+		assertEquals(1, matches.size());
+		
+		assertNull("Cache must not be updated with failover JWK set", jwkSetSource.getCachedJWKSet());
+	}
+
+
+	@Test
+	public void testWithFailoverJWKSource_remoteJWKSet()
+		throws Exception {
+		
+		JWKSet jwkSet = new JWKSet(Arrays.asList(RSA_JWK_1, (JWK)RSA_JWK_2));
+
+		URL jwkSetURL = new URL("http://localhost:" + port() + "/jwks.json");
+		URL failoverJWKSetURL = new URL("http://localhost:" + port() + "/failover-jwks.json");
+		
+		onRequest()
+			.havingMethodEqualTo("GET")
+			.havingPathEqualTo("/jwks.json")
+			.respond()
+			.withStatus(404);
+		
+		onRequest()
+			.havingMethodEqualTo("GET")
+			.havingPathEqualTo("/failover-jwks.json")
+			.respond()
 			.withStatus(200)
 			.withHeader("Content-Type", "application/json")
 			.withBody(JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true)));
+		
+		JWKSource<?> failover = new RemoteJWKSet<>(failoverJWKSetURL);
+		
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, failover);
+
+		assertEquals(jwkSetURL, jwkSetSource.getJWKSetURL());
+		assertEquals(failover, jwkSetSource.getFailoverJWKSource());
+		assertNull(jwkSetSource.getCachedJWKSet());
+
+		List<JWK> matches = jwkSetSource.get(new JWKSelector(new JWKMatcher.Builder().keyID("1").build()), null);
+		
+		RSAKey m1 = (RSAKey) matches.get(0);
+		assertEquals(RSA_JWK_1.getPublicExponent(), m1.getPublicExponent());
+		assertEquals(RSA_JWK_1.getModulus(), m1.getModulus());
+		assertEquals("1", m1.getKeyID());
+		
+		assertEquals(1, matches.size());
+		
+		assertNull("Cache must not be updated with failover JWK set", jwkSetSource.getCachedJWKSet());
+	}
+
+
+	@Test
+	public void testWithFailoverJWKSource_fail()
+		throws Exception {
+		
+		URL jwkSetURL = new URL("http://localhost:" + port() + "/jwks.json");
+		URL failoverJWKSetURL = new URL("http://localhost:" + port() + "/failover-jwks.json");
+		
+		onRequest()
+			.havingMethodEqualTo("GET")
+			.havingPathEqualTo("/jwks.json")
+			.respond()
+			.withStatus(404);
+		
+		onRequest()
+			.havingMethodEqualTo("GET")
+			.havingPathEqualTo("/failover-jwks.json")
+			.respond()
+			.withStatus(404);
+		
+		JWKSource<?> failover = new RemoteJWKSet<>(failoverJWKSetURL);
+		
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, failover);
+
+		assertEquals(jwkSetURL, jwkSetSource.getJWKSetURL());
+		assertEquals(failover, jwkSetSource.getFailoverJWKSource());
+		assertNull(jwkSetSource.getCachedJWKSet());
+
+		try {
+			jwkSetSource.get(new JWKSelector(new JWKMatcher.Builder().keyID("1").build()), null);
+			fail();
+		} catch (KeySourceException e) {
+			assertEquals(
+				"Couldn't retrieve remote JWK set: " + jwkSetURL +
+					"; Failover JWK source retrieval failed with: " +
+					"Couldn't retrieve remote JWK set: " + failoverJWKSetURL,
+				e.getMessage()
+			);
+			Throwable cause = e.getCause();
+			assertTrue(cause instanceof KeySourceException);
+			assertEquals("Couldn't retrieve remote JWK set: " + failoverJWKSetURL, cause.getMessage());
+		}
+	}
+
+
+	@Test
+	public void testInvalidJWKSetURL()
+		throws Exception {
+
+		URL jwkSetURL = new URL("http://localhost:" + port() + "/jwks.json");
+
+		onRequest()
+			.havingMethodEqualTo("GET")
+			.havingPathEqualTo("/jwks.json")
+			.respond()
+			.withStatus(404);
 
 		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL);
 
@@ -342,6 +460,50 @@ public class RemoteJWKSetTest {
 			assertTrue(e.getCause() instanceof SocketTimeoutException);
 			assertEquals("Read timed out", e.getCause().getMessage());
 		}
+	}
+
+
+	@Test
+	public void testTimeout_withFailover()
+		throws Exception {
+		
+		JWKSet jwkSet = new JWKSet(Arrays.asList(RSA_JWK_1, (JWK)RSA_JWK_2));
+		
+		URL jwkSetURL = new URL("http://localhost:" + port() + "/jwks.json");
+		URL failoverJWKSetURL = new URL("http://localhost:" + port() + "/failover-jwks.json");
+
+		onRequest()
+			.havingMethodEqualTo("GET")
+			.havingPathEqualTo("/jwks.json")
+			.respond()
+			.withDelay(800, TimeUnit.MILLISECONDS);
+		
+		onRequest()
+			.havingMethodEqualTo("GET")
+			.havingPathEqualTo("/failover-jwks.json")
+			.respond()
+			.withStatus(200)
+			.withHeader("Content-Type", "application/json")
+			.withBody(JSONObjectUtils.toJSONString(jwkSet.toJSONObject(true)));
+		
+		JWKSource<?> failover = new RemoteJWKSet<>(failoverJWKSetURL);
+		
+		RemoteJWKSet<?> jwkSetSource = new RemoteJWKSet<>(jwkSetURL, failover);
+		
+		assertEquals(jwkSetURL, jwkSetSource.getJWKSetURL());
+		assertEquals(failover, jwkSetSource.getFailoverJWKSource());
+		assertNull(jwkSetSource.getCachedJWKSet());
+		
+		List<JWK> matches = jwkSetSource.get(new JWKSelector(new JWKMatcher.Builder().keyID("1").build()), null);
+		
+		RSAKey m1 = (RSAKey) matches.get(0);
+		assertEquals(RSA_JWK_1.getPublicExponent(), m1.getPublicExponent());
+		assertEquals(RSA_JWK_1.getModulus(), m1.getModulus());
+		assertEquals("1", m1.getKeyID());
+		
+		assertEquals(1, matches.size());
+		
+		assertNull("Cache must not be updated with failover JWK set", jwkSetSource.getCachedJWKSet());
 	}
 
 

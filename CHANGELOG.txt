@@ -1400,3 +1400,7 @@ version 9.16 (2022-01-24)
 version 9.16.1 (2022-01-25)
     * Updates RemoteJWKSet for efficient cache updates when the
       RemoteJWKSet.get method is called from multiple threads (iss #457).
+
+version 9.17 (2022-01-30)
+    * RemoteJWKSet allows an optional failover JWKSource.
+
