@@ -18,11 +18,6 @@
 package com.nimbusds.jose.jwk;
 
 
-import com.nimbusds.jose.Algorithm;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.util.Base64;
-import com.nimbusds.jose.util.*;
-
 import java.io.Serializable;
 import java.net.URI;
 import java.security.*;
@@ -34,6 +29,11 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.text.ParseException;
 import java.util.*;
+
+import com.nimbusds.jose.Algorithm;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.util.Base64;
+import com.nimbusds.jose.util.*;
 
 
 /**
@@ -383,9 +383,10 @@ public abstract class JWK implements Serializable {
 		throws JOSEException {
 
 		return computeThumbprint("SHA-256");
+		
 	}
-
-
+	
+	
 	/**
 	 * Computes the thumbprint of this JWK using the specified hash
 	 * algorithm. See RFC 7638 for more information.
@@ -400,6 +401,22 @@ public abstract class JWK implements Serializable {
 		throws JOSEException {
 
 		return ThumbprintUtils.compute(hashAlg, this);
+	}
+	
+	
+	/**
+	 * Computes the SHA-256 thumbprint URI of this JWK. See RFC 7638 and
+	 * draft-ietf-oauth-jwk-thumbprint-uri for more information.
+	 *
+	 * @return The SHA-256 thumbprint URI.
+	 *
+	 * @throws JOSEException If the SHA-256 hash algorithm is not
+	 *                       supported.
+	 */
+	public ThumbprintURI computeThumbprintURI()
+		throws JOSEException {
+		
+		return new ThumbprintURI(computeThumbprint("SHA-256"));
 	}
 
 

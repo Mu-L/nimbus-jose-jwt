@@ -1407,3 +1407,7 @@ version 9.17 (2022-01-30)
       below com.google.crypto.tink:tink:1.6.1. These transitive dependencies
       are not required in the context of the Nimbus JOSE+JWT library and have
       recent reported vulnerabilities in the pulled versions.
+
+version 9.18 (2022-01-30)
+    * ThumbprintURI implements draft-ietf-oauth-jwk-thumbprint-uri-00.
+
