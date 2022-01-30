@@ -1403,4 +1403,7 @@ version 9.16.1 (2022-01-25)
 
 version 9.17 (2022-01-30)
     * RemoteJWKSet allows an optional failover JWKSource.
-
+    * Excludes com.google.protobuf:protobuf-java and com.google.code.gson:gson
+      below com.google.crypto.tink:tink:1.6.1. These transitive dependencies
+      are not required in the context of the Nimbus JOSE+JWT library and have
+      recent reported vulnerabilities in the pulled versions.
