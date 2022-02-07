@@ -61,7 +61,7 @@ import com.nimbusds.jwt.SignedJWT;
  * Tests the base JWK class.
  *
  * @author Vladimir Dzhuvinov
- * @version 2020-06-23
+ * @version 2022-02-07
  */
 public class JWKTest extends TestCase {
 	
@@ -76,7 +76,7 @@ public class JWKTest extends TestCase {
 		
 		assertEquals(expectedKeyType, jwk.getKeyType());
 		assertNull(jwk.getAlgorithm());
-		assertEquals(KeyUse.ENCRYPTION, jwk.getKeyUse());
+		assertNull(jwk.getKeyUse());
 		assertNull(jwk.getKeyOperations());
 		assertEquals(1, jwk.getX509CertChain().size());
 		assertNull(jwk.getX509CertThumbprint());

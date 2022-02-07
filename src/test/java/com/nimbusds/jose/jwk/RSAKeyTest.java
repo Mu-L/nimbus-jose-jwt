@@ -1302,7 +1302,7 @@ public class RSAKeyTest extends TestCase {
 		X509Certificate cert = X509CertUtils.parse(pemEncodedCert);
 		RSAKey rsaKey = RSAKey.parse(cert);
 		
-		assertEquals(KeyUse.ENCRYPTION, rsaKey.getKeyUse());
+		assertNull(rsaKey.getKeyUse());
 		assertEquals(cert.getSerialNumber().toString(10), rsaKey.getKeyID());
 		assertNotSame(pemEncodedCert, rsaKey.getX509CertChain().get(0).toString());
 		assertEquals(1, rsaKey.getX509CertChain().size());
@@ -1485,7 +1485,7 @@ public class RSAKeyTest extends TestCase {
 		
 		RSAKey rsaKey = RSAKey.load(keyStore, "1", null);
 		assertNotNull(rsaKey);
-		assertEquals(KeyUse.ENCRYPTION, rsaKey.getKeyUse());
+		assertNull(rsaKey.getKeyUse());
 		assertEquals("1", rsaKey.getKeyID());
 		assertEquals(1, rsaKey.getX509CertChain().size());
 		assertEquals(1, rsaKey.getParsedX509CertChain().size());

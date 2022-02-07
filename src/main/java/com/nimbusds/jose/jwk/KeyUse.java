@@ -18,12 +18,14 @@
 package com.nimbusds.jose.jwk;
 
 
-import com.nimbusds.jose.HeaderParameterNames;
-
 import java.io.Serializable;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+
+import com.nimbusds.jose.HeaderParameterNames;
 
 
 /**
@@ -159,15 +161,17 @@ public final class KeyUse implements Serializable {
 	
 	
 	/**
-	 * Infers the public key use of the specified X.509 certificate. Note
-	 * that there is no standard algorithm for mapping PKIX key usage to
-	 * JWK use. See RFC 2459, section 4.2.1.3, as well as the underlying
+	 * Infers the use of the public key in the specified X.509 certificate.
+	 * Note that there is no standard algorithm for mapping PKIX key usage
+	 * to JWK use. See RFC 2459, section 4.2.1.3, as well as the underlying
 	 * code for the chosen algorithm to infer JWK use.
 	 *
 	 * @param cert The X.509 certificate. Must not be {@code null}.
 	 *
-	 * @return The public key use, {@code null} if the key use couldn't be
-	 *         reliably determined.
+	 * @return The inferred public key use, {@code null} if the use of the
+	 *         public key is not specified by the X.509 certificate or the
+	 *         use maps to both {@link KeyUse#SIGNATURE} and
+	 *         {@link KeyUse#ENCRYPTION}.
 	 */
 	public static KeyUse from(final X509Certificate cert) {
 		
@@ -175,33 +179,42 @@ public final class KeyUse implements Serializable {
 			return null;
 		}
 		
-		// nonRepudiation
-		if (cert.getKeyUsage()[1]) {
-			return SIGNATURE;
+		Set<KeyUse> foundUses = new HashSet<>();
+		
+		// https://datatracker.ietf.org/doc/html/rfc2459#section-4.2.1.3
+		
+		// digitalSignature || nonRepudiation
+		if (cert.getKeyUsage()[0] || cert.getKeyUsage()[1]) {
+			foundUses.add(SIGNATURE);
 		}
 		
 		// digitalSignature && keyEncipherment
 		// (e.g. RSA TLS certificate for authenticated encryption)
 		if (cert.getKeyUsage()[0] && cert.getKeyUsage()[2]) {
-			return KeyUse.ENCRYPTION;
+			foundUses.add(KeyUse.ENCRYPTION);
 		}
 		
 		// digitalSignature && keyAgreement
 		// (e.g. EC TLS certificate for authenticated encryption)
 		if (cert.getKeyUsage()[0] && cert.getKeyUsage()[4]) {
-			return KeyUse.ENCRYPTION;
+			foundUses.add(KeyUse.ENCRYPTION);
 		}
 		
 		// keyEncipherment || dataEncipherment || keyAgreement
 		if (cert.getKeyUsage()[2] || cert.getKeyUsage()[3] || cert.getKeyUsage()[4]) {
-			return ENCRYPTION;
+			foundUses.add(ENCRYPTION);
 		}
 		
 		// keyCertSign || cRLSign
 		if (cert.getKeyUsage()[5] || cert.getKeyUsage()[6]) {
-			return SIGNATURE;
+			foundUses.add(SIGNATURE);
 		}
 		
-		return null;
+		if (foundUses.size() == 1) {
+			return foundUses.iterator().next();
+		} else {
+			// Cannot map cert usage to singular JWK use value
+			return null;
+		}
 	}
 }

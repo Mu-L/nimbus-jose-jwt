@@ -872,7 +872,7 @@ public class ECKeyTest extends TestCase {
 		
 		assertEquals(KeyType.EC, ecKey.getKeyType());
 		assertEquals(Curve.P_256, ecKey.getCurve());
-		assertEquals(KeyUse.ENCRYPTION, ecKey.getKeyUse());
+		assertNull(ecKey.getKeyUse());
 		assertEquals(cert.getSerialNumber().toString(10), ecKey.getKeyID());
 		assertEquals(1, ecKey.getX509CertChain().size());
 		assertNull(ecKey.getX509CertThumbprint());
@@ -975,7 +975,7 @@ public class ECKeyTest extends TestCase {
 		ECKey ecKey = ECKey.load(keyStore, "1", null);
 		assertNotNull(ecKey);
 		assertEquals(Curve.P_256, ecKey.getCurve());
-		assertEquals(KeyUse.ENCRYPTION, ecKey.getKeyUse());
+		assertNull(ecKey.getKeyUse());
 		assertEquals("1", ecKey.getKeyID());
 		assertEquals(1, ecKey.getX509CertChain().size());
 		assertNull(ecKey.getX509CertThumbprint());

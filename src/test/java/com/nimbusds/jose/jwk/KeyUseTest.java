@@ -44,7 +44,7 @@ import com.nimbusds.jose.util.X509CertUtils;
  * Tests the key use enumeration.
  *
  * @author Vladimir Dzhuvinov
- * @version 2022-01-24
+ * @version 2022-02-07
  */
 public class KeyUseTest extends TestCase {
 
@@ -120,7 +120,7 @@ public class KeyUseTest extends TestCase {
 		
 		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/ietf.crt"), StandardCharset.UTF_8);
 		X509Certificate x509Cert = X509CertUtils.parse(pemEncodedCert);
-		assertEquals(KeyUse.ENCRYPTION, KeyUse.from(x509Cert));
+		assertNull(KeyUse.from(x509Cert));
 	}
 	
 	
@@ -129,7 +129,7 @@ public class KeyUseTest extends TestCase {
 		
 		String pemEncodedCert = IOUtils.readFileToString(new File("src/test/resources/sample-certs/wikipedia.crt"), StandardCharset.UTF_8);
 		X509Certificate x509Cert = X509CertUtils.parse(pemEncodedCert);
-		assertEquals(KeyUse.ENCRYPTION, KeyUse.from(x509Cert));
+		assertNull(KeyUse.from(x509Cert));
 	}
 	
 	
