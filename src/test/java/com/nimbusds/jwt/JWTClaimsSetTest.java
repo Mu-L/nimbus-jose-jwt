@@ -989,6 +989,7 @@ public class JWTClaimsSetTest extends TestCase {
 		assertTrue(jwtClaimsSet.getClaims().containsKey(JWTClaimNames.SUBJECT));
 	}
 
+	
 	public void testEquals() throws ParseException {
 
 		String json = "{\"sub\":\"alice\",\"irt\":true,\"rft\":\"YWxpY2U.aHR0cDovL2NsaWVudDEuZXhhbXBsZS5jb20.rsKHqBpyEh-MMtllO7chHg\",\"aud\":[\"http:\\/\\/userinfo.example.com\"],\"iss\":\"http:\\/\\/oidc.example.com\",\"ate\":\"IDENTIFIER\",\"lng\":true,\"iat\":1420544052,\"cid\":\"http:\\/\\/client1.example.com\"}";
@@ -996,5 +997,31 @@ public class JWTClaimsSetTest extends TestCase {
 		JWTClaimsSet claimsB = JWTClaimsSet.parse(json);
 
 		assertEquals(claimsB, claimsA);
+	}
+	
+	
+	// https://bitbucket.org/connect2id/nimbus-jose-jwt/issues/462/
+	public void testParseNormalizesAudienceToStringArray() throws ParseException {
+	
+		String json = 
+			"{" +
+			"    \"iss\": \"my-client\"," +
+			"    \"sub\": \"my-client\"," +
+			"    \"aud\": \"https://server.example.org\"," +
+			"    \"jti\": \"my-jwt-001\"," +
+			"    \"exp\": 1744228361," +
+			"    \"iat\": 1644228361" +
+			"}";
+		
+		JWTClaimsSet claimsSet = JWTClaimsSet.parse(JSONObjectUtils.parse(json));
+		
+		try {
+			claimsSet.getStringClaim("aud");
+			fail();
+		} catch (ParseException e) {
+			assertEquals("The aud claim is not a String", e.getMessage());
+		}
+		
+		assertEquals(Collections.singletonList("https://server.example.org"), claimsSet.getStringListClaim("aud"));
 	}
 }
